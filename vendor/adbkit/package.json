@@ -1,0 +1,134 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "adbkit",
+        "scope": null,
+        "escapedName": "adbkit",
+        "name": "adbkit",
+        "rawSpec": "",
+        "spec": "latest",
+        "type": "tag"
+      },
+      "C:\\Users\\Administrator"
+    ]
+  ],
+  "_cnpm_publish_time": 1502281725689,
+  "_from": "adbkit@latest",
+  "_hasShrinkwrap": false,
+  "_id": "adbkit@2.11.0",
+  "_inCache": true,
+  "_location": "/adbkit",
+  "_nodeVersion": "8.1.2",
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages",
+    "tmp": "tmp/adbkit-2.11.0.tgz_1502281725540_0.030396183021366596"
+  },
+  "_npmUser": {
+    "name": "sorccu",
+    "email": "simo@shoqolate.com"
+  },
+  "_npmVersion": "5.0.3",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "adbkit",
+    "scope": null,
+    "escapedName": "adbkit",
+    "name": "adbkit",
+    "rawSpec": "",
+    "spec": "latest",
+    "type": "tag"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "https://registry.npmjs.org/adbkit/-/adbkit-2.11.0.tgz",
+  "_shasum": "9a8da51e62790f8bae5296b1c52614f69e4c2684",
+  "_shrinkwrap": null,
+  "_spec": "adbkit",
+  "_where": "C:\\Users\\Administrator",
+  "author": {
+    "name": "The OpenSTF Project",
+    "email": "contact@openstf.io",
+    "url": "https://openstf.io"
+  },
+  "bin": {
+    "adbkit": "./bin/adbkit"
+  },
+  "bugs": {
+    "url": "https://github.com/openstf/adbkit/issues"
+  },
+  "dependencies": {
+    "adbkit-logcat": "^1.1.0",
+    "adbkit-monkey": "~1.0.1",
+    "bluebird": "~2.9.24",
+    "commander": "^2.3.0",
+    "debug": "~2.6.3",
+    "node-forge": "^0.7.1",
+    "split": "~0.3.3"
+  },
+  "description": "A pure Node.js client for the Android Debug Bridge.",
+  "devDependencies": {
+    "bench": "~0.3.5",
+    "chai": "~2.2.0",
+    "coffee-script": "~1.9.1",
+    "coffeelint": "~1.9.3",
+    "grunt": "~0.4.5",
+    "grunt-cli": "~0.1.13",
+    "grunt-coffeelint": "0.0.13",
+    "grunt-contrib-clean": "~0.6.0",
+    "grunt-contrib-coffee": "~0.13.0",
+    "grunt-contrib-watch": "~0.6.1",
+    "grunt-exec": "~0.4.3",
+    "grunt-jsonlint": "~1.0.4",
+    "grunt-notify": "~0.4.1",
+    "mocha": "~2.2.1",
+    "sinon": "~1.14.1",
+    "sinon-chai": "~2.7.0"
+  },
+  "directories": {},
+  "dist": {
+    "shasum": "9a8da51e62790f8bae5296b1c52614f69e4c2684",
+    "size": 41852,
+    "noattachment": false,
+    "tarball": "http://registry.npm.taobao.org/adbkit/download/adbkit-2.11.0.tgz"
+  },
+  "engines": {
+    "node": ">= 0.10.4"
+  },
+  "gitHead": "0adc637a59690e1d9839e9559cac3956c7b4721b",
+  "homepage": "https://github.com/openstf/adbkit#readme",
+  "keywords": [
+    "adb",
+    "adbkit",
+    "android",
+    "logcat",
+    "monkey"
+  ],
+  "license": "Apache-2.0",
+  "main": "./index",
+  "maintainers": [
+    {
+      "name": "cyberagent",
+      "email": "npm@cyberagent.co.jp"
+    },
+    {
+      "name": "sorccu",
+      "email": "simo@shoqolate.com"
+    }
+  ],
+  "name": "adbkit",
+  "optionalDependencies": {},
+  "publish_time": 1502281725689,
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openstf/adbkit.git"
+  },
+  "scripts": {
+    "postpublish": "grunt clean",
+    "prepublish": "grunt test coffee",
+    "test": "grunt test"
+  },
+  "version": "2.11.0"
+}

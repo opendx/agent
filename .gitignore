@@ -1,0 +1,16 @@
+*.dex
+*.class
+gen/
+local.properties
+.classpath
+.project
+.DS_Store
+target
+.settings
+*.sw*
+*.un~
+*.idea/
+*.iml
+test-output/
+*.mp4
+*.jpg
