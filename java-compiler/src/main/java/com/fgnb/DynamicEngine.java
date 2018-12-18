@@ -60,6 +60,9 @@ public class DynamicEngine {
         long start = System.currentTimeMillis(); //记录开始编译时间
         //获取系统编译器
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        if(compiler == null){
+            throw new Error("获取java编译器失败，请检查java环境配置");
+        }
         // 建立DiagnosticCollector对象
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
 
