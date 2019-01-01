@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by jiangyitao.
  */
@@ -24,7 +27,9 @@ public class SeleniumController {
             return Response.fail("driverType不能为空");
         }
         if(driverType == DriverType.CHROME.getType()){
-            return Response.success("获取成功",SeleniumInitializer.getChromeDriverServicePort());
+            Map data = new HashMap();
+            data.put("port",SeleniumInitializer.getChromeDriverServicePort());
+            return Response.success("获取成功",data);
         }
         return Response.fail("driverType错误");
     }
