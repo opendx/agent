@@ -14,6 +14,7 @@ import com.fgnb.enums.DeviceMacacaStatus;
 import com.fgnb.enums.DeviceStatus;
 import com.fgnb.enums.DeviceStfStatus;
 import com.fgnb.enums.DeviceType;
+import com.fgnb.init.AppicationContextRegister;
 import com.fgnb.utils.NetUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,10 +49,16 @@ public class AndroidDeviceChangeService {
         log.info("[{}]已连接",deviceId);
 
         //等待设备上线
-        waitForDeviceOnline(iDevice);
+        try {
+            log.info("[{}]等待手机上线",deviceId);
+            AndroidUtils.waitForDeviceOnline(iDevice,10);
+            log.info("[{}]手机已上线",deviceId);
+        } catch (Exception e) {
+            throw new RuntimeException("等待手机上线出错",e);
+        }
 
         AndroidDevice androidDevice = AndroidDeviceHolder.getAndroidDevice(deviceId);
-        if(androidDevice == null){
+        if(androidDevice == null){//该agent未接入过该手机
             //第一次上线
             log.info("[{}]首次上线",deviceId);
             Device device = checkDeviceIsFirstAccessSystem(deviceId);
@@ -67,6 +74,7 @@ public class AndroidDeviceChangeService {
             }
             AndroidDeviceHolder.addAndroidDevice(deviceId,androidDevice);
         }
+
         Device device = androidDevice.getDevice();
         //设备ip地址
         device.setPhoneIp(AndroidUtils.getIp(iDevice));
@@ -76,6 +84,8 @@ public class AndroidDeviceChangeService {
         } catch (UnknownHostException e) {
             throw new RuntimeException("["+deviceId+"]获取agent ip失败",e);
         }
+        //agent port
+        device.setAgentPort(Integer.parseInt(AppicationContextRegister.getApplicationContext().getEnvironment().getProperty("server.port")));
         //闲置状态
         device.setStatus(DeviceStatus.IDLE.getStatus());
         //最后一次在线时间
@@ -136,20 +146,6 @@ public class AndroidDeviceChangeService {
             return device;
         } catch (Exception e) {
             throw new RuntimeException("["+deviceId+"]检查手机是否首次接入系统出错",e);
-        }
-    }
-    /**
-     * 等待设备上线
-     * @param iDevice
-     */
-    private void waitForDeviceOnline(IDevice iDevice){
-        String deviceId = iDevice.getSerialNumber();
-        try {
-            log.info("[{}]等待手机上线",deviceId);
-            AndroidUtils.waitForDeviceOnline(iDevice,10);
-            log.info("[{}]手机已上线",deviceId);
-        } catch (Exception e) {
-            throw new RuntimeException("等待手机上线出错",e);
         }
     }
 

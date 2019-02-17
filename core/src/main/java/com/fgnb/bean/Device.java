@@ -17,6 +17,8 @@ public class Device {
     private String phoneIp;
     /* agent ip */
     private String agentIp;
+    /* agent 端口 */
+    private Integer agentPort;
     /* 系统版本 */
     private String systemVersion;
     /* api版本 */

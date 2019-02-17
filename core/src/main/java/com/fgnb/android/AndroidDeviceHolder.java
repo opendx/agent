@@ -17,8 +17,4 @@ public class AndroidDeviceHolder {
     public static AndroidDevice getAndroidDevice(String deviceId){
         return androidDeviceHolder.get(deviceId);
     }
-
-    public static void removeIDevice(String deviceId){
-        androidDeviceHolder.remove(deviceId);
-    }
 }
