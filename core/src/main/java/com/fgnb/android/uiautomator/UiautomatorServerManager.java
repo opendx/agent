@@ -92,7 +92,7 @@ public class UiautomatorServerManager {
         try {
             AndroidUtils.forceStopApp(iDevice,PACKAGE_NAME);
         } catch (Exception e) {
-            log.error("[{}]强制关闭{}出错",deviceId,PACKAGE_NAME);
+            log.error("[{}]强制关闭{}出错",deviceId,PACKAGE_NAME,e);
         }
         startServerThread = new Thread(()->{
             CollectingOutputReceiver collectingOutputReceiver = new CollectingOutputReceiver();
@@ -111,7 +111,7 @@ public class UiautomatorServerManager {
         try {
             AndroidUtils.forceStopApp(iDevice,PACKAGE_NAME);
         } catch (Exception e) {
-            log.error("[{}]强制关闭{}出错",deviceId,PACKAGE_NAME);
+            log.error("[{}]强制关闭{}出错",deviceId,PACKAGE_NAME,e);
         }
         //2.removeForward
         if(androidDevice.isConnected()) {
