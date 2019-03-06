@@ -9,6 +9,8 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+
 /**
  * Created by jiangyitao.
  * 首次启动初始化器
@@ -24,7 +26,7 @@ public class AndroidInitializer implements ApplicationRunner{
     private String uiServerHost;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) throws IOException {
         log.info("UIServer -> {}",uiServerHost);
         //每次启动 都先杀掉adb server
         AdbManager.killAdbServer();

@@ -22,9 +22,10 @@ public class AdbManager {
 
     /**
      * 添加Android设备监听器
+     *
      * @param deviceChangeListener
      */
-    public static void addDeviceChangeListener(AndroidDebugBridge.IDeviceChangeListener deviceChangeListener){
+    public static void addDeviceChangeListener(AndroidDebugBridge.IDeviceChangeListener deviceChangeListener) {
         AndroidDebugBridge.addDeviceChangeListener(deviceChangeListener);
         log.info("DeviceChangeListener added");
     }
@@ -32,23 +33,20 @@ public class AdbManager {
     /**
      * 杀掉adb服务
      */
-    public static void killAdbServer(){
-        try {
-            log.info("start kill adb-server");
-            ShellExecutor.exec("adb kill-server");
-            log.info("kill adb-server success");
-        } catch (IOException e) {
-            log.error("kill adb server出错",e);
-        }
+    public static void killAdbServer() throws IOException {
+        log.info("start kill adb-server");
+        ShellExecutor.exec("adb kill-server");
+        log.info("kill adb-server success");
     }
 
     /**
      * 获取ADB
+     *
      * @return
      * @throws Exception
      */
-    public static synchronized AndroidDebugBridge getAdb() throws Exception {
-        if(androidDebugBridge == null){
+    public static synchronized AndroidDebugBridge getAdb() {
+        if (androidDebugBridge == null) {
             log.info("init adb");
             //初始化adb
             AndroidDebugBridge.init(false);
@@ -57,8 +55,8 @@ public class AdbManager {
             //等待adb连接 10s
             log.info("wait for adb connected");
             long start = System.currentTimeMillis();
-            while(System.currentTimeMillis()-start<=10000){
-                if(androidDebugBridge.isConnected()){
+            while (System.currentTimeMillis() - start <= 10000) {
+                if (androidDebugBridge.isConnected()) {
                     log.info("adb connected");
                     return androidDebugBridge;
                 }
@@ -67,20 +65,21 @@ public class AdbManager {
         log.info("adb has inited");
         return androidDebugBridge;
     }
+
     /**
      * 获取adb的位置
+     *
      * @return
      * @throws Exception
      */
-    private static String getAdbPath() throws Exception{
+    private static String getAdbPath() {
         String adbPath = System.getenv("ANDROID_HOME");
-        log.info("ANDROID_HOME ==> {}",adbPath);
-        if(StringUtils.isEmpty(adbPath)){
-            log.error("环境变量未配置ANDROID_HOME");
+        log.info("ANDROID_HOME ==> {}", adbPath);
+        if (StringUtils.isEmpty(adbPath)) {
             throw new RuntimeException("环境变量未配置ANDROID_HOME");
         }
-        adbPath = adbPath + File.separator + ADB_PLATFORM_TOOLS + File.separator+"adb";
-        log.info("adbPath ==> {}",adbPath);
+        adbPath = adbPath + File.separator + ADB_PLATFORM_TOOLS + File.separator + "adb";
+        log.info("adbPath ==> {}", adbPath);
         return adbPath;
     }
 }
