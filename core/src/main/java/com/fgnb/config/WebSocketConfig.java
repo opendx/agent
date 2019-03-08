@@ -1,4 +1,4 @@
-package com.fgnb.websocket;
+package com.fgnb.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
