@@ -40,39 +40,40 @@ public class AndroidDeviceChangeService {
     /**
      * 设备连接上，调用的方法
      * 注意这里是多线程调用，尽量不要用成员变量
+     *
      * @param iDevice
      * @throws Exception
      */
-    public void deviceConnected(IDevice iDevice){
+    public void deviceConnected(IDevice iDevice) {
 
         String deviceId = iDevice.getSerialNumber();
-        log.info("[{}]已连接",deviceId);
+        log.info("[{}]已连接", deviceId);
 
         //等待设备上线
         try {
-            log.info("[{}]等待手机上线",deviceId);
-            AndroidUtils.waitForDeviceOnline(iDevice,10);
-            log.info("[{}]手机已上线",deviceId);
+            log.info("[{}]等待手机上线", deviceId);
+            AndroidUtils.waitForDeviceOnline(iDevice, 10);
+            log.info("[{}]手机已上线", deviceId);
         } catch (Exception e) {
-            throw new RuntimeException("等待手机上线出错",e);
+            throw new RuntimeException("等待手机上线出错", e);
         }
 
         AndroidDevice androidDevice = AndroidDeviceHolder.getAndroidDevice(deviceId);
-        if(androidDevice == null){//该agent未接入过该手机
+        if (androidDevice == null) {//该agent未接入过该手机
             //第一次上线
-            log.info("[{}]首次上线",deviceId);
+            log.info("[{}]首次上线", deviceId);
             Device device = checkDeviceIsFirstAccessSystem(deviceId);
-            if (device == null){
+            if (device == null) {
                 //首次接入
-                log.info("[{}]首次接入系统",deviceId);
+                log.info("[{}]首次接入系统", deviceId);
                 androidDevice = initDevice(iDevice);
-            }else{
+            } else {
                 //接入过 首次上线
-                log.info("[{}]非首次接入系统",deviceId);
+                log.info("[{}]非首次接入系统", deviceId);
                 androidDevice = new AndroidDevice(device);
                 androidDevice.setIDevice(iDevice);
             }
-            AndroidDeviceHolder.addAndroidDevice(deviceId,androidDevice);
+            AndroidDeviceHolder.addAndroidDevice(deviceId, androidDevice);
         }
 
         Device device = androidDevice.getDevice();
@@ -82,7 +83,7 @@ public class AndroidDeviceChangeService {
         try {
             device.setAgentIp(NetUtil.getLocalHostAddress());
         } catch (UnknownHostException e) {
-            throw new RuntimeException("["+deviceId+"]获取agent ip失败",e);
+            throw new RuntimeException("[" + deviceId + "]获取agent ip失败", e);
         }
         //agent port
         device.setAgentPort(Integer.parseInt(AppicationContextRegister.getApplicationContext().getEnvironment().getProperty("server.port")));
@@ -94,31 +95,33 @@ public class AndroidDeviceChangeService {
         try {
             uiServerApi.save(device);
         } catch (Exception e) {
-            throw new RuntimeException("["+deviceId+"]保存手机信息到服务器失败",e);
+            throw new RuntimeException("[" + deviceId + "]保存手机信息到服务器失败", e);
         }
         //将手机状态改为已连接
         androidDevice.setIsConnected(true);
-        log.info("[{}]deviceConnected处理完成",deviceId);
+        log.info("[{}]deviceConnected处理完成", deviceId);
 
     }
 
     /**
      * 设备断开连接，调用的方法
      * 注意这里是多线程调用，尽量不要用成员变量
+     *
      * @param iDevice
      */
     public void deviceDisconnected(IDevice iDevice) {
         //设备id
         String deviceId = iDevice.getSerialNumber();
 
-        log.info("[{}]断开连接",deviceId);
+        log.info("[{}]断开连接", deviceId);
 
         AndroidDevice androidDevice = AndroidDeviceHolder.getAndroidDevice(deviceId);
         //有可能刚连上就断了 androidDevice还没初始化
-        if(androidDevice!=null) {
-            //将手机状态改为断开
-            androidDevice.setIsConnected(false);
+        if (androidDevice == null) {
+            return;
         }
+        //将手机状态改为断开
+        androidDevice.setIsConnected(false);
 
         //手机断开 回收minicap/minitouch/adbkit等占用的资源，如关闭输入输出流，端口释放等
         StfResourceReleaser stfResourceReleaser = new StfResourceReleaser(deviceId);
@@ -129,14 +132,15 @@ public class AndroidDeviceChangeService {
         try {
             uiServerApi.save(androidDevice.getDevice());
         } catch (Exception e) {
-            throw new RuntimeException("["+deviceId+"]手机离线失败",e);
+            throw new RuntimeException("[" + deviceId + "]手机离线失败", e);
         }
 
-        log.info("[{}]deviceDisconnected处理完成",deviceId);
+        log.info("[{}]deviceDisconnected处理完成", deviceId);
     }
 
     /**
      * 手机是否首次接入系统
+     *
      * @param deviceId
      * @return
      */
@@ -145,18 +149,19 @@ public class AndroidDeviceChangeService {
             Device device = uiServerApi.findById(deviceId);
             return device;
         } catch (Exception e) {
-            throw new RuntimeException("["+deviceId+"]检查手机是否首次接入系统出错",e);
+            throw new RuntimeException("[" + deviceId + "]检查手机是否首次接入系统出错", e);
         }
     }
 
     /**
      * 首次接入获取设备的信息
+     *
      * @param iDevice
      * @return
      */
     private AndroidDevice initDevice(IDevice iDevice) {
         File screenshot = null;
-        try{
+        try {
             Device device = new Device();
             device.setCreateTime(new Date());
             //设备id
@@ -192,14 +197,14 @@ public class AndroidDeviceChangeService {
             //手机macaca初始化成功
             device.setMacacaStatus(DeviceMacacaStatus.SUCCESS.getStatus());
             return androidDevice;
-        }catch (Exception e){
-            throw new RuntimeException("初始化设备失败",e);
-        }finally {
+        } catch (Exception e) {
+            throw new RuntimeException("初始化设备失败", e);
+        } finally {
             //删除首次接入系统的截图
-            if(screenshot != null){
+            if (screenshot != null) {
                 try {
                     screenshot.delete();
-                }catch (Exception e){
+                } catch (Exception e) {
                     //ignore
                 }
             }
@@ -208,26 +213,27 @@ public class AndroidDeviceChangeService {
 
     /**
      * 安装minicap minitouch uiautomatorServerApk
+     *
      * @param deviceId
      * @param androidDevice
      */
     private void installMinicapAndMinitouchAndUiAutomatorServerApk(String deviceId, AndroidDevice androidDevice) {
-        try{
+        try {
             //安装minicap
-            log.info("[{}]开始安装minicap",deviceId);
+            log.info("[{}]开始安装minicap", deviceId);
             MinicapManager minicapManager = new MinicapManager(androidDevice);
             minicapManager.installMinicap();
-            log.info("[{}]安装minicap成功",deviceId);
+            log.info("[{}]安装minicap成功", deviceId);
             //安装minitouch
-            log.info("[{}]开始安装minitouch",deviceId);
+            log.info("[{}]开始安装minitouch", deviceId);
             MinitouchManager minitouchManager = new MinitouchManager(androidDevice);
             minitouchManager.installMinitouch();
-            log.info("[{}]安装minitouch成功",deviceId);
+            log.info("[{}]安装minitouch成功", deviceId);
             //安装uiautomator2 server apk
             UiautomatorServerManager uiautomatorServerManager = new UiautomatorServerManager(androidDevice);
             uiautomatorServerManager.installServerApk();
-        }catch (Exception e){
-            throw new RuntimeException("安装minicap/minitouch/UiAutomatorServerApk出错",e);
+        } catch (Exception e) {
+            throw new RuntimeException("安装minicap/minitouch/UiAutomatorServerApk出错", e);
         }
     }
 
