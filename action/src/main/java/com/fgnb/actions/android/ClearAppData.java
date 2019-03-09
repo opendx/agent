@@ -1,25 +1,29 @@
 package com.fgnb.actions.android;
 
-import com.fgnb.actions.Action;
 import com.fgnb.actions.utils.AndroidUtil;
 import com.fgnb.actions.utils.MacacaUtil;
 import macaca.client.MacacaClient;
 
+import java.io.IOException;
+
 /**
  * Created by jiangyitao.
  */
-public class ClearAppData extends Action{
+public class ClearAppData {
+
+    private MacacaClient macacaClient;
 
     public ClearAppData(MacacaClient macacaClient) {
-        super(macacaClient);
+        this.macacaClient = macacaClient;
     }
 
-    @Override
-    public String excute(String... params) throws Exception {
-        String packageName = params[0];
+    /**
+     * 清除APP数据
+     * @param packageName
+     * @throws Exception
+     */
+    public void excute(String packageName) throws IOException {
         String deviceId = MacacaUtil.getDeviceId(macacaClient);
-
         AndroidUtil.clearAppData(deviceId,packageName);
-        return null;
     }
 }

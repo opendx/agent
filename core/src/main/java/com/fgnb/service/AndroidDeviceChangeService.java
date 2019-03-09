@@ -50,13 +50,9 @@ public class AndroidDeviceChangeService {
         log.info("[{}]已连接", deviceId);
 
         //等待设备上线
-        try {
-            log.info("[{}]等待手机上线", deviceId);
-            AndroidUtils.waitForDeviceOnline(iDevice, 10);
-            log.info("[{}]手机已上线", deviceId);
-        } catch (Exception e) {
-            throw new RuntimeException("等待手机上线出错", e);
-        }
+        log.info("[{}]等待手机上线", deviceId);
+        AndroidUtils.waitForDeviceOnline(iDevice, 10);
+        log.info("[{}]手机已上线", deviceId);
 
         AndroidDevice androidDevice = AndroidDeviceHolder.getAndroidDevice(deviceId);
         if (androidDevice == null) {//该agent未接入过该手机

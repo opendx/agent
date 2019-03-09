@@ -76,17 +76,21 @@ public class AndroidUtils {
      * @param maxWaitTimeSeconds
      * @throws Exception
      */
-    public static void waitForDeviceOnline(IDevice iDevice,long maxWaitTimeSeconds) throws Exception{
+    public static void waitForDeviceOnline(IDevice iDevice,long maxWaitTimeSeconds) {
         long startTime = System.currentTimeMillis();
         while(true){
             if(System.currentTimeMillis()-startTime>maxWaitTimeSeconds*1000){
                 log.error("[{}]设备在{}秒内没有上线",iDevice.getSerialNumber(),maxWaitTimeSeconds);
-                throw new Exception("设备未上线");
+                throw new RuntimeException("设备未上线");
             }
             if(iDevice.isOnline()){
                 return;
             }
-            Thread.sleep(1000);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                //ignore
+            }
         }
     }
 

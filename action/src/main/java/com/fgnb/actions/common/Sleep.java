@@ -1,23 +1,16 @@
 package com.fgnb.actions.common;
 
-import com.fgnb.actions.Action;
-import macaca.client.MacacaClient;
-
-import java.util.Map;
-
 /**
  * Created by jiangyitao.
  */
-public class Sleep extends Action {
+public class Sleep {
 
-    public Sleep(MacacaClient macacaClient) {
-        super(macacaClient);
-    }
-
-    @Override
-    public String excute(String... params) throws Exception {
-        long ms = Long.parseLong(params[0]);
+    /**
+     * 休眠
+     * @param params
+     */
+    public void excute(String params) throws InterruptedException {
+        long ms = Long.parseLong(params);
         Thread.sleep(ms);
-        return null;
     }
 }

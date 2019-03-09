@@ -48,20 +48,4 @@ public class ShellExecutor {
         }
 
     }
-
-    /**
-     * 执行命令 返回watchdog watchdog可杀掉执行的进程
-     *
-     * @param cmd
-     * @return
-     * @throws IOException
-     */
-    public static ExecuteWatchdog execReturnWatchdog(String cmd) throws IOException {
-        CommandLine commandLine = CommandLine.parse(cmd);
-        ExecuteWatchdog watchdog = new ExecuteWatchdog(Integer.MAX_VALUE);
-        DefaultExecutor executor = new DefaultExecutor();
-        executor.setWatchdog(watchdog);
-        executor.execute(commandLine, new DefaultExecuteResultHandler());
-        return watchdog;
-    }
 }

@@ -1,20 +1,20 @@
 package com.fgnb.actions.macaca;
 
-import com.fgnb.actions.Action;
 import macaca.client.MacacaClient;
 
 
 /**
  * Created by jiangyitao.
  */
-public class PressHome extends Action {
+public class PressHome {
+
+    private MacacaClient macacaClient;
+
     public PressHome(MacacaClient macacaClient) {
-        super(macacaClient);
+        this.macacaClient = macacaClient;
     }
 
-    @Override
-    public String excute(String... params) throws Exception {
+    public void excute() throws Exception {
         macacaClient.keys("3");
-        return null;
     }
 }

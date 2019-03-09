@@ -1,5 +1,7 @@
 package com.fgnb.actions.utils;
 
+import java.io.IOException;
+
 /**
  * Created by jiangyitao.
  */
@@ -9,9 +11,8 @@ public class AndroidUtil {
     /**
      * 执行命令
      * @param cmd
-     * @throws Exception
      */
-    public static void excuteCmd(String deviceId,String cmd) throws Exception{
+    public static void excuteCmd(String deviceId,String cmd) throws IOException {
         System.out.println("["+deviceId+"]执行 -> "+cmd);
         String result = ShellExecutor.execReturnResult("adb -s " + deviceId + " shell \"" + cmd + "\"");
         System.out.println("["+deviceId+"]返回 <- "+result);
@@ -21,9 +22,8 @@ public class AndroidUtil {
      * push APK到手机
      * @param deviceId
      * @param localAppPath
-     * @throws Exception
      */
-    public static String pushAppToDeviceByAdbShell(String deviceId,String localAppPath) throws Exception{
+    public static String pushAppToDeviceByAdbShell(String deviceId,String localAppPath) throws IOException {
         String remoteApkPath = DEVICE_FILE_PATH+"/autoTest.apk";
         String cmd = "adb -s " + deviceId + " push "+localAppPath+" "+remoteApkPath;
         System.out.println("["+deviceId+"]push APP到手机:"+cmd);
@@ -35,9 +35,8 @@ public class AndroidUtil {
      * 安装Android APP
      * @param deviceId
      * @param phoneAppPath
-     * @throws Exception
      */
-    public static void installAppByAdbShell(String deviceId,String phoneAppPath) throws Exception {
+    public static void installAppByAdbShell(String deviceId,String phoneAppPath) throws IOException {
         String cmd = "pm install -t "+phoneAppPath;
         System.out.println("["+deviceId+"]安装android app:"+cmd);
         excuteCmd(deviceId,cmd);
@@ -48,9 +47,8 @@ public class AndroidUtil {
      * @param deviceId
      * @param packageName
      * @param launchActivity
-     * @throws Exception
      */
-    public static void restartAppByAdbShell(String deviceId,String packageName,String launchActivity) throws Exception {
+    public static void restartAppByAdbShell(String deviceId,String packageName,String launchActivity) throws IOException {
         String cmd = "am start -S -n "+packageName+"/"+launchActivity;
         System.out.println("["+deviceId+"]重启APP:"+cmd);
         excuteCmd(deviceId,cmd);
@@ -62,7 +60,7 @@ public class AndroidUtil {
      * @param packageName
      * @throws Exception
      */
-    public static void clearAppData(String deviceId,String packageName) throws Exception {
+    public static void clearAppData(String deviceId,String packageName) throws IOException {
         String cmd = "pm clear "+packageName;
         System.out.println("["+deviceId+"]清除APP数据:"+cmd);
         excuteCmd(deviceId,cmd);
@@ -72,9 +70,8 @@ public class AndroidUtil {
      * 卸载Android APP
      * @param deviceId
      * @param appPackage
-     * @throws Exception
      */
-    public static void uninstallAppByAdbShell(String deviceId,String appPackage) throws Exception {
+    public static void uninstallAppByAdbShell(String deviceId,String appPackage) throws IOException {
         String cmd = "adb -s "+deviceId + " uninstall "+appPackage;
         System.out.println("["+deviceId+"]卸载android app:"+cmd);
         ShellExecutor.exec(cmd);
@@ -85,9 +82,8 @@ public class AndroidUtil {
      * @param deviceId
      * @param appPackage
      * @return
-     * @throws Exception
      */
-    public static boolean isInstalledApp(String deviceId,String appPackage) throws Exception {
+    public static boolean isInstalledApp(String deviceId,String appPackage) throws IOException {
         String cmd = "adb -s " + deviceId + " shell \"pm list packages|grep " + appPackage + "\"";
         System.out.println("[" + deviceId + "]检查是否安装了APP:" + cmd);
         String result = ShellExecutor.execReturnResult(cmd);

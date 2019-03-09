@@ -1,26 +1,31 @@
 package com.fgnb.actions.android;
 
-import com.fgnb.actions.Action;
 import com.fgnb.actions.utils.AndroidUtil;
 import com.fgnb.actions.utils.MacacaUtil;
-import com.fgnb.actions.utils.ShellExecutor;
 import macaca.client.MacacaClient;
+
+import java.io.IOException;
 
 
 /**
  * Created by jiangyitao.
  */
-public class ExcuteAdbShell extends Action {
+public class ExcuteAdbShell {
+
+    private MacacaClient macacaClient;
+
     public ExcuteAdbShell(MacacaClient macacaClient) {
-        super(macacaClient);
+        this.macacaClient = macacaClient;
     }
 
-    @Override
-    public String excute(String... params) throws Exception {
+    /**
+     * 执行adb命令
+     * @param cmd
+     * @throws IOException
+     */
+    public void excute(String cmd) throws IOException {
         String deviceId = MacacaUtil.getDeviceId(macacaClient);
-        String cmd = params[0];
         System.out.println("["+deviceId+"]执行adb shell命令:"+cmd);
         AndroidUtil.excuteCmd(deviceId,cmd);
-        return null;
     }
 }
