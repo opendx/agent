@@ -13,6 +13,7 @@ public class ShellExecutor {
 
     /**
      * 执行命令
+     *
      * @param cmd
      * @throws IOException
      */
@@ -22,6 +23,7 @@ public class ShellExecutor {
 
     /**
      * 执行命令返回执行结果
+     *
      * @param cmd
      * @return
      * @throws IOException
@@ -39,9 +41,7 @@ public class ShellExecutor {
         try {
             executor.execute(commandLine);
             return outputStream.toString() + errorStream.toString();
-        }catch (IOException e){
-            throw e;
-        }finally {
+        } finally {
             outputStream.close();
             errorStream.close();
         }
@@ -50,6 +50,7 @@ public class ShellExecutor {
 
     /**
      * 执行命令 返回watchdog watchdog可杀掉执行的进程
+     *
      * @param cmd
      * @return
      * @throws IOException
@@ -59,7 +60,7 @@ public class ShellExecutor {
         ExecuteWatchdog watchdog = new ExecuteWatchdog(Integer.MAX_VALUE);
         DefaultExecutor executor = new DefaultExecutor();
         executor.setWatchdog(watchdog);
-        executor.execute(commandLine,new DefaultExecuteResultHandler());
+        executor.execute(commandLine, new DefaultExecuteResultHandler());
         return watchdog;
     }
 }
