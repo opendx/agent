@@ -47,7 +47,7 @@ public class AndroidDevice {
             while(true){
                 try {
                     Map<String,String> codes = taskQueue.take();
-                    log.info("[{}]准备执行测试任务",device.getDeviceId());
+                    log.info("[{}]准备执行测试任务",device.getId());
 
                     Excutor excutor = new Excutor();
 
@@ -57,11 +57,11 @@ public class AndroidDevice {
                         Class clazz = excutor.compiler(fullClassName, codes.get(fullClassName));
                         classes.add(clazz);
                     }
-                    log.info("[{}]开始执行测试任务",device.getDeviceId());
+                    log.info("[{}]开始执行测试任务",device.getId());
                     excutor.runTestCasesByTestNG(classes.toArray(new Class[classes.size()]));
-                    log.info("[{}]执行测试任务完成",device.getDeviceId());
+                    log.info("[{}]执行测试任务完成",device.getId());
                 } catch (Exception e) {
-                    log.error("[{}]执行测试任务出现出错",device.getDeviceId(),e);
+                    log.error("[{}]执行测试任务出现出错",device.getId(),e);
                 } finally {
                     //如果设备还处于连接电脑状态 则将设备改为闲置
                     if(isConnected){

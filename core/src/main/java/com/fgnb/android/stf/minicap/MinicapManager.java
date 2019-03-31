@@ -35,7 +35,7 @@ public class MinicapManager {
     public MinicapManager(AndroidDevice androidDevice){
         this.androidDevice = androidDevice;
         iDevice = androidDevice.getIDevice();
-        deviceId = androidDevice.getDevice().getDeviceId();
+        deviceId = androidDevice.getDevice().getId();
     }
 
     /**

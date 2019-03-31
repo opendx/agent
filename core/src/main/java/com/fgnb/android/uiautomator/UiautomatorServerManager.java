@@ -28,7 +28,7 @@ public class UiautomatorServerManager {
     public UiautomatorServerManager(AndroidDevice androidDevice){
         this.androidDevice = androidDevice;
         this.iDevice = androidDevice.getIDevice();
-        this.deviceId = androidDevice.getDevice().getDeviceId();
+        this.deviceId = androidDevice.getDevice().getId();
     }
 
     /**

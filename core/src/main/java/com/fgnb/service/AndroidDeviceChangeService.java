@@ -73,8 +73,6 @@ public class AndroidDeviceChangeService {
         }
 
         Device device = androidDevice.getDevice();
-        //设备ip地址
-        device.setPhoneIp(AndroidUtils.getIp(iDevice));
         //agent ip
         try {
             device.setAgentIp(NetUtil.getLocalHostAddress());
@@ -161,7 +159,7 @@ public class AndroidDeviceChangeService {
             Device device = new Device();
             device.setCreateTime(new Date());
             //设备id
-            device.setDeviceId(iDevice.getSerialNumber());
+            device.setId(iDevice.getSerialNumber());
             // api level
             device.setApiLevel(AndroidUtils.getApiLevel(iDevice));
             // cpu架构
@@ -171,13 +169,13 @@ public class AndroidDeviceChangeService {
             //内存
             device.setMemSize(AndroidUtils.getMemSize(iDevice));
             //设备名
-            device.setDeviceName(AndroidUtils.getDeviceName(iDevice));
+            device.setName(AndroidUtils.getDeviceName(iDevice));
             //安卓版本
             device.setSystemVersion(AndroidUtils.getAndroidVersion(iDevice));
             //屏幕分辨率
             device.setResolution(AndroidUtils.getResolution(iDevice));
             //设备类型
-            device.setDeviceType(DeviceType.ANDROID.getType());
+            device.setType(DeviceType.ANDROID.getType());
             //截图并上传到服务器
             screenshot = AndroidUtils.screenshot(iDevice);
             String downloadURL = uiServerApi.uploadFile(screenshot);

@@ -31,7 +31,7 @@ public class MinitouchManager {
     public MinitouchManager(AndroidDevice androidDevice){
         this.androidDevice = androidDevice;
         iDevice = androidDevice.getIDevice();
-        deviceId = androidDevice.getDevice().getDeviceId();
+        deviceId = androidDevice.getDevice().getId();
     }
 
     public int getMinitouchPort() {

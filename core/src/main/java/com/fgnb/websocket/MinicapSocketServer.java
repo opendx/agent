@@ -61,7 +61,7 @@ public class MinicapSocketServer {
 		//检测手机是否闲置
 		if(androidDevice.getDevice().getStatus() != DeviceStatus.IDLE.getStatus()){
 			log.info("[{}]设备未处于闲置状态",deviceId);
-			WebSocketUtil.sendText(session,deviceId+"设备未处于闲置状态,"+androidDevice.getDevice().getUserName()+"使用中");
+			WebSocketUtil.sendText(session,deviceId+"设备未处于闲置状态,"+androidDevice.getDevice().getUsername()+"使用中");
 			return;
 		}
 
@@ -112,7 +112,7 @@ public class MinicapSocketServer {
 		//minicap连接成功 则把手机改为使用中
 		Device device = AndroidDeviceHolder.getAndroidDevice(deviceId).getDevice();
 		device.setStatus(DeviceStatus.USING.getStatus());
-		device.setUserName(userName);
+		device.setUsername(userName);
 		uiServerApi.save(device);
 		log.info("[{}]数据库状态改为使用中",deviceId);
 
