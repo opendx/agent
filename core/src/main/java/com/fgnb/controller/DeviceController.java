@@ -3,11 +3,10 @@ package com.fgnb.controller;
 import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
 import com.fgnb.android.uiautomator.UiautomatorServerManager;
-import com.fgnb.enums.DeviceStatus;
+import com.fgnb.model.Device;
 import com.fgnb.vo.Response;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,7 +42,7 @@ public class DeviceController {
             deviceInfo.setCanUse(false);
             return Response.fail(deviceInfo);
         }
-        if(androidDevice.getDevice().getStatus() != DeviceStatus.IDLE.getStatus()){
+        if(androidDevice.getDevice().getStatus() != Device.IDLE_STATUS){
             deviceInfo.setMsg("设备未闲置");
             deviceInfo.setCanUse(false);
             return Response.fail(deviceInfo);
@@ -55,7 +54,7 @@ public class DeviceController {
             deviceInfo.setPort(port);
             deviceInfo.setMsg("启动UiAutomatorServer成功");
             //将设备改为使用中 防止其他人远程操控
-            androidDevice.getDevice().setStatus(DeviceStatus.USING.getStatus());
+            androidDevice.getDevice().setStatus(Device.USING_STATUS);
         } catch (Exception e) {
             log.error("[{}]启动uiautomator服务失败",deviceId,e);
             deviceInfo.setMsg(e.getMessage());

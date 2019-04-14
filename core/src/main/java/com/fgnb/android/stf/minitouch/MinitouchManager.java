@@ -3,6 +3,7 @@ package com.fgnb.android.stf.minitouch;
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.NullOutputReceiver;
 import com.fgnb.android.AndroidDevice;
+import com.fgnb.android.AndroidUtils;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -89,7 +90,7 @@ public class MinitouchManager {
      */
     public void installMinitouch() throws Exception{
 
-        String cpuAbi = androidDevice.getDevice().getCpuAbi();
+        String cpuAbi = AndroidUtils.getCpuAbi(iDevice);
 
         String minitouchFilePath = "vendor/minitouch/" + cpuAbi + "/minitouch";
 

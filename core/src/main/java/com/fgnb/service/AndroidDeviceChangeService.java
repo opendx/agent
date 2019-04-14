@@ -9,9 +9,8 @@ import com.fgnb.android.stf.minicap.MinicapManager;
 import com.fgnb.android.stf.minitouch.MinitouchManager;
 import com.fgnb.android.uiautomator.UiautomatorServerManager;
 import com.fgnb.api.UIServerApi;
-import com.fgnb.bean.Device;
+import com.fgnb.model.Device;
 import com.fgnb.enums.DeviceMacacaStatus;
-import com.fgnb.enums.DeviceStatus;
 import com.fgnb.enums.DeviceStfStatus;
 import com.fgnb.enums.DeviceType;
 import com.fgnb.init.AppicationContextRegister;
@@ -82,7 +81,7 @@ public class AndroidDeviceChangeService {
         //agent port
         device.setAgentPort(Integer.parseInt(AppicationContextRegister.getApplicationContext().getEnvironment().getProperty("server.port")));
         //闲置状态
-        device.setStatus(DeviceStatus.IDLE.getStatus());
+        device.setStatus(Device.IDLE_STATUS);
         //最后一次在线时间
         device.setLastOnlineTime(new Date());
         //上报服务器
@@ -121,7 +120,7 @@ public class AndroidDeviceChangeService {
         StfResourceReleaser stfResourceReleaser = new StfResourceReleaser(deviceId);
         stfResourceReleaser.release();
 
-        androidDevice.getDevice().setStatus(DeviceStatus.OFFLINE.getStatus());
+        androidDevice.getDevice().setStatus(Device.OFFLINE_STATUS);
         androidDevice.getDevice().setLastOfflineTime(new Date());
         try {
             uiServerApi.save(androidDevice.getDevice());
@@ -160,10 +159,6 @@ public class AndroidDeviceChangeService {
             device.setCreateTime(new Date());
             //设备id
             device.setId(iDevice.getSerialNumber());
-            // api level
-            device.setApiLevel(AndroidUtils.getApiLevel(iDevice));
-            // cpu架构
-            device.setCpuAbi(AndroidUtils.getCpuAbi(iDevice));
             //cpu
             device.setCpuInfo(AndroidUtils.getCpuInfo(iDevice));
             //内存

@@ -331,9 +331,6 @@ public class MinicapDataHandler {
         cursor += 1;
         readBannerBytes += 1;
 
-        if (readBannerBytes == bannerLength) {
-            log.debug(banner.toString());
-        }
         return cursor;
     }
 }

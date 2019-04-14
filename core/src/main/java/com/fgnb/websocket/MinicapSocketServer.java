@@ -5,8 +5,7 @@ import com.fgnb.android.AndroidDeviceHolder;
 import com.fgnb.android.stf.minicap.MinicapDataHandler;
 import com.fgnb.android.stf.minicap.MinicapManager;
 import com.fgnb.api.UIServerApi;
-import com.fgnb.bean.Device;
-import com.fgnb.enums.DeviceStatus;
+import com.fgnb.model.Device;
 import com.fgnb.init.AppicationContextRegister;
 import com.fgnb.service.AndroidDeviceService;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +58,7 @@ public class MinicapSocketServer {
 			return;
 		}
 		//检测手机是否闲置
-		if(androidDevice.getDevice().getStatus() != DeviceStatus.IDLE.getStatus()){
+		if(androidDevice.getDevice().getStatus() != Device.IDLE_STATUS){
 			log.info("[{}]设备未处于闲置状态",deviceId);
 			WebSocketUtil.sendText(session,deviceId+"设备未处于闲置状态,"+androidDevice.getDevice().getUsername()+"使用中");
 			return;
@@ -111,7 +110,7 @@ public class MinicapSocketServer {
 
 		//minicap连接成功 则把手机改为使用中
 		Device device = AndroidDeviceHolder.getAndroidDevice(deviceId).getDevice();
-		device.setStatus(DeviceStatus.USING.getStatus());
+		device.setStatus(Device.USING_STATUS);
 		device.setUsername(userName);
 		uiServerApi.save(device);
 		log.info("[{}]数据库状态改为使用中",deviceId);
@@ -151,9 +150,9 @@ public class MinicapSocketServer {
 			//minicap总是比minitouch/adbkit等晚很多关闭，所以只要minicap websocket关闭 则意味着手机可以变为闲置了
 			Device device = AndroidDeviceHolder.getAndroidDevice(deviceId).getDevice();
 			//因为手机可能被拔出离线，AndroidDeviceChangeService.deviceDisconnected已经在数据库改为离线，这里不能改为闲置
-			if(device!=null && device.getStatus() == DeviceStatus.USING.getStatus()){
+			if(device!=null && device.getStatus() == Device.USING_STATUS){
 				//将设备改为闲置
-				device.setStatus(DeviceStatus.IDLE.getStatus());
+				device.setStatus(Device.IDLE_STATUS);
 				try {
 					uiServerApi.save(device);
 				} catch (Exception e) {

@@ -3,6 +3,7 @@ package com.fgnb.android.stf.minicap;
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.NullOutputReceiver;
 import com.fgnb.android.AndroidDevice;
+import com.fgnb.android.AndroidUtils;
 import com.fgnb.init.AppicationContextRegister;
 import lombok.extern.slf4j.Slf4j;
 
@@ -102,8 +103,8 @@ public class MinicapManager {
      */
     public void installMinicap() throws Exception{
 
-        String cpuAbi = androidDevice.getDevice().getCpuAbi();
-        String apiLevel = androidDevice.getDevice().getApiLevel();
+        String cpuAbi = AndroidUtils.getCpuAbi(iDevice);
+        String apiLevel = AndroidUtils.getApiLevel(iDevice) ;
 
         String minicapFilePath = "vendor/minicap/bin/" + cpuAbi + "/minicap";
         String minicapSoFilePath = "vendor/minicap/shared/android-" + apiLevel + "/" + cpuAbi + "/minicap.so";

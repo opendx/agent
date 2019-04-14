@@ -6,8 +6,8 @@ import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
 import com.fgnb.android.stf.minitouch.Minitouch;
 import com.fgnb.android.stf.minitouch.MinitouchManager;
-import com.fgnb.enums.DeviceStatus;
 import com.fgnb.init.AppicationContextRegister;
+import com.fgnb.model.Device;
 import com.fgnb.service.AndroidDeviceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -57,7 +57,7 @@ public class MinitouchSocketServer {
 			return;
 		}
 		//检测手机是否闲置
-		if(androidDevice.getDevice().getStatus() != DeviceStatus.IDLE.getStatus()){
+		if(androidDevice.getDevice().getStatus() != Device.IDLE_STATUS){
 			log.info("[{}]设备未处于闲置状态",deviceId);
 			WebSocketUtil.sendText(session,deviceId+"设备未处于闲置状态");
 			return;

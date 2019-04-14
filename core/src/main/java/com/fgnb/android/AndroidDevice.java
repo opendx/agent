@@ -3,8 +3,7 @@ package com.fgnb.android;
 import com.android.ddmlib.IDevice;
 import com.fgnb.android.uiautomator.UiautomatorServerManager;
 import com.fgnb.api.UIServerApi;
-import com.fgnb.bean.Device;
-import com.fgnb.enums.DeviceStatus;
+import com.fgnb.model.Device;
 import com.fgnb.excutor.Excutor;
 import com.fgnb.init.AppicationContextRegister;
 import lombok.extern.slf4j.Slf4j;
@@ -69,7 +68,7 @@ public class AndroidDevice {
                             //停掉执行自动化测试的uiautomatorserver
                             uiautomatorServerManager.stopServer();
                         }
-                        device.setStatus(DeviceStatus.IDLE.getStatus());
+                        device.setStatus(Device.IDLE_STATUS);
                         try {
                             uiServerApi.save(device);
                         } catch (Exception e) {
