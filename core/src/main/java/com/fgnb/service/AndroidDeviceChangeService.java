@@ -10,9 +10,6 @@ import com.fgnb.android.stf.minitouch.MinitouchManager;
 import com.fgnb.android.uiautomator.UiautomatorServerManager;
 import com.fgnb.api.UIServerApi;
 import com.fgnb.model.Device;
-import com.fgnb.enums.DeviceMacacaStatus;
-import com.fgnb.enums.DeviceStfStatus;
-import com.fgnb.enums.DeviceType;
 import com.fgnb.init.AppicationContextRegister;
 import com.fgnb.utils.NetUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -170,7 +167,7 @@ public class AndroidDeviceChangeService {
             //屏幕分辨率
             device.setResolution(AndroidUtils.getResolution(iDevice));
             //设备类型
-            device.setType(DeviceType.ANDROID.getType());
+            device.setType(Device.ANDROID_TYPE);
             //截图并上传到服务器
             screenshot = AndroidUtils.screenshot(iDevice);
             String downloadURL = uiServerApi.uploadFile(screenshot);
@@ -182,9 +179,9 @@ public class AndroidDeviceChangeService {
             //安装minicap minitouch uiautomatorServerApk
             installMinicapAndMinitouchAndUiAutomatorServerApk(iDevice.getSerialNumber(), androidDevice);
             // 手机stf初始化成功
-            device.setStfStatus(DeviceStfStatus.SUCCESS.getStatus());
+            device.setStfStatus(1);
             //手机macaca初始化成功
-            device.setMacacaStatus(DeviceMacacaStatus.SUCCESS.getStatus());
+            device.setMacacaStatus(1);
             return androidDevice;
         } catch (Exception e) {
             throw new RuntimeException("初始化设备失败", e);

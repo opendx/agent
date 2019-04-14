@@ -28,7 +28,7 @@ import static io.restassured.RestAssured.given;
 public class TestListenerForTestCase extends TestListenerAdapter {
 
     //ui-server resources配置文件中 eg.http://192.168.1.101:8081
-    private static final String UI_SERVER_BASE_URL = AppicationContextRegister.getApplicationContext().getEnvironment().getProperty("uiServerHost");
+    private static final String UI_SERVER_BASE_URL = AppicationContextRegister.getApplicationContext().getEnvironment().getProperty("server");
 
     //设备开始测试
     private static final String TEST_TASK_DEVICE_START = UI_SERVER_BASE_URL + "/testTaskDevice/start";

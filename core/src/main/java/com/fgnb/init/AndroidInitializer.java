@@ -22,12 +22,12 @@ public class AndroidInitializer implements ApplicationRunner{
     @Autowired
     private DeviceChangeListener deviceChangeListener;
 
-    @Value("${uiServerHost}")
-    private String uiServerHost;
+    @Value("${server}")
+    private String server;
 
     @Override
     public void run(ApplicationArguments args) throws IOException {
-        log.info("UIServer -> {}",uiServerHost);
+        log.info("UIServer -> {}",server);
         //每次启动 都先杀掉adb server
         AdbManager.killAdbServer();
         //初始化adb

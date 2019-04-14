@@ -22,17 +22,17 @@ import static io.restassured.RestAssured.given;
 @Slf4j
 public class UIServerApi {
 
-    @Value("${uiServerHost}/device/add")
+    @Value("${server}/device/add")
     private String addNewDeviceApi;
 
     //查找手机
-    @Value("${uiServerHost}/device/list")
+    @Value("${server}/device/list")
     private String findDeviceApi;
     //上传文件
-    @Value("${uiServerHost}/upload/file")
+    @Value("${server}/upload/file")
     private String uploadFileApi;
     //设备在线
-    @Value("${uiServerHost}/device/save")
+    @Value("${server}/device/save")
     private String deviceSaveApi;
 
     /**
