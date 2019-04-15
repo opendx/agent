@@ -18,9 +18,8 @@ public class NetUtil {
     /**
      * 检测本地端口是否可用
      *
-     * @param port
-     *            端口号
-     * @return 如果可用返回true,不可用返回false
+     * @param port 端口号
+     * @return 如果可用返回true, 不可用返回false
      */
     public static boolean isPortAvailable(int port) {
         try {
@@ -28,19 +27,23 @@ public class NetUtil {
             bindPort("0.0.0.0", port);
             return true;
         } catch (IOException e) {
-            log.warn("检测端口:" + port + " 被占用");
+            log.info("端口:" + port + " 被占用");
         }
         return false;
     }
 
     private static void bindPort(String host, int port) throws IOException {
         Socket s = new Socket();
-        s.bind(new InetSocketAddress(host, port));
-        s.close();
+        try {
+            s.bind(new InetSocketAddress(host, port));
+        } finally {
+            s.close();
+        }
     }
 
     /**
      * 获取本机ip
+     *
      * @return
      */
     public static String getLocalHostAddress() throws UnknownHostException {

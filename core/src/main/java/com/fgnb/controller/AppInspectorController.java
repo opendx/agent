@@ -1,7 +1,7 @@
 package com.fgnb.controller;
 
 import com.fgnb.service.AppInspectorService;
-import com.fgnb.vo.Response;
+import com.fgnb.model.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +34,7 @@ public class AppInspectorController {
             return Response.success("获取截图成功",appInspectorService.getScreenShot(deviceId));
         } catch (Exception e) {
             log.error("截图出错",e);
-            return Response.error("截图失败",e.getMessage());
+            return Response.error("截图失败");
         }
     }
 

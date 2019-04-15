@@ -2,10 +2,11 @@ package com.fgnb.android;
 
 import com.android.ddmlib.IDevice;
 import com.fgnb.android.uiautomator.UiautomatorServerManager;
-import com.fgnb.api.UIServerApi;
+import com.fgnb.api.ServerApi;
 import com.fgnb.model.Device;
 import com.fgnb.excutor.Excutor;
-import com.fgnb.init.AppicationContextRegister;
+import com.fgnb.App;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -18,29 +19,21 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Created by jiangyitao.
  */
 @Slf4j
+@Data
 public class AndroidDevice {
 
     //任务队列 执行自动化测试任务
     private BlockingQueue<Map<String,String>> taskQueue = new LinkedBlockingQueue();
 
     private Device device;
-
     private IDevice iDevice;
-
-    private int deviceHeight;
-    private int deviceWidth;
 
     private UiautomatorServerManager uiautomatorServerManager;
 
-    private boolean isConnected = false;
-
-    private UIServerApi uiServerApi = AppicationContextRegister.getApplicationContext().getBean(UIServerApi.class);
+    private ServerApi uiServerApi = App.getBean(ServerApi.class);
 
     public AndroidDevice(Device device){
         this.device = device;
-        String[] resolution = device.getResolution().split("x");
-        deviceWidth =Integer.parseInt(resolution[0]);
-        deviceHeight = Integer.parseInt(resolution[1]);
         //开启一个线程 专门执行推送过来的自动化测试任务
         new Thread(()->{
             while(true){
@@ -63,17 +56,13 @@ public class AndroidDevice {
                     log.error("[{}]执行测试任务出现出错",device.getId(),e);
                 } finally {
                     //如果设备还处于连接电脑状态 则将设备改为闲置
-                    if(isConnected){
+                    if(isConnected()){
                         if(uiautomatorServerManager != null){
                             //停掉执行自动化测试的uiautomatorserver
                             uiautomatorServerManager.stopServer();
                         }
                         device.setStatus(Device.IDLE_STATUS);
-                        try {
-                            uiServerApi.save(device);
-                        } catch (Exception e) {
-                            log.error("保存手机失败",e);
-                        }
+                        uiServerApi.saveDevice(device);
                     }
                 }
             }
@@ -85,39 +74,19 @@ public class AndroidDevice {
         }
     }
 
-    public UiautomatorServerManager getUiautomatorServerManager() {
-        return uiautomatorServerManager;
-    }
-
-    public void setUiautomatorServerManager(UiautomatorServerManager uiautomatorServerManager) {
-        this.uiautomatorServerManager = uiautomatorServerManager;
-    }
-
+    /**
+     * 设备是否连接
+     * @return
+     */
     public boolean isConnected() {
-        return isConnected;
+        return device.getStatus() == Device.OFFLINE_STATUS ? false : true;
     }
 
-    public void setIsConnected(boolean connected) {
-        isConnected = connected;
-    }
-
-    public int getDeviceHeight() {
-        return deviceHeight;
-    }
-
-    public int getDeviceWidth() {
-        return deviceWidth;
-    }
-
-    public IDevice getIDevice() {
-        return iDevice;
-    }
-
-    public void setIDevice(IDevice iDevice) {
-        this.iDevice = iDevice;
-    }
-
-    public Device getDevice(){
-        return device;
+    /**
+     * 获取设备屏幕分辨率
+     * @return eg.1080 * 1920
+     */
+    public String getResolution() {
+        return String.valueOf(device.getScreenWidth()) + String.valueOf(device.getScreenHeight());
     }
 }

@@ -1,10 +1,10 @@
 package com.fgnb.init;
 
-import com.fgnb.android.AdbManager;
-import com.fgnb.android.DeviceChangeListener;
+import com.fgnb.App;
+import com.fgnb.android.ADB;
+import com.fgnb.android.AndroidDeviceChangeListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -20,19 +20,16 @@ import java.io.IOException;
 public class AndroidInitializer implements ApplicationRunner{
 
     @Autowired
-    private DeviceChangeListener deviceChangeListener;
-
-    @Value("${server}")
-    private String server;
+    private AndroidDeviceChangeListener deviceChangeListener;
 
     @Override
     public void run(ApplicationArguments args) throws IOException {
-        log.info("UIServer -> {}",server);
-        //每次启动 都先杀掉adb server
-        AdbManager.killAdbServer();
+        log.info("Server: {}", App.getProperty("server"));
+        //agent每次启动都先kill adb server
+        ADB.killServer();
         //初始化adb
-        AdbManager.getAdb();
+        ADB.init();
         //添加设备监听器，监听设备连接、断开
-        AdbManager.addDeviceChangeListener(deviceChangeListener);
+        ADB.addDeviceChangeListener(deviceChangeListener);
     }
 }

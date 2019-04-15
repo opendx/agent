@@ -1,4 +1,4 @@
-package com.fgnb.vo;
+package com.fgnb.model;
 
 import lombok.Data;
 

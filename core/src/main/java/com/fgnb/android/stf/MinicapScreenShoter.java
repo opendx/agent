@@ -33,7 +33,7 @@ public class MinicapScreenShoter {
 
         IDevice iDevice = androidDevice.getIDevice();
         //使用minicap截图
-        String minicapScreenShotCmd = String.format(MINICAP_SCREENSHOT_CMD,androidDevice.getDevice().getResolution(),androidDevice.getDevice().getResolution());
+        String minicapScreenShotCmd = String.format(MINICAP_SCREENSHOT_CMD,androidDevice.getResolution(),androidDevice.getResolution());
         log.info("[{}]minicap截图命令:{}",deviceId,minicapScreenShotCmd);
         CollectingOutputReceiver minicapReceiver = new CollectingOutputReceiver();
         iDevice.executeShellCommand(minicapScreenShotCmd,minicapReceiver);

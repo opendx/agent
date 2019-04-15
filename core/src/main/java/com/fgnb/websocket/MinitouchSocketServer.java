@@ -6,7 +6,7 @@ import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
 import com.fgnb.android.stf.minitouch.Minitouch;
 import com.fgnb.android.stf.minitouch.MinitouchManager;
-import com.fgnb.init.AppicationContextRegister;
+import com.fgnb.App;
 import com.fgnb.model.Device;
 import com.fgnb.service.AndroidDeviceService;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ public class MinitouchSocketServer {
 	private String deviceId;
 	private Session session;
 
-	private AndroidDeviceService androidDeviceService = AppicationContextRegister.getApplicationContext().getBean(AndroidDeviceService.class);
+	private AndroidDeviceService androidDeviceService = App.getBean(AndroidDeviceService.class);
 
 	private Minitouch minitouch;
 

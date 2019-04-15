@@ -4,9 +4,9 @@ import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
 import com.fgnb.android.stf.minicap.MinicapDataHandler;
 import com.fgnb.android.stf.minicap.MinicapManager;
-import com.fgnb.api.UIServerApi;
+import com.fgnb.api.ServerApi;
 import com.fgnb.model.Device;
-import com.fgnb.init.AppicationContextRegister;
+import com.fgnb.App;
 import com.fgnb.service.AndroidDeviceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -36,8 +36,8 @@ public class MinicapSocketServer {
 	private Session session;
 	private MinicapDataHandler minicapDataHandler;
 
-	private AndroidDeviceService androidDeviceService = AppicationContextRegister.getApplicationContext().getBean(AndroidDeviceService.class);
-	private UIServerApi uiServerApi = AppicationContextRegister.getApplicationContext().getBean(UIServerApi.class);
+	private AndroidDeviceService androidDeviceService = App.getBean(AndroidDeviceService.class);
+	private ServerApi uiServerApi = App.getBean(ServerApi.class);
 
 	@OnOpen
 	public void onOpen(@PathParam("deviceId") String deviceId,@PathParam("userName")String userName, Session session) throws Exception {
@@ -112,7 +112,7 @@ public class MinicapSocketServer {
 		Device device = AndroidDeviceHolder.getAndroidDevice(deviceId).getDevice();
 		device.setStatus(Device.USING_STATUS);
 		device.setUsername(userName);
-		uiServerApi.save(device);
+		uiServerApi.saveDevice(device);
 		log.info("[{}]数据库状态改为使用中",deviceId);
 
 		//3.将图片队列里的数据发送给浏览器
@@ -153,11 +153,7 @@ public class MinicapSocketServer {
 			if(device!=null && device.getStatus() == Device.USING_STATUS){
 				//将设备改为闲置
 				device.setStatus(Device.IDLE_STATUS);
-				try {
-					uiServerApi.save(device);
-				} catch (Exception e) {
-					log.error("保存手机失败",e);
-				}
+				uiServerApi.saveDevice(device);
 				log.info("[{}]数据库状态改为闲置",deviceId);
 			}
 		}

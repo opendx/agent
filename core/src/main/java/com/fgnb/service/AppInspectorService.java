@@ -6,9 +6,9 @@ import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
 import com.fgnb.android.stf.MinicapScreenShoter;
 import com.fgnb.android.uiautomator.UiautomatorServerManager;
-import com.fgnb.api.UIServerApi;
+import com.fgnb.api.ServerApi;
 import com.fgnb.utils.UUIDUtil;
-import com.fgnb.vo.InspctorImgVo;
+import com.fgnb.model.InspctorImgVo;
 import com.fgnb.websocket.UiAutomator2SocketServer;
 import io.restassured.response.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ public class AppInspectorService {
 
 
     @Autowired
-    private UIServerApi uiServerApi;
+    private ServerApi uiServerApi;
 
     public String getAndroidDumpJson(String deviceId) throws Exception{
         UiautomatorServerManager uiautomatorServerManager = UiAutomator2SocketServer.uiautomatorServerManagerMap.get(deviceId);
@@ -70,11 +70,9 @@ public class AppInspectorService {
 
             InspctorImgVo inspctorImgVo = new InspctorImgVo();
             inspctorImgVo.setDownloadURL(downloadURL);
-            inspctorImgVo.setImgHeight(androidDevice.getDeviceHeight());
-            inspctorImgVo.setImgWidth(androidDevice.getDeviceWidth());
+            inspctorImgVo.setImgHeight(androidDevice.getDevice().getScreenHeight());
+            inspctorImgVo.setImgWidth(androidDevice.getDevice().getScreenWidth());
             return inspctorImgVo;
-        }catch (Exception e){
-            throw e;
         }finally {
             //删除生成的图片
             if(localScreenshotPath!=null){

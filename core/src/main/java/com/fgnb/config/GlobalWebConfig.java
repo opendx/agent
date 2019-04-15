@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * Created by jiangyitao.
  */
 @Configuration
-public class GlobalWebConfigurer implements WebMvcConfigurer {
+public class GlobalWebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**").//所有请求，解决跨域问题

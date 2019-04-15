@@ -1,4 +1,4 @@
-package com.fgnb.init;
+package com.fgnb;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  * Created by jiangyitao.
  */
 @Component
-public class AppicationContextRegister implements ApplicationContextAware{
+public class App implements ApplicationContextAware{
 
     private static ApplicationContext context;
 
@@ -18,7 +18,11 @@ public class AppicationContextRegister implements ApplicationContextAware{
         context = applicationContext;
     }
 
-    public static ApplicationContext getApplicationContext() {
-        return context;
+    public static <T> T getBean(Class<T> clazz) {
+        return context.getBean(clazz);
+    }
+
+    public static String getProperty(String key) {
+        return context.getEnvironment().getProperty(key);
     }
 }

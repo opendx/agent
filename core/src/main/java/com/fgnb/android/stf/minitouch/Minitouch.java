@@ -22,9 +22,6 @@ public class Minitouch {
 
     private Socket socket;
 
-    private int deviceWidth;
-    private int deviceHeight;
-
     /** minitouch输出的宽度 这个值有可能不准确*/
     private int minitouchWidth;
     /** minitouch输出的高度 这个值有可能不准确*/
@@ -46,9 +43,6 @@ public class Minitouch {
         this.deviceId = deviceId;
         androidDevice = AndroidDeviceHolder.getAndroidDevice(deviceId);
         iDevice = androidDevice.getIDevice();
-
-        deviceWidth = androidDevice.getDeviceWidth();
-        deviceHeight = androidDevice.getDeviceHeight();
 
         try {
             socket = new Socket("127.0.0.1",minitouchPort);
@@ -226,11 +220,4 @@ public class Minitouch {
         return minitouchHeight;
     }
 
-    public int getDeviceWidth() {
-        return deviceWidth;
-    }
-
-    public int getDeviceHeight() {
-        return deviceHeight;
-    }
 }

@@ -4,7 +4,6 @@ import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
 import com.fgnb.android.stf.adbkit.AdbKitManager;
 import com.fgnb.android.stf.adbkit.AdbKitPortProvider;
-import com.fgnb.enums.DeviceStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

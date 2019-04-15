@@ -1,60 +1,73 @@
-package com.fgnb.service;
+package com.fgnb.android;
 
+import com.android.ddmlib.AndroidDebugBridge;
 import com.android.ddmlib.IDevice;
-import com.fgnb.android.AndroidDevice;
-import com.fgnb.android.AndroidDeviceHolder;
-import com.fgnb.android.AndroidUtils;
+import com.fgnb.App;
 import com.fgnb.android.stf.StfResourceReleaser;
 import com.fgnb.android.stf.minicap.MinicapManager;
 import com.fgnb.android.stf.minitouch.MinitouchManager;
 import com.fgnb.android.uiautomator.UiautomatorServerManager;
-import com.fgnb.api.UIServerApi;
+import com.fgnb.api.ServerApi;
 import com.fgnb.model.Device;
-import com.fgnb.init.AppicationContextRegister;
 import com.fgnb.utils.NetUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.net.UnknownHostException;
 import java.util.Date;
-
 
 /**
  * Created by jiangyitao.
- * 安卓设备连接和断开连接服务
+ * 安卓手机接入，拔出监听器
  */
-@Service
+@Component
 @Slf4j
-public class AndroidDeviceChangeService {
-
+public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceChangeListener {
 
     @Autowired
-    private UIServerApi uiServerApi;
+    private ServerApi serverApi;
+
+    @Override
+    public void deviceConnected(IDevice device) {
+        new Thread(() -> {
+            try {
+                androidDeviceConnected(device);
+            } catch (Exception e) {
+                log.error("[{}]设备连接处理出错",device.getSerialNumber(),e);
+            }
+        }).start();
+    }
+
+    @Override
+    public void deviceDisconnected(IDevice device) {
+        new Thread(() -> androidDeviceDisconnected(device)).start();
+    }
+
+    @Override
+    public void deviceChanged(IDevice device, int changeMask) {
+        //ignore
+    }
 
     /**
-     * 设备连接上，调用的方法
-     * 注意这里是多线程调用，尽量不要用成员变量
-     *
+     * Android设备连接上，调用的方法
      * @param iDevice
      * @throws Exception
      */
-    public void deviceConnected(IDevice iDevice) {
-
+    private void androidDeviceConnected(IDevice iDevice) throws Exception {
         String deviceId = iDevice.getSerialNumber();
         log.info("[{}]已连接", deviceId);
 
         //等待设备上线
         log.info("[{}]等待手机上线", deviceId);
-        AndroidUtils.waitForDeviceOnline(iDevice, 10);
+        AndroidUtils.waitForDeviceOnline(iDevice, 60);
         log.info("[{}]手机已上线", deviceId);
 
         AndroidDevice androidDevice = AndroidDeviceHolder.getAndroidDevice(deviceId);
         if (androidDevice == null) {//该agent未接入过该手机
             //第一次上线
             log.info("[{}]首次上线", deviceId);
-            Device device = checkDeviceIsFirstAccessSystem(deviceId);
+            Device device = serverApi.getDeviceById(deviceId);
             if (device == null) {
                 //首次接入
                 log.info("[{}]首次接入系统", deviceId);
@@ -70,25 +83,15 @@ public class AndroidDeviceChangeService {
 
         Device device = androidDevice.getDevice();
         //agent ip
-        try {
-            device.setAgentIp(NetUtil.getLocalHostAddress());
-        } catch (UnknownHostException e) {
-            throw new RuntimeException("[" + deviceId + "]获取agent ip失败", e);
-        }
+        device.setAgentIp(NetUtil.getLocalHostAddress());
         //agent port
-        device.setAgentPort(Integer.parseInt(AppicationContextRegister.getApplicationContext().getEnvironment().getProperty("server.port")));
+        device.setAgentPort(Integer.parseInt(App.getProperty("server.port")));
         //闲置状态
         device.setStatus(Device.IDLE_STATUS);
         //最后一次在线时间
         device.setLastOnlineTime(new Date());
         //上报服务器
-        try {
-            uiServerApi.save(device);
-        } catch (Exception e) {
-            throw new RuntimeException("[" + deviceId + "]保存手机信息到服务器失败", e);
-        }
-        //将手机状态改为已连接
-        androidDevice.setIsConnected(true);
+        serverApi.saveDevice(device);
         log.info("[{}]deviceConnected处理完成", deviceId);
 
     }
@@ -99,7 +102,7 @@ public class AndroidDeviceChangeService {
      *
      * @param iDevice
      */
-    public void deviceDisconnected(IDevice iDevice) {
+    public void androidDeviceDisconnected(IDevice iDevice) {
         //设备id
         String deviceId = iDevice.getSerialNumber();
 
@@ -110,8 +113,6 @@ public class AndroidDeviceChangeService {
         if (androidDevice == null) {
             return;
         }
-        //将手机状态改为断开
-        androidDevice.setIsConnected(false);
 
         //手机断开 回收minicap/minitouch/adbkit等占用的资源，如关闭输入输出流，端口释放等
         StfResourceReleaser stfResourceReleaser = new StfResourceReleaser(deviceId);
@@ -119,28 +120,9 @@ public class AndroidDeviceChangeService {
 
         androidDevice.getDevice().setStatus(Device.OFFLINE_STATUS);
         androidDevice.getDevice().setLastOfflineTime(new Date());
-        try {
-            uiServerApi.save(androidDevice.getDevice());
-        } catch (Exception e) {
-            throw new RuntimeException("[" + deviceId + "]手机离线失败", e);
-        }
+        serverApi.saveDevice(androidDevice.getDevice());
 
         log.info("[{}]deviceDisconnected处理完成", deviceId);
-    }
-
-    /**
-     * 手机是否首次接入系统
-     *
-     * @param deviceId
-     * @return
-     */
-    private Device checkDeviceIsFirstAccessSystem(String deviceId) {
-        try {
-            Device device = uiServerApi.findById(deviceId);
-            return device;
-        } catch (Exception e) {
-            throw new RuntimeException("[" + deviceId + "]检查手机是否首次接入系统出错", e);
-        }
     }
 
     /**
@@ -165,12 +147,14 @@ public class AndroidDeviceChangeService {
             //安卓版本
             device.setSystemVersion(AndroidUtils.getAndroidVersion(iDevice));
             //屏幕分辨率
-            device.setResolution(AndroidUtils.getResolution(iDevice));
+            String[] resolution = AndroidUtils.getResolution(iDevice).split("x");
+            device.setScreenWidth(Integer.parseInt(resolution[0]));
+            device.setScreenHeight(Integer.parseInt(resolution[1]));
             //设备类型
             device.setType(Device.ANDROID_TYPE);
             //截图并上传到服务器
             screenshot = AndroidUtils.screenshot(iDevice);
-            String downloadURL = uiServerApi.uploadFile(screenshot);
+            String downloadURL = serverApi.uploadFile(screenshot);
             //首次截屏下载地址
             device.setImgUrl(downloadURL);
 
@@ -222,5 +206,4 @@ public class AndroidDeviceChangeService {
             throw new RuntimeException("安装minicap/minitouch/UiAutomatorServerApk出错", e);
         }
     }
-
 }

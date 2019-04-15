@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
 import com.fgnb.android.stf.MinicapScreenShoter;
-import com.fgnb.api.UIServerApi;
-import com.fgnb.init.AppicationContextRegister;
+import com.fgnb.api.ServerApi;
+import com.fgnb.App;
 import com.fgnb.utils.ShellExecutor;
 import com.fgnb.utils.UUIDUtil;
 import io.restassured.http.ContentType;
@@ -28,7 +28,7 @@ import static io.restassured.RestAssured.given;
 public class TestListenerForTestCase extends TestListenerAdapter {
 
     //ui-server resources配置文件中 eg.http://192.168.1.101:8081
-    private static final String UI_SERVER_BASE_URL = AppicationContextRegister.getApplicationContext().getEnvironment().getProperty("server");
+    private static final String UI_SERVER_BASE_URL = App.getProperty("server");
 
     //设备开始测试
     private static final String TEST_TASK_DEVICE_START = UI_SERVER_BASE_URL + "/testTaskDevice/start";
@@ -247,7 +247,7 @@ public class TestListenerForTestCase extends TestListenerAdapter {
             //视频合成完毕 上传视频
             String videoUrl;
             try {
-                videoUrl = AppicationContextRegister.getApplicationContext().getBean(UIServerApi.class)
+                videoUrl = App.getBean(ServerApi.class)
                         .uploadFile(new File(videoPath));
                 log.info("视频上传成功，下载URL -> {}",videoUrl);
                 return videoUrl;
@@ -284,7 +284,7 @@ public class TestListenerForTestCase extends TestListenerAdapter {
             AndroidDevice androidDevice = AndroidDeviceHolder.getAndroidDevice(deviceId);
             imgFilePath = UUIDUtil.getUUID()+".jpg";
             MinicapScreenShoter.takeScreenShot(imgFilePath,androidDevice);
-            UIServerApi uiServerApi = AppicationContextRegister.getApplicationContext().getBean(UIServerApi.class);
+            ServerApi uiServerApi = App.getBean(ServerApi.class);
             return uiServerApi.uploadFile(new File(imgFilePath));
         }catch (Exception e){
             log.error("上传图片失败",e);

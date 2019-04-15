@@ -3,7 +3,6 @@ package com.fgnb.websocket;
 import com.android.ddmlib.InstallException;
 import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
-import com.fgnb.enums.DeviceStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

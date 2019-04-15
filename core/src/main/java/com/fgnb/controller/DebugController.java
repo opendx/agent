@@ -1,7 +1,7 @@
 package com.fgnb.controller;
 
 import com.fgnb.excutor.Excutor;
-import com.fgnb.vo.Response;
+import com.fgnb.model.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 

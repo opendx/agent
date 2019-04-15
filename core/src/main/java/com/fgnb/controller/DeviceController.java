@@ -4,7 +4,7 @@ import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
 import com.fgnb.android.uiautomator.UiautomatorServerManager;
 import com.fgnb.model.Device;
-import com.fgnb.vo.Response;
+import com.fgnb.model.Response;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
@@ -35,17 +35,17 @@ public class DeviceController {
         if(androidDevice == null){
             deviceInfo.setMsg("设备未接入");
             deviceInfo.setCanUse(false);
-            return Response.fail(deviceInfo);
+            return Response.fail("设备未接入");
         }
         if(!androidDevice.isConnected()){
             deviceInfo.setMsg("设备未连接");
             deviceInfo.setCanUse(false);
-            return Response.fail(deviceInfo);
+            return Response.fail("设备未连接");
         }
         if(androidDevice.getDevice().getStatus() != Device.IDLE_STATUS){
             deviceInfo.setMsg("设备未闲置");
             deviceInfo.setCanUse(false);
-            return Response.fail(deviceInfo);
+            return Response.fail("设备未闲置");
         }
 
         try {
@@ -59,7 +59,7 @@ public class DeviceController {
             log.error("[{}]启动uiautomator服务失败",deviceId,e);
             deviceInfo.setMsg(e.getMessage());
             deviceInfo.setCanUse(false);
-            return Response.fail(deviceInfo);
+            return Response.fail("启动uiautomator服务失败");
         }
         return Response.success(deviceInfo);
     }

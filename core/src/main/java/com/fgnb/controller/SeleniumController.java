@@ -3,7 +3,7 @@ package com.fgnb.controller;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fgnb.init.SeleniumInitializer;
-import com.fgnb.vo.Response;
+import com.fgnb.model.Response;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
