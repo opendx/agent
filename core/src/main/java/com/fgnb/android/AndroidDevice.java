@@ -32,8 +32,9 @@ public class AndroidDevice {
 
     private ServerApi uiServerApi = App.getBean(ServerApi.class);
 
-    public AndroidDevice(Device device){
+    public AndroidDevice(Device device,IDevice iDevice){
         this.device = device;
+        this.iDevice = iDevice;
         //开启一个线程 专门执行推送过来的自动化测试任务
         new Thread(()->{
             while(true){

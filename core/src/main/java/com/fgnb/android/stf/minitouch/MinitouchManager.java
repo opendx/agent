@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 public class MinitouchManager {
 
     private final static String ANDROID_TMP_FOLDER = "/data/local/tmp/";
-    private final static String MINITOUCH_CHMOD_SHELL = "chmod 777 %s";
     public static final String START_MINITOUCH_SHELL = ANDROID_TMP_FOLDER + "minitouch";
 
 
@@ -84,23 +83,5 @@ public class MinitouchManager {
     }
 
 
-    /**
-     * 安装minitouch
-     * @throws Exception
-     */
-    public void installMinitouch() throws Exception{
-
-        String cpuAbi = AndroidUtils.getCpuAbi(iDevice);
-
-        String minitouchFilePath = "vendor/minitouch/" + cpuAbi + "/minitouch";
-
-        log.info("[{}]push minitouchfile to phone,{}->{}",deviceId,minitouchFilePath,ANDROID_TMP_FOLDER + "minitouch");
-        iDevice.pushFile(minitouchFilePath, ANDROID_TMP_FOLDER + "minitouch");
-
-        //给手机里的minicap/minicap.so 赋予777权限
-        String chmodShellCmd = String.format(MINITOUCH_CHMOD_SHELL, ANDROID_TMP_FOLDER + "minitouch");
-        log.info("[{}]{} ",deviceId,chmodShellCmd);
-        iDevice.executeShellCommand(chmodShellCmd,new NullOutputReceiver());
-    }
 
 }

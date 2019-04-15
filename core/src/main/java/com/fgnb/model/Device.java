@@ -16,6 +16,9 @@ public class Device implements Serializable {
     public static final Integer USING_STATUS = 1;
     public static final Integer IDLE_STATUS = 2;
 
+    public static final Integer STF_SUCCESS_STATUS = 1;
+    public static final Integer MACACA_SUCCESS_STATUS = 1;
+
     /**
      * 设备id
      *

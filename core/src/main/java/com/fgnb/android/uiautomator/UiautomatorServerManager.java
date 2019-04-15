@@ -31,16 +31,7 @@ public class UiautomatorServerManager {
         this.deviceId = androidDevice.getDevice().getId();
     }
 
-    /**
-     * 安装uiautomator2server apk
-     * @throws Exception
-     */
-    public void installServerApk() throws Exception{
-        iDevice.installPackage("vendor/macaca/app-debug.apk",true,"-t");
-        log.info("[{}]安装app-debug完成",deviceId);
-        iDevice.installPackage("vendor/macaca/app-debug-androidTest.apk",true,"-t");
-        log.info("[{}]安装app-debug-androidTest完成",deviceId);
-    }
+
 
     /**
      * 获取可用的端口

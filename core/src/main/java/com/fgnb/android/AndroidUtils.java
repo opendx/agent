@@ -21,6 +21,7 @@ public class AndroidUtils {
     private static final String MEM_SIZE_SHELL = "cat /proc/meminfo |grep MemTotal";
     private static final String IP_SHELL = "ip addr show |grep inet |grep -v inet6 |grep -v \"127.0.0.1\"";
     private static final String RESOLUTION_SHELL = "wm size";
+
     private static Map<String, String> sdkMap = new HashMap();
 
     static {
@@ -43,6 +44,13 @@ public class AndroidUtils {
 
     /**
      * 获取分辨率
+     *
+     * @param iDevice
+     * @return eg.1080 X 1920
+     * @throws TimeoutException
+     * @throws AdbCommandRejectedException
+     * @throws ShellCommandUnresponsiveException
+     * @throws IOException
      */
     public static String getResolution(IDevice iDevice) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         return executeShellCommand(iDevice, RESOLUTION_SHELL).split(":")[1].trim();
@@ -53,39 +61,12 @@ public class AndroidUtils {
      *
      * @return
      */
-    public static String getCpuInfo(IDevice iDevice) {
-        try {
-            String output = executeShellCommand(iDevice, CPU_INFO_SHELL);
-            if (!StringUtils.isEmpty(output)) {
-                return output.split(":")[1].trim();
-            }
-        } catch (Exception e) {
-            log.error("CPU信息获取失败", e);
+    public static String getCpuInfo(IDevice iDevice) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+        String output = executeShellCommand(iDevice, CPU_INFO_SHELL);
+        if (StringUtils.isEmpty(output)) {
+            throw new RuntimeException("获取CPU信息失败");
         }
-        return "CPU信息获取失败";
-    }
-
-    /**
-     * 等待设备上线
-     *
-     * @param maxWaitTimeSeconds
-     * @throws Exception
-     */
-    public static void waitForDeviceOnline(IDevice iDevice, long maxWaitTimeSeconds) {
-        long startTime = System.currentTimeMillis();
-        while (true) {
-            if (System.currentTimeMillis() - startTime > maxWaitTimeSeconds * 1000) {
-                throw new RuntimeException("[" + iDevice.getSerialNumber() + "]设备未上线");
-            }
-            if (iDevice.isOnline()) {
-                return;
-            }
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                //ignore
-            }
-        }
+        return output.split(":")[1].trim();
     }
 
     /**
@@ -93,37 +74,16 @@ public class AndroidUtils {
      *
      * @return
      */
-    public static String getMemSize(IDevice iDevice) {
-        try {
-            String output = executeShellCommand(iDevice, MEM_SIZE_SHELL);
-            if (!StringUtils.isEmpty(output)) {
-                String kB = (output.replaceAll(" ", "")).replaceAll("\n", "").replaceAll("\r", "").split(":")[1];
-                kB = kB.substring(0, kB.length() - 2);
-                //向上取整
-                double ceil = Math.ceil(Long.parseLong(kB) / (1024.0 * 1024));
-                return ceil + " GB";
-            }
-        } catch (Exception e) {
-            log.error("内存信息获取失败", e);
+    public static String getMemSize(IDevice iDevice) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+        String output = executeShellCommand(iDevice, MEM_SIZE_SHELL);
+        if (StringUtils.isEmpty(output)) {
+            throw new RuntimeException("获取内存信息失败");
         }
-        return "内存信息获取失败";
-    }
-
-    /**
-     * 获取IP地址
-     *
-     * @return
-     */
-    public static String getIp(IDevice iDevice) {
-        try {
-            String output = executeShellCommand(iDevice, IP_SHELL);
-            if (!StringUtils.isEmpty(output)) {
-                return output.split("/")[0].trim().split(" ")[1];
-            }
-        } catch (Exception e) {
-            log.error("获取设备IP失败", e);
-        }
-        return "获取设备IP失败";
+        String kB = (output.replaceAll(" ", "")).replaceAll("\n", "").replaceAll("\r", "").split(":")[1];
+        kB = kB.substring(0, kB.length() - 2);
+        //向上取整
+        double ceil = Math.ceil(Long.parseLong(kB) / (1024.0 * 1024));
+        return ceil + " GB";
     }
 
     /**
@@ -132,7 +92,7 @@ public class AndroidUtils {
      * @return
      */
     public static String getDeviceName(IDevice iDevice) {
-        return iDevice.getProperty("ro.product.brand") + " " + iDevice.getProperty("ro.product.model");
+        return "[" + iDevice.getProperty("ro.product.brand") + "] " + iDevice.getProperty("ro.product.model");
     }
 
     /**
@@ -174,7 +134,7 @@ public class AndroidUtils {
      * @return
      */
     public static String getCpuAbi(IDevice iDevice) {
-        return iDevice.getAbis().get(0);
+        return iDevice.getAbis().stream().findFirst().orElseThrow(() -> new RuntimeException("获取CPU架构失败"));
     }
 
     /**
@@ -187,6 +147,29 @@ public class AndroidUtils {
     }
 
     /**
+     * 等待设备上线
+     *
+     * @param maxWaitTimeSeconds
+     * @throws Exception
+     */
+    public static void waitForDeviceOnline(IDevice iDevice, long maxWaitTimeSeconds) {
+        long startTime = System.currentTimeMillis();
+        while (true) {
+            if (System.currentTimeMillis() - startTime > maxWaitTimeSeconds * 1000) {
+                throw new RuntimeException("[" + iDevice.getSerialNumber() + "]设备未上线");
+            }
+            if (iDevice.isOnline()) {
+                return;
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                //ignore
+            }
+        }
+    }
+
+    /**
      * 检查是否安装了app
      *
      * @param iDevice
@@ -194,9 +177,8 @@ public class AndroidUtils {
      * @return
      * @throws Exception
      */
-    public static boolean hasInstalledApp(IDevice iDevice, String packageName) throws Exception {
+    public static boolean hasInstalledApp(IDevice iDevice, String packageName) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         String result = executeShellCommand(iDevice, "pm list packages|grep " + packageName);
-        log.info("[{}]是否安装了{} => {}", iDevice.getSerialNumber(), packageName, result);
         if (StringUtils.isEmpty(result)) {
             return false;
         }
@@ -211,7 +193,7 @@ public class AndroidUtils {
      * @return
      * @throws Exception
      */
-    public static boolean isAppRunning(IDevice iDevice, String packageName) throws Exception {
+    public static boolean isAppRunning(IDevice iDevice, String packageName) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         String result = executeShellCommand(iDevice, "ps |grep " + packageName);
         if (StringUtils.isEmpty(result)) {
             return false;
@@ -226,7 +208,7 @@ public class AndroidUtils {
      * @param packageName
      * @throws Exception
      */
-    public static void forceStopApp(IDevice iDevice, String packageName) throws Exception {
+    public static void forceStopApp(IDevice iDevice, String packageName) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         iDevice.executeShellCommand("am force-stop " + packageName, new NullOutputReceiver());
     }
 

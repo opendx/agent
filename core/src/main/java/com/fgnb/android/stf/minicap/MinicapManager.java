@@ -16,13 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 public class MinicapManager {
 
     private static final String START_MINICAP_SHELL = "LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/minicap -P %s@%s/0";
-    private static final String ANDROID_TMP_FOLDER = "/data/local/tmp/";
-    private static final String MINICAP_CHMOD_SHELL = "chmod 777 %s %s";
+
 
     private AndroidDevice androidDevice;
-    private String deviceId;
-    private IDevice iDevice;
-
 
     /**
      * 在网页上手机显示的高度
@@ -41,8 +37,6 @@ public class MinicapManager {
 
     public MinicapManager(AndroidDevice androidDevice) {
         this.androidDevice = androidDevice;
-        iDevice = androidDevice.getIDevice();
-        deviceId = androidDevice.getDevice().getId();
     }
 
     /**
@@ -105,32 +99,7 @@ public class MinicapManager {
         return minicapPort;
     }
 
-    /**
-     * 根据手机cpu架构/android版本 push相应的minicap文件到手机/data/local/tmp目录
-     * 对minicap/minicap.so 文件赋予777权限
-     *
-     * @throws Exception
-     */
-    public void installMinicap() throws Exception {
 
-        String cpuAbi = AndroidUtils.getCpuAbi(iDevice);
-        String apiLevel = AndroidUtils.getApiLevel(iDevice);
-
-        String minicapFilePath = "vendor/minicap/bin/" + cpuAbi + "/minicap";
-        String minicapSoFilePath = "vendor/minicap/shared/android-" + apiLevel + "/" + cpuAbi + "/minicap.so";
-
-        //push minicap/minicap.so 到手机
-        log.info("[{}]push minicapfile to phone,{}->{}", deviceId, minicapFilePath, ANDROID_TMP_FOLDER + "minicap");
-        iDevice.pushFile(minicapFilePath, ANDROID_TMP_FOLDER + "minicap");
-        log.info("[{}]push minicapsofile to phone,{}->{}", deviceId, minicapSoFilePath, ANDROID_TMP_FOLDER + "minicap.so");
-        iDevice.pushFile(minicapSoFilePath, ANDROID_TMP_FOLDER + "minicap.so");
-
-        //给手机里的minicap/minicap.so 赋予777权限
-        String chmodShellCmd = String.format(MINICAP_CHMOD_SHELL, ANDROID_TMP_FOLDER + "minicap", ANDROID_TMP_FOLDER + "minicap.so");
-        log.info("[{}]{} ", deviceId, chmodShellCmd);
-        iDevice.executeShellCommand(chmodShellCmd, new NullOutputReceiver());
-
-    }
 
     /**
      * 获取屏幕在网页上显示的分辨率

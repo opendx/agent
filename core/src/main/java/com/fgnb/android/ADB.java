@@ -31,6 +31,7 @@ public class ADB {
             while (System.currentTimeMillis() - start <= 10000) {
                 if (adb.isConnected()) {
                     log.info("adb已连接");
+                    break;
                 }
             }
         }
