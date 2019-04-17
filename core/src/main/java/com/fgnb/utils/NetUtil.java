@@ -19,7 +19,7 @@ public class NetUtil {
      * 检测本地端口是否可用
      *
      * @param port 端口号
-     * @return 如果可用返回true, 不可用返回false
+     * @return
      */
     public static boolean isPortAvailable(int port) {
         try {
@@ -27,17 +27,17 @@ public class NetUtil {
             bindPort("0.0.0.0", port);
             return true;
         } catch (IOException e) {
-            log.info("端口:" + port + " 被占用");
+            log.info("端口{}被占用", port);
+            return false;
         }
-        return false;
     }
 
     private static void bindPort(String host, int port) throws IOException {
-        Socket s = new Socket();
+        Socket socket = new Socket();
         try {
-            s.bind(new InetSocketAddress(host, port));
+            socket.bind(new InetSocketAddress(host, port));
         } finally {
-            s.close();
+            socket.close();
         }
     }
 

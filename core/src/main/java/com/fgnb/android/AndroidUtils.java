@@ -112,10 +112,11 @@ public class AndroidUtils {
      */
     public static File screenshot(IDevice iDevice) throws Exception {
         RawImage rawImage = iDevice.getScreenshot();
-        //rawImage转换为Image
         BufferedImage image = new BufferedImage(rawImage.width, rawImage.height, BufferedImage.TYPE_INT_ARGB);
+
         int index = 0;
         int IndexInc = rawImage.bpp >> 3;
+
         for (int y = 0; y < rawImage.height; y++) {
             for (int x = 0; x < rawImage.width; x++) {
                 int value = rawImage.getARGB(index);
@@ -123,8 +124,10 @@ public class AndroidUtils {
                 image.setRGB(x, y, value);
             }
         }
+
         File file = new File(iDevice.getSerialNumber() + ".png");
         ImageIO.write(image, "png", file);
+
         return file;
     }
 
@@ -175,7 +178,6 @@ public class AndroidUtils {
      * @param iDevice
      * @param packageName 包名
      * @return
-     * @throws Exception
      */
     public static boolean hasInstalledApp(IDevice iDevice, String packageName) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         String result = executeShellCommand(iDevice, "pm list packages|grep " + packageName);
@@ -191,7 +193,6 @@ public class AndroidUtils {
      * @param iDevice
      * @param packageName
      * @return
-     * @throws Exception
      */
     public static boolean isAppRunning(IDevice iDevice, String packageName) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         String result = executeShellCommand(iDevice, "ps |grep " + packageName);
@@ -206,7 +207,6 @@ public class AndroidUtils {
      *
      * @param iDevice
      * @param packageName
-     * @throws Exception
      */
     public static void forceStopApp(IDevice iDevice, String packageName) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         iDevice.executeShellCommand("am force-stop " + packageName, new NullOutputReceiver());
@@ -217,7 +217,6 @@ public class AndroidUtils {
      *
      * @param cmd
      * @return
-     * @throws Exception
      */
     public static String executeShellCommand(IDevice iDevice, String cmd) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         CollectingOutputReceiver collectingOutputReceiver = new CollectingOutputReceiver();

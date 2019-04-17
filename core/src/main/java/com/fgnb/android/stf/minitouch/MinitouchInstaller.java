@@ -14,7 +14,7 @@ public class MinitouchInstaller {
 
     private static final String ANDROID_TMP_FOLDER = "/data/local/tmp/";
     private static final String MINITOUCH_PATH = "vendor/minitouch/%s/minitouch";
-    private final static String MINITOUCH_CHMOD_SHELL = "chmod 777 %s";
+    private static final String MINITOUCH_CHMOD_SHELL = "chmod 777 %s";
 
     private IDevice iDevice;
 

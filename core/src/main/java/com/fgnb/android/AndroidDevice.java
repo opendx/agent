@@ -85,9 +85,17 @@ public class AndroidDevice {
 
     /**
      * 获取设备屏幕分辨率
-     * @return eg.1080 * 1920
+     * @return eg.1080x1920
      */
     public String getResolution() {
-        return String.valueOf(device.getScreenWidth()) + String.valueOf(device.getScreenHeight());
+        return String.valueOf(device.getScreenWidth()) + "x" + String.valueOf(device.getScreenHeight());
+    }
+
+    /**
+     * 获取设备id
+     * @return
+     */
+    public String getId() {
+        return device.getId();
     }
 }

@@ -23,7 +23,7 @@ public class MinicapScreenShoter {
      */
     public static void takeScreenShot(String localPath,AndroidDevice androidDevice) throws Exception{
 
-        String deviceId = androidDevice.getDevice().getId();
+        String deviceId = androidDevice.getId();
 
         //检查设备连接状态
         if(!androidDevice.isConnected()){
@@ -47,6 +47,6 @@ public class MinicapScreenShoter {
         log.info("[{}]minicap截图成功,截图位置:{}",deviceId,MINICAP_SCREENSHOT_PATH);
 
         //pull到本地
-        androidDevice.getIDevice().pullFile(MINICAP_SCREENSHOT_PATH,localPath);
+        iDevice.pullFile(MINICAP_SCREENSHOT_PATH,localPath);
     }
 }

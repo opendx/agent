@@ -92,7 +92,7 @@ public class MinitouchSocketServer {
 
 		WebSocketUtil.sendText(session,"开始建立socket连接手机minitouch服务");
 		//2.建立socket连接手机里的minitouch
-		minitouch = new Minitouch(deviceId,minitouchPort);
+		minitouch = new Minitouch(androidDevice,minitouchPort);
 
 		WebSocketUtil.sendText(session,"连接手机minitouch服务成功,"+"端口为:"+minitouchPort+",sessionid:"+session.getId());
 

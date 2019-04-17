@@ -1,7 +1,6 @@
 package com.fgnb.android.stf.minicap;
 
 import com.android.ddmlib.*;
-import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidUtils;
 import lombok.extern.slf4j.Slf4j;
 

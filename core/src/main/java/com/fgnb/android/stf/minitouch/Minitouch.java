@@ -5,6 +5,8 @@ import com.android.ddmlib.NullOutputReceiver;
 import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
+import org.springframework.util.StreamUtils;
 
 import java.io.*;
 import java.net.Socket;
@@ -16,8 +18,6 @@ import java.net.Socket;
 public class Minitouch {
 
 
-    private String deviceId;
-    private IDevice iDevice;
     private AndroidDevice androidDevice;
 
     private Socket socket;
@@ -38,36 +38,34 @@ public class Minitouch {
 
     private final static String INPUT_KEYEVENT = "input keyevent ";
 
-    public Minitouch(String deviceId,int minitouchPort){
+    public Minitouch(AndroidDevice androidDevice,int minitouchPort){
         this.minitouchPort = minitouchPort;
-        this.deviceId = deviceId;
-        androidDevice = AndroidDeviceHolder.getAndroidDevice(deviceId);
-        iDevice = androidDevice.getIDevice();
+        this.androidDevice = androidDevice;
 
         try {
             socket = new Socket("127.0.0.1",minitouchPort);
-            log.info("[{}]开启socket连接minitouch,socket连接成功,端口{}",deviceId,minitouchPort);
+            log.info("[{}]开启socket连接minitouch,socket连接成功,端口{}",androidDevice.getId(),minitouchPort);
             os = socket.getOutputStream();
             pw = new PrintWriter(os);
             //获取 minitouch 输出的屏幕宽度 高度 pid
             inputStream = socket.getInputStream();
             br = new BufferedReader(new InputStreamReader(inputStream));
-            String line = "";
+            String line;
             while((line=br.readLine())!=null){
                 if(line.startsWith("^")){
                     // ^ 10 1079 1919 2048
                     String[] split = line.split(" ");
                     minitouchWidth = Integer.parseInt(split[2]);
                     minitouchHeight = Integer.parseInt(split[3]);
-                    log.info("[{}]minitouch输出设备宽度:{},高度:{}",deviceId,minitouchWidth,minitouchHeight);
+                    log.info("[{}]minitouch输出设备宽度:{},高度:{}",androidDevice.getId(),minitouchWidth,minitouchHeight);
                 }else if(line.startsWith("$")){
                     // $ 12310
                     pid = Integer.parseInt(line.split(" ")[1]);
-                    log.info("[{}]minitouch在设备中运行的pid => {}",deviceId,pid);
+                    log.info("[{}]minitouch在设备中运行的pid => {}",androidDevice.getId(),pid);
                     break;
                 }
             }
-            log.info("[{}]minitouch初始化完成",deviceId);
+            log.info("[{}]minitouch初始化完成",androidDevice.getId());
         } catch (IOException e) {
             log.error("初始化minitouch socket连接出错",e);
             if(inputStream!=null){
@@ -91,42 +89,42 @@ public class Minitouch {
      * 释放资源
      */
     public void releaseResources(){
-        log.info("[{}]开始回收minitouch资源",deviceId);
+        log.info("[{}]开始回收minitouch资源",androidDevice.getId());
         //1.关闭输入输出流
         closeStream();
         //2.关闭socket
         if(socket!=null && socket.isConnected()){
             try {
-                log.info("[{}]关闭minitouch socket,port=>{}",deviceId,minitouchPort);
+                log.info("[{}]关闭minitouch socket,port=>{}",androidDevice.getId(),minitouchPort);
                 socket.close();
             } catch (IOException e) {
-                log.error("[{}]关闭minitouch socket出错",deviceId);
+                log.error("[{}]关闭minitouch socket出错",androidDevice.getId());
             }
         }
         //3.关闭手机里的minitouch
         if(pid>0 && androidDevice.isConnected()){
             try {
                 String cmd = "kill "+pid;
-                log.info("[{}]关闭手机里的minitouch，{}",deviceId,cmd);
-                iDevice.executeShellCommand(cmd,new NullOutputReceiver());
+                log.info("[{}]关闭手机里的minitouch，{}",androidDevice.getId(),cmd);
+                androidDevice.getIDevice().executeShellCommand(cmd,new NullOutputReceiver());
             } catch (Exception e) {
-                log.error("[{}]关闭手机里的minitouch出错",deviceId,e);
+                log.error("[{}]关闭手机里的minitouch出错",androidDevice.getId(),e);
             }
         }
         //4.移除adb forward
         if(androidDevice.isConnected()) {
             try {
-                log.info("[{}]removeForward : {} => localabstract:minitouch,", deviceId, minitouchPort);
-                iDevice.removeForward(minitouchPort, "minitouch", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
+                log.info("[{}]removeForward : {} => localabstract:minitouch,", androidDevice.getId(), minitouchPort);
+                androidDevice.getIDevice().removeForward(minitouchPort, "minitouch", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
             } catch (Exception e) {
-                log.error("[{}]removeForward出错", deviceId, e);
+                log.error("[{}]removeForward出错", androidDevice.getId(), e);
             }
         }
         //5.归还端口
-        log.info("[{}]归还minitouch端口:{}",deviceId,minitouchPort);
+        log.info("[{}]归还minitouch端口:{}",androidDevice.getId(),minitouchPort);
         MinitouchPortProvider.pushAvailablePort(minitouchPort);
 
-        log.info("[{}]minitouch资源回收完成",deviceId);
+        log.info("[{}]minitouch资源回收完成",androidDevice.getId());
 
     }
 
@@ -135,21 +133,21 @@ public class Minitouch {
             try {
                 inputStream.close();
             } catch (IOException e) {
-                log.error("[{}]关闭minitouch输入流错误",deviceId,e);
+                log.error("[{}]关闭minitouch输入流错误",androidDevice.getId(),e);
             }
         }
         if(br!=null){
             try {
                 br.close();
             } catch (IOException e) {
-                log.error("[{}]关闭minitouch BufferedReader错误",deviceId,e);
+                log.error("[{}]关闭minitouch BufferedReader错误",androidDevice.getId(),e);
             }
         }
         if(os!=null){
             try {
                 os.close();
             } catch (IOException e) {
-                log.error("[{}]关闭minitouch BufferedReader错误",deviceId,e);
+                log.error("[{}]关闭minitouch BufferedReader错误",androidDevice.getId(),e);
             }
         }
         if(pw!=null){
@@ -165,8 +163,8 @@ public class Minitouch {
     public void inputKeyevent(int keyCode){
         try {
             String cmd = INPUT_KEYEVENT+keyCode;
-            iDevice.executeShellCommand(cmd,new NullOutputReceiver());
-            log.debug("[{}]minitouch commit => {}",deviceId,cmd);
+            androidDevice.getIDevice().executeShellCommand(cmd,new NullOutputReceiver());
+            log.debug("[{}]minitouch commit => {}",androidDevice.getId(),cmd);
         } catch (Exception e){
             log.error("input keyevent error",e);
         }
@@ -208,7 +206,7 @@ public class Minitouch {
             String commitCmd = cmd + "c\n";
             pw.write(commitCmd);
             pw.flush();
-            log.info("[{}]minitouch commit => {}",deviceId,cmd);
+            log.info("[{}]minitouch commit => {}",androidDevice.getId(),cmd);
         }
     }
 

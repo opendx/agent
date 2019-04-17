@@ -3,7 +3,6 @@ package com.fgnb.android.stf.minicap;
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.NullOutputReceiver;
 import com.fgnb.android.AndroidDevice;
-import com.fgnb.android.AndroidUtils;
 import com.fgnb.App;
 import lombok.extern.slf4j.Slf4j;
 
@@ -57,9 +56,9 @@ public class MinicapManager {
         //需要开线程启动minicap 因为executeShellCommand(START_MINICAP_SHELL) 后线程会阻塞在此处
         runMinicapThread = new Thread(() -> {
             try {
-                log.info("[{}]start minicap service，exec => {},thread id => {}", iDevice.getSerialNumber(), minicapStartCmd, Thread.currentThread().getId());
-                iDevice.executeShellCommand(minicapStartCmd, new NullOutputReceiver(), 0);
-                log.info("[{}]minicap service stopped", iDevice);
+                log.info("[{}]start minicap service，exec => {},thread id => {}", androidDevice.getIDevice().getSerialNumber(), minicapStartCmd, Thread.currentThread().getId());
+                androidDevice.getIDevice().executeShellCommand(minicapStartCmd, new NullOutputReceiver(), 0);
+                log.info("[{}]minicap service stopped", androidDevice.getDevice().getId());
             } catch (Exception e) {
                 log.error("minicap执行异常", e);
             }
@@ -85,10 +84,10 @@ public class MinicapManager {
     public void createForward() throws Exception {
         minicapPort = getAvailablePort();
         try {
-            iDevice.createForward(minicapPort, "minicap", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
+            androidDevice.getIDevice().createForward(minicapPort, "minicap", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
         } catch (Exception e) {
             //出现异常 归还端口
-            log.error("[{}]createForward error,pushAvailablePort back{}  ", deviceId, minicapPort);
+            log.error("[{}]createForward error,pushAvailablePort back{}  ", androidDevice.getDevice().getId(), minicapPort);
             MinicapPortProvider.pushAvailablePort(minicapPort);
             throw e;
         }
