@@ -4,6 +4,7 @@ import com.android.ddmlib.CollectingOutputReceiver;
 import com.android.ddmlib.IDevice;
 import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidUtils;
+import com.fgnb.android.PortProvider;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.TimeUnit;
@@ -36,7 +37,7 @@ public class UiautomatorServerManager {
      * @throws Exception
      */
     public void createForward() throws Exception {
-        uiautomatorServerPort = getAvailablePort();
+        uiautomatorServerPort = PortProvider.getUiautomator2ServerPort();
         try {
             iDevice.createForward(uiautomatorServerPort,SERVER_RUN_IN_PHONE_PROT);
         }catch (Exception e){

@@ -10,7 +10,6 @@ import java.net.UnknownHostException;
 
 /**
  * Created by jiangyitao.
- * 网络工具类
  */
 @Slf4j
 public class NetUtil {
@@ -27,13 +26,12 @@ public class NetUtil {
             bindPort("0.0.0.0", port);
             return true;
         } catch (IOException e) {
-            log.info("端口{}被占用", port);
             return false;
         }
     }
 
     private static void bindPort(String host, int port) throws IOException {
-        try (Socket socket = new Socket()){
+        try (Socket socket = new Socket()) {
             socket.bind(new InetSocketAddress(host, port));
         }
     }

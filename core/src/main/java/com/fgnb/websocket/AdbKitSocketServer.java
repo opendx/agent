@@ -2,8 +2,8 @@ package com.fgnb.websocket;
 
 import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
+import com.fgnb.android.PortProvider;
 import com.fgnb.android.stf.adbkit.AdbKitManager;
-import com.fgnb.android.stf.adbkit.AdbKitPortProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -65,7 +65,7 @@ public class AdbKitSocketServer {
         WebSocketUtil.sendText(session,"开始启动手机远程调试服务");
 
         try {
-            adbkitPort = AdbKitPortProvider.getAvailablePort();
+            adbkitPort = PortProvider.getAdbKitAvailablePort();
             adbKitManager = new AdbKitManager(adbkitPort,deviceId);
         } catch (Exception e) {
             log.error("[{}]初始化AdbKitManager出错",deviceId,e);

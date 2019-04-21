@@ -28,7 +28,7 @@ public class ADB {
 
             log.info("等待adb连接");
             long start = System.currentTimeMillis();
-            while (System.currentTimeMillis() - start <= 10000) {
+            while (System.currentTimeMillis() - start <= 30000) {
                 if (adb.isConnected()) {
                     log.info("adb已连接");
                     break;

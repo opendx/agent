@@ -2,8 +2,8 @@ package com.fgnb.android.stf.minicap;
 
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.NullOutputReceiver;
+import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
-import com.fgnb.utils.ByteUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.DataInputStream;
@@ -49,6 +49,9 @@ public class MinicapDataHandler {
     private int frameBodyLength = 0;
     private byte[] frameBody = new byte[0];
     /** minicap解析相关 end */
+
+    private AndroidDevice androidDevice;
+    private String deviceId;
 
     public MinicapDataHandler(String deviceId, int minicapPort){
         this.minicapPort = minicapPort;
@@ -126,9 +129,6 @@ public class MinicapDataHandler {
                 log.error("[{}]removeForward出错", deviceId, e);
             }
         }
-        //8.归还端口
-        log.info("[{}]归还minicap端口:{}",deviceId,minicapPort);
-        MinicapPortProvider.pushAvailablePort(minicapPort);
 
         log.info("[{}]minicap资源回收完成",deviceId);
 
@@ -218,30 +218,6 @@ public class MinicapDataHandler {
                             readFrameBytes += 1;
                         } else {
                             //增加frame缓冲区的大小判断，防止出现负数的情况
-                            if (len - cursor >= frameBodyLength && frameBodyLength>=0) {
-                                byte[] subByte = ByteUtil.subByteArray(binaryData, cursor,
-                                        cursor + frameBodyLength);
-                                frameBody = ByteUtil.byteMerger(frameBody, subByte);
-                                if ((frameBody.length>=1 && frameBody[0] != -1) || (frameBody.length>=2 && frameBody[1] != -40)) {
-                                    log.error("Frame body does not start with JPG header");
-                                    return;
-                                }
-                                byte[] finalBytes = ByteUtil.subByteArray(frameBody, 0,
-                                        frameBody.length);
-                                //将真正的图片字节数组放入队列
-                                processedMinicapImageDataQueue.offer(finalBytes);
-                                cursor += frameBodyLength;
-                                frameBodyLength = 0;
-                                readFrameBytes = 0;
-                                frameBody = new byte[0];
-                            } else if(len >= cursor) {
-                                byte[] subByte = ByteUtil.subByteArray(binaryData, cursor,
-                                        len);
-                                frameBody = ByteUtil.byteMerger(frameBody, subByte);
-                                frameBodyLength -= (len - cursor);
-                                readFrameBytes += (len - cursor);
-                                cursor = len;
-                            }
                         }
                     }
                 }

@@ -39,25 +39,6 @@ public class AndroidDeviceService {
         return minitouchManager;
     }
 
-    public MinicapManager startMiniCapService(String deviceId) throws Exception{
-
-        AndroidDevice androidDevice = AndroidDeviceHolder.getAndroidDevice(deviceId);
-        if(androidDevice == null){
-            throw new RuntimeException("通过"+deviceId+"在AndroidDevice未获取到AndroidDevice对象");
-        }
-
-        MinicapManager minicapManager = new MinicapManager(androidDevice);
-
-        //1.端口转发到minicap服务
-        minicapManager.createForward();
-        log.info("[{}]createforward : {} => localabstract:minicap",deviceId,minicapManager.getMinicapPort());
-
-        //2.启动minicap服务
-        minicapManager.startMiniCap();
-        log.info("[{}]minicap started,local port => {}",deviceId,minicapManager.getMinicapPort());
-
-        return minicapManager;
-    }
 
 
 }

@@ -2,62 +2,64 @@ package com.fgnb.android;
 
 import com.fgnb.utils.NetUtil;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Created by jiangyitao.
  */
 public class PortProvider {
 
-    private Set<Integer> availablePorts = Collections.synchronizedSet(new TreeSet<Integer>());
+    private static final int MINITOUCH_PORT_START = 7000;
+    private static final int MINITOUCH_PORT_END = 7499;
+    private static int minitouchPort = MINITOUCH_PORT_START;
 
-    private int startPort;
-    private int endPort;
+    private static final int MINICAP_PORT_START = 7500;
+    private static final int MINICAP_PORT_END = 7999;
+    private static int minicapPort = MINICAP_PORT_START;
 
-    public PortProvider(int startPort,int endPort){
-        this.startPort = startPort;
-        this.endPort = endPort;
-        int port = startPort;
-        //获取可用端口
-        while(port<=endPort){
-            if(NetUtil.isPortAvailable(port)){
-                //如果端口没有被占用，那么就添加
-                availablePorts.add(port);
+    private static final int ADBKIT_PORT_START = 8000;
+    private static final int ADBKIT_PORT_END = 8499;
+    private static int adbKitPort = ADBKIT_PORT_START;
+
+    private static final int UIAUTOMATOR2_SERVER_PORT_START = 8500;
+    private static final int UIAUTOMATOR2_SERVER_PORT_END = 8999;
+    private static int uiautomator2ServerPort = UIAUTOMATOR2_SERVER_PORT_START;
+
+    public static synchronized int getMinitouchAvailablePort() {
+        int availablePort = getAvailablePort(MINITOUCH_PORT_START, MINITOUCH_PORT_END, minitouchPort);
+        minitouchPort = availablePort + 1;
+        return availablePort;
+    }
+
+    public static synchronized int getMinicapAvailablePort() {
+        int availablePort = getAvailablePort(MINICAP_PORT_START, MINICAP_PORT_END, minicapPort);
+        minicapPort = availablePort + 1;
+        return availablePort;
+    }
+
+    public static synchronized int getAdbKitAvailablePort() {
+        int availablePort = getAvailablePort(ADBKIT_PORT_START, ADBKIT_PORT_END, adbKitPort);
+        adbKitPort = availablePort + 1;
+        return availablePort;
+    }
+
+    public static synchronized int getUiautomator2ServerPort() {
+        int availablePort = getAvailablePort(UIAUTOMATOR2_SERVER_PORT_START, UIAUTOMATOR2_SERVER_PORT_END, uiautomator2ServerPort);
+        uiautomator2ServerPort = availablePort + 1;
+        return availablePort;
+    }
+
+    private static int getAvailablePort(int startPort,int endPort,int port) {
+        while (true) {
+            if(port > endPort || port < startPort) {
+                port = startPort;
             }
-            port++;
+            if(NetUtil.isPortAvailable(port)) {
+                return port;
+            } else {
+                port ++;
+            }
         }
     }
 
-    /**
-     * 获取可用端口
-     * @return
-     */
-    public synchronized int getAvailablePorts(){
-        Iterator<Integer> it = availablePorts.iterator();
-        if(it.hasNext()){
-            Integer port = it.next();
-            //从set中移除
-            availablePorts.remove(port);
-            return port.intValue();
-        }else{
-            return -1;
-        }
-    }
-
-    /**
-     * 归还端口号
-     * @param port 端口号
-     * @return boolean
-     */
-    public boolean pushAvailablePorts(int port){
-        if(port>=startPort && port<=endPort){
-            return availablePorts.add(port);
-        }else{
-            return false;
-        }
-    }
 
 }

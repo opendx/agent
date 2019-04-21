@@ -203,7 +203,6 @@ public class Minitouch {
             String commitCmd = cmd + "c\n";
             pw.write(commitCmd);
             pw.flush();
-            log.info("[{}]minitouch commit => {}",androidDevice.getId(),cmd);
         }
     }
 
