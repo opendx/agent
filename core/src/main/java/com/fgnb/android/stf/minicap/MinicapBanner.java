@@ -2,19 +2,18 @@ package com.fgnb.android.stf.minicap;
 
 import lombok.Data;
 
+/**
+ * Created by jiangyitao.
+ */
 @Data
 public class MinicapBanner {
-    private int version;
-    private int length;
-    private int pid;
-    private int readWidth;
-    private int readHeight;
-    private int virtualWidth;
-    private int virtualHeight;
-    private int orientation;
-    private int quirks;
-    private int maxX;
-    private int maxY;
-    private int maxPoint;
-    private int maxPress;
+    private Integer version;
+    private Integer length;
+    private Integer pid;
+    private Integer realWidth;
+    private Integer realHeight;
+    private Integer virtualWidth;
+    private Integer virtualHeight;
+    private Integer orientation;
+    private Integer quirks;
 }

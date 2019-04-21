@@ -2,7 +2,6 @@ package com.fgnb.android.stf.minicap;
 
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.NullOutputReceiver;
-import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
 import com.fgnb.utils.ByteUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +25,6 @@ public class MinicapDataHandler {
     private int minicapPort;
 
     /** 设备id */
-    private String deviceId;
-    private AndroidDevice androidDevice;
     private IDevice iDevice;
 
     /** 原生的minicap图片数据存放队列 */
@@ -164,8 +161,8 @@ public class MinicapDataHandler {
             Thread thread = Thread.currentThread();
             log.info("[{}]开启一个线程将minicap输出的数据放入nativeMinicapImageDataQueue队列，thread id => {}",deviceId,thread.getId());
             while(true){
-                int len = 0;
-                byte[] buffer = null;
+                int len;
+                byte[] buffer;
                 try {
                     len = dataInputStream.available();
                 } catch (IOException e) {
@@ -286,18 +283,18 @@ public class MinicapDataHandler {
             case 8:
             case 9:
                 // real width
-                int realWidth = banner.getReadWidth();
+                int realWidth = banner.getRealWidth();
                 realWidth += (byte10 << ((readBannerBytes - 6) * 8)) >>> 0;
-                banner.setReadWidth(realWidth);
+                banner.setRealWidth(realWidth);
                 break;
             case 10:
             case 11:
             case 12:
             case 13:
                 // real height
-                int realHeight = banner.getReadHeight();
+                int realHeight = banner.getRealHeight();
                 realHeight += (byte10 << ((readBannerBytes - 10) * 8)) >>> 0;
-                banner.setReadHeight(realHeight);
+                banner.setRealHeight(realHeight);
                 break;
             case 14:
             case 15:

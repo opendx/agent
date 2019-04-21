@@ -120,9 +120,6 @@ public class Minitouch {
                 log.error("[{}]removeForward出错", androidDevice.getId(), e);
             }
         }
-        //5.归还端口
-        log.info("[{}]归还minitouch端口:{}",androidDevice.getId(),minitouchPort);
-        MinitouchPortProvider.pushAvailablePort(minitouchPort);
 
         log.info("[{}]minitouch资源回收完成",androidDevice.getId());
 

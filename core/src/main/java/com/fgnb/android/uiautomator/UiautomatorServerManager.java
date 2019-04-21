@@ -6,6 +6,8 @@ import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidUtils;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by jiangyitao.
  */
@@ -22,25 +24,12 @@ public class UiautomatorServerManager {
     private String deviceId;
     private int uiautomatorServerPort;
 
-    private Thread startServerThread;
-
-
     public UiautomatorServerManager(AndroidDevice androidDevice){
         this.androidDevice = androidDevice;
         this.iDevice = androidDevice.getIDevice();
         this.deviceId = androidDevice.getDevice().getId();
     }
 
-
-
-    /**
-     * 获取可用的端口
-     * @return
-     * @throws Exception
-     */
-    private int getAvailablePort() throws Exception {
-        return UiAutomatorServerPortProvider.getAvailablePort();
-    }
 
     /**
      * 端口转发到uiautomator2server服务
@@ -52,8 +41,6 @@ public class UiautomatorServerManager {
             iDevice.createForward(uiautomatorServerPort,SERVER_RUN_IN_PHONE_PROT);
         }catch (Exception e){
             log.error("[{}]createForward error,pushAvailablePort back {}  ",deviceId,uiautomatorServerPort);
-            //出现异常 归还端口
-            UiAutomatorServerPortProvider.pushAvailablePort(uiautomatorServerPort);
             throw e;
         }
     }
@@ -85,16 +72,15 @@ public class UiautomatorServerManager {
         } catch (Exception e) {
             log.error("[{}]强制关闭{}出错",deviceId,PACKAGE_NAME,e);
         }
-        startServerThread = new Thread(()->{
+        new Thread(()->{
             CollectingOutputReceiver collectingOutputReceiver = new CollectingOutputReceiver();
             try {
-                iDevice.executeShellCommand(START_SERVER_CMD, collectingOutputReceiver,0);
+                iDevice.executeShellCommand(START_SERVER_CMD, collectingOutputReceiver,0, TimeUnit.SECONDS);
                 log.info("[{}]uiautomator2服务停止：{}",deviceId,collectingOutputReceiver.getOutput());
             } catch (Exception e) {
                 log.error("[{}]执行{}出错",deviceId,START_SERVER_CMD,e);
             }
-        });
-        startServerThread.start();
+        }).start();
     }
 
     public void stopServer(){
@@ -113,9 +99,6 @@ public class UiautomatorServerManager {
                 log.error("[{}]removeForward出错", deviceId, e);
             }
         }
-        //3.归还端口
-        log.info("[{}]归还uiautomator2server端口:{}",deviceId,uiautomatorServerPort);
-        UiAutomatorServerPortProvider.pushAvailablePort(uiautomatorServerPort);
         log.info("[{}]uiautomator server资源回收完成",deviceId);
     }
 

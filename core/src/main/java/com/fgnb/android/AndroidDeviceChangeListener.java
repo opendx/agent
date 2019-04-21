@@ -61,24 +61,19 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         String deviceId = iDevice.getSerialNumber();
         log.info("[{}]已连接", deviceId);
 
-        //等待设备上线
         log.info("[{}]等待手机上线", deviceId);
         AndroidUtils.waitForDeviceOnline(iDevice, 60);
         log.info("[{}]手机已上线", deviceId);
 
         AndroidDevice androidDevice = AndroidDeviceHolder.getAndroidDevice(deviceId);
-        if (androidDevice == null) {//该agent未接入过该手机
-            //第一次上线
+        if (androidDevice == null) {
             log.info("[{}]首次上线", deviceId);
-            //是否在server注册
             log.info("[{}]检查是否已接入过系统", deviceId);
             Device device = serverApi.getDeviceById(deviceId);
             if (device == null) {
-                //首次接入
                 log.info("[{}]首次接入系统", deviceId);
                 androidDevice = initDevice(iDevice);
             } else {
-                //接入过 首次上线
                 log.info("[{}]已接入过系统", deviceId);
                 androidDevice = new AndroidDevice(device, iDevice);
             }

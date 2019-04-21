@@ -19,27 +19,21 @@ public class AdbKitManager {
 
     private ExecuteWatchdog watchdog;
 
-    /** 运行adbkit的线程 stopUsbDeviceToTcp 线程将会执行结束 */
-    private Thread startAdbKitThread;
-
     public AdbKitManager(int port,String deviceId){
         this.port = port;
         this.deviceId = deviceId;
     }
 
     public void startUsbDeviceToTcp(){
-        startAdbKitThread = new Thread(()->{
+        new Thread(()->{
             try {
                 String cmd = String.format(START_CMD, port, deviceId);
                 log.info("[{}]启动adbkit，开启远程调试功能,cmd=>{}",deviceId,cmd);
                 watchdog = ShellExecutor.execReturnWatchdog(cmd);
             } catch (IOException e) {
                 log.error("[{}]adbkit运行异常",deviceId,e);
-                //归还端口
-                AdbKitPortProvider.pushAvailablePort(port);
             }
-        });
-        startAdbKitThread.start();
+        }).start();
     }
 
     public void stopUsbDeviceToTcp(){
@@ -48,10 +42,6 @@ public class AdbKitManager {
             //杀掉startUsbDeviceToTcp 启动的START_CMD命令
             watchdog.destroyProcess();
         }
-        //归还端口
-        log.info("[{}]归还adbkit端口{}",deviceId,port);
-        AdbKitPortProvider.pushAvailablePort(port);
-
         log.info("[{}]adbkit资源回收完成",deviceId);
     }
 

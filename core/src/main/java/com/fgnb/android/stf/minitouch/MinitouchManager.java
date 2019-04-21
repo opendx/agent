@@ -6,6 +6,8 @@ import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidUtils;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.TimeUnit;
+
 
 /**
  * Created by jiangyitao.
@@ -22,9 +24,6 @@ public class MinitouchManager {
     private String deviceId;
     private AndroidDevice androidDevice;
 
-
-    /** 运行手机minitouch的线程 Minitouch.releaseResources里杀掉minicap进程 线程将会执行结束*/
-    private Thread runMinitouchThread;
 
     private int minitouchPort = -1;
 
@@ -45,26 +44,17 @@ public class MinitouchManager {
     public void startMinitouch() throws Exception {
 
         //需要开线程启动minitouch 因为executeShellCommand(START_MINITOUCH_SHELL) 后线程会阻塞在此处
-        runMinitouchThread = new Thread(() -> {
+        new Thread(() -> {
             try {
                 log.info("[{}]start minitouch service，exec => {},thread id => {}",deviceId,START_MINITOUCH_SHELL,Thread.currentThread().getId());
-                iDevice.executeShellCommand(START_MINITOUCH_SHELL, new NullOutputReceiver(),0);
+                iDevice.executeShellCommand(START_MINITOUCH_SHELL, new NullOutputReceiver(),0, TimeUnit.SECONDS);
                 log.info("[{}]minitouch service stopped",deviceId);
             } catch (Exception e) {
                 log.error("[{}]minitouch执行异常",deviceId,e);
             }
-        });
-        runMinitouchThread.start();
+        }).start();
     }
 
-    /**
-     * 获取可用的minitouch端口
-     * @return
-     * @throws Exception
-     */
-    private int getAvailablePort() throws Exception {
-        return MinitouchPortProvider.getAvailablePort();
-    }
 
     /**
      * 端口转发到minitouch服务
@@ -76,8 +66,6 @@ public class MinitouchManager {
             iDevice.createForward(minitouchPort,"minitouch",IDevice.DeviceUnixSocketNamespace.ABSTRACT);
         }catch (Exception e){
             log.error("[{}]createForward error,pushAvailablePort back{}  ",deviceId,minitouchPort);
-            //出现异常 归还端口
-            MinitouchPortProvider.pushAvailablePort(minitouchPort);
             throw e;
         }
     }

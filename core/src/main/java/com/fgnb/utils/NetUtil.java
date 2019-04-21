@@ -33,11 +33,8 @@ public class NetUtil {
     }
 
     private static void bindPort(String host, int port) throws IOException {
-        Socket socket = new Socket();
-        try {
+        try (Socket socket = new Socket()){
             socket.bind(new InetSocketAddress(host, port));
-        } finally {
-            socket.close();
         }
     }
 
