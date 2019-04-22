@@ -17,8 +17,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class MinitouchManager {
 
-    private final static String ANDROID_TMP_FOLDER = "/data/local/tmp/";
-    public static final String START_MINITOUCH_SHELL = ANDROID_TMP_FOLDER + "minitouch";
 
 
     private IDevice iDevice;
@@ -44,16 +42,7 @@ public class MinitouchManager {
      */
     public void startMinitouch() throws Exception {
 
-        //需要开线程启动minitouch 因为executeShellCommand(START_MINITOUCH_SHELL) 后线程会阻塞在此处
-        new Thread(() -> {
-            try {
-                log.info("[{}]start minitouch service，exec => {},thread id => {}",deviceId,START_MINITOUCH_SHELL,Thread.currentThread().getId());
-                iDevice.executeShellCommand(START_MINITOUCH_SHELL, new NullOutputReceiver(),0, TimeUnit.SECONDS);
-                log.info("[{}]minitouch service stopped",deviceId);
-            } catch (Exception e) {
-                log.error("[{}]minitouch执行异常",deviceId,e);
-            }
-        }).start();
+
     }
 
 

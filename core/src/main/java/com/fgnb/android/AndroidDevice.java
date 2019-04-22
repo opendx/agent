@@ -22,6 +22,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Data
 public class AndroidDevice {
 
+    public final static String TMP_FOLDER = "/data/local/tmp/";
+
     //任务队列 执行自动化测试任务
     private BlockingQueue<Map<String,String>> taskQueue = new LinkedBlockingQueue();
 

@@ -3,10 +3,7 @@ package com.fgnb.android.stf.minitouch;
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.NullOutputReceiver;
 import com.fgnb.android.AndroidDevice;
-import com.fgnb.android.AndroidDeviceHolder;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
-import org.springframework.util.StreamUtils;
 
 import java.io.*;
 import java.net.Socket;

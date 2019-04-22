@@ -1,6 +1,7 @@
 package com.fgnb.android.stf.minitouch;
 
 import com.android.ddmlib.*;
+import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -12,7 +13,6 @@ import java.io.IOException;
 @Slf4j
 public class MinitouchInstaller {
 
-    private static final String ANDROID_TMP_FOLDER = "/data/local/tmp/";
     private static final String MINITOUCH_PATH = "vendor/minitouch/%s/minitouch";
     private static final String MINITOUCH_CHMOD_SHELL = "chmod 777 %s";
 
@@ -31,7 +31,7 @@ public class MinitouchInstaller {
         String cpuAbi = AndroidUtils.getCpuAbi(iDevice);
         String minitouchFilePath = String.format(MINITOUCH_PATH, cpuAbi);
 
-        String phoneMinitouchPath = ANDROID_TMP_FOLDER + "minitouch";
+        String phoneMinitouchPath = AndroidDevice.TMP_FOLDER + "minitouch";
         log.info("[{}]push minitouch到手机,{}->{}", deviceId, minitouchFilePath, phoneMinitouchPath);
         iDevice.pushFile(minitouchFilePath, phoneMinitouchPath);
 

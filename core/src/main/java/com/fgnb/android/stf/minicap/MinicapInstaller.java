@@ -1,6 +1,7 @@
 package com.fgnb.android.stf.minicap;
 
 import com.android.ddmlib.*;
+import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -8,12 +9,10 @@ import java.io.IOException;
 
 /**
  * Created by jiangyitao.
- * minicap安装器
  */
 @Slf4j
 public class MinicapInstaller {
 
-    private static final String ANDROID_TMP_FOLDER = "/data/local/tmp/";
     private static final String MINICAP_CHMOD_SHELL = "chmod 777 %s %s";
 
     private static final String MINICAP_PATH = "vendor/minicap/bin/%s/minicap";
@@ -26,8 +25,7 @@ public class MinicapInstaller {
     }
 
     /**
-     * 根据手机cpu架构/android版本 push相应的minicap文件到手机/data/local/tmp目录
-     * 对minicap/minicap.so 文件赋予777权限
+     * 安装minicap
      */
     public void install() throws TimeoutException, AdbCommandRejectedException, SyncException, IOException, ShellCommandUnresponsiveException {
         String deviceId = iDevice.getSerialNumber();
@@ -39,12 +37,12 @@ public class MinicapInstaller {
         String minicapSoFilePath = String.format(MINICAP_SO_PATH,apiLevel,cpuAbi);
 
         //push minicap 到手机
-        String phoneMinicapPath = ANDROID_TMP_FOLDER + "minicap";
+        String phoneMinicapPath = AndroidDevice.TMP_FOLDER + "minicap";
         log.info("[{}][minicap]push minicap到手机,{} -> {}", deviceId, minicapFilePath, phoneMinicapPath);
         iDevice.pushFile(minicapFilePath, phoneMinicapPath);
 
         //push minicap.so 到手机
-        String phoneMinicapSoPath = ANDROID_TMP_FOLDER + "minicap.so";
+        String phoneMinicapSoPath = AndroidDevice.TMP_FOLDER + "minicap.so";
         log.info("[{}][minicap]push minicap.so到手机,{} -> {}", deviceId, minicapSoFilePath, phoneMinicapSoPath);
         iDevice.pushFile(minicapSoFilePath, phoneMinicapSoPath);
 

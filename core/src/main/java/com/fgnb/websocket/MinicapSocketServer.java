@@ -6,7 +6,6 @@ import com.fgnb.android.stf.minicap.Minicap;
 import com.fgnb.api.ServerApi;
 import com.fgnb.model.Device;
 import com.fgnb.App;
-import com.fgnb.service.AndroidDeviceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +14,6 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.nio.ByteBuffer;
 import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 

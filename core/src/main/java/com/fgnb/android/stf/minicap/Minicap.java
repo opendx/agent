@@ -19,19 +19,17 @@ public class Minicap {
 
     private static final String START_MINICAP_SHELL = "LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/minicap -P %s@%s/%d";
 
-    /**
-     * 本地端口，adb forward 本地端口到手机端口
-     */
-    private Integer localPort;
-    /**
-     * 运行在手机里的进程id
-     */
-    private Integer pid;
-
     private BlockingQueue<byte[]> imgQueue = new LinkedBlockingQueue<>();
 
     private AndroidDevice androidDevice;
-
+    /**
+     * 本地端口，adb forward 本地端口到手机端口
+     */
+    private int localPort;
+    /**
+     * 运行在手机里的进程id
+     */
+    private int pid;
     /**
      * 是否持续解析minicap数据
      */
@@ -68,7 +66,7 @@ public class Minicap {
                     public void processNewLines(String[] lines) {
                         for (String line : lines) {
                             log.info("[{}][minicap]手机控制台输出：{}", getDeviceId(), line);
-                            if (!StringUtils.isEmpty(line) && line.startsWith("INFO: (jni/minicap/JpgEncoder.cpp:64)")) {
+                            if (!StringUtils.isEmpty(line) && line.startsWith("INFO: (jni/minicap/JpgEncoder.cpp)")) {
                                 //minicap启动完成
                                 countDownLatch.countDown();
                             }
