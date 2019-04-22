@@ -68,7 +68,7 @@ public class Minicap {
                     public void processNewLines(String[] lines) {
                         for (String line : lines) {
                             log.info("[{}][minicap]手机控制台输出：{}", deviceId, line);
-                            if (!StringUtils.isEmpty(line) && line.startsWith("INFO: (jni/minicap/JpgEncoder.cpp)")) {
+                            if (!StringUtils.isEmpty(line) && line.startsWith("INFO: (jni/minicap/JpgEncoder.cpp")) {
                                 //minicap启动完成
                                 countDownLatch.countDown();
                             }
