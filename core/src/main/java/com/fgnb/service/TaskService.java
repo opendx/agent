@@ -18,7 +18,7 @@ public class TaskService {
 
     public void commit(String deviceId, Map<String,String> codes){
         log.info("[{}]提交测试任务",deviceId);
-        AndroidDevice androidDevice = AndroidDeviceHolder.getAndroidDevice(deviceId);
+        AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
         if(androidDevice == null){
             throw new RuntimeException("设备不存在");
         }

@@ -63,7 +63,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         AndroidUtils.waitForDeviceOnline(iDevice, 60);
         log.info("[{}]手机已上线", deviceId);
 
-        AndroidDevice androidDevice = AndroidDeviceHolder.getAndroidDevice(deviceId);
+        AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
         if (androidDevice == null) {
             log.info("[{}]首次上线", deviceId);
             log.info("[{}]检查是否已接入过系统", deviceId);
@@ -75,7 +75,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
                 log.info("[{}]已接入过系统", deviceId);
                 androidDevice = new AndroidDevice(device, iDevice);
             }
-            AndroidDeviceHolder.addAndroidDevice(deviceId, androidDevice);
+            AndroidDeviceHolder.add(deviceId, androidDevice);
         }
 
         Device device = androidDevice.getDevice();
@@ -98,7 +98,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         String deviceId = iDevice.getSerialNumber();
         log.info("[{}]断开连接", deviceId);
 
-        AndroidDevice androidDevice = AndroidDeviceHolder.getAndroidDevice(deviceId);
+        AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
         if (androidDevice == null) {
             return;
         }

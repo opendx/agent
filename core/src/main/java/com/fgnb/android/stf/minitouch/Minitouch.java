@@ -91,6 +91,7 @@ public class Minitouch {
         log.info("[{}][minitouch]minitouch启动完成", deviceId);
 
         socket = new Socket("127.0.0.1", localPort);
+        log.info("[{}][minitouch]创建socket获取minitouch输出的数据：127.0.0.1:{}", deviceId, localPort);
         printWriter = new PrintWriter(socket.getOutputStream());
 
         try (InputStream inputStream = socket.getInputStream();

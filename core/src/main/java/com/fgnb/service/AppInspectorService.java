@@ -58,7 +58,7 @@ public class AppInspectorService {
     }
 
     public InspctorImgVo getScreenShot(String deviceId) throws Exception{
-        AndroidDevice androidDevice = AndroidDeviceHolder.getAndroidDevice(deviceId);
+        AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
         String localScreenshotPath = null;
         try {
             //本地 截图路径

@@ -45,7 +45,7 @@ public class MinicapSocketServer {
         WebSocketUtil.sendText(session, "minicap websocket连接成功");
 
         //检测手机是否连接
-        AndroidDevice androidDevice = AndroidDeviceHolder.getAndroidDevice(deviceId);
+        AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
         if (androidDevice == null || !androidDevice.isConnected()) {
             log.info("[{}]设备未连接", deviceId);
             WebSocketUtil.sendText(session, deviceId + "手机未连接,请稍后重试");
@@ -77,7 +77,7 @@ public class MinicapSocketServer {
         WebSocketUtil.sendText(session, "minicap图片数据处理中," + "端口为:1" + ",session id:" + session.getId());
 
         //minicap连接成功 则把手机改为使用中
-        Device device = AndroidDeviceHolder.getAndroidDevice(deviceId).getDevice();
+        Device device = AndroidDeviceHolder.get(deviceId).getDevice();
         device.setStatus(Device.USING_STATUS);
         device.setUsername(userName);
         uiServerApi.saveDevice(device);
@@ -106,7 +106,7 @@ public class MinicapSocketServer {
             //停止minicap
             minicap.stop();
             //minicap总是比minitouch/adbkit等晚很多关闭，所以只要minicap websocket关闭 则意味着手机可以变为闲置了
-            Device device = AndroidDeviceHolder.getAndroidDevice(deviceId).getDevice();
+            Device device = AndroidDeviceHolder.get(deviceId).getDevice();
             //因为手机可能被拔出离线，AndroidDeviceChangeService.deviceDisconnected已经在数据库改为离线，这里不能改为闲置
             if (device != null && device.getStatus() == Device.USING_STATUS) {
                 //将设备改为闲置

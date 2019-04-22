@@ -265,7 +265,7 @@ public class TestListenerForTestCase extends TestListenerAdapter {
      */
     private String takeScreenShot(String imgFilePath, String deviceId){
         try{
-            AndroidDevice androidDevice = AndroidDeviceHolder.getAndroidDevice(deviceId);
+            AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
             MinicapScreenShoter.takeScreenShot(imgFilePath,androidDevice);
             return imgFilePath;
         }catch (Exception e){
@@ -281,7 +281,7 @@ public class TestListenerForTestCase extends TestListenerAdapter {
     private String takeScreenShotAndUploadImg(String deviceId){
         String imgFilePath = null;
         try{
-            AndroidDevice androidDevice = AndroidDeviceHolder.getAndroidDevice(deviceId);
+            AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
             imgFilePath = UUIDUtil.getUUID()+".jpg";
             MinicapScreenShoter.takeScreenShot(imgFilePath,androidDevice);
             ServerApi uiServerApi = App.getBean(ServerApi.class);

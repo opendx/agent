@@ -31,7 +31,7 @@ public class DeviceController {
         DeviceInfo deviceInfo = new DeviceInfo();
         deviceInfo.setDeviceId(deviceId);
 
-        AndroidDevice androidDevice = AndroidDeviceHolder.getAndroidDevice(deviceId);
+        AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
         if(androidDevice == null){
             deviceInfo.setMsg("设备未接入");
             deviceInfo.setCanUse(false);

@@ -10,11 +10,11 @@ public class AndroidDeviceHolder {
 
     private static Map<String,AndroidDevice> androidDeviceHolder = new ConcurrentHashMap<>();
 
-    public static void addAndroidDevice(String deviceId,AndroidDevice androidDevice){
+    public static void add(String deviceId, AndroidDevice androidDevice){
         androidDeviceHolder.put(deviceId,androidDevice);
     }
 
-    public static AndroidDevice getAndroidDevice(String deviceId){
+    public static AndroidDevice get(String deviceId){
         return androidDeviceHolder.get(deviceId);
     }
 }

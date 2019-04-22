@@ -41,7 +41,7 @@ public class UiAutomator2SocketServer {
         WebSocketUtil.sendText(session,"UiAutomator2SocketServer连接成功");
 
         //检测手机是否连接
-        AndroidDevice androidDevice = AndroidDeviceHolder.getAndroidDevice(deviceId);
+        AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
         if(androidDevice == null || !androidDevice.isConnected()){
             log.info("[{}]设备未连接",deviceId);
             WebSocketUtil.sendText(session,deviceId+"手机未连接");
