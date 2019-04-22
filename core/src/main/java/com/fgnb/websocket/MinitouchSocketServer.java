@@ -5,10 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
 import com.fgnb.android.stf.minitouch.Minitouch;
-import com.fgnb.android.stf.minitouch.MinitouchManager;
-import com.fgnb.App;
 import com.fgnb.model.Device;
-import com.fgnb.service.AndroidDeviceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -34,8 +31,6 @@ public class MinitouchSocketServer {
 
 	private String deviceId;
 	private Session session;
-
-	private AndroidDeviceService androidDeviceService = App.getBean(AndroidDeviceService.class);
 
 	private Minitouch minitouch;
 
@@ -76,25 +71,9 @@ public class MinitouchSocketServer {
 
 		WebSocketUtil.sendText(session,"开始启动手机minitouch服务");
 		//1.启动手机minitouch服务
-		int minitouchPort = -1;
-		try {
-			MinitouchManager minitouchManager = androidDeviceService.startMinitouchService(deviceId);
-			minitouchPort = minitouchManager.getMinitouchPort();
-			//延迟2秒 等待minitouch启动完成
-			Thread.sleep(2000);
-		} catch (Exception e) {
-			log.error("[{}]启动minitouch服务失败",deviceId,e);
-			WebSocketUtil.sendText(session,"启动minitouch服务失败，请稍后重试");
-			return;
-		}
-
+		minitouch = new Minitouch(androidDevice);
+		minitouch.start();
 		WebSocketUtil.sendText(session,"启动手机minitouch服务成功");
-
-		WebSocketUtil.sendText(session,"开始建立socket连接手机minitouch服务");
-		//2.建立socket连接手机里的minitouch
-		minitouch = new Minitouch(androidDevice,minitouchPort);
-
-		WebSocketUtil.sendText(session,"连接手机minitouch服务成功,"+"端口为:"+minitouchPort+",sessionid:"+session.getId());
 
 	}
 
@@ -127,7 +106,7 @@ public class MinitouchSocketServer {
             }
 
             //释放minitouch资源
-			minitouch.releaseResources();
+			minitouch.stop();
 
             //关闭adbkit websocket连接
 			Session adbkitSession = AdbKitSocketServer.adbKitSessionMap.get(deviceId);
@@ -172,28 +151,26 @@ public class MinitouchSocketServer {
 		//将前端传递过来的尺寸比例乘以minitou输出的屏幕尺寸 得到坐标
 		switch (operation){
 			case "m":
-				minitouch.moveTo((int)(objToFloat(jsonObject.get("pX"))*minitouch.getMinitouchWidth()),
-						(int)(objToFloat(jsonObject.get("pY"))*minitouch.getMinitouchHeight()));
+				minitouch.moveTo(objToFloat(jsonObject.get("pX")), objToFloat(jsonObject.get("pY")));
 				break;
 			case "d":
-				minitouch.touchDown((int)(objToFloat(jsonObject.get("pX"))*minitouch.getMinitouchWidth()),
-						(int)(objToFloat(jsonObject.get("pY"))*minitouch.getMinitouchHeight()));
+				minitouch.touchDown(objToFloat(jsonObject.get("pX")), objToFloat(jsonObject.get("pY")));
 				break;
 			case "u":
 				minitouch.touchUp();
 				break;
-			case "g":
-				minitouch.inputKeyevent(3);
-				break;
-			case "b":
-				minitouch.inputKeyevent(4);
-				break;
-			case "p":
-				minitouch.inputKeyevent(26);
-				break;
-			case "menu":
-				minitouch.inputKeyevent(82);
-				break;
+//			case "g":
+//				minitouch.inputKeyevent(3);
+//				break;
+//			case "b":
+//				minitouch.inputKeyevent(4);
+//				break;
+//			case "p":
+//				minitouch.inputKeyevent(26);
+//				break;
+//			case "menu":
+//				minitouch.inputKeyevent(82);
+//				break;
 		}
 	}
 

@@ -213,6 +213,15 @@ public class AndroidUtils {
     }
 
     /**
+     * input keyevent
+     * keyCode对照表 https://blog.csdn.net/moyu123456789/article/details/71209893
+     * @param keyCode
+     */
+    public static void inputKeyevent(IDevice iDevice,int keyCode) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+        iDevice.executeShellCommand("input keyevent " + keyCode, new NullOutputReceiver());
+    }
+
+    /**
      * 执行命令
      *
      * @param cmd

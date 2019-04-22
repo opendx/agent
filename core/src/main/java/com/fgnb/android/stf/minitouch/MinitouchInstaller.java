@@ -32,11 +32,11 @@ public class MinitouchInstaller {
         String minitouchFilePath = String.format(MINITOUCH_PATH, cpuAbi);
 
         String phoneMinitouchPath = AndroidDevice.TMP_FOLDER + "minitouch";
-        log.info("[{}]push minitouch到手机,{}->{}", deviceId, minitouchFilePath, phoneMinitouchPath);
+        log.info("[{}][minitouch]push minitouch到手机,{}->{}", deviceId, minitouchFilePath, phoneMinitouchPath);
         iDevice.pushFile(minitouchFilePath, phoneMinitouchPath);
 
         String chmodShellCmd = String.format(MINITOUCH_CHMOD_SHELL, phoneMinitouchPath);
-        log.info("[{}]{} ", deviceId, chmodShellCmd);
+        log.info("[{}][minitouch]{} ", deviceId, chmodShellCmd);
         iDevice.executeShellCommand(chmodShellCmd, new NullOutputReceiver());
     }
 }
