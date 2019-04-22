@@ -2,7 +2,6 @@ package com.fgnb.service;
 
 import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
-import com.fgnb.android.stf.minicap.MinicapManager;
 import com.fgnb.android.stf.minitouch.MinitouchManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

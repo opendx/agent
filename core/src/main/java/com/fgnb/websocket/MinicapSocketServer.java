@@ -3,7 +3,6 @@ package com.fgnb.websocket;
 import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
 import com.fgnb.android.stf.minicap.Minicap;
-import com.fgnb.android.stf.minicap.MinicapManager;
 import com.fgnb.api.ServerApi;
 import com.fgnb.model.Device;
 import com.fgnb.App;
