@@ -92,43 +92,8 @@ public class MinitouchSocketServer {
         if(minitouch!=null){
 			//断开连接后 移除map里的session
             minitouchSessionMap.remove(deviceId);
-
-            //关闭minicap websockt连接
-            //因为有时关闭浏览器minicap断开很慢，而minitouch关闭则很快，所以在minitouch关闭后，强制关闭minicap防止minicap断开慢的问题
-            Session minicapSession = MinicapSocketServer.minicapSessionMap.get(deviceId);
-            if(minicapSession!=null && minicapSession.isOpen()){
-                try {
-					minicapSession.close();
-                    log.info("[{}]在minitouch socket关闭后，关闭了minicap websocket",deviceId);
-                } catch (IOException e) {
-                    log.error("[{}]在minitouc断开连接时关闭minicap websocket出错",deviceId,e);
-                }
-            }
-
             //释放minitouch资源
 			minitouch.stop();
-
-            //关闭adbkit websocket连接
-			Session adbkitSession = AdbKitSocketServer.adbKitSessionMap.get(deviceId);
-			if(adbkitSession!=null && adbkitSession.isOpen()){
-				try {
-					adbkitSession.close();
-					log.info("[{}]在minitouch socket关闭后，关闭了adbkit websocket",deviceId);
-				} catch (IOException e) {
-					log.error("[{}]在minitouc断开连接时关闭adbkit websocket出错",deviceId,e);
-				}
-			}
-
-			//停止uiautomator2服务
-			Session uiautomator2Session = UiAutomator2SocketServer.uiautomator2SessionMap.get(deviceId);
-			if(uiautomator2Session!=null && uiautomator2Session.isOpen()){
-				try {
-					uiautomator2Session.close();
-					log.info("[{}]在minitouch socket关闭后，关闭了uiautomator2server websocket",deviceId);
-				} catch (IOException e) {
-					log.error("[{}]在minitouc断开连接时关闭关闭了uiautomator2server websocket出错",deviceId,e);
-				}
-			}
 		}
 
 	}

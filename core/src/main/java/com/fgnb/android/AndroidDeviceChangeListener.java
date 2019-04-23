@@ -2,7 +2,6 @@ package com.fgnb.android;
 
 import com.android.ddmlib.*;
 import com.fgnb.App;
-import com.fgnb.android.stf.StfResourceReleaser;
 import com.fgnb.android.stf.minicap.MinicapInstaller;
 import com.fgnb.android.stf.minitouch.MinitouchInstaller;
 import com.fgnb.android.uiautomator.Uiautomator2ServerApkInstaller;
@@ -50,7 +49,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
     }
 
     /**
-     * Android设备连接到电脑，调用的方法
+     * Android设备连接到电脑
      *
      * @param iDevice
      * @throws Exception
@@ -90,7 +89,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
     }
 
     /**
-     * Android设备断开电脑，调用的方法
+     * Android设备断开电脑
      *
      * @param iDevice
      */
@@ -102,11 +101,6 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         if (androidDevice == null) {
             return;
         }
-
-        //todo 重构这里
-        //手机断开 回收minicap/minitouch/adbkit等占用的资源，如关闭输入输出流，端口释放等
-        StfResourceReleaser stfResourceReleaser = new StfResourceReleaser(deviceId);
-        stfResourceReleaser.release();
 
         Device device = androidDevice.getDevice();
         device.setStatus(Device.OFFLINE_STATUS);
