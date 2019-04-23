@@ -10,7 +10,6 @@ import java.io.IOException;
  */
 public class ShellExecutor {
 
-
     /**
      * 执行命令
      *
@@ -29,23 +28,16 @@ public class ShellExecutor {
      * @throws IOException
      */
     public static String execReturnResult(String cmd) throws IOException {
-
         CommandLine commandLine = CommandLine.parse(cmd);
         DefaultExecutor executor = new DefaultExecutor();
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
-        PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(outputStream, errorStream);
-
-        executor.setStreamHandler(pumpStreamHandler);
-        try {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+             ByteArrayOutputStream errorStream = new ByteArrayOutputStream()) {
+            PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(outputStream, errorStream);
+            executor.setStreamHandler(pumpStreamHandler);
             executor.execute(commandLine);
             return outputStream.toString() + errorStream.toString();
-        } finally {
-            outputStream.close();
-            errorStream.close();
         }
-
     }
 
     /**

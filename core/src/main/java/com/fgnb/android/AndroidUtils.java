@@ -151,9 +151,6 @@ public class AndroidUtils {
 
     /**
      * 等待设备上线
-     *
-     * @param maxWaitTimeSeconds
-     * @throws Exception
      */
     public static void waitForDeviceOnline(IDevice iDevice, long maxWaitTimeSeconds) {
         long startTime = System.currentTimeMillis();
