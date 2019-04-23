@@ -30,9 +30,9 @@ public class NetUtil {
         }
     }
 
-    private static void bindPort(String host, int port) throws IOException {
+    private static void bindPort(String ip, int port) throws IOException {
         try (Socket socket = new Socket()) {
-            socket.bind(new InetSocketAddress(host, port));
+            socket.bind(new InetSocketAddress(ip, port));
         }
     }
 
