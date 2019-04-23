@@ -10,7 +10,6 @@ import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -86,19 +85,17 @@ public class Minitouch {
 
         this.localPort = PortProvider.getMinitouchAvailablePort();
 
-        androidDevice.getIDevice().createForward(localPort, "minitouch", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
         log.info("[{}][minitouch]adb forward: {} -> remote minitouch", deviceId, localPort);
+        androidDevice.getIDevice().createForward(localPort, "minitouch", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
 
         countDownLatch.await();
         log.info("[{}][minitouch]minitouch启动完成", deviceId);
-
-        log.info("[{}][minitouch]创建socket获取minitouch输出的数据：127.0.0.1:{}", deviceId, localPort);
 
         new Thread(() -> {
             try (Socket socket = new Socket("127.0.0.1", localPort);
                  BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                  PrintWriter printWriter = new PrintWriter(socket.getOutputStream())){
-
+                log.info("[{}][minitouch]创建socket获取minitouch输出的数据：127.0.0.1:{}", deviceId, localPort);
                 this.printWriter = printWriter;
 
                 String line;

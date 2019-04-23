@@ -6,7 +6,6 @@ import com.fgnb.android.PortProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
 import java.util.concurrent.*;
@@ -88,8 +87,8 @@ public class Minicap {
 
         this.localPort = PortProvider.getMinicapAvailablePort();
 
-        androidDevice.getIDevice().createForward(localPort, "minicap", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
         log.info("[{}][minicap]adb forward: {} -> remote minicap", deviceId, localPort);
+        androidDevice.getIDevice().createForward(localPort, "minicap", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
 
         countDownLatch.await();
         log.info("[{}][minicap]minicap启动完成", deviceId);
