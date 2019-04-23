@@ -111,33 +111,33 @@ public class Minicap {
                     imgQueue.offer(img);
                 }
                 log.info("[{}][minicap]已停止向imgQueue推送图片数据", deviceId);
-
-                // 手机未连接，minicap会自己退出
-                if (pid > 0 && androidDevice.isConnected()) {
-                    String cmd = "kill -9 " + pid;
-                    log.info("[{}][minicap]kill minicap：{}", deviceId, cmd);
-                    try {
-                        androidDevice.getIDevice().executeShellCommand(cmd, new NullOutputReceiver());
-                    } catch (Exception e) {
-                        log.error("[{}][minicap]{}执行出错", deviceId, cmd, e);
-                    }
-                }
-
-                //手机未连接 adb forward会自己移除
-                if (androidDevice.isConnected()) {
-                    try {
-                        log.info("[{}][minicap]移除adb forward: {} -> remote minicap", deviceId, localPort);
-                        androidDevice.getIDevice().removeForward(localPort, "minicap", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
-                    } catch (Exception e) {
-                        log.error("[{}][minicap]移除adb forward出错", deviceId, e);
-                    }
-                }
-
-                log.info("[{}][minicap]清空imgQueue数据", deviceId);
-                imgQueue.clear();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.error("[{}][minicap]处理minicap数据出错", deviceId, e);
             }
+
+            // 手机未连接，minicap会自己退出
+            if (pid > 0 && androidDevice.isConnected()) {
+                String cmd = "kill -9 " + pid;
+                log.info("[{}][minicap]kill minicap：{}", deviceId, cmd);
+                try {
+                    androidDevice.getIDevice().executeShellCommand(cmd, new NullOutputReceiver());
+                } catch (Exception e) {
+                    log.error("[{}][minicap]{}执行出错", deviceId, cmd, e);
+                }
+            }
+
+            //手机未连接 adb forward会自己移除
+            if (androidDevice.isConnected()) {
+                try {
+                    log.info("[{}][minicap]移除adb forward: {} -> remote minicap", deviceId, localPort);
+                    androidDevice.getIDevice().removeForward(localPort, "minicap", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
+                } catch (Exception e) {
+                    log.error("[{}][minicap]移除adb forward出错", deviceId, e);
+                }
+            }
+
+            log.info("[{}][minicap]清空imgQueue数据", deviceId);
+            imgQueue.clear();
         }).start();
     }
 
