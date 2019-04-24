@@ -3,7 +3,7 @@ package com.fgnb.excutor;
 import com.alibaba.fastjson.JSONObject;
 import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
-import com.fgnb.android.stf.MinicapScreenShoter;
+import com.fgnb.android.AndroidUtils;
 import com.fgnb.api.ServerApi;
 import com.fgnb.App;
 import com.fgnb.utils.ShellExecutor;
@@ -266,7 +266,7 @@ public class TestListenerForTestCase extends TestListenerAdapter {
     private String takeScreenShot(String imgFilePath, String deviceId){
         try{
             AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
-            MinicapScreenShoter.takeScreenShot(imgFilePath,androidDevice);
+            AndroidUtils.screenshotByMinicap(androidDevice.getIDevice(),imgFilePath,androidDevice.getResolution());
             return imgFilePath;
         }catch (Exception e){
             log.error("截图失败",e);
@@ -283,7 +283,7 @@ public class TestListenerForTestCase extends TestListenerAdapter {
         try{
             AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
             imgFilePath = UUIDUtil.getUUID()+".jpg";
-            MinicapScreenShoter.takeScreenShot(imgFilePath,androidDevice);
+            AndroidUtils.screenshotByMinicap(androidDevice.getIDevice(),imgFilePath,androidDevice.getResolution());
             ServerApi uiServerApi = App.getBean(ServerApi.class);
             return uiServerApi.uploadFile(new File(imgFilePath));
         }catch (Exception e){

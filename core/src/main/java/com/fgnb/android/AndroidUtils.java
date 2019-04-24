@@ -132,6 +132,26 @@ public class AndroidUtils {
     }
 
     /**
+     * 通过minicap截图
+     * @param iDevice
+     * @param localPath 本地路径 eg. d:/path/img.jpg
+     * @param resolution 手机分辨率 eg. 1080x1920
+     * @throws Exception
+     */
+    public static void screenshotByMinicap(IDevice iDevice,String localPath,String resolution) throws Exception {
+        String imgPhonePath = "/data/local/tmp/minicap.jpg";
+        String screenshotCmd = String.format("LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/minicap -P %s@%s/0 -s >%s",resolution,resolution,imgPhonePath);
+        String minicapOutput = executeShellCommand(iDevice, screenshotCmd);
+
+        if(StringUtils.isEmpty(minicapOutput) || !minicapOutput.contains("bytes for JPG encoder")){
+            log.error("[{}]minicap截图失败,cmd: {},minicapOutput: {}",iDevice.getSerialNumber(),screenshotCmd,minicapOutput);
+            throw new RuntimeException("minicap截图失败,cmd: " + screenshotCmd + ",minicapOutput: " + minicapOutput);
+        }
+        //pull到本地
+        iDevice.pullFile(imgPhonePath,localPath);
+    }
+
+    /**
      * 获取CPU架构
      *
      * @return
