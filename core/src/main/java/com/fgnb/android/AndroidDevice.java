@@ -1,6 +1,9 @@
 package com.fgnb.android;
 
 import com.android.ddmlib.IDevice;
+import com.fgnb.android.stf.adbkit.AdbKit;
+import com.fgnb.android.stf.minicap.Minicap;
+import com.fgnb.android.stf.minitouch.Minitouch;
 import com.fgnb.android.uiautomator.Uiautomator2Server;
 import com.fgnb.api.ServerApi;
 import com.fgnb.model.Device;
@@ -30,13 +33,17 @@ public class AndroidDevice {
     private Device device;
     private IDevice iDevice;
 
-    private Uiautomator2Server uiautomatorServerManager;
+    private Minicap minicap;
+    private Minitouch minitouch;
+    private Uiautomator2Server uiautomator2Server;
+    private AdbKit adbKit;
 
     private ServerApi uiServerApi = App.getBean(ServerApi.class);
 
-    public AndroidDevice(Device device,IDevice iDevice){
+    public AndroidDevice(Device device, IDevice iDevice){
         this.device = device;
         this.iDevice = iDevice;
+
         //开启一个线程 专门执行推送过来的自动化测试任务
         new Thread(()->{
             while(true){

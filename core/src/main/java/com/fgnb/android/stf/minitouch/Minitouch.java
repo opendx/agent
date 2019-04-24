@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class Minitouch {
 
-    public static final String START_MINITOUCH_SHELL = AndroidDevice.TMP_FOLDER + "minitouch";
+    public static final String START_MINITOUCH_CMD = AndroidDevice.TMP_FOLDER + "minitouch";
 
     private int localPort;
 
@@ -40,7 +40,9 @@ public class Minitouch {
      */
     private int pid;
 
-    /** 用于向minitouch发送指令 */
+    /**
+     * 用于向minitouch发送指令
+     */
     private PrintWriter printWriter;
 
 
@@ -59,8 +61,8 @@ public class Minitouch {
         //启动minitouch会阻塞线程，启一个线程运行minitouch
         new Thread(() -> {
             try {
-                log.info("[{}][minitouch]启动：{}", deviceId, START_MINITOUCH_SHELL);
-                androidDevice.getIDevice().executeShellCommand(START_MINITOUCH_SHELL, new MultiLineReceiver() {
+                log.info("[{}][minitouch]启动：{}", deviceId, START_MINITOUCH_CMD);
+                androidDevice.getIDevice().executeShellCommand(START_MINITOUCH_CMD, new MultiLineReceiver() {
                     @Override
                     public void processNewLines(String[] lines) {
                         for (String line : lines) {
@@ -94,7 +96,7 @@ public class Minitouch {
         new Thread(() -> {
             try (Socket socket = new Socket("127.0.0.1", localPort);
                  BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                 PrintWriter printWriter = new PrintWriter(socket.getOutputStream())){
+                 PrintWriter printWriter = new PrintWriter(socket.getOutputStream())) {
                 log.info("[{}][minitouch]创建socket获取minitouch输出的数据：127.0.0.1:{}", deviceId, localPort);
                 this.printWriter = printWriter;
 
@@ -115,7 +117,7 @@ public class Minitouch {
                         log.info("[{}][minitouch]运行进程id: {}", deviceId, pid);
                     }
                 }
-            }catch (Exception e) {
+            } catch (Exception e) {
                 log.error("[{}][minitouch]处理minitouch数据出错", deviceId, e);
             }
 

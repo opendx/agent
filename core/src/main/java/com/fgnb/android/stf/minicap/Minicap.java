@@ -16,8 +16,11 @@ import java.util.concurrent.*;
 @Slf4j
 public class Minicap {
 
-    private static final String START_MINICAP_SHELL = "LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/minicap -P %s@%s/%d";
+    private static final String START_MINICAP_CMD = "LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/minicap -P %s@%s/%d";
 
+    /**
+     * minicap输出的图片存放的队列
+     */
     private BlockingQueue<byte[]> imgQueue = new LinkedBlockingQueue<>();
 
     private AndroidDevice androidDevice;
@@ -55,7 +58,7 @@ public class Minicap {
      * @param orientation       屏幕的旋转角度
      */
     public void start(String virtualResolution, Integer orientation) throws Exception {
-        String startMinicapCmd = String.format(START_MINICAP_SHELL, androidDevice.getResolution(), virtualResolution, orientation);
+        String startMinicapCmd = String.format(START_MINICAP_CMD, androidDevice.getResolution(), virtualResolution, orientation);
 
         CountDownLatch countDownLatch = new CountDownLatch(1);
         //启动minicap会阻塞线程，启一个线程运行minicap
