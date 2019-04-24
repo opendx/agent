@@ -2,7 +2,7 @@ package com.fgnb.controller;
 
 import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
-import com.fgnb.android.uiautomator.UiautomatorServerManager;
+import com.fgnb.android.uiautomator.Uiautomator2Server;
 import com.fgnb.model.Device;
 import com.fgnb.model.Response;
 import lombok.Data;
@@ -72,7 +72,7 @@ public class DeviceController {
      * @throws Exception
      */
     private int openUiAutomatorServer(AndroidDevice androidDevice,long maxWaitSeconds) throws Exception{
-        UiautomatorServerManager uiautomatorServerManager = new UiautomatorServerManager(androidDevice);
+        Uiautomator2Server uiautomatorServerManager = new Uiautomator2Server(androidDevice);
         //以后重构 先这样处理   AndroidDevice code line 70 用于停掉自动化测试开启的uiautomatorserver
         androidDevice.setUiautomatorServerManager(uiautomatorServerManager);
         uiautomatorServerManager.startServer();

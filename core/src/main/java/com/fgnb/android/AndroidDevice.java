@@ -1,7 +1,7 @@
 package com.fgnb.android;
 
 import com.android.ddmlib.IDevice;
-import com.fgnb.android.uiautomator.UiautomatorServerManager;
+import com.fgnb.android.uiautomator.Uiautomator2Server;
 import com.fgnb.api.ServerApi;
 import com.fgnb.model.Device;
 import com.fgnb.excutor.Excutor;
@@ -30,7 +30,7 @@ public class AndroidDevice {
     private Device device;
     private IDevice iDevice;
 
-    private UiautomatorServerManager uiautomatorServerManager;
+    private Uiautomator2Server uiautomatorServerManager;
 
     private ServerApi uiServerApi = App.getBean(ServerApi.class);
 
@@ -62,7 +62,7 @@ public class AndroidDevice {
                     if(isConnected()){
                         if(uiautomatorServerManager != null){
                             //停掉执行自动化测试的uiautomatorserver
-                            uiautomatorServerManager.stopServer();
+                            uiautomatorServerManager.stop();
                         }
                         device.setStatus(Device.IDLE_STATUS);
                         uiServerApi.saveDevice(device);

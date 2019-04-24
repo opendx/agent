@@ -2,7 +2,7 @@ package com.fgnb.websocket;
 
 import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
-import com.fgnb.android.uiautomator.UiautomatorServerManager;
+import com.fgnb.android.uiautomator.Uiautomator2Server;
 import com.fgnb.model.Device;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -25,11 +25,11 @@ public class UiAutomator2SocketServer {
 
 
     public static Map<String,Session> uiautomator2SessionMap = new ConcurrentHashMap<>();
-    public static Map<String,UiautomatorServerManager> uiautomatorServerManagerMap = new ConcurrentHashMap<>();
+    public static Map<String,Uiautomator2Server> uiautomatorServerManagerMap = new ConcurrentHashMap<>();
 
     private String deviceId;
     private Session session;
-    private UiautomatorServerManager uiautomatorServerManager;
+    private Uiautomator2Server uiautomatorServerManager;
 
     @OnOpen
     public void onOpen(@PathParam("deviceId")String deviceId, Session session) throws Exception {
@@ -66,7 +66,7 @@ public class UiAutomator2SocketServer {
 
         WebSocketUtil.sendText(session,"开始启动手机uiautomator2 server");
 
-        uiautomatorServerManager = new UiautomatorServerManager(androidDevice);
+        uiautomatorServerManager = new Uiautomator2Server(androidDevice);
         uiautomatorServerManager.startServer();
         uiautomatorServerManager.createForward();
 

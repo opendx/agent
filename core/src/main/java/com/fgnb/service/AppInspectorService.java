@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
 import com.fgnb.android.stf.MinicapScreenShoter;
-import com.fgnb.android.uiautomator.UiautomatorServerManager;
+import com.fgnb.android.uiautomator.Uiautomator2Server;
 import com.fgnb.api.ServerApi;
 import com.fgnb.utils.UUIDUtil;
 import com.fgnb.model.InspctorImgVo;
@@ -33,7 +33,7 @@ public class AppInspectorService {
     private ServerApi uiServerApi;
 
     public String getAndroidDumpJson(String deviceId) throws Exception{
-        UiautomatorServerManager uiautomatorServerManager = UiAutomator2SocketServer.uiautomatorServerManagerMap.get(deviceId);
+        Uiautomator2Server uiautomatorServerManager = UiAutomator2SocketServer.uiautomatorServerManagerMap.get(deviceId);
         if(uiautomatorServerManager==null){
             throw new RuntimeException("没有得到uiautomatorServerManager，无法dump布局");
         }

@@ -25,12 +25,12 @@ public class Uiautomator2ServerApkInstaller {
     public void install() throws InstallException {
         String deviceId = iDevice.getSerialNumber();
 
-        log.info("[{}]开始安装{}", deviceId, APP_DEBUG_APK_PATH);
+        log.info("[{}][uiautomator2server]开始安装{}", deviceId, APP_DEBUG_APK_PATH);
         iDevice.installPackage(APP_DEBUG_APK_PATH, true, "-t");
-        log.info("[{}]安装{}完成", deviceId, APP_DEBUG_APK_PATH);
+        log.info("[{}][uiautomator2server]安装{}完成", deviceId, APP_DEBUG_APK_PATH);
 
-        log.info("[{}]开始安装{}", deviceId, APP_DEBUG_ANDROID_TEST_APK_PATH);
+        log.info("[{}][uiautomator2server]开始安装{}", deviceId, APP_DEBUG_ANDROID_TEST_APK_PATH);
         iDevice.installPackage(APP_DEBUG_ANDROID_TEST_APK_PATH, true, "-t");
-        log.info("[{}]安装{}完成", deviceId, APP_DEBUG_ANDROID_TEST_APK_PATH);
+        log.info("[{}][uiautomator2server]安装{}完成", deviceId, APP_DEBUG_ANDROID_TEST_APK_PATH);
     }
 }
