@@ -32,8 +32,9 @@ public class AdbKit {
      * @throws IOException
      */
     public int start() throws IOException {
-        int localPort = PortProvider.getAdbKitAvailablePort();
+        stop();
 
+        int localPort = PortProvider.getAdbKitAvailablePort();
         String cmd = String.format(START_ADBKIT_CMD, localPort, deviceId);
         log.info("[{}][adbkit]开启远程调试功能：{}", deviceId, cmd);
 

@@ -97,7 +97,6 @@ public class MinicapSocketServer {
      */
     @OnClose
     public void onClose() {
-
         log.info("[{}]断开MinicapSocketServer连接，sessionid => {}", deviceId, session.getId());
         //由于可能有多个连接访问进来，只允许一个连接使用，意味着只有minicapDataHandler被成功初始化的连接才是占用的连接，占用连接断开才做资源回收操作
         if (minicap != null) {
