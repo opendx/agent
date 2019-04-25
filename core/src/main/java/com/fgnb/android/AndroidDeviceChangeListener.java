@@ -2,8 +2,12 @@ package com.fgnb.android;
 
 import com.android.ddmlib.*;
 import com.fgnb.App;
+import com.fgnb.android.stf.adbkit.AdbKit;
+import com.fgnb.android.stf.minicap.Minicap;
 import com.fgnb.android.stf.minicap.MinicapInstaller;
+import com.fgnb.android.stf.minitouch.Minitouch;
 import com.fgnb.android.stf.minitouch.MinitouchInstaller;
+import com.fgnb.android.uiautomator.Uiautomator2Server;
 import com.fgnb.android.uiautomator.Uiautomator2ServerApkInstaller;
 import com.fgnb.api.ServerApi;
 import com.fgnb.model.Device;
@@ -14,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.Date;
 
 /**
@@ -29,13 +35,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
 
     @Override
     public void deviceConnected(IDevice device) {
-        new Thread(() -> {
-            try {
-                androidDeviceConnected(device);
-            } catch (Exception e) {
-                log.error("[{}]设备连接处理出错", device.getSerialNumber(), e);
-            }
-        }).start();
+        new Thread(() -> androidDeviceConnected(device)).start();
     }
 
     @Override
@@ -52,9 +52,8 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
      * Android设备连接到电脑
      *
      * @param iDevice
-     * @throws Exception
      */
-    private void androidDeviceConnected(IDevice iDevice) throws Exception {
+    private void androidDeviceConnected(IDevice iDevice) {
         String deviceId = iDevice.getSerialNumber();
         log.info("[{}]已连接", deviceId);
 
@@ -64,22 +63,35 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
 
         AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
         if (androidDevice == null) {
-            log.info("[{}]首次上线", deviceId);
-            log.info("[{}]检查是否已接入过系统", deviceId);
+            log.info("[{}]首次在agent上线", deviceId);
+
+            log.info("[{}]检查是否已接入过master", deviceId);
             Device device = serverApi.getDeviceById(deviceId);
+
             if (device == null) {
-                log.info("[{}]首次接入系统", deviceId);
+                log.info("[{}]首次接入master", deviceId);
                 androidDevice = initDevice(iDevice);
             } else {
-                log.info("[{}]已接入过系统", deviceId);
+                log.info("[{}]已接入过master", deviceId);
                 androidDevice = new AndroidDevice(device, iDevice);
             }
+
+            androidDevice.setMinicap(new Minicap(androidDevice));
+            androidDevice.setMinitouch(new Minitouch(androidDevice));
+            androidDevice.setAdbKit(new AdbKit(androidDevice));
+            androidDevice.setUiautomator2Server(new Uiautomator2Server(androidDevice));
+
             AndroidDeviceHolder.add(deviceId, androidDevice);
+        } else {
+            log.info("[{}]非首次在agent上线", deviceId);
         }
 
         Device device = androidDevice.getDevice();
-
-        device.setAgentIp(NetUtil.getLocalHostAddress());
+        try {
+            device.setAgentIp(NetUtil.getLocalHostAddress());
+        } catch (UnknownHostException e) {
+            throw new RuntimeException("获取agent ip失败", e);
+        }
         device.setAgentPort(Integer.parseInt(App.getProperty("server.port")));
         device.setStatus(Device.IDLE_STATUS);
         device.setLastOnlineTime(new Date());
@@ -116,7 +128,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
      * @param iDevice
      * @return
      */
-    private AndroidDevice initDevice(IDevice iDevice) throws Exception {
+    private AndroidDevice initDevice(IDevice iDevice) {
         File screenshot = null;
         try {
             Device device = new Device();
@@ -124,24 +136,50 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
             device.setType(Device.ANDROID_TYPE);
             device.setCreateTime(new Date());
             device.setId(iDevice.getSerialNumber());
-            device.setCpuInfo(AndroidUtils.getCpuInfo(iDevice));
-            device.setMemSize(AndroidUtils.getMemSize(iDevice));
+
+            try {
+                device.setCpuInfo(AndroidUtils.getCpuInfo(iDevice));
+            } catch (Exception e) {
+                log.error("获取cpu信息失败", e);
+                device.setCpuInfo("获取cpu信息失败");
+            }
+
+            try {
+                device.setMemSize(AndroidUtils.getMemSize(iDevice));
+            } catch (Exception e) {
+                log.error("获取内存大小失败", e);
+                device.setMemSize("获取内存大小失败");
+            }
+
             device.setName(AndroidUtils.getDeviceName(iDevice));
             device.setSystemVersion(AndroidUtils.getAndroidVersion(iDevice));
 
-            String[] resolution = AndroidUtils.getResolution(iDevice).split("x");
+            String[] resolution;
+            try {
+                resolution = AndroidUtils.getResolution(iDevice).split("x");
+            } catch (Exception e) {
+                throw new RuntimeException("获取屏幕分辨率失败", e);
+            }
             device.setScreenWidth(Integer.parseInt(resolution[0]));
             device.setScreenHeight(Integer.parseInt(resolution[1]));
 
             //截图并上传到服务器
-            screenshot = AndroidUtils.screenshot(iDevice);
-            String downloadURL = serverApi.uploadFile(screenshot);
-            device.setImgUrl(downloadURL);
+            try {
+                screenshot = AndroidUtils.screenshot(iDevice);
+                String downloadURL = serverApi.uploadFile(screenshot);
+                device.setImgUrl(downloadURL);
+            } catch (Exception e) {
+                log.error("设置首次接入master屏幕截图失败", e);
+            }
 
             AndroidDevice androidDevice = new AndroidDevice(device, iDevice);
 
             //安装minicap minitouch uiautomatorServerApk
-            installMinicapAndMinitouchAndUiAutomatorServerApk(androidDevice);
+            try {
+                installMinicapAndMinitouchAndUiAutomatorServerApk(androidDevice);
+            } catch (Exception e) {
+                throw new RuntimeException("安装必要程序到手机出错", e);
+            }
 
             device.setStfStatus(Device.STF_SUCCESS_STATUS);
             device.setMacacaStatus(Device.MACACA_SUCCESS_STATUS);

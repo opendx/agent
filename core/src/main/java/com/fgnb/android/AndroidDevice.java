@@ -38,8 +38,6 @@ public class AndroidDevice {
     private Uiautomator2Server uiautomator2Server;
     private AdbKit adbKit;
 
-    private ServerApi uiServerApi = App.getBean(ServerApi.class);
-
     public AndroidDevice(Device device, IDevice iDevice){
         this.device = device;
         this.iDevice = iDevice;
@@ -67,12 +65,12 @@ public class AndroidDevice {
                 } finally {
                     //如果设备还处于连接电脑状态 则将设备改为闲置
                     if(isConnected()){
-                        if(uiautomatorServerManager != null){
+                        if(uiautomator2Server != null){
                             //停掉执行自动化测试的uiautomatorserver
-                            uiautomatorServerManager.stop();
+                            uiautomator2Server.stop();
                         }
                         device.setStatus(Device.IDLE_STATUS);
-                        uiServerApi.saveDevice(device);
+                        App.getBean(ServerApi.class).saveDevice(device);
                     }
                 }
             }
