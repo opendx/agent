@@ -22,7 +22,7 @@ import java.util.Map;
  */
 @Component
 @Slf4j
-public class ServerApi {
+public class MasterApi {
 
     @Autowired
     private RestTemplate restTemplate;

@@ -3,7 +3,7 @@ package com.fgnb.websocket;
 import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
 import com.fgnb.android.stf.minicap.Minicap;
-import com.fgnb.api.ServerApi;
+import com.fgnb.api.MasterApi;
 import com.fgnb.model.Device;
 import com.fgnb.App;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,7 @@ public class MinicapSocketServer {
     private Session session;
     private Minicap minicap;
 
-    private ServerApi uiServerApi = App.getBean(ServerApi.class);
+    private MasterApi masterApi = App.getBean(MasterApi.class);
 
     @OnOpen
     public void onOpen(@PathParam("deviceId") String deviceId, @PathParam("userName") String userName, Session session) throws Exception {
@@ -80,7 +80,7 @@ public class MinicapSocketServer {
         Device device = AndroidDeviceHolder.get(deviceId).getDevice();
         device.setStatus(Device.USING_STATUS);
         device.setUsername(userName);
-        uiServerApi.saveDevice(device);
+        masterApi.saveDevice(device);
         log.info("[{}]数据库状态改为使用中", deviceId);
 
         //3.将图片队列里的数据发送给浏览器
@@ -110,7 +110,7 @@ public class MinicapSocketServer {
             if (device != null && device.getStatus() == Device.USING_STATUS) {
                 //将设备改为闲置
                 device.setStatus(Device.IDLE_STATUS);
-                uiServerApi.saveDevice(device);
+                masterApi.saveDevice(device);
                 log.info("[{}]数据库状态改为闲置", deviceId);
             }
         }

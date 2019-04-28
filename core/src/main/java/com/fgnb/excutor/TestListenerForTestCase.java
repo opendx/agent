@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
 import com.fgnb.android.AndroidUtils;
-import com.fgnb.api.ServerApi;
+import com.fgnb.api.MasterApi;
 import com.fgnb.App;
 import com.fgnb.utils.ShellExecutor;
 import com.fgnb.utils.UUIDUtil;
@@ -247,7 +247,7 @@ public class TestListenerForTestCase extends TestListenerAdapter {
             //视频合成完毕 上传视频
             String videoUrl;
             try {
-                videoUrl = App.getBean(ServerApi.class)
+                videoUrl = App.getBean(MasterApi.class)
                         .uploadFile(new File(videoPath));
                 log.info("视频上传成功，下载URL -> {}",videoUrl);
                 return videoUrl;
@@ -284,7 +284,7 @@ public class TestListenerForTestCase extends TestListenerAdapter {
             AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
             imgFilePath = UUIDUtil.getUUID()+".jpg";
             AndroidUtils.screenshotByMinicap(androidDevice.getIDevice(),imgFilePath,androidDevice.getResolution());
-            ServerApi uiServerApi = App.getBean(ServerApi.class);
+            MasterApi uiServerApi = App.getBean(MasterApi.class);
             return uiServerApi.uploadFile(new File(imgFilePath));
         }catch (Exception e){
             log.error("上传图片失败",e);

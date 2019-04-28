@@ -9,7 +9,7 @@ import com.fgnb.android.stf.minitouch.Minitouch;
 import com.fgnb.android.stf.minitouch.MinitouchInstaller;
 import com.fgnb.android.uiautomator.Uiautomator2Server;
 import com.fgnb.android.uiautomator.Uiautomator2ServerApkInstaller;
-import com.fgnb.api.ServerApi;
+import com.fgnb.api.MasterApi;
 import com.fgnb.model.Device;
 import com.fgnb.utils.NetUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Date;
 
@@ -31,7 +30,7 @@ import java.util.Date;
 public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceChangeListener {
 
     @Autowired
-    private ServerApi serverApi;
+    private MasterApi masterApi;
 
     @Override
     public void deviceConnected(IDevice device) {
@@ -66,7 +65,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
             log.info("[{}]首次在agent上线", deviceId);
 
             log.info("[{}]检查是否已接入过master", deviceId);
-            Device device = serverApi.getDeviceById(deviceId);
+            Device device = masterApi.getDeviceById(deviceId);
 
             if (device == null) {
                 log.info("[{}]首次接入master", deviceId);
@@ -96,7 +95,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         device.setStatus(Device.IDLE_STATUS);
         device.setLastOnlineTime(new Date());
 
-        serverApi.saveDevice(device);
+        masterApi.saveDevice(device);
         log.info("[{}]deviceConnected处理完成", deviceId);
     }
 
@@ -118,7 +117,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         device.setStatus(Device.OFFLINE_STATUS);
         device.setLastOfflineTime(new Date());
 
-        serverApi.saveDevice(device);
+        masterApi.saveDevice(device);
         log.info("[{}]deviceDisconnected处理完成", deviceId);
     }
 
@@ -166,7 +165,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
             //截图并上传到服务器
             try {
                 screenshot = AndroidUtils.screenshot(iDevice);
-                String downloadURL = serverApi.uploadFile(screenshot);
+                String downloadURL = masterApi.uploadFile(screenshot);
                 device.setImgUrl(downloadURL);
             } catch (Exception e) {
                 log.error("设置首次接入master屏幕截图失败", e);

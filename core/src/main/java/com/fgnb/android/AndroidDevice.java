@@ -5,7 +5,7 @@ import com.fgnb.android.stf.adbkit.AdbKit;
 import com.fgnb.android.stf.minicap.Minicap;
 import com.fgnb.android.stf.minitouch.Minitouch;
 import com.fgnb.android.uiautomator.Uiautomator2Server;
-import com.fgnb.api.ServerApi;
+import com.fgnb.api.MasterApi;
 import com.fgnb.model.Device;
 import com.fgnb.excutor.Excutor;
 import com.fgnb.App;
@@ -70,7 +70,7 @@ public class AndroidDevice {
                             uiautomator2Server.stop();
                         }
                         device.setStatus(Device.IDLE_STATUS);
-                        App.getBean(ServerApi.class).saveDevice(device);
+                        App.getBean(MasterApi.class).saveDevice(device);
                     }
                 }
             }
