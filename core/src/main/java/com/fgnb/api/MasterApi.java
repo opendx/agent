@@ -27,13 +27,13 @@ public class MasterApi {
     @Autowired
     private RestTemplate restTemplate;
 
-    @Value("${server}/device/list")
+    @Value("${master}/device/list")
     private String deviceListApi;
 
-    @Value("${server}/device/save")
+    @Value("${master}/device/save")
     private String deviceSaveApi;
 
-    @Value("${server}/upload/file")
+    @Value("${master}/upload/file")
     private String uploadFileApi;
 
     /**
