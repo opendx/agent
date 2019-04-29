@@ -29,6 +29,10 @@ public class Uiautomator2Server {
         this.deviceId = androidDevice.getId();
     }
 
+    public int getLocalPort() {
+        return localPort;
+    }
+
     /**
      * 开启服务
      */
