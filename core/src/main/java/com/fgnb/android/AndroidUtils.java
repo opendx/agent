@@ -239,6 +239,16 @@ public class AndroidUtils {
     }
 
     /**
+     * 安装APK
+     * @param iDevice
+     * @param apkPath
+     * @throws InstallException
+     */
+    public static void installApk(IDevice iDevice,String apkPath) throws InstallException {
+        iDevice.installPackage(apkPath,true);
+    }
+
+    /**
      * 执行命令
      *
      * @param cmd

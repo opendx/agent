@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -133,6 +134,30 @@ public class AndroidService {
         return Response.success(response);
     }
 
+
+    public Response installApk(MultipartFile apk, String deviceId) {
+        if (apk == null) {
+            return Response.fail("apk不能为空");
+        }
+        if (!apk.getOriginalFilename().endsWith(".apk")) {
+            return Response.fail("无法安装非APK文件");
+        }
+        AndroidDevice androidDevice = getAndroidDevice(deviceId);
+
+        String apkPath = UUIDUtil.getUUID() + ".apk";
+        File apkFile = new File(apkPath);
+        try {
+            FileUtils.copyInputStreamToFile(apk.getInputStream(), apkFile);
+            AndroidUtils.installApk(androidDevice.getIDevice(), apkPath);
+            return Response.success("安装成功");
+        } catch (Exception e) {
+            log.error("安装apk失败", e);
+            return Response.fail(e.getMessage());
+        } finally {
+            FileUtils.deleteQuietly(apkFile);
+        }
+    }
+
     private AndroidDevice getAndroidDevice(String deviceId) {
         if (StringUtils.isEmpty(deviceId)) {
             throw new BusinessException("设备id不能为空");
@@ -146,5 +171,4 @@ public class AndroidService {
         }
         return androidDevice;
     }
-
 }

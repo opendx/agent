@@ -3,10 +3,8 @@ package com.fgnb.controller;
 import com.fgnb.model.Response;
 import com.fgnb.service.AndroidService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Created by jiangyitao.
@@ -69,5 +67,16 @@ public class AndroidController {
     @GetMapping("/screenshot/{deviceId}")
     public Response screenshot(@PathVariable String deviceId) {
         return androidService.screenshot(deviceId);
+    }
+
+    /**
+     * 安装APK
+     * @param apk
+     * @param deviceId
+     * @return
+     */
+    @PostMapping("/installApk/{deviceId}")
+    public Response installApk(MultipartFile apk,@PathVariable String deviceId) {
+        return androidService.installApk(apk,deviceId);
     }
 }
