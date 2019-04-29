@@ -32,10 +32,10 @@ public class Uiautomator2Server {
     /**
      * 开启服务
      */
-    public void start() throws Exception {
+    public int start() throws Exception {
         try {
             boolean appRunning = AndroidUtils.isAppRunning(androidDevice.getIDevice(), PACKAGE_NAME);
-            log.info("[{}][uiautomator2server]APP是否在运行：", deviceId, appRunning);
+            log.info("[{}][uiautomator2server]APP是否在运行：{}", deviceId, appRunning);
             if (appRunning) {
                 log.info("[{}][uiautomator2server]强制停止服务", deviceId);
                 AndroidUtils.forceStopApp(androidDevice.getIDevice(), PACKAGE_NAME);
@@ -47,7 +47,7 @@ public class Uiautomator2Server {
         localPort = PortProvider.getUiautomator2ServerPort();
         log.info("[{}][uiautomator2server]申请本地端口：{}", deviceId, localPort);
 
-        log.info("[{}][uiautomator2server]adb forward: {} ->{}", deviceId, localPort, UIAUTOMATOR2_SERVER_RUN_IN_PHONE_PORT);
+        log.info("[{}][uiautomator2server]adb forward: {} -> {}", deviceId, localPort, UIAUTOMATOR2_SERVER_RUN_IN_PHONE_PORT);
         androidDevice.getIDevice().createForward(localPort, UIAUTOMATOR2_SERVER_RUN_IN_PHONE_PORT);
 
         CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -59,7 +59,7 @@ public class Uiautomator2Server {
                     public void processNewLines(String[] lines) {
                         for (String line : lines) {
                             log.info("[{}][uiautomator2server]手机控制台输出：{}", deviceId, line);
-                            if (!StringUtils.isEmpty(line) && line.startsWith("UIAutomatorWD->http://localhost:9001<-UIAutomatorWD")) {
+                            if (!StringUtils.isEmpty(line) && line.startsWith("com.macaca.android.testing.UIAutomatorWD")) {
                                 //uiautomator2server启动完成
                                 countDownLatch.countDown();
                             }
@@ -91,6 +91,8 @@ public class Uiautomator2Server {
 
         countDownLatch.await();
         log.info("[{}][uiautomator2server]uiautomator2server启动完成", deviceId);
+
+        return localPort;
     }
 
     public void stop() {
