@@ -38,10 +38,10 @@ public class AndroidService {
         try {
             int port = androidDevice.getAdbKit().start();
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("port",port);
+            jsonObject.put("port", port);
             return Response.success(jsonObject);
         } catch (IOException e) {
-            log.error("启动adbkit失败",e);
+            log.error("启动adbkit失败", e);
             return Response.fail(e.getMessage());
         }
     }
@@ -57,10 +57,10 @@ public class AndroidService {
         try {
             int port = androidDevice.getUiautomator2Server().start();
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("port",port);
+            jsonObject.put("port", port);
             return Response.success(jsonObject);
         } catch (Exception e) {
-            log.error("[{}]启动uiautomator2server出错",deviceId,e);
+            log.error("[{}]启动uiautomator2server出错", deviceId, e);
             return Response.fail(e.getMessage());
         }
     }
@@ -69,7 +69,7 @@ public class AndroidService {
         AndroidDevice androidDevice = getAndroidDevice(deviceId);
 
         int localPort = androidDevice.getUiautomator2Server().getLocalPort();
-        if(localPort <= 0) {
+        if (localPort <= 0) {
             return Response.fail("未开启Uiautomator2Server");
         }
 
@@ -79,64 +79,69 @@ public class AndroidService {
         try {
             uiautomator2ServerResponse = restTemplate.getForObject(url, String.class);
         } catch (Exception e) {
-            log.error("[{}]请求{}失败",deviceId,url,e);
+            log.error("[{}]请求{}失败", deviceId, url, e);
             return Response.fail("请求Uiautomator2Server失败，请确认是否已打开Uiautomator2Server");
         }
 
-        if(StringUtils.isEmpty(uiautomator2ServerResponse)) {
+        if (StringUtils.isEmpty(uiautomator2ServerResponse)) {
             return Response.fail("Uiautomator2Server未返回dump数据");
         }
 
         JSONObject uiautomator2ServerResponseObject = JSON.parseObject(uiautomator2ServerResponse);
-        if(uiautomator2ServerResponseObject.getInteger("status") != 0) {
+        if (uiautomator2ServerResponseObject.getInteger("status") != 0) {
             return Response.fail("Uiautomator2Server返回状态错误");
         }
 
         String dumpXml = uiautomator2ServerResponseObject.getString("value");
-        if(StringUtils.isEmpty(dumpXml)) {
+        if (StringUtils.isEmpty(dumpXml)) {
             return Response.fail("Uiautomator2Server dump数据为空");
         }
 
-        return Response.success("ok",XML.toJSONObject(dumpXml).toString());
+        return Response.success("ok", XML.toJSONObject(dumpXml).toString());
     }
 
     public Response screenshot(String deviceId) {
         AndroidDevice androidDevice = getAndroidDevice(deviceId);
 
         //本地截图位置
-        String localScreenshotPath = UUIDUtil.getUUID()+".jpg";
+        String localScreenshotPath = UUIDUtil.getUUID() + ".jpg";
+        File localScreenshotPathFile = new File(localScreenshotPath);
+
         try {
-            AndroidUtils.screenshotByMinicap(androidDevice.getIDevice(),localScreenshotPath,androidDevice.getResolution());
+            AndroidUtils.screenshotByMinicap(androidDevice.getIDevice(), localScreenshotPath, androidDevice.getResolution());
         } catch (Exception e) {
-            log.error("[{}]minicap截图失败",deviceId,e);
+            FileUtils.deleteQuietly(localScreenshotPathFile);
+            log.error("[{}]minicap截图失败", deviceId, e);
             return Response.fail(e.getMessage());
         }
 
         String downloadURL;
         try {
-           downloadURL = masterApi.uploadFile(new File(localScreenshotPath));
-        }catch (Exception e) {
-            log.error("[{}]上传截图到master失败",deviceId,e);
+            downloadURL = masterApi.uploadFile(localScreenshotPathFile);
+            FileUtils.deleteQuietly(localScreenshotPathFile);
+        } catch (Exception e) {
+            FileUtils.deleteQuietly(localScreenshotPathFile);
+            log.error("[{}]上传截图到master失败", deviceId, e);
             return Response.fail(e.getMessage());
         }
 
         JSONObject response = new JSONObject();
-        response.put("downloadURL",downloadURL);
-        response.put("imgHeight",androidDevice.getDevice().getScreenHeight());
-        response.put("imgWidth",androidDevice.getDevice().getScreenWidth());
+        response.put("downloadURL", downloadURL);
+        response.put("imgHeight", androidDevice.getDevice().getScreenHeight());
+        response.put("imgWidth", androidDevice.getDevice().getScreenWidth());
 
         return Response.success(response);
     }
 
     private AndroidDevice getAndroidDevice(String deviceId) {
-        if(StringUtils.isEmpty(deviceId)) {
+        if (StringUtils.isEmpty(deviceId)) {
             throw new BusinessException("设备id不能为空");
         }
         AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
-        if(androidDevice == null) {
+        if (androidDevice == null) {
             throw new BusinessException("设备不存在");
         }
-        if(!androidDevice.isConnected()) {
+        if (!androidDevice.isConnected()) {
             throw new BusinessException("设备未连接");
         }
         return androidDevice;
