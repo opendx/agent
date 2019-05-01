@@ -17,7 +17,6 @@ public class SeleniumController {
 
     @GetMapping("/getDrivers")
     public Response getDrivers(){
-
         JSONArray result = new JSONArray();
 
         JSONObject chrome = new JSONObject();
@@ -26,7 +25,6 @@ public class SeleniumController {
         chrome.put("port",SeleniumInitializer.getChromeDriverServicePort());
 
         result.add(chrome);
-
         return Response.success(result);
     }
 }
