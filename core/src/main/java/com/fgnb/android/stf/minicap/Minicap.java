@@ -33,10 +33,6 @@ public class Minicap {
      * 运行在手机里的进程id
      */
     private int pid;
-    /**
-     * 是否持续解析minicap数据
-     */
-    private boolean isParseFrame = false;
 
     public Minicap(AndroidDevice androidDevice) {
         this.androidDevice = androidDevice;
@@ -45,10 +41,6 @@ public class Minicap {
 
     public BlockingQueue<byte[]> getImgQueue() {
         return imgQueue;
-    }
-
-    public boolean isParseFrame() {
-        return isParseFrame;
     }
 
     /**
@@ -107,26 +99,16 @@ public class Minicap {
                 log.info("[{}][minicap]运行进程id: {}", deviceId, pid);
 
                 log.info("[{}][minicap]开始持续向imgQueue推送图片数据", deviceId);
-                this.isParseFrame = true;
-                while (isParseFrame) {
+                while (true) { // 获取不到minicap输出的数据时，将会抛出MinicapFrameSizeException，循环退出
                     byte[] img = MinicapFrameParser.parse(inputStream);
                     imgQueue.offer(img);
                 }
-                log.info("[{}][minicap]已停止向imgQueue推送图片数据", deviceId);
+            } catch (MinicapFrameSizeException e) {
+                log.info("[{}][minicap]无法获取minicap输出数据",deviceId);
             } catch (Exception e) {
                 log.error("[{}][minicap]处理minicap数据出错", deviceId, e);
             }
-
-            // 手机未连接，minicap会自己退出
-            if (pid > 0 && androidDevice.isConnected()) {
-                String cmd = "kill -9 " + pid;
-                log.info("[{}][minicap]kill minicap：{}", deviceId, cmd);
-                try {
-                    androidDevice.getIDevice().executeShellCommand(cmd, new NullOutputReceiver());
-                } catch (Exception e) {
-                    log.error("[{}][minicap]{}执行出错", deviceId, cmd, e);
-                }
-            }
+            log.info("[{}][minicap]已停止向imgQueue推送图片数据", deviceId);
 
             //手机未连接 adb forward会自己移除
             if (androidDevice.isConnected()) {
@@ -145,7 +127,16 @@ public class Minicap {
 
     public void stop() {
         log.info("[{}][minicap]开始停止minicap", deviceId);
-        isParseFrame = false;
+        // 手机未连接，minicap会自己退出
+        if (pid > 0 && androidDevice.isConnected()) {
+            String cmd = "kill -9 " + pid;
+            log.info("[{}][minicap]kill minicap：{}", deviceId, cmd);
+            try {
+                androidDevice.getIDevice().executeShellCommand(cmd, new NullOutputReceiver());
+            } catch (Exception e) {
+                log.error("[{}][minicap]{}执行出错", deviceId, cmd, e);
+            }
+        }
     }
 
 }

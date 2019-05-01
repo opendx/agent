@@ -67,9 +67,9 @@ public class MinitouchSocketServer {
     @OnClose
     public void onClose() {
         log.info("[{}][minitouch][socketserver]onClose", deviceId);
+        sessionPool.remove(deviceId);
 
         if (minitouch != null) {
-            sessionPool.remove(deviceId);
             minitouch.stop();
         }
     }

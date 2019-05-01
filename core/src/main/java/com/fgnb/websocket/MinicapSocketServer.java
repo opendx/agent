@@ -29,6 +29,8 @@ public class MinicapSocketServer {
 
     private Minicap minicap;
     private String deviceId;
+    private boolean needSendImageData;
+    private BlockingQueue<byte[]> imgQueue;
 
     @OnOpen
     public void onOpen(@PathParam("deviceId") String deviceId, @PathParam("username") String username, Session session) throws Exception {
@@ -62,18 +64,13 @@ public class MinicapSocketServer {
         minicap.start("408x720", 0);
         basicRemote.sendText("启动minicap服务完成");
 
-        Device device = androidDevice.getDevice();
-        device.setStatus(Device.USING_STATUS);
-        device.setUsername(username);
-        App.getBean(MasterApi.class).saveDevice(device);
-        log.info("[{}][minicap][socketserver]数据库状态改为{}使用中", deviceId, username);
-
-        BlockingQueue<byte[]> imgQueue = minicap.getImgQueue();
+        imgQueue = minicap.getImgQueue();
+        needSendImageData = true;
         new Thread(() -> {
-            while (minicap.isParseFrame()) {
+            while (needSendImageData) {
                 try {
                     byte[] img = imgQueue.take();
-                    if (session.isOpen()) {
+                    if(session.isOpen()){
                         basicRemote.sendBinary(ByteBuffer.wrap(img));
                     }
                 } catch (Exception e) {
@@ -81,16 +78,29 @@ public class MinicapSocketServer {
                 }
             }
             log.info("[{}][minicap][socketserver]停止发送图片数据", deviceId);
-        }).start();
+        },"MinicapSocketServer-ImageDataTakerAndSender-" + deviceId).start();
+
+        Device device = androidDevice.getDevice();
+        device.setStatus(Device.USING_STATUS);
+        device.setUsername(username);
+        App.getBean(MasterApi.class).saveDevice(device);
+        log.info("[{}][minicap][socketserver]数据库状态改为{}使用中", deviceId, username);
     }
 
     @OnClose
     public void onClose() {
         log.info("[{}][minicap][socketserver]onClose", deviceId);
-        if (minicap != null) {
-            sessionPool.remove(deviceId);
-            minicap.stop();
+        sessionPool.remove(deviceId);
+        needSendImageData = false;
 
+        // 防止MinicapSocketServer-ImageDataTakerAndSender线程由于imgQueue被清空，线程阻塞在imgQueue.take()无法结束
+        // 在关闭websocket时，推送一个数据，让循环能走到while(needSendImageData)
+        if(imgQueue != null) {
+            imgQueue.offer(new byte[]{1});
+        }
+
+        if (minicap != null) {
+            minicap.stop();
             Device device = AndroidDeviceHolder.get(deviceId).getDevice();
             //因为手机可能被拔出离线，AndroidDeviceChangeService.deviceDisconnected已经在数据库改为离线，这里不能改为闲置
             if (device != null && device.getStatus() == Device.USING_STATUS) {
@@ -111,4 +121,5 @@ public class MinicapSocketServer {
     public void onMessage(String message) {
         log.info("[{}][minicap][socketserver]onMessage: {}", deviceId, message);
     }
+
 }

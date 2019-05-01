@@ -37,16 +37,7 @@ public class Uiautomator2Server {
      * 开启服务
      */
     public int start() throws Exception {
-        try {
-            boolean appRunning = AndroidUtils.isAppRunning(androidDevice.getIDevice(), PACKAGE_NAME);
-            log.info("[{}][uiautomator2server]APP是否在运行：{}", deviceId, appRunning);
-            if (appRunning) {
-                log.info("[{}][uiautomator2server]强制停止服务", deviceId);
-                AndroidUtils.forceStopApp(androidDevice.getIDevice(), PACKAGE_NAME);
-            }
-        } catch (Exception e) {
-            log.error("[{}][uiautomator2server]before start error", deviceId, e);
-        }
+        stop();
 
         localPort = PortProvider.getUiautomator2ServerPort();
         log.info("[{}][uiautomator2server]申请本地端口：{}", deviceId, localPort);
@@ -56,6 +47,9 @@ public class Uiautomator2Server {
 
         CountDownLatch countDownLatch = new CountDownLatch(1);
         new Thread(() -> {
+            // 需要在线程里记录端口，否则可能出现，这次申请的端口，被上次启动的线程removeForward
+            int port = localPort;
+
             try {
                 log.info("[{}][uiautomator2server]启动：{}", deviceId, START_UIAUTOMATOR2_SERVER_CMD);
                 androidDevice.getIDevice().executeShellCommand(START_UIAUTOMATOR2_SERVER_CMD, new MultiLineReceiver() {
@@ -84,8 +78,8 @@ public class Uiautomator2Server {
             //手机未连接 adb forward会自己移除
             if (androidDevice.isConnected()) {
                 try {
-                    log.info("[{}][uiautomator2server]移除adb forward: {} -> {}", deviceId, localPort, UIAUTOMATOR2_SERVER_RUN_IN_PHONE_PORT);
-                    androidDevice.getIDevice().removeForward(localPort, UIAUTOMATOR2_SERVER_RUN_IN_PHONE_PORT);
+                    log.info("[{}][uiautomator2server]移除adb forward: {} -> {}", deviceId, port, UIAUTOMATOR2_SERVER_RUN_IN_PHONE_PORT);
+                    androidDevice.getIDevice().removeForward(port, UIAUTOMATOR2_SERVER_RUN_IN_PHONE_PORT);
                 } catch (Exception e) {
                     log.error("[{}][uiautomator2server]移除adb forward出错", deviceId, e);
                 }
