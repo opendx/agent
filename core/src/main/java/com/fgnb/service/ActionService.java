@@ -49,11 +49,15 @@ public class ActionService {
         log.info("[调试action]: {}", testNGCode);
         try {
             Class clazz = JavaCodeCompiler.compile(testClassName, testNGCode);
-            TestNGRunner.debugAction(clazz);
+            String failMsg = TestNGRunner.debugAction(clazz);
+            if (StringUtils.isEmpty(failMsg)) {
+                return Response.success("执行成功");
+            } else {
+                return Response.fail(failMsg);
+            }
         } catch (Exception e) {
             log.error("调试action出错", e);
             return Response.fail(e.getMessage());
         }
-        return Response.success("执行成功");
     }
 }

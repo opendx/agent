@@ -25,7 +25,7 @@ import static io.restassured.RestAssured.given;
  * Created by jiangyitao.
  */
 @Slf4j
-public class TestListenerForTestCase extends TestListenerAdapter {
+public class TestCaseTestListener extends TestListenerAdapter {
 
     //ui-server resources配置文件中 eg.http://192.168.1.101:8081
     private static final String UI_SERVER_BASE_URL = App.getProperty("server");

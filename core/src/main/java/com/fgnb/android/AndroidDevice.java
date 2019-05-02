@@ -57,7 +57,7 @@ public class AndroidDevice {
                         classes.add(clazz);
                     }
                     log.info("[{}]开始执行测试任务",device.getId());
-                    TestNGRunner.runTestCasesByTestNG(classes.toArray(new Class[classes.size()]));
+                    TestNGRunner.runTestCases(classes.toArray(new Class[classes.size()]));
                     log.info("[{}]执行测试任务完成",device.getId());
                 } catch (Exception e) {
                     log.error("[{}]执行测试任务出现出错",device.getId(),e);
