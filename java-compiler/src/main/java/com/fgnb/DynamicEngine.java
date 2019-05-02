@@ -9,7 +9,6 @@ import java.util.List;
 
 
 /**
- * Created by jiangyitao.
  * 在Java SE6中最好的方法是使用StandardJavaFileManager类。
  * 这个类可以很好地控制输入、输出，并且可以通过DiagnosticListener得到诊断信息，
  * 而DiagnosticCollector类就是listener的实现。
@@ -48,7 +47,6 @@ public class DynamicEngine {
             sb.append(p).append(File.pathSeparator);
         }
         this.classpath = sb.toString();
-        System.out.println("classpath -> "+this.classpath);
     }
 
     /**

@@ -4,7 +4,6 @@ import javax.tools.SimpleJavaFileObject;
 import java.net.URI;
 
 /**
- * Created by jiangyitao.
  * 用于将java源码保存在content属性中
  */
 public class CharSequenceJavaFileObject extends SimpleJavaFileObject {

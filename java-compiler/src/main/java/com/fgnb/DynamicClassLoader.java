@@ -4,7 +4,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 /**
- * Created by jiangyitao.
  * 自定义类加载器
  */
 public class DynamicClassLoader extends URLClassLoader {

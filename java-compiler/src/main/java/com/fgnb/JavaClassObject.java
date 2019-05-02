@@ -7,7 +7,6 @@ import java.io.OutputStream;
 import java.net.URI;
 
 /**
- * Created by jiangyitao.
  * 将输出流交给JavaCompiler，最后JavaCompiler将编译后的class文件写入输出流中
  */
 public class JavaClassObject extends SimpleJavaFileObject {

@@ -1,13 +1,14 @@
 package com.fgnb.android;
 
 import com.android.ddmlib.IDevice;
+import com.fgnb.JavaCodeCompiler;
 import com.fgnb.android.stf.adbkit.AdbKit;
 import com.fgnb.android.stf.minicap.Minicap;
 import com.fgnb.android.stf.minitouch.Minitouch;
 import com.fgnb.android.uiautomator.Uiautomator2Server;
 import com.fgnb.api.MasterApi;
 import com.fgnb.model.Device;
-import com.fgnb.excutor.Excutor;
+import com.fgnb.testng.TestNGRunner;
 import com.fgnb.App;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -49,16 +50,14 @@ public class AndroidDevice {
                     Map<String,String> codes = taskQueue.take();
                     log.info("[{}]准备执行测试任务",device.getId());
 
-                    Excutor excutor = new Excutor();
-
                     List<Class> classes = new ArrayList();
                     for(String fullClassName:codes.keySet()){
                         //编译测试代码
-                        Class clazz = excutor.compiler(fullClassName, codes.get(fullClassName));
+                        Class clazz = JavaCodeCompiler.compile(fullClassName, codes.get(fullClassName));
                         classes.add(clazz);
                     }
                     log.info("[{}]开始执行测试任务",device.getId());
-                    excutor.runTestCasesByTestNG(classes.toArray(new Class[classes.size()]));
+                    TestNGRunner.runTestCasesByTestNG(classes.toArray(new Class[classes.size()]));
                     log.info("[{}]执行测试任务完成",device.getId());
                 } catch (Exception e) {
                     log.error("[{}]执行测试任务出现出错",device.getId(),e);

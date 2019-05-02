@@ -1,4 +1,4 @@
-package com.fgnb.excutor;
+package com.fgnb.testng.listener;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fgnb.android.AndroidDevice;
