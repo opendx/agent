@@ -8,14 +8,19 @@ import com.fgnb.android.stf.minitouch.Minitouch;
 import com.fgnb.android.uiautomator.Uiautomator2Server;
 import com.fgnb.api.MasterApi;
 import com.fgnb.model.Device;
+import com.fgnb.model.action.Action;
+import com.fgnb.model.action.GlobalVar;
+import com.fgnb.model.devicetesttask.DeviceTestTask;
+import com.fgnb.model.devicetesttask.Testcase;
+import com.fgnb.testng.TestNGCodeConverter;
 import com.fgnb.testng.TestNGRunner;
 import com.fgnb.App;
+import com.fgnb.utils.UUIDUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -28,8 +33,8 @@ public class AndroidDevice {
 
     public final static String TMP_FOLDER = "/data/local/tmp/";
 
-    //任务队列 执行自动化测试任务
-    private BlockingQueue<Map<String,String>> taskQueue = new LinkedBlockingQueue();
+    /** 执行自动化测试任务队列 */
+    private final BlockingQueue<DeviceTestTask> testTaskQueue = new LinkedBlockingQueue();
 
     private Device device;
     private IDevice iDevice;
@@ -43,41 +48,32 @@ public class AndroidDevice {
         this.device = device;
         this.iDevice = iDevice;
 
-        //开启一个线程 专门执行推送过来的自动化测试任务
+        //执行自动化测试任务线程
         new Thread(()->{
             while(true){
+                DeviceTestTask deviceTestTask;
                 try {
-                    Map<String,String> codes = taskQueue.take();
-                    log.info("[{}]准备执行测试任务",device.getId());
-
-                    List<Class> classes = new ArrayList();
-                    for(String fullClassName:codes.keySet()){
-                        //编译测试代码
-                        Class clazz = JavaCodeCompiler.compile(fullClassName, codes.get(fullClassName));
-                        classes.add(clazz);
-                    }
-                    log.info("[{}]开始执行测试任务",device.getId());
-                    TestNGRunner.runTestCases(classes.toArray(new Class[classes.size()]));
-                    log.info("[{}]执行测试任务完成",device.getId());
+                    deviceTestTask = testTaskQueue.take(); //没有测试任务，线程阻塞在此
+                } catch (InterruptedException e) {
+                    log.error("[{}][自动化测试]获取测试任务出错",getId(),e);
+                    continue;
+                }
+                try {
+                    excuteTestTask(deviceTestTask);
                 } catch (Exception e) {
-                    log.error("[{}]执行测试任务出现出错",device.getId(),e);
-                } finally {
-                    //如果设备还处于连接电脑状态 则将设备改为闲置
-                    if(isConnected()){
-                        if(uiautomator2Server != null){
-                            //停掉执行自动化测试的uiautomatorserver
-                            uiautomator2Server.stop();
-                        }
-                        device.setStatus(Device.IDLE_STATUS);
-                        App.getBean(MasterApi.class).saveDevice(device);
-                    }
+                    log.error("[{}][自动化测试]执行测试任务'{}'出错",getId(),deviceTestTask.getTestTaskName(),e);
                 }
             }
         }).start();
     }
-    public void addTask(Map<String,String> codes){
-        if(!taskQueue.offer(codes)){
-            throw new RuntimeException("添加测试任务失败");
+
+    /**
+     * 提交测试任务
+     * @param deviceTestTask
+     */
+    public void commitTestTask(DeviceTestTask deviceTestTask){
+        if(!testTaskQueue.offer(deviceTestTask)){
+            throw new RuntimeException("[自动化测试]提交测试任务'"+ deviceTestTask.getTestTaskName() +"'失败");
         }
     }
 
@@ -103,5 +99,69 @@ public class AndroidDevice {
      */
     public String getId() {
         return device.getId();
+    }
+
+    /**
+     * 执行测试任务
+     * @param deviceTestTask
+     */
+    private void excuteTestTask(DeviceTestTask deviceTestTask) throws Exception{
+        log.info("[{}][自动化测试]开始执行测试任务: {}",getId(),deviceTestTask.getTestTaskName());
+
+        device.setStatus(Device.USING_STATUS);
+        device.setUsername(deviceTestTask.getTestTaskName());
+        App.getBean(MasterApi.class).saveDevice(device);
+
+        try {
+            int port = uiautomator2Server.start();
+
+            Action beforeSuite = deviceTestTask.getBeforeSuite();
+            List<Testcase> testcases = deviceTestTask.getTestcases();
+            List<GlobalVar> globalVars = deviceTestTask.getGlobalVars();
+
+            List<Class> classes = new ArrayList();
+
+            if (beforeSuite != null) {
+                String beforeSuiteClassName = "BeforeSuite_" + UUIDUtil.getUUID();
+                String beforeSuiteCode = new TestNGCodeConverter()
+                        .setActionTree(beforeSuite)
+                        .setTestClassName(beforeSuiteClassName)
+                        .setIsBeforeSuite(true)
+                        .setProjectType(beforeSuite.getProjectType())
+                        .setDeviceId(deviceTestTask.getDeviceId())
+                        .setPort(port)
+                        .setGlobalVars(globalVars)
+                        .setBasePackagePath("/codetemplate")
+                        .setFtlFileName("testngCode.ftl")
+                        .convert();
+                Class beforeSuiteClass = JavaCodeCompiler.compile(beforeSuiteClassName, beforeSuiteCode);
+                classes.add(beforeSuiteClass);
+            }
+
+            for(Testcase testcase: testcases) {
+                String testcaseClassName = "Test_" + UUIDUtil.getUUID();
+                String testcaseCode = new TestNGCodeConverter()
+                        .setDeviceTestTaskId(deviceTestTask.getId())
+                        .setActionTree(testcase)
+                        .setTestClassName(testcaseClassName)
+                        .setIsBeforeSuite(false)
+                        .setProjectType(beforeSuite.getProjectType())
+                        .setDeviceId(deviceTestTask.getDeviceId())
+                        .setPort(port)
+                        .setGlobalVars(globalVars)
+                        .setBasePackagePath("/codetemplate")
+                        .setFtlFileName("testngCode.ftl")
+                        .convert();
+                Class testcaseClass = JavaCodeCompiler.compile(testcaseClassName, testcaseCode);
+                classes.add(testcaseClass);
+            }
+
+            TestNGRunner.runTestCases(classes.toArray(new Class[classes.size()]));
+        } finally {
+            if(isConnected()){
+                device.setStatus(Device.IDLE_STATUS);
+                App.getBean(MasterApi.class).saveDevice(device);
+            }
+        }
     }
 }

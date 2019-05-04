@@ -1,5 +1,7 @@
 package com.fgnb.android;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,5 +18,9 @@ public class AndroidDeviceHolder {
 
     public static AndroidDevice get(String deviceId){
         return androidDeviceHolder.get(deviceId);
+    }
+
+    public static List<AndroidDevice> getAndroidDevices() {
+        return new ArrayList<>(androidDeviceHolder.values());
     }
 }

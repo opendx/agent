@@ -26,8 +26,8 @@ public class ${testClassName} {
         <#lt>    @BeforeSuite
     <#else>
         <#--非debug-->
-        <#if testTaskId?? && testTaskReportId?? && deviceId?? && testCaseId?? && testCaseName??>
-            <#lt>    @Test(description = "${testTaskId?c}@&@${testTaskReportId?c}@&@${deviceId}@&@${testCaseId?c}@&@${testCaseName}")
+        <#if deviceTestTaskId?? && testcaseId??>
+            <#lt>    @Test(description = "${deviceTestTaskId?c}_${testcaseId?c}")
         <#--debug-->
         <#else>
             <#lt>    @Test

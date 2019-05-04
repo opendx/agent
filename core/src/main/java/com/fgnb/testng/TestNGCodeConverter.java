@@ -20,8 +20,7 @@ public class TestNGCodeConverter {
 
     private final Map<Integer, Method> methodMap = new HashMap();
 
-    private Integer testTaskId;
-    private Integer testTaskReportId;
+    private Integer deviceTestTaskId;
     private List<GlobalVar> globalVars;
     private String deviceId;
     private Integer port;
@@ -48,10 +47,8 @@ public class TestNGCodeConverter {
         dataModel.put("deviceId", deviceId);
         dataModel.put("port", port);
 
-        dataModel.put("testTaskId", testTaskId);
-        dataModel.put("testTaskReportId", testTaskReportId);
-        dataModel.put("testCaseId", actionTree.getId());
-        dataModel.put("testCaseName", actionTree.getName());
+        dataModel.put("deviceTestTaskId", deviceTestTaskId);
+        dataModel.put("testcaseId", actionTree.getId());
 
         dataModel.put("isBeforeSuite", isBeforeSuite);
         dataModel.put("projectType", projectType);

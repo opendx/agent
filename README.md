@@ -14,5 +14,11 @@ mvn clean install
 ## 注意
 需要将(C:\Program Files\)Java\jdk1.8.0_144\lib\tools.jar  copy到(C:\Program Files\)Java\jre1.8.0_191\lib目录下，否则可能获取不到编译器，导致调试action报错
 
-##2019-01-01
+## 2019-01-01
 chromedrivers http://npm.taobao.org/mirrors/chromedriver/
+
+## todo
+* 返回值全部改为Object，加return_value_desc字段
+* 用户上传jar，动态加载jar，以及action的表单提交
+* iOS支持
+* web支持
