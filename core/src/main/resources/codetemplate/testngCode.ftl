@@ -27,7 +27,7 @@ public class ${testClassName} {
     <#else>
         <#--非debug-->
         <#if deviceTestTaskId?? && testcaseId??>
-            <#lt>    @Test(description = "${deviceTestTaskId?c}_${testcaseId?c}")
+            <#lt>    @Test(description = "${deviceId}_${deviceTestTaskId?c}_${testcaseId?c}")
         <#--debug-->
         <#else>
             <#lt>    @Test

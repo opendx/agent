@@ -145,7 +145,7 @@ public class AndroidDevice {
                         .setActionTree(testcase)
                         .setTestClassName(testcaseClassName)
                         .setIsBeforeSuite(false)
-                        .setProjectType(beforeSuite.getProjectType())
+                        .setProjectType(testcase.getProjectType())
                         .setDeviceId(deviceTestTask.getDeviceId())
                         .setPort(port)
                         .setGlobalVars(globalVars)

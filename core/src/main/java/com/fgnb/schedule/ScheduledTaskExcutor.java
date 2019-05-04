@@ -42,7 +42,7 @@ public class ScheduledTaskExcutor {
 
         unStartDeviceTestTasks.stream().parallel().forEach(deviceTestTask -> {
             AndroidDeviceHolder.get(deviceTestTask.getDeviceId()).commitTestTask(deviceTestTask);
-            log.info("[自动化测试]提交测试任务{}到设备{}",deviceTestTask.getTestTaskName(),deviceTestTask.getDeviceId());
+            log.info("[{}][自动化测试]提交测试任务{}",deviceTestTask.getDeviceId(),deviceTestTask.getTestTaskName());
         });
     }
 }
