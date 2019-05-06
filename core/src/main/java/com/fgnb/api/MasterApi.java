@@ -2,6 +2,7 @@ package com.fgnb.api;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.fgnb.App;
 import com.fgnb.model.Device;
 import com.fgnb.model.Response;
 import com.fgnb.model.devicetesttask.DeviceTestTask;
@@ -29,6 +30,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MasterApi {
 
+    private static MasterApi masterApi;
+
     @Autowired
     private RestTemplate restTemplate;
 
@@ -46,6 +49,13 @@ public class MasterApi {
     private String findUnStartTestTasksByDeviceIdsApi;
     @Value("${master}/deviceTestTask/updateTestcase/")
     private String updateTestcaseApi;
+
+    public synchronized static MasterApi getInstance() {
+        if(masterApi == null) {
+            masterApi = App.getBean(MasterApi.class);
+        }
+        return masterApi;
+    }
 
     /**
      * 通过设备id获取Device

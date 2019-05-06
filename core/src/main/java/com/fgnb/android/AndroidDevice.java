@@ -14,7 +14,6 @@ import com.fgnb.model.devicetesttask.DeviceTestTask;
 import com.fgnb.model.devicetesttask.Testcase;
 import com.fgnb.testng.TestNGCodeConverter;
 import com.fgnb.testng.TestNGRunner;
-import com.fgnb.App;
 import com.fgnb.utils.UUIDUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -110,7 +109,7 @@ public class AndroidDevice {
 
         device.setStatus(Device.USING_STATUS);
         device.setUsername(deviceTestTask.getTestTaskName());
-        App.getBean(MasterApi.class).saveDevice(device);
+        MasterApi.getInstance().saveDevice(device);
 
         try {
             int port = uiautomator2Server.start();
@@ -160,7 +159,7 @@ public class AndroidDevice {
         } finally {
             if(isConnected()){
                 device.setStatus(Device.IDLE_STATUS);
-                App.getBean(MasterApi.class).saveDevice(device);
+                MasterApi.getInstance().saveDevice(device);
             }
         }
     }

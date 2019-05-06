@@ -4,7 +4,6 @@ import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
 import com.fgnb.android.AndroidUtils;
 import com.fgnb.api.MasterApi;
-import com.fgnb.App;
 import com.fgnb.model.devicetesttask.DeviceTestTask;
 import com.fgnb.model.devicetesttask.Testcase;
 import com.fgnb.utils.ShellExecutor;
@@ -26,8 +25,6 @@ import java.util.Date;
 @Slf4j
 public class TestCaseTestListener extends TestListenerAdapter {
 
-    private static final MasterApi masterApi = App.getBean(MasterApi.class);
-
     private static final ThreadLocal<String> TL_DEVICE_ID = new ThreadLocal<>();
     private static final ThreadLocal<Integer> TL_DEVICE_TEST_TASK_ID = new ThreadLocal<>();
     private static final ThreadLocal<Integer> TL_TEST_CASE_ID = new ThreadLocal<>();
@@ -48,7 +45,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         deviceTestTask.setId(TL_DEVICE_TEST_TASK_ID.get());
         deviceTestTask.setStartTime(new Date());
         deviceTestTask.setStatus(DeviceTestTask.RUNNING_STATUS);
-        masterApi.updateDeviceTestTask(deviceTestTask);
+        MasterApi.getInstance().updateDeviceTestTask(deviceTestTask);
     }
 
     @Override
@@ -57,7 +54,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         deviceTestTask.setId(TL_DEVICE_TEST_TASK_ID.get());
         deviceTestTask.setEndTime(new Date());
         deviceTestTask.setStatus(DeviceTestTask.FINISHED_STATUS);
-        masterApi.updateDeviceTestTask(deviceTestTask);
+        MasterApi.getInstance().updateDeviceTestTask(deviceTestTask);
 
         if(TL_RECORDING_VIDEO.get()) {
             //删除录制视频生成的文件夹
@@ -77,7 +74,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         Testcase testcase = new Testcase();
         testcase.setId(TL_TEST_CASE_ID.get());
         testcase.setStartTime(new Date());
-        masterApi.updateTestcase(TL_DEVICE_TEST_TASK_ID.get(), testcase);
+        MasterApi.getInstance().updateTestcase(TL_DEVICE_TEST_TASK_ID.get(), testcase);
 
         if (TL_RECORDING_VIDEO.get()) { // 需要录制测试视频
             File deviceIdFolder = new File(TL_DEVICE_ID.get());
@@ -123,7 +120,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         testcase.setId(TL_TEST_CASE_ID.get());
         testcase.setEndTime(new Date());
         testcase.setStatus(Testcase.PASS_STATUS);
-        masterApi.updateTestcase(TL_DEVICE_TEST_TASK_ID.get(), testcase);
+        MasterApi.getInstance().updateTestcase(TL_DEVICE_TEST_TASK_ID.get(), testcase);
     }
 
     @Override
@@ -137,7 +134,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         if(TL_RECORDING_VIDEO.get()) {
             testcase.setVideoUrl(generateVideoAndUploadToMaster());
         }
-        masterApi.updateTestcase(TL_DEVICE_TEST_TASK_ID.get(), testcase);
+        MasterApi.getInstance().updateTestcase(TL_DEVICE_TEST_TASK_ID.get(), testcase);
     }
 
     @Override
@@ -151,7 +148,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         if(TL_RECORDING_VIDEO.get()) {
             testcase.setVideoUrl(generateVideoAndUploadToMaster());
         }
-        masterApi.updateTestcase(TL_DEVICE_TEST_TASK_ID.get(), testcase);
+        MasterApi.getInstance().updateTestcase(TL_DEVICE_TEST_TASK_ID.get(), testcase);
     }
 
     /**
@@ -176,7 +173,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         }
 
         try {
-            return masterApi.uploadFile(new File(videoPath));
+            return MasterApi.getInstance().uploadFile(new File(videoPath));
         } catch (Exception e) {
             log.error("[{}]上传视频失败，videoPath: {}",TL_DEVICE_ID.get(),videoPath);
             return null;
@@ -197,7 +194,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         }
         File screenshotFile = new File(screenshotFilePath);
         try {
-            return masterApi.uploadFile(screenshotFile);
+            return MasterApi.getInstance().uploadFile(screenshotFile);
         } catch (Exception e){
             log.error("[{}]上传截图失败",TL_DEVICE_ID.get());
             return null;

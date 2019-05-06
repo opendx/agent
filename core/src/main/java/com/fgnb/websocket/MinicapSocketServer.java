@@ -5,7 +5,6 @@ import com.fgnb.android.AndroidDeviceHolder;
 import com.fgnb.android.stf.minicap.Minicap;
 import com.fgnb.api.MasterApi;
 import com.fgnb.model.Device;
-import com.fgnb.App;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -83,7 +82,7 @@ public class MinicapSocketServer {
         Device device = androidDevice.getDevice();
         device.setStatus(Device.USING_STATUS);
         device.setUsername(username);
-        App.getBean(MasterApi.class).saveDevice(device);
+        MasterApi.getInstance().saveDevice(device);
         log.info("[{}][minicap][socketserver]数据库状态改为{}使用中", deviceId, username);
     }
 
@@ -105,7 +104,7 @@ public class MinicapSocketServer {
             //因为手机可能被拔出离线，AndroidDeviceChangeService.deviceDisconnected已经在数据库改为离线，这里不能改为闲置
             if (device != null && device.getStatus() == Device.USING_STATUS) {
                 device.setStatus(Device.IDLE_STATUS);
-                App.getBean(MasterApi.class).saveDevice(device);
+                MasterApi.getInstance().saveDevice(device);
                 log.info("[{}][minicap][socketserver]数据库状态改为闲置", deviceId);
             }
         }
