@@ -4,8 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.fgnb.model.Device;
 import com.fgnb.model.Response;
-import com.fgnb.model.action.GlobalVar;
 import com.fgnb.model.devicetesttask.DeviceTestTask;
+import com.fgnb.model.devicetesttask.Testcase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,6 +44,8 @@ public class MasterApi {
     private String updateDeviceTestTaskApi;
     @Value("${master}/deviceTestTask/findUnStartTestTasksByDeviceIds")
     private String findUnStartTestTasksByDeviceIdsApi;
+    @Value("${master}/deviceTestTask/updateTestcase/")
+    private String updateTestcaseApi;
 
     /**
      * 通过设备id获取Device
@@ -109,7 +111,7 @@ public class MasterApi {
      * 获取未开始的测试任务
      */
     public List<DeviceTestTask> getUnStartTestTasksByDeviceIds(List<String> deviceIds) {
-        if(CollectionUtils.isEmpty(deviceIds)) {
+        if (CollectionUtils.isEmpty(deviceIds)) {
             return new ArrayList<>();
         }
 
@@ -118,6 +120,19 @@ public class MasterApi {
         if (response.isSuccess()) {
             return JSON.parseArray(JSONArray.toJSONString(response.getData()), DeviceTestTask.class);
         } else {
+            throw new RuntimeException(response.getMsg());
+        }
+    }
+
+    /**
+     * 更新测试用例执行状态
+     * @param deviceTestTaskId
+     * @param testcase
+     */
+    public void updateTestcase(Integer deviceTestTaskId, Testcase testcase) {
+        String url = updateTestcaseApi + deviceTestTaskId;
+        Response response = restTemplate.postForObject(url, testcase, Response.class);
+        if (!response.isSuccess()) {
             throw new RuntimeException(response.getMsg());
         }
     }
