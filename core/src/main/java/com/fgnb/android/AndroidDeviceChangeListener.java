@@ -128,66 +128,64 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
      * @return
      */
     private AndroidDevice initDevice(IDevice iDevice) {
+        Device device = new Device();
+
+        device.setType(Device.ANDROID_TYPE);
+        device.setCreateTime(new Date());
+        device.setId(iDevice.getSerialNumber());
+
+        try {
+            device.setCpuInfo(AndroidUtils.getCpuInfo(iDevice));
+        } catch (Exception e) {
+            log.error("获取cpu信息失败", e);
+            device.setCpuInfo("获取cpu信息失败");
+        }
+
+        try {
+            device.setMemSize(AndroidUtils.getMemSize(iDevice));
+        } catch (Exception e) {
+            log.error("获取内存大小失败", e);
+            device.setMemSize("获取内存大小失败");
+        }
+
+        device.setName(AndroidUtils.getDeviceName(iDevice));
+        device.setSystemVersion(AndroidUtils.getAndroidVersion(iDevice));
+
+        String[] resolution;
+        try {
+            resolution = AndroidUtils.getResolution(iDevice).split("x");
+        } catch (Exception e) {
+            throw new RuntimeException("获取屏幕分辨率失败", e);
+        }
+        device.setScreenWidth(Integer.parseInt(resolution[0]));
+        device.setScreenHeight(Integer.parseInt(resolution[1]));
+
+        //截图并上传到服务器
         File screenshot = null;
         try {
-            Device device = new Device();
-
-            device.setType(Device.ANDROID_TYPE);
-            device.setCreateTime(new Date());
-            device.setId(iDevice.getSerialNumber());
-
-            try {
-                device.setCpuInfo(AndroidUtils.getCpuInfo(iDevice));
-            } catch (Exception e) {
-                log.error("获取cpu信息失败", e);
-                device.setCpuInfo("获取cpu信息失败");
-            }
-
-            try {
-                device.setMemSize(AndroidUtils.getMemSize(iDevice));
-            } catch (Exception e) {
-                log.error("获取内存大小失败", e);
-                device.setMemSize("获取内存大小失败");
-            }
-
-            device.setName(AndroidUtils.getDeviceName(iDevice));
-            device.setSystemVersion(AndroidUtils.getAndroidVersion(iDevice));
-
-            String[] resolution;
-            try {
-                resolution = AndroidUtils.getResolution(iDevice).split("x");
-            } catch (Exception e) {
-                throw new RuntimeException("获取屏幕分辨率失败", e);
-            }
-            device.setScreenWidth(Integer.parseInt(resolution[0]));
-            device.setScreenHeight(Integer.parseInt(resolution[1]));
-
-            //截图并上传到服务器
-            try {
-                screenshot = AndroidUtils.screenshot(iDevice);
-                String downloadURL = masterApi.uploadFile(screenshot);
-                device.setImgUrl(downloadURL);
-            } catch (Exception e) {
-                log.error("设置首次接入master屏幕截图失败", e);
-            }
-
-            AndroidDevice androidDevice = new AndroidDevice(device, iDevice);
-
-            //安装minicap minitouch uiautomatorServerApk
-            try {
-                installMinicapAndMinitouchAndUiAutomatorServerApk(androidDevice);
-            } catch (Exception e) {
-                throw new RuntimeException("安装必要程序到手机出错", e);
-            }
-
-            device.setStfStatus(Device.STF_SUCCESS_STATUS);
-            device.setMacacaStatus(Device.MACACA_SUCCESS_STATUS);
-
-            return androidDevice;
+            screenshot = AndroidUtils.screenshot(iDevice);
+            String downloadURL = masterApi.uploadFile(screenshot);
+            device.setImgUrl(downloadURL);
+        } catch (Exception e) {
+            log.error("设置首次接入master屏幕截图失败", e);
         } finally {
-            //删除首次接入系统的截图
+            //删除截图
             FileUtils.deleteQuietly(screenshot);
         }
+
+        AndroidDevice androidDevice = new AndroidDevice(device, iDevice);
+
+        //安装minicap minitouch uiautomatorServerApk
+        try {
+            installMinicapAndMinitouchAndUiAutomatorServerApk(androidDevice);
+        } catch (Exception e) {
+            throw new RuntimeException("安装必要程序到手机出错", e);
+        }
+
+        device.setStfStatus(Device.STF_SUCCESS_STATUS);
+        device.setMacacaStatus(Device.MACACA_SUCCESS_STATUS);
+
+        return androidDevice;
     }
 
     /**

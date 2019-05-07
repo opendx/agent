@@ -111,19 +111,19 @@ public class AndroidService {
         try {
             AndroidUtils.screenshotByMinicap(androidDevice.getIDevice(), localScreenshotPath, androidDevice.getResolution());
         } catch (Exception e) {
-            FileUtils.deleteQuietly(localScreenshotPathFile);
             log.error("[{}]minicap截图失败", deviceId, e);
+            FileUtils.deleteQuietly(localScreenshotPathFile);
             return Response.fail(e.getMessage());
         }
 
         String downloadURL;
         try {
             downloadURL = masterApi.uploadFile(localScreenshotPathFile);
-            FileUtils.deleteQuietly(localScreenshotPathFile);
         } catch (Exception e) {
-            FileUtils.deleteQuietly(localScreenshotPathFile);
             log.error("[{}]上传截图到master失败", deviceId, e);
             return Response.fail(e.getMessage());
+        } finally {
+            FileUtils.deleteQuietly(localScreenshotPathFile);
         }
 
         JSONObject response = new JSONObject();
