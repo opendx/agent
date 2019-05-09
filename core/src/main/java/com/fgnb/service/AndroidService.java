@@ -104,26 +104,12 @@ public class AndroidService {
     public Response screenshot(String deviceId) {
         AndroidDevice androidDevice = getAndroidDevice(deviceId);
 
-        //本地截图位置
-        String localScreenshotPath = UUIDUtil.getUUID() + ".jpg";
-        File localScreenshotPathFile = new File(localScreenshotPath);
-
-        try {
-            AndroidUtils.screenshotByMinicap(androidDevice.getIDevice(), localScreenshotPath, androidDevice.getResolution());
-        } catch (Exception e) {
-            log.error("[{}]minicap截图失败", deviceId, e);
-            FileUtils.deleteQuietly(localScreenshotPathFile);
-            return Response.fail(e.getMessage());
-        }
-
         String downloadURL;
         try {
-            downloadURL = masterApi.uploadFile(localScreenshotPathFile);
+            downloadURL = screenshotByMinicapAndUploadToMaster(androidDevice);
         } catch (Exception e) {
-            log.error("[{}]上传截图到master失败", deviceId, e);
-            return Response.fail(e.getMessage());
-        } finally {
-            FileUtils.deleteQuietly(localScreenshotPathFile);
+            log.error("[{}]截图并上传到master失败", deviceId, e);
+            return Response.fail("");
         }
 
         JSONObject response = new JSONObject();
@@ -170,5 +156,17 @@ public class AndroidService {
             throw new BusinessException("设备未连接");
         }
         return androidDevice;
+    }
+
+    public String screenshotByMinicapAndUploadToMaster(AndroidDevice androidDevice) throws Exception {
+        String screenshotFilePath = UUIDUtil.getUUID() + ".jpg";
+        File screenshotFile = null;
+        try {
+            AndroidUtils.screenshotByMinicap(androidDevice.getIDevice(), screenshotFilePath, androidDevice.getResolution());
+            screenshotFile = new File(screenshotFilePath);
+            return masterApi.uploadFile(screenshotFile);
+        } finally {
+            FileUtils.deleteQuietly(screenshotFile);
+        }
     }
 }
