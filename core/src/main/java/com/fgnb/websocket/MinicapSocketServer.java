@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -28,8 +29,8 @@ public class MinicapSocketServer {
 
     private Minicap minicap;
     private String deviceId;
-    private boolean needSendImageData;
     private BlockingQueue<byte[]> imgQueue;
+    private Thread handleImgDataThread;
 
     @OnOpen
     public void onOpen(@PathParam("deviceId") String deviceId, @PathParam("username") String username, Session session) throws Exception {
@@ -64,20 +65,24 @@ public class MinicapSocketServer {
         basicRemote.sendText("启动minicap服务完成");
 
         imgQueue = minicap.getImgQueue();
-        needSendImageData = true;
-        new Thread(() -> {
-            while (needSendImageData) {
+        handleImgDataThread = new Thread(() -> {
+            while (true) {
+                byte[] img;
                 try {
-                    byte[] img = imgQueue.take();
-                    if(session.isOpen()){
-                        basicRemote.sendBinary(ByteBuffer.wrap(img));
-                    }
-                } catch (Exception e) {
-                    log.error("[{}][minicap][socketserver]图片处理出错", e);
+                    img = imgQueue.take();
+                } catch (InterruptedException e) {
+                    log.info("[{}][minicap][socketserver]停止从imgQueue获取数据", deviceId);
+                    break;
+                }
+                try {
+                    basicRemote.sendBinary(ByteBuffer.wrap(img));
+                } catch (IOException e) {
+                    log.error("[{}][minicap][socketserver]发送图片数据出错", deviceId, e);
                 }
             }
             log.info("[{}][minicap][socketserver]停止发送图片数据", deviceId);
-        },"MinicapSocketServer-ImageDataTakerAndSender-" + deviceId).start();
+        }, "MinicapSocketServer-ImageDataTakerAndSender-" + deviceId);
+        handleImgDataThread.start();
 
         Device device = androidDevice.getDevice();
         device.setStatus(Device.USING_STATUS);
@@ -90,13 +95,7 @@ public class MinicapSocketServer {
     public void onClose() {
         log.info("[{}][minicap][socketserver]onClose", deviceId);
         sessionPool.remove(deviceId);
-        needSendImageData = false;
-
-        // 防止MinicapSocketServer-ImageDataTakerAndSender线程由于imgQueue被清空，线程阻塞在imgQueue.take()无法结束
-        // 在关闭websocket时，推送一个数据，让循环能走到while(needSendImageData)
-        if(imgQueue != null) {
-            imgQueue.offer(new byte[]{1});
-        }
+        handleImgDataThread.interrupt();
 
         if (minicap != null) {
             minicap.stop();
