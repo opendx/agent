@@ -1,7 +1,6 @@
-package com.fgnb.init;
+package com.fgnb.selenium;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.jni.Error;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
