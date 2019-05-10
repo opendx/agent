@@ -20,7 +20,6 @@ import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
 
 import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.Date;
