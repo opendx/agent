@@ -1,9 +1,5 @@
-package com.fgnb.init;
+package com.fgnb.android;
 
-import com.fgnb.App;
-import com.fgnb.android.ADB;
-import com.fgnb.android.AndroidDeviceChangeListener;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -16,7 +12,6 @@ import java.io.IOException;
  * 首次启动初始化器
  */
 @Component
-@Slf4j
 public class AndroidInitializer implements ApplicationRunner{
 
     @Autowired
@@ -24,7 +19,6 @@ public class AndroidInitializer implements ApplicationRunner{
 
     @Override
     public void run(ApplicationArguments args) throws IOException {
-        log.info("Server: {}", App.getProperty("server"));
         //agent每次启动都先kill adb server
         ADB.killServer();
         //初始化adb
