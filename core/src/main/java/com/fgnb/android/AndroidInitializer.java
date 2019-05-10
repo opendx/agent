@@ -9,7 +9,6 @@ import java.io.IOException;
 
 /**
  * Created by jiangyitao.
- * 首次启动初始化器
  */
 @Component
 public class AndroidInitializer implements ApplicationRunner{

@@ -23,7 +23,6 @@ import java.util.Date;
 
 /**
  * Created by jiangyitao.
- * 安卓手机接入，拔出监听器
  */
 @Component
 @Slf4j
