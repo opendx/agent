@@ -34,6 +34,8 @@ public class AndroidDevice {
 
     /** 执行自动化测试任务队列 */
     private final BlockingQueue<DeviceTestTask> testTaskQueue = new LinkedBlockingQueue();
+    /** 执行自动化测试任务线程 */
+    private Thread excuteTestTaskThread;
 
     private Device device;
     private IDevice iDevice;
@@ -47,15 +49,15 @@ public class AndroidDevice {
         this.device = device;
         this.iDevice = iDevice;
 
-        //执行自动化测试任务线程
-        new Thread(()->{
+        excuteTestTaskThread = new Thread(()->{
             while(true){
                 DeviceTestTask deviceTestTask;
                 try {
                     deviceTestTask = testTaskQueue.take(); //没有测试任务，线程阻塞在此
                 } catch (InterruptedException e) {
-                    log.error("[{}][自动化测试]获取测试任务出错",getId(),e);
-                    continue;
+                    // 调用excuteTestTaskThread.interrupt()可以执行到这里
+                    log.info("[{}][自动化测试]停止获取测试任务",getId());
+                    break;
                 }
                 try {
                     excuteTestTask(deviceTestTask);
@@ -63,7 +65,8 @@ public class AndroidDevice {
                     log.error("[{}][自动化测试]执行测试任务'{}'出错",getId(),deviceTestTask.getTestTaskName(),e);
                 }
             }
-        }).start();
+        });
+        excuteTestTaskThread.start();
     }
 
     /**
