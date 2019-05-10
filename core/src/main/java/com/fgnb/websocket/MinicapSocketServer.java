@@ -61,6 +61,7 @@ public class MinicapSocketServer {
 
         basicRemote.sendText("启动minicap服务...");
         minicap = new Minicap(androidDevice);
+        //todo 按比例分辨率
         minicap.start("408x720", 0);
         basicRemote.sendText("启动minicap服务完成");
 
