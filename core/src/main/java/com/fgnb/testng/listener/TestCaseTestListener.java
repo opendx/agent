@@ -4,6 +4,7 @@ import com.fgnb.App;
 import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
 import com.fgnb.api.MasterApi;
+import com.fgnb.model.Device;
 import com.fgnb.model.devicetesttask.DeviceTestTask;
 import com.fgnb.model.devicetesttask.Testcase;
 import com.fgnb.service.AndroidService;
@@ -36,9 +37,9 @@ public class TestCaseTestListener extends TestListenerAdapter {
     private static final ThreadLocal<AndroidDevice> TL_ANDROID_DEVICE = new ThreadLocal<>();
     private static final ThreadLocal<Integer> TL_DEVICE_TEST_TASK_ID = new ThreadLocal<>();
     private static final ThreadLocal<Integer> TL_TEST_CASE_ID = new ThreadLocal<>();
-    private static final ThreadLocal<Boolean> TL_NEED_RECORDING_VIDEO = new ThreadLocal<>();
-    private static final ThreadLocal<FutureTask<String>> TL_RECORDING_VIDEO_FUTURE_TASK = new ThreadLocal<>();
-    private static final ThreadLocal<Thread> TL_RECORDING_VIDEO_THREAD = new ThreadLocal<>();
+    private static final ThreadLocal<Boolean> TL_NEED_RECORD_VIDEO = new ThreadLocal<>();
+    private static final ThreadLocal<FutureTask<String>> TL_RECORD_VIDEO_FUTURE_TASK = new ThreadLocal<>();
+    private static final ThreadLocal<Thread> TL_RECORD_VIDEO_THREAD = new ThreadLocal<>();
 
     /**
      * 每个设备开始测试调用的方法，这里可能有多个线程同时调用
@@ -49,26 +50,29 @@ public class TestCaseTestListener extends TestListenerAdapter {
     public void onStart(ITestContext testContext) {
         // deviceId_deviceTestTaskId_testcaseId
         String[] testDesc = testContext.getAllTestMethods()[0].getDescription().split("_");
-        AndroidDevice androidDevice = AndroidDeviceHolder.get(testDesc[0]);
-        log.info("[{}][自动化测试]开始执行任务：{}", androidDevice.getId(), testDesc[1]);
+        String deviceId = testDesc[0];
+        Integer deviceTestTaskId = Integer.parseInt(testDesc[1]);
+        Boolean needRecordVideo = true; // 这个版本先设置为需要录制视频，以后可能改成从前端传过来
+
+        AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
+        log.info("[{}][自动化测试]开始执行任务：{}", deviceId, deviceTestTaskId);
 
         TL_ANDROID_DEVICE.set(androidDevice);
-        TL_DEVICE_TEST_TASK_ID.set(Integer.parseInt(testDesc[1]));
-
-        TL_NEED_RECORDING_VIDEO.set(true);// 这个版本先设置为需要录制视频，以后可能改成从前端传过来
+        TL_DEVICE_TEST_TASK_ID.set(deviceTestTaskId);
+        TL_NEED_RECORD_VIDEO.set(needRecordVideo);
 
         DeviceTestTask deviceTestTask = new DeviceTestTask();
-        deviceTestTask.setId(TL_DEVICE_TEST_TASK_ID.get());
+        deviceTestTask.setId(deviceTestTaskId);
         deviceTestTask.setStartTime(new Date());
         deviceTestTask.setStatus(DeviceTestTask.RUNNING_STATUS);
         MasterApi.getInstance().updateDeviceTestTask(deviceTestTask);
 
-        if (TL_NEED_RECORDING_VIDEO.get()) {
+        if (needRecordVideo) {
             try {
                 // 启动minicap，视频录制从minicap获取屏幕数据
                 androidDevice.getMinicap().start(androidDevice.getResolution(), 0);
             } catch (Exception e) {
-                log.error("[{}]启动minicap失败", androidDevice.getId(), e);
+                log.error("[{}]启动minicap失败", deviceId, e);
             }
         }
     }
@@ -80,16 +84,21 @@ public class TestCaseTestListener extends TestListenerAdapter {
      */
     @Override
     public void onFinish(ITestContext testContext) {
-        log.info("[{}][自动化测试]执行任务完成：{}", TL_ANDROID_DEVICE.get().getId(), TL_DEVICE_TEST_TASK_ID.get());
+        AndroidDevice androidDevice = TL_ANDROID_DEVICE.get();
+        String deviceId = androidDevice.getId();
+        Integer deviceTestTaskId = TL_DEVICE_TEST_TASK_ID.get();
+        Boolean needRecordVideo = TL_NEED_RECORD_VIDEO.get();
+
+        log.info("[{}][自动化测试]执行任务完成：{}", deviceId, deviceTestTaskId);
         DeviceTestTask deviceTestTask = new DeviceTestTask();
-        deviceTestTask.setId(TL_DEVICE_TEST_TASK_ID.get());
+        deviceTestTask.setId(deviceTestTaskId);
         deviceTestTask.setEndTime(new Date());
         deviceTestTask.setStatus(DeviceTestTask.FINISHED_STATUS);
         MasterApi.getInstance().updateDeviceTestTask(deviceTestTask);
 
-        if (TL_NEED_RECORDING_VIDEO.get() && TL_ANDROID_DEVICE.get().getMinicap() != null) {
+        if (needRecordVideo && androidDevice.getMinicap() != null) {
             // 测试结束，停止minicap
-            TL_ANDROID_DEVICE.get().getMinicap().stop();
+            androidDevice.getMinicap().stop();
         }
     }
 
@@ -101,33 +110,38 @@ public class TestCaseTestListener extends TestListenerAdapter {
      */
     @Override
     public void onTestStart(ITestResult tr) {
+        Integer deviceTestTaskId = TL_DEVICE_TEST_TASK_ID.get();
+        Boolean needRecordVideo = TL_NEED_RECORD_VIDEO.get();
+        AndroidDevice androidDevice = TL_ANDROID_DEVICE.get();
+        String deviceId = androidDevice.getId();
         // deviceId_deviceTestTaskId_testcaseId
-        TL_TEST_CASE_ID.set(Integer.parseInt(tr.getMethod().getDescription().split("_")[2]));
-        log.info("[{}][自动化测试]开始执行用例：{}", TL_ANDROID_DEVICE.get().getId(), TL_TEST_CASE_ID.get());
+        Integer testcaseId = Integer.parseInt(tr.getMethod().getDescription().split("_")[2]);
+        TL_TEST_CASE_ID.set(testcaseId);
+
+        log.info("[{}][自动化测试]开始执行用例：{}", deviceId, testcaseId);
 
         Testcase testcase = new Testcase();
-        testcase.setId(TL_TEST_CASE_ID.get());
+        testcase.setId(testcaseId);
         testcase.setStartTime(new Date());
-        MasterApi.getInstance().updateTestcase(TL_DEVICE_TEST_TASK_ID.get(), testcase);
+        MasterApi.getInstance().updateTestcase(deviceTestTaskId, testcase);
 
-        if (TL_NEED_RECORDING_VIDEO.get()) {
+        if (needRecordVideo) {
             String videoPath = UUIDUtil.getUUID() + ".mp4";
-            log.info("[{}][自动化测试]用例：{}，开始录制视频：{}", TL_ANDROID_DEVICE.get().getId(), TL_TEST_CASE_ID.get(), videoPath);
+            log.info("[{}][自动化测试]用例：{}，开始录制视频：{}", deviceId, testcaseId, videoPath);
 
-            final FFmpegFrameRecorder videoRecorder = new FFmpegFrameRecorder(videoPath, TL_ANDROID_DEVICE.get().getDevice().getScreenWidth(), TL_ANDROID_DEVICE.get().getDevice().getScreenHeight());
+            Device device = androidDevice.getDevice();
+            final FFmpegFrameRecorder videoRecorder = new FFmpegFrameRecorder(videoPath, device.getScreenWidth(), device.getScreenHeight());
             videoRecorder.setVideoCodec(avcodec.AV_CODEC_ID_H264); //编码
             videoRecorder.setFrameRate(30); //帧率
             videoRecorder.setFormat("mp4");
             try {
                 videoRecorder.start();
             } catch (FrameRecorder.Exception e) {
-                log.error("[{}][自动化测试]用例：{}，开始录制视频出错", TL_ANDROID_DEVICE.get().getId(), TL_TEST_CASE_ID.get(), e);
+                log.error("[{}][自动化测试]用例：{}，开始录制视频出错", deviceId, testcaseId, e);
             }
 
             File video = new File(videoPath);
-            BlockingQueue<byte[]> imgQueue = TL_ANDROID_DEVICE.get().getMinicap().getImgQueue();
-            String deviceId = TL_ANDROID_DEVICE.get().getId();
-            String testcaseId = String.valueOf(TL_TEST_CASE_ID.get());
+            BlockingQueue<byte[]> imgQueue = androidDevice.getMinicap().getImgQueue();
             Callable<String> recordingVideo = () -> {
                 try {
                     while (true) {
@@ -153,10 +167,10 @@ public class TestCaseTestListener extends TestListenerAdapter {
             };
 
             FutureTask<String> futureTask = new FutureTask<>(recordingVideo);
-            TL_RECORDING_VIDEO_FUTURE_TASK.set(futureTask);
+            TL_RECORD_VIDEO_FUTURE_TASK.set(futureTask);
 
             Thread recordingVideoThread = new Thread(futureTask);
-            TL_RECORDING_VIDEO_THREAD.set(recordingVideoThread);
+            TL_RECORD_VIDEO_THREAD.set(recordingVideoThread);
 
             recordingVideoThread.start();
         }
@@ -206,13 +220,13 @@ public class TestCaseTestListener extends TestListenerAdapter {
     }
 
     private String getVideoDownloadUrl() {
-        if (!TL_NEED_RECORDING_VIDEO.get()) {
+        if (!TL_NEED_RECORD_VIDEO.get()) {
             return null;
         }
         //停止录制视频,imgQueue.take()捕获到InterruptedException跳出循环
-        TL_RECORDING_VIDEO_THREAD.get().interrupt();
+        TL_RECORD_VIDEO_THREAD.get().interrupt();
         try {
-            return TL_RECORDING_VIDEO_FUTURE_TASK.get().get();
+            return TL_RECORD_VIDEO_FUTURE_TASK.get().get();
         } catch (Exception e) {
             log.error("[{}][自动化测试]用例：{}，获取视频下载地址失败", TL_ANDROID_DEVICE.get().getId(), TL_TEST_CASE_ID.get(), e);
             return null;
