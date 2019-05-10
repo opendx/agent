@@ -142,7 +142,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
 
             File video = new File(videoPath);
             BlockingQueue<byte[]> imgQueue = androidDevice.getMinicap().getImgQueue();
-            Callable<String> recordingVideo = () -> {
+            Callable<String> recordVideo = () -> {
                 try {
                     while (true) {
                         byte[] imgData;
@@ -153,8 +153,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
                             break;
                         }
                         try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(imgData)) {
-                            BufferedImage read = ImageIO.read(byteArrayInputStream);
-                            videoRecorder.record(Java2DFrameUtils.toFrame(read));
+                            videoRecorder.record(Java2DFrameUtils.toFrame(ImageIO.read(byteArrayInputStream)));
                         }
                     }
                     videoRecorder.stop();
@@ -166,13 +165,13 @@ public class TestCaseTestListener extends TestListenerAdapter {
                 }
             };
 
-            FutureTask<String> futureTask = new FutureTask<>(recordingVideo);
-            TL_RECORD_VIDEO_FUTURE_TASK.set(futureTask);
+            FutureTask<String> recordVideoFutureTask = new FutureTask<>(recordVideo);
+            TL_RECORD_VIDEO_FUTURE_TASK.set(recordVideoFutureTask);
 
-            Thread recordingVideoThread = new Thread(futureTask);
-            TL_RECORD_VIDEO_THREAD.set(recordingVideoThread);
+            Thread recordVideoThread = new Thread(recordVideoFutureTask);
+            TL_RECORD_VIDEO_THREAD.set(recordVideoThread);
 
-            recordingVideoThread.start();
+            recordVideoThread.start();
         }
     }
 
