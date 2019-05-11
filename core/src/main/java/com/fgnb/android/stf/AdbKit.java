@@ -1,4 +1,4 @@
-package com.fgnb.android.stf.adbkit;
+package com.fgnb.android.stf;
 
 import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.PortProvider;

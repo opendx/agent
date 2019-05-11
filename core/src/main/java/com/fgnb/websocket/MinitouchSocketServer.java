@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
 import com.fgnb.android.AndroidUtils;
-import com.fgnb.android.stf.minitouch.Minitouch;
+import com.fgnb.android.stf.Minitouch;
 import com.fgnb.model.Device;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

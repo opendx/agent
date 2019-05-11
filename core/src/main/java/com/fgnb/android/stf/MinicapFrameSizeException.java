@@ -1,4 +1,4 @@
-package com.fgnb.android.stf.minicap;
+package com.fgnb.android.stf;
 
 /**
  * Created by jiangyitao.

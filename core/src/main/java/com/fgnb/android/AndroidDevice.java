@@ -2,9 +2,9 @@ package com.fgnb.android;
 
 import com.android.ddmlib.IDevice;
 import com.fgnb.JavaCodeCompiler;
-import com.fgnb.android.stf.adbkit.AdbKit;
-import com.fgnb.android.stf.minicap.Minicap;
-import com.fgnb.android.stf.minitouch.Minitouch;
+import com.fgnb.android.stf.AdbKit;
+import com.fgnb.android.stf.Minicap;
+import com.fgnb.android.stf.Minitouch;
 import com.fgnb.android.uiautomator.Uiautomator2Server;
 import com.fgnb.api.MasterApi;
 import com.fgnb.model.Device;

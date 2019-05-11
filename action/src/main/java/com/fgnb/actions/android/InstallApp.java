@@ -55,25 +55,14 @@ public class InstallApp {
     }
 
     private void downloadApp(File file, String downloadURL) throws Exception {
-        InputStream appInputStream = null;
-        FileOutputStream fos = null;
-        try {
-            appInputStream = RestAssured.get(downloadURL).getBody().asInputStream();
-            fos = new FileOutputStream(file);
+        try (InputStream appInputStream = RestAssured.get(downloadURL).getBody().asInputStream();
+             FileOutputStream fos = new FileOutputStream(file)){
             int bytesRead;
             int bufferSize = 8192;
             byte[] buffer = new byte[bufferSize];
             while ((bytesRead = appInputStream.read(buffer, 0, bufferSize)) != -1) {
                 fos.write(buffer, 0, bytesRead);
             }
-        } finally {
-            if (fos != null) {
-                fos.close();
-            }
-            if (appInputStream != null) {
-                appInputStream.close();
-            }
         }
     }
-
 }

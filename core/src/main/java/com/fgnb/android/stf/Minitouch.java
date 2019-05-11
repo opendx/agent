@@ -1,4 +1,4 @@
-package com.fgnb.android.stf.minitouch;
+package com.fgnb.android.stf;
 
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.MultiLineReceiver;

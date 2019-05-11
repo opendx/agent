@@ -1,4 +1,4 @@
-package com.fgnb.android.stf.minitouch;
+package com.fgnb.android.stf;
 
 import com.android.ddmlib.*;
 import com.fgnb.android.AndroidDevice;

@@ -2,11 +2,11 @@ package com.fgnb.android;
 
 import com.android.ddmlib.*;
 import com.fgnb.App;
-import com.fgnb.android.stf.adbkit.AdbKit;
-import com.fgnb.android.stf.minicap.Minicap;
-import com.fgnb.android.stf.minicap.MinicapInstaller;
-import com.fgnb.android.stf.minitouch.Minitouch;
-import com.fgnb.android.stf.minitouch.MinitouchInstaller;
+import com.fgnb.android.stf.AdbKit;
+import com.fgnb.android.stf.Minicap;
+import com.fgnb.android.stf.MinicapInstaller;
+import com.fgnb.android.stf.Minitouch;
+import com.fgnb.android.stf.MinitouchInstaller;
 import com.fgnb.android.uiautomator.Uiautomator2Server;
 import com.fgnb.android.uiautomator.Uiautomator2ServerApkInstaller;
 import com.fgnb.api.MasterApi;

@@ -2,7 +2,7 @@ package com.fgnb.websocket;
 
 import com.fgnb.android.AndroidDevice;
 import com.fgnb.android.AndroidDeviceHolder;
-import com.fgnb.android.stf.minicap.Minicap;
+import com.fgnb.android.stf.Minicap;
 import com.fgnb.api.MasterApi;
 import com.fgnb.model.Device;
 import lombok.extern.slf4j.Slf4j;
