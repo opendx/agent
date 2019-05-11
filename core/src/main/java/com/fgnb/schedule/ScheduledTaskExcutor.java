@@ -37,7 +37,7 @@ public class ScheduledTaskExcutor {
         if (CollectionUtils.isEmpty(idleAndroidDeviceIds)) {
             return;
         }
-        //还没开始的测试任务 todo 可能会提交重复的测试任务
+        //还没开始的测试任务
         List<DeviceTestTask> unStartDeviceTestTasks = masterApi.getUnStartTestTasksByDeviceIds(idleAndroidDeviceIds);
 
         unStartDeviceTestTasks.stream().parallel().forEach(deviceTestTask -> {
