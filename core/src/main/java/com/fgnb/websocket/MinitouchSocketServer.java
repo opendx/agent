@@ -42,17 +42,20 @@ public class MinitouchSocketServer {
         androidDevice = AndroidDeviceHolder.get(deviceId);
         if (androidDevice == null || !androidDevice.isConnected()) {
             basicRemote.sendText(deviceId + "手机未连接");
+            session.close();
             return;
         }
 
         if (androidDevice.getDevice().getStatus() != Device.IDLE_STATUS) {
             basicRemote.sendText(deviceId + "设备未处于闲置状态，" + androidDevice.getDevice().getUsername() + "使用中");
+            session.close();
             return;
         }
 
         Session otherSession = sessionPool.get(deviceId);
         if (otherSession != null && otherSession.isOpen()) {
             basicRemote.sendText(deviceId + "手机正在被" + otherSession.getId() + "连接占用，请稍后重试");
+            session.close();
             return;
         }
 
