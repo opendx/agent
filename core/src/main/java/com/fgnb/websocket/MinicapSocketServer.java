@@ -29,7 +29,6 @@ public class MinicapSocketServer {
 
     private Minicap minicap;
     private String deviceId;
-    private BlockingQueue<byte[]> imgQueue;
     private Thread handleImgDataThread;
 
     @OnOpen
@@ -68,8 +67,8 @@ public class MinicapSocketServer {
         minicap.start("408x720", 0);
         basicRemote.sendText("启动minicap服务完成");
 
-        imgQueue = minicap.getImgQueue();
         handleImgDataThread = new Thread(() -> {
+            BlockingQueue<byte[]> imgQueue = minicap.getImgQueue();
             while (true) {
                 byte[] img;
                 try {
@@ -99,7 +98,10 @@ public class MinicapSocketServer {
     public void onClose() {
         log.info("[{}][minicap][socketserver]onClose", deviceId);
         sessionPool.remove(deviceId);
-        handleImgDataThread.interrupt();
+
+        if (handleImgDataThread != null) {
+            handleImgDataThread.interrupt();
+        }
 
         if (minicap != null) {
             minicap.stop();

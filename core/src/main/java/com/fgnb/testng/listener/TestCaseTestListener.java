@@ -140,8 +140,8 @@ public class TestCaseTestListener extends TestListenerAdapter {
             }
 
             File video = new File(videoPath);
-            BlockingQueue<byte[]> imgQueue = androidDevice.getMinicap().getImgQueue();
             Callable<String> recordVideo = () -> {
+                BlockingQueue<byte[]> imgQueue = androidDevice.getMinicap().getImgQueue();
                 try {
                     while (true) {
                         byte[] imgData;
