@@ -28,6 +28,7 @@ public class MinicapSocketServer {
     private static Map<String, Session> sessionPool = new ConcurrentHashMap<>();
 
     private Minicap minicap;
+    private AndroidDevice androidDevice;
     private String deviceId;
     private Thread handleImgDataThread;
 
@@ -39,7 +40,8 @@ public class MinicapSocketServer {
         RemoteEndpoint.Basic basicRemote = session.getBasicRemote();
         basicRemote.sendText("minicap websocket连接成功");
 
-        AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
+        androidDevice = AndroidDeviceHolder.get(deviceId);
+
         if (androidDevice == null || !androidDevice.isConnected()) {
             basicRemote.sendText(deviceId + "手机未连接");
             session.close();
@@ -103,9 +105,9 @@ public class MinicapSocketServer {
             handleImgDataThread.interrupt();
         }
 
-        if (minicap != null) {
+        if (minicap != null && androidDevice != null) {
             minicap.stop();
-            Device device = AndroidDeviceHolder.get(deviceId).getDevice();
+            Device device = androidDevice.getDevice();
             //因为手机可能被拔出离线，AndroidDeviceChangeService.deviceDisconnected已经在数据库改为离线，这里不能改为闲置
             if (device != null && device.getStatus() == Device.USING_STATUS) {
                 device.setStatus(Device.IDLE_STATUS);
