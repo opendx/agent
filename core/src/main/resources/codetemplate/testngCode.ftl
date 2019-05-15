@@ -18,7 +18,7 @@ public class ${testClassName} {
     <#-- 全局变量 变量名格式为g_xxx -->
     <#if globalVars?? && (globalVars?size>0)>
         <#list globalVars as globalVar>
-            <#lt>    public static final String g_${globalVar.name} = "${globalVar.value}";
+            <#lt>    public static final Object g_${globalVar.name} = "${globalVar.value}";
         </#list>
     </#if>
 
@@ -51,7 +51,7 @@ public class ${testClassName} {
             </#if>
             <#lt>    public <#rt>
             <#if method.hasReturnValue>
-                <#lt>String <#rt>
+                <#lt>Object <#rt>
             <#else>
                 <#lt>void <#rt>
             </#if>
@@ -60,7 +60,7 @@ public class ${testClassName} {
                 <#-- 方法参数，参数格式p_xxx -->
                 <#if method.methodParams?? && (method.methodParams?size>0)>
                     <#list method.methodParams as methodParam>
-                        <#lt>String p_${methodParam}<#rt>
+                        <#lt>Object p_${methodParam}<#rt>
                         <#if methodParam_has_next>
                             <#lt>, <#rt>
                         </#if>
@@ -86,7 +86,7 @@ public class ${testClassName} {
                      <#list method.vars as var>
                          <#list var?keys as key>
                              <#-- 局部变量，格式v_xxx -->
-                             <#lt>        String v_${key} = <#if var[key]?? && var[key]!=''>"${var[key]}"<#else>null</#if>;
+                             <#lt>        Object v_${key} = <#if var[key]?? && var[key]!=''>"${var[key]}"<#else>null</#if>;
                          </#list>
                      </#list>
                 </#if>
