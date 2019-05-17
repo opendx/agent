@@ -198,10 +198,7 @@ public class AndroidUtils {
      */
     public static boolean hasInstalledApp(IDevice iDevice, String packageName) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         String result = executeShellCommand(iDevice, "pm list packages|grep " + packageName);
-        if (StringUtils.isEmpty(result)) {
-            return false;
-        }
-        return true;
+        return !StringUtils.isEmpty(result);
     }
 
     /**
@@ -213,10 +210,7 @@ public class AndroidUtils {
      */
     public static boolean isAppRunning(IDevice iDevice, String packageName) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         String result = executeShellCommand(iDevice, "ps |grep " + packageName);
-        if (StringUtils.isEmpty(result)) {
-            return false;
-        }
-        return true;
+        return !StringUtils.isEmpty(result);
     }
 
     /**

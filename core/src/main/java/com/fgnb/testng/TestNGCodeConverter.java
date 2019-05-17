@@ -88,24 +88,24 @@ public class TestNGCodeConverter {
      */
     private Method actionToMethod(Action action) {
         Method method = new Method();
-        //基础的action
         method.setClassName(action.getClassName());
+
         //基础action new的时候是否要传webdriver or macacaclient
-        if (action.getNeedDriver() == Action.NEED_DRIVER) {
-            method.setNeedDriver(true);
-        } else {
-            method.setNeedDriver(false);
-        }
+        method.setNeedDriver(action.getNeedDriver() == Action.NEED_DRIVER);
+
         //方法名 m_${actionId}
         method.setMethodName("m_" + action.getId());
+
         //方法描述
         method.setMethodDescription(action.getName());
+
         //方法参数
         List<Param> params = action.getParams();
         if (!CollectionUtils.isEmpty(params)) {
             List<String> methodParams = params.stream().map(Param::getName).collect(Collectors.toList());
             method.setMethodParams(methodParams);
         }
+
         //局部变量
         List<LocalVar> localVars = action.getLocalVars();
         if (!CollectionUtils.isEmpty(localVars)) {
@@ -116,25 +116,11 @@ public class TestNGCodeConverter {
             }).collect(Collectors.toList());
             method.setVars(vars);
         }
-        //是否有返回值
-        if (action.getType() == Action.TYPE_BASE) {
-            //基础action可以这样处理
-            if (action.getHasReturnValue() == Action.HAS_RETURN_VALUE) {
-                method.setHasReturnValue(true);
-            } else {
-                method.setHasReturnValue(false);
-            }
-        } else {
-            //对于非基础的action 其实第一次没保存就调试的话 数据库是没有hasReturnValue的
-            if (StringUtils.isEmpty(action.getReturnValue())) {
-                method.setHasReturnValue(false);
-            } else {
-                method.setHasReturnValue(true);
-            }
-        }
 
         //返回值
+        method.setHasReturnValue(action.getHasReturnValue() == Action.HAS_RETURN_VALUE);
         method.setReturnValue(action.getReturnValue());
+
         //步骤里的action
         List<Step> steps = action.getSteps();
         if (!CollectionUtils.isEmpty(steps)) {

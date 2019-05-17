@@ -88,9 +88,6 @@ public class AndroidUtil {
         System.out.println("[" + deviceId + "]检查是否安装了APP:" + cmd);
         String result = ShellExecutor.execReturnResult(cmd);
         System.out.println("[" + deviceId + "]"+result);
-        if (result != null && result.contains(appPackage)) {
-            return true;
-        }
-        return false;
+        return result != null && result.contains(appPackage);
     }
 }
