@@ -139,4 +139,11 @@ public class Minicap {
         }
     }
 
+    public String convertVirtualResolution(int displayWidth) {
+        int screenHeight = androidDevice.getDevice().getScreenHeight();
+        int screenWidth = androidDevice.getDevice().getScreenWidth();
+        float scale = screenHeight / (float)screenWidth;
+        int displayHeight = (int)(scale * displayWidth);
+        return displayWidth + "x" + displayHeight;
+    }
 }

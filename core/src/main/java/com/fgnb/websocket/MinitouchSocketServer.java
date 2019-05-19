@@ -97,10 +97,10 @@ public class MinitouchSocketServer {
         String operation = jsonObject.getString("operation");
         switch (operation) {
             case "m":
-                minitouch.moveTo(jsonObject.getFloat("pX"), jsonObject.getFloat("pY"));
+                minitouch.moveTo(jsonObject.getFloat("percentOfX"), jsonObject.getFloat("percentOfY"));
                 break;
             case "d":
-                minitouch.touchDown(jsonObject.getFloat("pX"), jsonObject.getFloat("pY"));
+                minitouch.touchDown(jsonObject.getFloat("percentOfX"), jsonObject.getFloat("percentOfY"));
                 break;
             case "u":
                 minitouch.touchUp();
