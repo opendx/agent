@@ -84,7 +84,7 @@ public class AndroidDevice {
      * @return
      */
     public boolean isConnected() {
-        return device.getStatus() == Device.OFFLINE_STATUS ? false : true;
+        return device.getStatus() != Device.OFFLINE_STATUS;
     }
 
     /**
