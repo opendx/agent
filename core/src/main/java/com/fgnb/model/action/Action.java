@@ -16,7 +16,7 @@ public class Action {
     private Integer id;
     private String name;
     private Integer type;
-    private Integer projectType;
+    private Integer platform;
     private String className;
     private Integer needDriver;
     private Integer hasReturnValue;

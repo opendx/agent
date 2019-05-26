@@ -4,7 +4,6 @@ import com.fgnb.model.action.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +28,7 @@ public class TestNGCodeConverter {
     private String basePackagePath;
     private String ftlFileName;
     private Boolean isBeforeSuite;
-    private Integer projectType;
+    private Integer platform;
 
     /**
      * 转换为testng代码
@@ -51,7 +50,7 @@ public class TestNGCodeConverter {
         dataModel.put("testcaseId", actionTree.getId());
 
         dataModel.put("isBeforeSuite", isBeforeSuite);
-        dataModel.put("projectType", projectType);
+        dataModel.put("platform", platform);
 
         //testng @Test @BeforeSuite注解下调用的方法
         StringBuilder testMethod = new StringBuilder("m_" + actionTree.getId() + "(");

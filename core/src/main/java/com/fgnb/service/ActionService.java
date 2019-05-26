@@ -31,7 +31,7 @@ public class ActionService {
                     .setActionTree(request.getAction())
                     .setTestClassName(testClassName)
                     .setIsBeforeSuite(false)
-                    .setProjectType(request.getAction().getProjectType())
+                    .setPlatform(request.getAction().getPlatform())
                     .setDeviceId(request.getDeviceId())
                     .setPort(request.getPort())
                     .setGlobalVars(request.getGlobalVars())

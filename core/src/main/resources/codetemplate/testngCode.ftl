@@ -8,10 +8,10 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import java.net.URL;
 
 public class ${testClassName} {
-    <#--projectType: 1.android 2.ios 3.web-->
-    <#if projectType == 1>
+    <#--platform: 1.android 2.ios 3.web-->
+    <#if platform == 1>
     private MacacaClient driver;
-    <#elseif projectType = 3>
+    <#elseif platform = 3>
     private WebDriver driver;
     </#if>
 
@@ -35,9 +35,9 @@ public class ${testClassName} {
     </#if>
     public void test() throws Exception {
         <#-- ${port?c} 去除数字逗号分隔 -->
-        <#if projectType == 1>
+        <#if platform == 1>
         driver = MacacaUtil.createMacacaClient("${deviceId}",${port?c});
-        <#elseif projectType = 3>
+        <#elseif platform = 3>
         driver = new RemoteWebDriver(new URL("http://localhost:${port?c}"),DesiredCapabilities.chrome());
         </#if>
         ${testMethod}
