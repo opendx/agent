@@ -45,8 +45,8 @@ public class MasterApi {
 
     @Value("${master}/deviceTestTask/update")
     private String updateDeviceTestTaskApi;
-    @Value("${master}/deviceTestTask/findUnStartTestTasksByDeviceIds")
-    private String findUnStartTestTasksByDeviceIdsApi;
+    @Value("${master}/deviceTestTask/unStart")
+    private String findUnStartDeviceTestTasksByDeviceIdsApi;
     @Value("${master}/deviceTestTask/updateTestcase/")
     private String updateTestcaseApi;
 
@@ -120,13 +120,13 @@ public class MasterApi {
     /**
      * 获取未开始的测试任务
      */
-    public List<DeviceTestTask> getUnStartTestTasksByDeviceIds(List<String> deviceIds) {
+    public List<DeviceTestTask> findUnStartDeviceTestTasksByDeviceIds(List<String> deviceIds) {
         if (CollectionUtils.isEmpty(deviceIds)) {
             return new ArrayList<>();
         }
 
         String param = "?deviceIds=" + deviceIds.stream().collect(Collectors.joining(","));
-        Response response = restTemplate.getForObject(findUnStartTestTasksByDeviceIdsApi + param, Response.class);
+        Response response = restTemplate.getForObject(findUnStartDeviceTestTasksByDeviceIdsApi + param, Response.class);
         if (response.isSuccess()) {
             return JSON.parseArray(JSONArray.toJSONString(response.getData()), DeviceTestTask.class);
         } else {

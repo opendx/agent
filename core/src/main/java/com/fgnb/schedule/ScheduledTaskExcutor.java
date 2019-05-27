@@ -38,7 +38,7 @@ public class ScheduledTaskExcutor {
             return;
         }
         //还没开始的测试任务
-        List<DeviceTestTask> unStartDeviceTestTasks = masterApi.getUnStartTestTasksByDeviceIds(idleAndroidDeviceIds);
+        List<DeviceTestTask> unStartDeviceTestTasks = masterApi.findUnStartDeviceTestTasksByDeviceIds(idleAndroidDeviceIds);
 
         unStartDeviceTestTasks.stream().parallel().forEach(deviceTestTask -> {
             AndroidDeviceHolder.get(deviceTestTask.getDeviceId()).commitTestTask(deviceTestTask);
