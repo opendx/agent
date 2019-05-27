@@ -8,6 +8,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by jiangyitao.
@@ -23,15 +24,15 @@ public class SeleniumInitializer implements ApplicationRunner{
     private static int chromeDriverServicePort = -1;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
-        log.info("开始启动ChromeDriverService:{}",chromeDriverPath);
+    public void run(ApplicationArguments args) throws IOException {
+        log.info("[selenium]启动ChromeDriverService: {}",chromeDriverPath);
         ChromeDriverService service = new ChromeDriverService.Builder()
                 .usingDriverExecutable(new File(chromeDriverPath))
                 .usingAnyFreePort()
                 .build();
         service.start();
         chromeDriverServicePort = service.getUrl().getPort();
-        log.info("ChromeDriverService启动完成，端口：{}",chromeDriverServicePort);
+        log.info("[selenium]ChromeDriverService启动完成，端口：{}",chromeDriverServicePort);
     }
 
     /**
