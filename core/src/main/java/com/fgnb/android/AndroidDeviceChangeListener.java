@@ -129,7 +129,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
     private AndroidDevice initDevice(IDevice iDevice) {
         Device device = new Device();
 
-        device.setType(Device.ANDROID_TYPE);
+        device.setPlatform(Device.ANDROID);
         device.setCreateTime(new Date());
         device.setId(iDevice.getSerialNumber());
 
