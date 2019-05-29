@@ -1,6 +1,6 @@
 package com.fgnb.service;
 
-import com.fgnb.JavaCodeCompiler;
+import com.fgnb.javacompile.JavaCompiler;
 import com.fgnb.testng.TestNGRunner;
 import com.fgnb.model.Response;
 import com.fgnb.model.request.ActionDebugRequest;
@@ -48,7 +48,7 @@ public class ActionService {
 
         log.info("[调试action]: {}", testNGCode);
         try {
-            Class clazz = JavaCodeCompiler.compile(testClassName, testNGCode);
+            Class clazz = JavaCompiler.compile(testClassName, testNGCode);
             String failMsg = TestNGRunner.debugAction(clazz);
             if (StringUtils.isEmpty(failMsg)) {
                 return Response.success("执行成功");

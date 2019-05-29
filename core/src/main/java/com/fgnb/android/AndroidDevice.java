@@ -1,12 +1,12 @@
 package com.fgnb.android;
 
 import com.android.ddmlib.IDevice;
-import com.fgnb.JavaCodeCompiler;
 import com.fgnb.android.stf.AdbKit;
 import com.fgnb.android.stf.Minicap;
 import com.fgnb.android.stf.Minitouch;
 import com.fgnb.android.uiautomator.Uiautomator2Server;
 import com.fgnb.api.MasterApi;
+import com.fgnb.javacompile.JavaCompiler;
 import com.fgnb.model.Device;
 import com.fgnb.model.action.Action;
 import com.fgnb.model.action.GlobalVar;
@@ -136,7 +136,7 @@ public class AndroidDevice {
                         .setBasePackagePath("/codetemplate")
                         .setFtlFileName("testngCode.ftl")
                         .convert();
-                Class beforeSuiteClass = JavaCodeCompiler.compile(beforeSuiteClassName, beforeSuiteCode);
+                Class beforeSuiteClass = JavaCompiler.compile(beforeSuiteClassName, beforeSuiteCode);
                 classes.add(beforeSuiteClass);
             }
 
@@ -154,7 +154,7 @@ public class AndroidDevice {
                         .setBasePackagePath("/codetemplate")
                         .setFtlFileName("testngCode.ftl")
                         .convert();
-                Class testcaseClass = JavaCodeCompiler.compile(testcaseClassName, testcaseCode);
+                Class testcaseClass = JavaCompiler.compile(testcaseClassName, testcaseCode);
                 classes.add(testcaseClass);
             }
 
