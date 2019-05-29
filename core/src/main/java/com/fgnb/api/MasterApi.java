@@ -12,16 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Created by jiangyitao.
@@ -45,8 +42,8 @@ public class MasterApi {
 
     @Value("${master}/deviceTestTask/update")
     private String updateDeviceTestTaskApi;
-    @Value("${master}/deviceTestTask/unStart")
-    private String findUnStartDeviceTestTasksByDeviceIdsApi;
+    @Value("${master}/deviceTestTask/firstUnStart/")
+    private String findFirstUnStartDeviceTestTaskApi;
     @Value("${master}/deviceTestTask/updateTestcase/")
     private String updateTestcaseApi;
 
@@ -120,15 +117,10 @@ public class MasterApi {
     /**
      * 获取未开始的测试任务
      */
-    public List<DeviceTestTask> findUnStartDeviceTestTasksByDeviceIds(List<String> deviceIds) {
-        if (CollectionUtils.isEmpty(deviceIds)) {
-            return new ArrayList<>();
-        }
-
-        String param = "?deviceIds=" + deviceIds.stream().collect(Collectors.joining(","));
-        Response response = restTemplate.getForObject(findUnStartDeviceTestTasksByDeviceIdsApi + param, Response.class);
+    public DeviceTestTask findFirstUnStartDeviceTestTask(String deviceId) {
+        Response response = restTemplate.getForObject(findFirstUnStartDeviceTestTaskApi + deviceId, Response.class);
         if (response.isSuccess()) {
-            return JSON.parseArray(JSONArray.toJSONString(response.getData()), DeviceTestTask.class);
+            return JSON.parseObject(JSON.toJSONString(response.getData()),DeviceTestTask.class);
         } else {
             throw new RuntimeException(response.getMsg());
         }
