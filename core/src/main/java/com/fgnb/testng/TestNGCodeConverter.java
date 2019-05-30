@@ -17,6 +17,10 @@ import java.util.stream.Collectors;
 @Accessors(chain = true)
 public class TestNGCodeConverter {
 
+    private static final String METHOD_PREFIX = "action_";
+    /**
+     * actionId: Method
+     */
     private final Map<Integer, Method> methodMap = new HashMap();
 
     private Integer deviceTestTaskId;
@@ -53,7 +57,7 @@ public class TestNGCodeConverter {
         dataModel.put("platform", platform);
 
         //testng @Test @BeforeSuite注解下调用的方法
-        StringBuilder testMethod = new StringBuilder("m_" + actionTree.getId() + "(");
+        StringBuilder testMethod = new StringBuilder(METHOD_PREFIX + actionTree.getId() + "(");
         List<Param> actionParams = actionTree.getParams();
         //如果有参数 则都传入null
         if (!CollectionUtils.isEmpty(actionParams)) {
@@ -87,15 +91,10 @@ public class TestNGCodeConverter {
      */
     private Method actionToMethod(Action action) {
         Method method = new Method();
+
         method.setClassName(action.getClassName());
-
-        //基础action new的时候是否要传webdriver or macacaclient
         method.setNeedDriver(action.getNeedDriver() == Action.NEED_DRIVER);
-
-        //方法名 m_${actionId}
-        method.setMethodName("m_" + action.getId());
-
-        //方法描述
+        method.setMethodName(METHOD_PREFIX + action.getId());
         method.setMethodDescription(action.getName());
 
         //方法参数
@@ -127,7 +126,7 @@ public class TestNGCodeConverter {
                 //步骤
                 MethodStep methodStep = new MethodStep();
                 //调用方法名
-                methodStep.setMethodName("m_" + step.getActionId());
+                methodStep.setMethodName(METHOD_PREFIX + step.getActionId());
                 //步骤号
                 methodStep.setStepNumber(step.getNumber());
                 //步骤名
