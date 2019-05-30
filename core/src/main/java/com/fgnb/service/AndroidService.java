@@ -109,7 +109,7 @@ public class AndroidService {
             downloadURL = screenshotByMinicapAndUploadToMaster(androidDevice);
         } catch (Exception e) {
             log.error("[{}]截图并上传到master失败", deviceId, e);
-            return Response.fail("");
+            return Response.fail(e.getMessage());
         }
 
         JSONObject response = new JSONObject();
