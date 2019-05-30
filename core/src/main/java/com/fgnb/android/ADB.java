@@ -31,11 +31,12 @@ public class ADB {
             while (System.currentTimeMillis() - start <= 30000) {
                 if (adb.isConnected()) {
                     log.info("adb已连接");
-                    break;
+                    log.info("adb初始化成功");
+                    return;
                 }
             }
+            throw new RuntimeException("adb初始化失败");
         }
-        log.info("adb初始化成功");
     }
 
     /**
