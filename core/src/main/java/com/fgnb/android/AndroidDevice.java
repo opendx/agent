@@ -123,22 +123,23 @@ public class AndroidDevice {
 
             List<Class> classes = new ArrayList();
 
-            if (beforeSuite != null) {
-                String beforeSuiteClassName = "BeforeSuite_" + UUIDUtil.getUUID();
-                String beforeSuiteCode = new TestNGCodeConverter()
-                        .setActionTree(beforeSuite)
-                        .setClassName(beforeSuiteClassName)
-                        .setIsBeforeSuite(true)
-                        .setPlatform(beforeSuite.getPlatform())
-                        .setDeviceId(deviceTestTask.getDeviceId())
-                        .setPort(port)
-                        .setGlobalVars(globalVars)
-                        .setBasePackagePath("/codetemplate")
-                        .setFtlFileName("testngCode.ftl")
-                        .convert();
-                Class beforeSuiteClass = JavaCompiler.compile(beforeSuiteClassName, beforeSuiteCode);
-                classes.add(beforeSuiteClass);
-            }
+            //todo
+//            if (beforeSuite != null) {
+//                String beforeSuiteClassName = "BeforeSuite_" + UUIDUtil.getUUID();
+//                String beforeSuiteCode = new TestNGCodeConverter()
+//                        .setActionTree(beforeSuite)
+//                        .setClassName(beforeSuiteClassName)
+//                        .setIsBeforeSuite(true)
+//                        .setPlatform(beforeSuite.getPlatform())
+//                        .setDeviceId(deviceTestTask.getDeviceId())
+//                        .setPort(port)
+//                        .setGlobalVars(globalVars)
+//                        .setBasePackagePath("/codetemplate")
+//                        .setFtlFileName("testngCode.ftl")
+//                        .convert();
+//                Class beforeSuiteClass = JavaCompiler.compile(beforeSuiteClassName, beforeSuiteCode);
+//                classes.add(beforeSuiteClass);
+//            }
 
             for(Testcase testcase: testcases) {
                 String testcaseClassName = "Test_" + UUIDUtil.getUUID();
@@ -147,12 +148,11 @@ public class AndroidDevice {
                         .setActionTree(testcase)
                         .setClassName(testcaseClassName)
                         .setIsBeforeSuite(false)
-                        .setPlatform(testcase.getPlatform())
                         .setDeviceId(deviceTestTask.getDeviceId())
                         .setPort(port)
                         .setGlobalVars(globalVars)
                         .setBasePackagePath("/codetemplate")
-                        .setFtlFileName("testngCode.ftl")
+                        .setFtlFileName("android.ftl")
                         .convert();
                 Class testcaseClass = JavaCompiler.compile(testcaseClassName, testcaseCode);
                 classes.add(testcaseClass);
