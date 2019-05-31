@@ -19,15 +19,15 @@ public class TestNGCodeConverter {
 
     private static final String METHOD_PREFIX = "action_";
     /**
-     * actionId: Method
+     * actionId: Action
      */
-    private final Map<Integer, Method> methodMap = new HashMap();
+    private final Map<Integer, Action> cachedActions = new HashMap();
 
     private Integer deviceTestTaskId;
     private List<GlobalVar> globalVars;
     private String deviceId;
     private Integer port;
-    private String testClassName;
+    private String className;
     private Action actionTree;
     private String basePackagePath;
     private String ftlFileName;
@@ -40,15 +40,15 @@ public class TestNGCodeConverter {
      * @return
      */
     public String convert() throws Exception {
-        //递归遍历出action里所有的action并封装到Method里
-        walk(actionTree);
+        parseAction(actionTree);
 
         Map<String, Object> dataModel = new HashMap();
         dataModel.put("globalVars", globalVars);
-        dataModel.put("methods", methodMap.values());
-        dataModel.put("testClassName", testClassName);
+        dataModel.put("actions", cachedActions.values());
+        dataModel.put("className", className);
         dataModel.put("deviceId", deviceId);
         dataModel.put("port", port);
+        dataModel.put("methodPrefix",METHOD_PREFIX);
 
         dataModel.put("deviceTestTaskId", deviceTestTaskId);
         dataModel.put("testcaseId", actionTree.getId());
@@ -70,83 +70,21 @@ public class TestNGCodeConverter {
     }
 
     /**
-     * 递归遍历出action里所有的action并封装到Method里
-     *
-     * @param action
-     * @return
+     * 递归遍历actionTree，把每个action放到cachedActions
      */
-    private void walk(Action action) {
-        Method method = methodMap.get(action.getId());
-        if (method == null) {
-            method = actionToMethod(action);
-            methodMap.put(action.getId(), method);
-        }
-    }
-
-    /**
-     * action转换为Method
-     *
-     * @param action
-     * @return
-     */
-    private Method actionToMethod(Action action) {
-        Method method = new Method();
-
-        method.setClassName(action.getClassName());
-        method.setNeedDriver(action.getNeedDriver() == Action.NEED_DRIVER);
-        method.setMethodName(METHOD_PREFIX + action.getId());
-        method.setMethodDescription(action.getName());
-
-        //方法参数
-        List<Param> params = action.getParams();
-        if (!CollectionUtils.isEmpty(params)) {
-            List<String> methodParams = params.stream().map(Param::getName).collect(Collectors.toList());
-            method.setMethodParams(methodParams);
-        }
-
-        //局部变量
-        List<LocalVar> localVars = action.getLocalVars();
-        if (!CollectionUtils.isEmpty(localVars)) {
-            List<Map<String, String>> vars = localVars.stream().map(localVar -> {
-                Map<String, String> var = new HashMap();
-                var.put(localVar.getName(), localVar.getValue());
-                return var;
-            }).collect(Collectors.toList());
-            method.setVars(vars);
-        }
-
-        //返回值
-        method.setHasReturnValue(action.getHasReturnValue() == Action.HAS_RETURN_VALUE);
-        method.setReturnValue(action.getReturnValue());
-
-        //步骤里的action
-        List<Step> steps = action.getSteps();
-        if (!CollectionUtils.isEmpty(steps)) {
-            List<MethodStep> methodSteps = steps.stream().map(step -> {
-                //步骤
-                MethodStep methodStep = new MethodStep();
-                //调用方法名
-                methodStep.setMethodName(METHOD_PREFIX + step.getActionId());
-                //步骤号
-                methodStep.setStepNumber(step.getNumber());
-                //步骤名
-                methodStep.setMethodStepName(step.getName());
-                //步骤赋值
-                methodStep.setEvaluation(step.getEvaluation());
-                //步骤传入的参数
-                List<ParamValue> paramValues = step.getParamValues();
-                if (!CollectionUtils.isEmpty(paramValues)) {
-                    List<String> methodParamValues = paramValues.stream().map(ParamValue::getParamValue).collect(Collectors.toList());
-                    methodStep.setMethodParamValues(methodParamValues);
+    private void parseAction(Action action) {
+        Action cachedAction = cachedActions.get(action.getId());
+        if (cachedAction == null) {
+            List<Step> steps = action.getSteps();
+            if(!CollectionUtils.isEmpty(steps)) {
+                for(Step step : steps) {
+                    Action stepAction = step.getAction();
+                    if(stepAction != null) {
+                        parseAction(stepAction);
+                    }
                 }
-                //步骤里的action
-                Action stepAction = step.getAction();
-                walk(stepAction);
-                return methodStep;
-            }).collect(Collectors.toList());
-            method.setMethodSteps(methodSteps);
+            }
+            cachedActions.put(action.getId(), action);
         }
-        return method;
     }
-
 }

@@ -7,7 +7,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import java.net.URL;
 
-public class ${testClassName} {
+public class ${className} {
     <#--platform: 1.android 2.ios 3.web-->
     <#if platform == 1>
     private MacacaClient driver;
@@ -43,25 +43,25 @@ public class ${testClassName} {
         ${testMethod}
     }
 
-    <#if methods?? && (methods?size>0)>
-        <#list methods as method>
+    <#if actions?? && (actions?size>0)>
+        <#list actions as action>
             <#--方法注释-->
-            <#if method.methodDescription?? && method.methodDescription!=''>
-                <#lt>    //${method.methodDescription}
+            <#if action.name?? && action.name!=''>
+                <#lt>    //${action.name}
             </#if>
             <#lt>    public <#rt>
-            <#if method.hasReturnValue>
+            <#if action.hasReturnValue==1>
                 <#lt>Object <#rt>
             <#else>
                 <#lt>void <#rt>
             </#if>
-            <#lt>${method.methodName}<#rt>
+            <#lt>${methodPrefix}${action.id}<#rt>
             <#lt>(<#rt>
                 <#-- 方法参数，参数格式p_xxx -->
-                <#if method.methodParams?? && (method.methodParams?size>0)>
-                    <#list method.methodParams as methodParam>
-                        <#lt>Object p_${methodParam}<#rt>
-                        <#if methodParam_has_next>
+                <#if action.params?? && (action.params?size>0)>
+                    <#list action.params as param>
+                        <#lt>Object p_${param.name}<#rt>
+                        <#if param_has_next>
                             <#lt>, <#rt>
                         </#if>
                     </#list>
@@ -69,12 +69,12 @@ public class ${testClassName} {
             <#lt>) throws Exception {
             <#--方法体-->
             <#-- 基础action -->
-            <#if method.className?? && method.className!=''>
-                <#lt>        <#if method.hasReturnValue>return </#if>new ${method.className}(<#if method.needDriver>driver</#if>).excute(<#rt>
-                <#if method.methodParams?? && (method.methodParams?size>0)>
-                    <#list method.methodParams as methodParam>
-                        <#lt>p_${methodParam}<#rt>
-                        <#if methodParam_has_next>
+            <#if action.type==1>
+                <#lt>        <#if action.hasReturnValue==1>return </#if>new ${action.className}(<#if action.needDriver==1>driver</#if>).excute(<#rt>
+                <#if action.params?? && (action.params?size>0)>
+                    <#list action.params as param>
+                        <#lt>p_${param.name}<#rt>
+                        <#if param_has_next>
                             <#lt>, <#rt>
                         </#if>
                     </#list>
@@ -82,41 +82,39 @@ public class ${testClassName} {
             <#-- 非基础action -->
             <#else>
                 <#--方法里的局部变量-->
-                <#if method.vars?? && (method.vars?size>0)>
-                     <#list method.vars as var>
-                         <#list var?keys as key>
-                             <#-- 局部变量，格式v_xxx -->
-                             <#lt>        Object v_${key} = <#if var[key]?? && var[key]!=''>"${var[key]}"<#else>null</#if>;
-                         </#list>
+                <#if action.localVars?? && (action.localVars?size>0)>
+                     <#list action.localVars as localVar>
+                         <#-- 局部变量，格式v_xxx -->
+                         <#lt>        Object v_${localVar.name} = <#if localVar.value?? && localVar.value!=''>"${localVar.value}"<#else>null</#if>;
                      </#list>
                 </#if>
                 <#--步骤调用-->
-                <#if method.methodSteps?? && (method.methodSteps?size>0)>
-                    <#list method.methodSteps as methodStep>
+                <#if action.steps?? && (action.steps?size>0)>
+                    <#list action.steps as step>
                         <#--步骤注释-->
-                        <#lt>        //${methodStep.stepNumber}.<#if methodStep.methodStepName?? && methodStep.methodStepName!=''>${methodStep.methodStepName}</#if>
+                        <#lt>        //${step.number}.<#if step.name?? && step.name!=''>${step.name}</#if>
                         <#-- 方法内的步骤 使用局部变量v_xxx赋值-->
-                        <#lt>        <#if methodStep.evaluation?? && methodStep.evaluation!=''>v_${methodStep.evaluation} = </#if>${methodStep.methodName}(<#rt>
-                        <#if methodStep.methodParamValues?? && (methodStep.methodParamValues?size>0)>
-                            <#list methodStep.methodParamValues as methodParamValue>
-                                <#if methodParamValue?? && methodParamValue!=''>
+                        <#lt>        <#if step.evaluation?? && step.evaluation!=''>v_${step.evaluation} = </#if>${methodPrefix}${step.actionId}(<#rt>
+                        <#if step.paramValues?? && (step.paramValues?size>0)>
+                            <#list step.paramValues as paramValue>
+                                <#if paramValue.paramValue?? && paramValue.paramValue!=''>
                                     <#-- 全局变量 -->
-                                    <#if methodParamValue?starts_with('${') && methodParamValue?ends_with('}')>
-                                        <#lt>g_${methodParamValue?substring(2,(methodParamValue)?length-1)}<#rt>
+                                    <#if paramValue.paramValue?starts_with('${') && paramValue.paramValue?ends_with('}')>
+                                        <#lt>g_${paramValue.paramValue?substring(2,(paramValue.paramValue)?length-1)}<#rt>
                                     <#-- 方法参数 -->
-                                    <#elseif methodParamValue?starts_with('#{') && methodParamValue?ends_with('}')>
-                                        <#lt>p_${methodParamValue?substring(2,(methodParamValue)?length-1)}<#rt>
+                                    <#elseif paramValue.paramValue?starts_with('#{') && paramValue.paramValue?ends_with('}')>
+                                        <#lt>p_${paramValue.paramValue?substring(2,(paramValue.paramValue)?length-1)}<#rt>
                                     <#-- 局部变量 -->
-                                    <#elseif methodParamValue?starts_with('@{') && methodParamValue?ends_with('}')>
-                                        <#lt>v_${methodParamValue?substring(2,(methodParamValue)?length-1)}<#rt>
+                                    <#elseif paramValue.paramValue?starts_with('@{') && paramValue.paramValue?ends_with('}')>
+                                        <#lt>v_${paramValue.paramValue?substring(2,(paramValue.paramValue)?length-1)}<#rt>
                                     <#-- 普通字符串 -->
                                     <#else>
-                                        <#lt>"${methodParamValue}"<#rt>
+                                        <#lt>"${paramValue.paramValue}"<#rt>
                                     </#if>
                                 <#else>
                                 <#lt>null<#rt>
                                 </#if>
-                                <#if methodParamValue_has_next>
+                                <#if paramValue_has_next>
                                     <#lt>, <#rt>
                                 </#if>
                             </#list>
@@ -124,8 +122,8 @@ public class ${testClassName} {
                     </#list>
                 </#if>
                 <#-- 方法返回值 使用局部变量v_xxx返回-->
-                <#if method.returnValue?? && method.returnValue!=''>
-                    <#lt>        return v_${method.returnValue};
+                <#if action.hasReturnValue==1>
+                    <#lt>        return v_${action.returnValue};
                 </#if>
             </#if>
     }
