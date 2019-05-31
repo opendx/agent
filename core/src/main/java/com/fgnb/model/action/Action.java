@@ -21,7 +21,7 @@ public class Action {
     private Integer needDriver;
     private Integer hasReturnValue;
     private String returnValue;
-
+    private String returnValueDesc;
     private List<Param> params;
     private List<LocalVar> localVars;
     private List<Step> steps;

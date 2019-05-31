@@ -29,7 +29,7 @@ public class ActionService {
         try {
             testNGCode = new TestNGCodeConverter()
                     .setActionTree(request.getAction())
-                    .setTestClassName(testClassName)
+                    .setClassName(testClassName)
                     .setIsBeforeSuite(false)
                     .setPlatform(request.getAction().getPlatform())
                     .setDeviceId(request.getDeviceId())

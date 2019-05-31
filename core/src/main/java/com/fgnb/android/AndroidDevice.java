@@ -127,7 +127,7 @@ public class AndroidDevice {
                 String beforeSuiteClassName = "BeforeSuite_" + UUIDUtil.getUUID();
                 String beforeSuiteCode = new TestNGCodeConverter()
                         .setActionTree(beforeSuite)
-                        .setTestClassName(beforeSuiteClassName)
+                        .setClassName(beforeSuiteClassName)
                         .setIsBeforeSuite(true)
                         .setPlatform(beforeSuite.getPlatform())
                         .setDeviceId(deviceTestTask.getDeviceId())
@@ -145,7 +145,7 @@ public class AndroidDevice {
                 String testcaseCode = new TestNGCodeConverter()
                         .setDeviceTestTaskId(deviceTestTask.getId())
                         .setActionTree(testcase)
-                        .setTestClassName(testcaseClassName)
+                        .setClassName(testcaseClassName)
                         .setIsBeforeSuite(false)
                         .setPlatform(testcase.getPlatform())
                         .setDeviceId(deviceTestTask.getDeviceId())
