@@ -145,15 +145,11 @@ public class AndroidDevice {
                 String testcaseClassName = "Test_" + UUIDUtil.getUUID();
                 String testcaseCode = new TestNGCodeConverter()
                         .setDeviceTestTaskId(deviceTestTask.getId())
-                        .setActionTree(testcase)
-                        .setClassName(testcaseClassName)
                         .setIsBeforeSuite(false)
                         .setDeviceId(deviceTestTask.getDeviceId())
                         .setPort(port)
                         .setGlobalVars(globalVars)
-                        .setBasePackagePath("/codetemplate")
-                        .setFtlFileName("android.ftl")
-                        .convert();
+                        .convert(testcaseClassName,testcase,"/codetemplate","android.ftl");
                 Class testcaseClass = JavaCompiler.compile(testcaseClassName, testcaseCode);
                 classes.add(testcaseClass);
             }

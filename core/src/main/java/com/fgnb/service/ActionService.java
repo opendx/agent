@@ -31,15 +31,11 @@ public class ActionService {
         if (request.getAction().getPlatform() == Platform.Android) {
             try {
                 testNGCode = new TestNGCodeConverter()
-                        .setActionTree(request.getAction())
-                        .setClassName(className)
                         .setIsBeforeSuite(false)
                         .setDeviceId(request.getDeviceId())
                         .setPort(request.getPort())
                         .setGlobalVars(request.getGlobalVars())
-                        .setBasePackagePath("/codetemplate")
-                        .setFtlFileName("android.ftl")
-                        .convert();
+                        .convert(className,request.getAction(),"/codetemplate","android.ftl");
                 log.info("[调试action]: {}", testNGCode);
                 if (StringUtils.isEmpty(testNGCode)) {
                     return Response.fail("转换testng代码失败");

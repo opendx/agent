@@ -27,10 +27,6 @@ public class TestNGCodeConverter {
     private List<GlobalVar> globalVars;
     private String deviceId;
     private Integer port;
-    private String className;
-    private Action actionTree;
-    private String basePackagePath;
-    private String ftlFileName;
     private Boolean isBeforeSuite;
 
     /**
@@ -38,7 +34,7 @@ public class TestNGCodeConverter {
      *
      * @return
      */
-    public String convert() throws Exception {
+    public String convert(String className,Action actionTree,String ftlBasePackagePath,String ftlFileName) throws Exception {
         parseAction(actionTree);
 
         Map<String, Object> dataModel = new HashMap();
@@ -64,7 +60,7 @@ public class TestNGCodeConverter {
         testMethod.append(");");
         dataModel.put("testMethod", testMethod.toString());
 
-        return FreemarkerUtil.process(basePackagePath, ftlFileName, dataModel);
+        return FreemarkerUtil.process(ftlBasePackagePath, ftlFileName, dataModel);
     }
 
     /**
