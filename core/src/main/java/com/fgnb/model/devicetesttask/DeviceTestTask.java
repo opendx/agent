@@ -28,7 +28,9 @@ public class DeviceTestTask {
     private Date startTime;
     private Date endTime;
     private List<GlobalVar> globalVars;
-    // todo beforeClass beforeMethod afterClass afterMethod
-    private Action beforeSuite;
+    private Action beforeClass;
+    private Action beforeMethod;
+    private Action afterClass;
+    private Action afterMethod;
     private List<Testcase> testcases;
 }

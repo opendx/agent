@@ -9,19 +9,17 @@ import com.fgnb.api.MasterApi;
 import com.fgnb.javacompile.JavaCompiler;
 import com.fgnb.model.Device;
 import com.fgnb.model.action.Action;
-import com.fgnb.model.action.GlobalVar;
 import com.fgnb.model.devicetesttask.DeviceTestTask;
-import com.fgnb.model.devicetesttask.Testcase;
 import com.fgnb.testng.TestNGCodeConverter;
 import com.fgnb.testng.TestNGRunner;
 import com.fgnb.utils.UUIDUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.Collectors;
 
 /**
  * Created by jiangyitao.
@@ -45,24 +43,24 @@ public class AndroidDevice {
     private Uiautomator2Server uiautomator2Server;
     private AdbKit adbKit;
 
-    public AndroidDevice(Device device, IDevice iDevice){
+    public AndroidDevice(Device device, IDevice iDevice) {
         this.device = device;
         this.iDevice = iDevice;
 
-        excuteTestTaskThread = new Thread(()->{
-            while(true){
+        excuteTestTaskThread = new Thread(() -> {
+            while (true) {
                 DeviceTestTask deviceTestTask;
                 try {
                     deviceTestTask = testTaskQueue.take(); //没有测试任务，线程阻塞在此
                 } catch (InterruptedException e) {
                     // 调用excuteTestTaskThread.interrupt()可以执行到这里
-                    log.info("[{}][自动化测试]停止获取测试任务",getId());
+                    log.info("[{}][自动化测试]停止获取测试任务", getId());
                     break;
                 }
                 try {
                     excuteTestTask(deviceTestTask);
                 } catch (Exception e) {
-                    log.error("[{}][自动化测试]执行测试任务'{}'出错",getId(),deviceTestTask.getTestTaskName(),e);
+                    log.error("[{}][自动化测试]执行测试任务'{}'出错", getId(), deviceTestTask.getTestTaskName(), e);
                 }
             }
         });
@@ -71,16 +69,18 @@ public class AndroidDevice {
 
     /**
      * 提交测试任务
+     *
      * @param deviceTestTask
      */
-    public void commitTestTask(DeviceTestTask deviceTestTask){
-        if(!testTaskQueue.offer(deviceTestTask)){
-            throw new RuntimeException("[自动化测试]提交测试任务'"+ deviceTestTask.getTestTaskName() +"'失败");
+    public void commitTestTask(DeviceTestTask deviceTestTask) {
+        if (!testTaskQueue.offer(deviceTestTask)) {
+            throw new RuntimeException("[自动化测试]提交测试任务'" + deviceTestTask.getTestTaskName() + "'失败");
         }
     }
 
     /**
      * 设备是否连接
+     *
      * @return
      */
     public boolean isConnected() {
@@ -89,6 +89,7 @@ public class AndroidDevice {
 
     /**
      * 获取设备屏幕分辨率
+     *
      * @return eg.1080x1920
      */
     public String getResolution() {
@@ -97,6 +98,7 @@ public class AndroidDevice {
 
     /**
      * 获取设备id
+     *
      * @return
      */
     public String getId() {
@@ -105,10 +107,11 @@ public class AndroidDevice {
 
     /**
      * 执行测试任务
+     *
      * @param deviceTestTask
      */
-    private void excuteTestTask(DeviceTestTask deviceTestTask) throws Exception{
-        log.info("[{}][自动化测试]开始执行测试任务: {}",getId(),deviceTestTask.getTestTaskName());
+    private void excuteTestTask(DeviceTestTask deviceTestTask) throws Exception {
+        log.info("[{}][自动化测试]开始执行测试任务: {}", getId(), deviceTestTask.getTestTaskName());
 
         device.setStatus(Device.USING_STATUS);
         device.setUsername(deviceTestTask.getTestTaskName());
@@ -116,47 +119,26 @@ public class AndroidDevice {
 
         try {
             int port = uiautomator2Server.start();
-
-            Action beforeSuite = deviceTestTask.getBeforeSuite();
-            List<Testcase> testcases = deviceTestTask.getTestcases();
-            List<GlobalVar> globalVars = deviceTestTask.getGlobalVars();
-
-            List<Class> classes = new ArrayList();
-
-            //todo
-//            if (beforeSuite != null) {
-//                String beforeSuiteClassName = "BeforeSuite_" + UUIDUtil.getUUID();
-//                String beforeSuiteCode = new TestNGCodeConverter()
-//                        .setActionTree(beforeSuite)
-//                        .setClassName(beforeSuiteClassName)
-//                        .setIsBeforeSuite(true)
-//                        .setPlatform(beforeSuite.getPlatform())
-//                        .setDeviceId(deviceTestTask.getDeviceId())
-//                        .setPort(port)
-//                        .setGlobalVars(globalVars)
-//                        .setBasePackagePath("/codetemplate")
-//                        .setFtlFileName("testngCode.ftl")
-//                        .convert();
-//                Class beforeSuiteClass = JavaCompiler.compile(beforeSuiteClassName, beforeSuiteCode);
-//                classes.add(beforeSuiteClass);
-//            }
-
-            for(Testcase testcase: testcases) {
-                String testcaseClassName = "Test_" + UUIDUtil.getUUID();
-                String testcaseCode = new TestNGCodeConverter()
-                        .setDeviceTestTaskId(deviceTestTask.getId())
-                        .setIsBeforeSuite(false)
-                        .setDeviceId(deviceTestTask.getDeviceId())
-                        .setPort(port)
-                        .setGlobalVars(globalVars)
-                        .convert(testcaseClassName,testcase,"/codetemplate","android.ftl");
-                Class testcaseClass = JavaCompiler.compile(testcaseClassName, testcaseCode);
-                classes.add(testcaseClass);
-            }
-
-            TestNGRunner.runTestCases(classes.toArray(new Class[classes.size()]));
+            String className = "Test_" + UUIDUtil.getUUID();
+            String code = new TestNGCodeConverter()
+                    .setDeviceTestTaskId(deviceTestTask.getId())
+                    .setDeviceId(deviceTestTask.getDeviceId())
+                    .setPort(port)
+                    .setGlobalVars(deviceTestTask.getGlobalVars())
+                    .setBeforeClass(deviceTestTask.getBeforeClass())
+                    .setAfterClass(deviceTestTask.getAfterClass())
+                    .setBeforeMethod(deviceTestTask.getBeforeMethod())
+                    .setAfterMethod(deviceTestTask.getAfterMethod())
+                    .convert(className, deviceTestTask.getTestcases().stream().map(testcase -> {
+                        Action action = new Action();
+                        BeanUtils.copyProperties(testcase,action);
+                        return action;
+                    }).collect(Collectors.toList()), "/codetemplate", "android.ftl");
+            log.info("[{}][自动化测试]转换代码：{}", getId(), code);
+            Class clazz = JavaCompiler.compile(className, code);
+            TestNGRunner.runTestCases(new Class[]{clazz});
         } finally {
-            if(isConnected()){
+            if (isConnected()) {
                 device.setStatus(Device.IDLE_STATUS);
                 MasterApi.getInstance().saveDevice(device);
             }

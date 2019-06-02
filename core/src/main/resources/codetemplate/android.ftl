@@ -1,7 +1,6 @@
 import macaca.client.MacacaClient;
-import org.testng.annotations.Test;
 import com.fgnb.actions.utils.MacacaUtil;
-import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.*;
 
 public class ${className} {
 
@@ -14,22 +13,46 @@ public class ${className} {
         </#list>
     </#if>
 
-    <#if isBeforeSuite>
-        <#lt>    @BeforeSuite
-    <#else>
-        <#--非debug-->
-        <#if deviceTestTaskId?? && testcaseId??>
-            <#lt>    @Test(description = "${deviceId}_${deviceTestTaskId?c}_${testcaseId?c}")
-        <#--debug-->
-        <#else>
-            <#lt>    @Test
-        </#if>
-    </#if>
-    public void test() throws Exception {
+    @BeforeSuite
+    public void beforeSuite() throws Exception {
         <#-- ${port?c} 去除数字逗号分隔 -->
-        driver = MacacaUtil.createMacacaClient("${deviceId}",${port?c});
-        ${testMethod}
+        driver = MacacaUtil.createMacacaClient("${deviceId}", ${port?c});
     }
+
+    <#if beforeClass??>
+        <#lt>    @BeforeClass
+        <#lt>    public void beforeClass() throws Exception {
+        <#lt>        ${beforeClass}
+        <#lt>    }
+    </#if>
+
+    <#if afterClass??>
+        <#lt>    @AfterClass
+        <#lt>    public void afterClass() throws Exception {
+        <#lt>        ${afterClass}
+        <#lt>    }
+    </#if>
+
+    <#if beforeMethod??>
+        <#lt>    @BeforeMethod
+        <#lt>    public void beforeMethod() throws Exception {
+        <#lt>        ${beforeMethod}
+        <#lt>    }
+    </#if>
+
+    <#if afterMethod??>
+        <#lt>    @AfterMethod
+        <#lt>    public void afterMethod() throws Exception {
+        <#lt>        ${afterMethod}
+        <#lt>    }
+    </#if>
+
+    <#list testcases as testcase>
+        <#lt>    @Test<#if deviceTestTaskId??>(description = "${deviceId}_${deviceTestTaskId?c}_${testcase.id?c}")</#if>
+        <#lt>    public void testcase_${testcase.id}() throws Exception {
+        <#lt>        ${testcase.testcase}
+        <#lt>    }
+    </#list>
 
     <#include "actions.ftl"/>
 }

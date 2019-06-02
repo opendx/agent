@@ -1,13 +1,15 @@
 package com.fgnb.testng;
 
+import com.alibaba.fastjson.JSONObject;
 import com.fgnb.model.action.*;
+import com.fgnb.model.devicetesttask.Testcase;
+import freemarker.template.TemplateException;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.util.CollectionUtils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -27,58 +29,98 @@ public class TestNGCodeConverter {
     private List<GlobalVar> globalVars;
     private String deviceId;
     private Integer port;
-    private Boolean isBeforeSuite;
+
+    private Action beforeClass;
+    private Action afterClass;
+    private Action beforeMethod;
+    private Action afterMethod;
 
     /**
      * 转换为testng代码
-     *
-     * @return
      */
-    public String convert(String className,Action actionTree,String ftlBasePackagePath,String ftlFileName) throws Exception {
-        parseAction(actionTree);
-
+    public String convert(String className, List<Action> testcases, String ftlBasePackagePath, String ftlFileName) throws IOException, TemplateException {
         Map<String, Object> dataModel = new HashMap();
-        dataModel.put("globalVars", globalVars);
+        List<Action> actionTreeList = new ArrayList<>();
+
+        actionTreeList.addAll(testcases);
+        dataModel.put("testcases", testcases.stream().map(testcase -> {
+            JSONObject tc = new JSONObject();
+            tc.put("testcase",getCallMethodString(testcase));
+            tc.put("id",testcase.getId());
+            return tc;
+        }).collect(Collectors.toList()));
+
+        if(beforeClass != null) {
+            actionTreeList.add(beforeClass);
+            String callBeforeClass = getCallMethodString(beforeClass);
+            dataModel.put("beforeClass", callBeforeClass);
+        }
+
+        if(afterClass != null) {
+            actionTreeList.add(afterClass);
+            String callAfterClass = getCallMethodString(afterClass);
+            dataModel.put("afterClass", callAfterClass);
+        }
+
+        if(beforeMethod != null) {
+            actionTreeList.add(beforeMethod);
+            String callBeforeMethod = getCallMethodString(beforeMethod);
+            dataModel.put("beforeMethod", callBeforeMethod);
+        }
+
+        if(afterMethod != null) {
+            actionTreeList.add(afterMethod);
+            String callAfterMethod = getCallMethodString(afterMethod);
+            dataModel.put("afterMethod", callAfterMethod);
+        }
+
+        parseAction(actionTreeList);
         dataModel.put("actions", cachedActions.values());
+
         dataModel.put("className", className);
+        dataModel.put("methodPrefix",METHOD_PREFIX);
+        dataModel.put("globalVars", globalVars);
         dataModel.put("deviceId", deviceId);
         dataModel.put("port", port);
-        dataModel.put("methodPrefix",METHOD_PREFIX);
-
         dataModel.put("deviceTestTaskId", deviceTestTaskId);
-        dataModel.put("testcaseId", actionTree.getId());
-
-        dataModel.put("isBeforeSuite", isBeforeSuite);
-
-        //testng @Test @BeforeSuite注解下调用的方法
-        StringBuilder testMethod = new StringBuilder(METHOD_PREFIX + actionTree.getId() + "(");
-        List<Param> actionParams = actionTree.getParams();
-        //如果有参数 则都传入null
-        if (!CollectionUtils.isEmpty(actionParams)) {
-            testMethod.append(actionParams.stream().map(i -> "null").collect(Collectors.joining(",")));
-        }
-        testMethod.append(");");
-        dataModel.put("testMethod", testMethod.toString());
 
         return FreemarkerUtil.process(ftlBasePackagePath, ftlFileName, dataModel);
     }
 
     /**
-     * 递归遍历actionTree，把每个action放到cachedActions
+     * 获取调用方法的字符串。如在@Test下调用testcase的action，在@BeforeClass调用BeforeClass的action，等等...
+     * @param action
+     * @return
      */
-    private void parseAction(Action action) {
-        Action cachedAction = cachedActions.get(action.getId());
-        if (cachedAction == null) {
-            List<Step> steps = action.getSteps();
-            if(!CollectionUtils.isEmpty(steps)) {
-                for(Step step : steps) {
-                    Action stepAction = step.getAction();
-                    if(stepAction != null) {
-                        parseAction(stepAction);
+    private String getCallMethodString(Action action) {
+        StringBuilder callMethodString = new StringBuilder(METHOD_PREFIX + action.getId() + "(");
+        List<Param> actionParams = action.getParams();
+        // 如果有参数 则都传入null
+        if (!CollectionUtils.isEmpty(actionParams)) {
+            callMethodString.append(actionParams.stream().map(i -> "null").collect(Collectors.joining(",")));
+        }
+        callMethodString.append(");");
+        return callMethodString.toString();
+    }
+
+    /**
+     * 递归把每个action放到cachedActions里
+     */
+    private void parseAction(List<Action> actions) {
+        for(Action action : actions) {
+            Action cachedAction = cachedActions.get(action.getId());
+            if (cachedAction == null) {
+                List<Step> steps = action.getSteps();
+                if(!CollectionUtils.isEmpty(steps)) {
+                    for(Step step : steps) {
+                        Action stepAction = step.getAction();
+                        if(stepAction != null) {
+                            parseAction(Arrays.asList(stepAction));
+                        }
                     }
                 }
+                cachedActions.put(action.getId(), action);
             }
-            cachedActions.put(action.getId(), action);
         }
     }
 }
