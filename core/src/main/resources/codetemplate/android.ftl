@@ -49,7 +49,7 @@ public class ${className} {
 
     <#list testcases as testcase>
         <#lt>    @Test<#if deviceTestTaskId??>(description = "${deviceId}_${deviceTestTaskId?c}_${testcase.id?c}")</#if>
-        <#lt>    public void testcase_${testcase.id}() throws Exception {
+        <#lt>    public void testcase_${testcase.id?c}() throws Exception {
         <#lt>        ${testcase.testcase}
         <#lt>    }
     </#list>
