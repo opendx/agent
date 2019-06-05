@@ -42,9 +42,9 @@ public class MasterApi {
 
     @Value("${master}/deviceTestTask/update")
     private String updateDeviceTestTaskApi;
-    @Value("${master}/deviceTestTask/firstUnStart/")
+    @Value("${master}/deviceTestTask/firstUnStart/device/")
     private String findFirstUnStartDeviceTestTaskApi;
-    @Value("${master}/deviceTestTask/updateTestcase/")
+    @Value("${master}/deviceTestTask/%d/updateTestcase")
     private String updateTestcaseApi;
 
     public synchronized static MasterApi getInstance() {
@@ -132,7 +132,7 @@ public class MasterApi {
      * @param testcase
      */
     public void updateTestcase(Integer deviceTestTaskId, Testcase testcase) {
-        String url = updateTestcaseApi + deviceTestTaskId;
+        String url = String.format(updateTestcaseApi, deviceTestTaskId);
         Response response = restTemplate.postForObject(url, testcase, Response.class);
         if (!response.isSuccess()) {
             throw new RuntimeException(response.getMsg());
