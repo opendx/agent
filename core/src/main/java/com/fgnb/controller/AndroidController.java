@@ -22,7 +22,7 @@ public class AndroidController {
      * @param deviceId
      * @return
      */
-    @GetMapping("/adbkit/start/{deviceId}")
+    @GetMapping("/{deviceId}/adbkit/start")
     public Response startAdbKit(@PathVariable String deviceId) {
         return androidService.startAdbKit(deviceId);
     }
@@ -33,7 +33,7 @@ public class AndroidController {
      * @param deviceId
      * @return
      */
-    @GetMapping("/adbkit/stop/{deviceId}")
+    @GetMapping("/{deviceId}/adbkit/stop")
     public Response stop(@PathVariable String deviceId) {
         return androidService.stopAdbKit(deviceId);
     }
@@ -44,7 +44,7 @@ public class AndroidController {
      * @param deviceId
      * @return
      */
-    @GetMapping("/uiautomator2server/start/{deviceId}")
+    @GetMapping("/{deviceId}/uiautomator2server/start")
     public Response start(@PathVariable String deviceId) {
         return androidService.startUiautomator2server(deviceId);
     }
@@ -54,7 +54,7 @@ public class AndroidController {
      * @param deviceId
      * @return
      */
-    @GetMapping("/uiautomator2/dump/{deviceId}")
+    @GetMapping("/{deviceId}/uiautomator2/dump")
     public Response dump(@PathVariable String deviceId) {
         return androidService.dump(deviceId);
     }
@@ -64,7 +64,7 @@ public class AndroidController {
      * @param deviceId
      * @return
      */
-    @GetMapping("/screenshot/{deviceId}")
+    @GetMapping("/{deviceId/screenshot}")
     public Response screenshot(@PathVariable String deviceId) {
         return androidService.screenshot(deviceId);
     }
@@ -75,7 +75,7 @@ public class AndroidController {
      * @param deviceId
      * @return
      */
-    @PostMapping("/installApk/{deviceId}")
+    @PostMapping("/{deviceId}/installApk")
     public Response installApk(MultipartFile apk,@PathVariable String deviceId) {
         return androidService.installApk(apk,deviceId);
     }
