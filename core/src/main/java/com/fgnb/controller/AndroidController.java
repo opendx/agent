@@ -64,7 +64,7 @@ public class AndroidController {
      * @param deviceId
      * @return
      */
-    @GetMapping("/{deviceId/screenshot}")
+    @GetMapping("/{deviceId}/screenshot")
     public Response screenshot(@PathVariable String deviceId) {
         return androidService.screenshot(deviceId);
     }
