@@ -6,16 +6,15 @@ public class ${className} {
 
     private MacacaClient driver;
 
-    <#-- 全局变量 变量名格式为g_xxx -->
+    <#-- 全局变量 -->
     <#if globalVars?? && (globalVars?size>0)>
         <#list globalVars as globalVar>
-            <#lt>    public static final Object g_${globalVar.name} = "${globalVar.value}";
+            <#lt>    public static final Object ${globalVar.name} = "${globalVar.value}";
         </#list>
     </#if>
 
     @BeforeSuite
     public void beforeSuite() throws Exception {
-        <#-- ${port?c} 去除数字逗号分隔 -->
         driver = MacacaUtil.createMacacaClient("${deviceId}", ${port?c});
     }
 
