@@ -70,7 +70,7 @@ public class TestNGCodeConverter {
             dataModel.put("afterMethod", callAfterMethod);
         }
 
-        parseAction(actionTreeList);
+        parseActions(actionTreeList);
 
         handleActions();
         dataModel.put("actions", cachedActions.values());
@@ -107,7 +107,7 @@ public class TestNGCodeConverter {
     /**
      * 递归把每个action放到cachedActions里
      */
-    private void parseAction(List<Action> actions) {
+    private void parseActions(List<Action> actions) {
         for (Action action : actions) {
             Action cachedAction = cachedActions.get(action.getId());
             if (cachedAction == null) {
@@ -116,7 +116,7 @@ public class TestNGCodeConverter {
                     for (Step step : steps) {
                         Action stepAction = step.getAction();
                         if (stepAction != null) {
-                            parseAction(Arrays.asList(stepAction));
+                            parseActions(Arrays.asList(stepAction));
                         }
                     }
                 }
