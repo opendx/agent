@@ -34,6 +34,7 @@ public class ActionService {
             if (StringUtils.isEmpty(testNGCode)) {
                 return Response.fail("转换testng代码失败");
             }
+
             Class clazz = JavaCompiler.compile(className, testNGCode);
             String failMsg = TestNGRunner.debugAction(clazz);
             if (StringUtils.isEmpty(failMsg)) {

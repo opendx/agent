@@ -2,7 +2,7 @@
     <#list actions as action>
         <#--方法注释-->
         <#if action.name?? && action.name!=''>
-            <#lt>    //${action.name}
+            <#lt>    // ${action.name}
         </#if>
         <#lt>    public <#rt>
         <#if action.hasReturnValue==1>
@@ -43,11 +43,11 @@
                     <#lt>        Object v_${localVar.name} = <#if localVar.value?? && localVar.value!=''>"${localVar.value}"<#else>null</#if>;
                 </#list>
             </#if>
-            <#--步骤调用-->
+            <#--步骤-->
             <#if action.steps?? && (action.steps?size>0)>
                 <#list action.steps as step>
                     <#--步骤注释-->
-                    <#lt>        //${step.number}.<#if step.name?? && step.name!=''>${step.name}</#if>
+                    <#lt>        // ${step.number}.<#if step.name?? && step.name!=''>${step.name}</#if>
                     <#-- 方法内的步骤 使用局部变量v_xxx赋值-->
                     <#lt>        <#if step.evaluation?? && step.evaluation!=''>v_${step.evaluation} = </#if>${methodPrefix}${step.actionId}(<#rt>
                     <#if step.paramValues?? && (step.paramValues?size>0)>
