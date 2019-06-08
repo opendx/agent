@@ -88,7 +88,7 @@ public class MinitouchSocketServer {
     }
 
     /**
-     * 根据前端传来的操作，调用minitouch执行相应操作
+     * 根据前端传来的操作，执行相应操作
      *
      * @param msg
      */

@@ -62,10 +62,8 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
         if (androidDevice == null) {
             log.info("[{}]首次在agent上线", deviceId);
-
             log.info("[{}]检查是否已接入过master", deviceId);
             Device device = masterApi.getDeviceById(deviceId);
-
             if (device == null) {
                 log.info("[{}]首次接入master", deviceId);
                 androidDevice = initDevice(iDevice);
@@ -132,21 +130,18 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         device.setPlatform(Device.ANDROID);
         device.setCreateTime(new Date());
         device.setId(iDevice.getSerialNumber());
-
         try {
             device.setCpuInfo(AndroidUtils.getCpuInfo(iDevice));
         } catch (Exception e) {
             log.error("获取cpu信息失败", e);
             device.setCpuInfo("获取cpu信息失败");
         }
-
         try {
             device.setMemSize(AndroidUtils.getMemSize(iDevice));
         } catch (Exception e) {
             log.error("获取内存大小失败", e);
             device.setMemSize("获取内存大小失败");
         }
-
         device.setName(AndroidUtils.getDeviceName(iDevice));
         device.setSystemVersion(AndroidUtils.getAndroidVersion(iDevice));
 
@@ -159,7 +154,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         device.setScreenWidth(Integer.parseInt(resolution[0]));
         device.setScreenHeight(Integer.parseInt(resolution[1]));
 
-        //截图并上传到服务器
+        // 截图并上传到服务器
         File screenshot = null;
         try {
             screenshot = AndroidUtils.screenshot(iDevice);
@@ -168,19 +163,18 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         } catch (Exception e) {
             log.error("设置首次接入master屏幕截图失败", e);
         } finally {
-            //删除截图
+            // 删除截图
             FileUtils.deleteQuietly(screenshot);
         }
 
         AndroidDevice androidDevice = new AndroidDevice(device, iDevice);
 
-        //安装minicap minitouch uiautomatorServerApk
+        // 安装minicap minitouch uiautomatorServerApk
         try {
             installMinicapAndMinitouchAndUiAutomatorServerApk(androidDevice);
         } catch (Exception e) {
             throw new RuntimeException("安装必要程序到手机出错", e);
         }
-
         device.setStfStatus(Device.STF_SUCCESS_STATUS);
         device.setMacacaStatus(Device.MACACA_SUCCESS_STATUS);
 
@@ -193,7 +187,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
      * @param androidDevice
      */
     private void installMinicapAndMinitouchAndUiAutomatorServerApk(AndroidDevice androidDevice) throws Exception {
-        String deviceId = androidDevice.getDevice().getId();
+        String deviceId = androidDevice.getId();
         IDevice iDevice = androidDevice.getIDevice();
 
         log.info("[{}]开始安装minicap", deviceId);

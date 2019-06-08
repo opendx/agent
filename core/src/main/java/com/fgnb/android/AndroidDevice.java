@@ -30,9 +30,13 @@ public class AndroidDevice {
 
     public final static String TMP_FOLDER = "/data/local/tmp/";
 
-    /** 执行自动化测试任务队列 */
+    /**
+     * 执行自动化测试任务队列
+     */
     private final BlockingQueue<DeviceTestTask> testTaskQueue = new LinkedBlockingQueue();
-    /** 执行自动化测试任务线程 */
+    /**
+     * 执行自动化测试任务线程
+     */
     private Thread excuteTestTaskThread;
 
     private Device device;
@@ -131,7 +135,7 @@ public class AndroidDevice {
                     .setAfterMethod(deviceTestTask.getAfterMethod())
                     .convert(className, deviceTestTask.getTestcases().stream().map(testcase -> {
                         Action action = new Action();
-                        BeanUtils.copyProperties(testcase,action);
+                        BeanUtils.copyProperties(testcase, action);
                         return action;
                     }).collect(Collectors.toList()), "/codetemplate", "android.ftl");
             log.info("[{}][自动化测试]转换代码：{}", getId(), code);

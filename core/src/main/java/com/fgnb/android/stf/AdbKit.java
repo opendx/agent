@@ -14,15 +14,15 @@ import java.io.IOException;
 @Slf4j
 public class AdbKit {
 
-    /* https://github.com/openstf/adbkit */
+    /**
+     * https://github.com/openstf/adbkit
+     */
     private static final String START_ADBKIT_CMD = "node vendor/adbkit/bin/adbkit usb-device-to-tcp -p %d %s";
 
     private ExecuteWatchdog watchdog;
-    private AndroidDevice androidDevice;
     private String deviceId;
 
     public AdbKit(AndroidDevice androidDevice) {
-        this.androidDevice = androidDevice;
         this.deviceId = androidDevice.getId();
     }
 
@@ -37,7 +37,6 @@ public class AdbKit {
         int localPort = PortProvider.getAdbKitAvailablePort();
         String cmd = String.format(START_ADBKIT_CMD, localPort, deviceId);
         log.info("[{}][adbkit]开启远程调试功能：{}", deviceId, cmd);
-
         watchdog = ShellExecutor.execReturnWatchdog(cmd);
         return localPort;
     }

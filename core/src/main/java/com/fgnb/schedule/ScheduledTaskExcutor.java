@@ -40,9 +40,9 @@ public class ScheduledTaskExcutor {
 
         idleAndroidDeviceIds.stream().parallel().forEach(deviceId -> {
             DeviceTestTask unStartDeviceTestTask = masterApi.findFirstUnStartDeviceTestTask(deviceId);
-            if(unStartDeviceTestTask != null) {
+            if (unStartDeviceTestTask != null) {
                 AndroidDeviceHolder.get(deviceId).commitTestTask(unStartDeviceTestTask);
-                log.info("[{}][自动化测试]提交测试任务{}",deviceId,unStartDeviceTestTask.getTestTaskName());
+                log.info("[{}][自动化测试]提交测试任务{}", deviceId, unStartDeviceTestTask.getTestTaskName());
             }
         });
     }

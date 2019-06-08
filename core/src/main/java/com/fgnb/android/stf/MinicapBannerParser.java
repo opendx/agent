@@ -13,12 +13,13 @@ public class MinicapBannerParser {
     /**
      * 解析出global header
      * https://github.com/openstf/minicap#global-header-binary-format
+     *
      * @param inputStream
      * @return
      * @throws IOException
      */
     public static MinicapBanner parse(InputStream inputStream) throws IOException {
-        if(inputStream == null) {
+        if (inputStream == null) {
             throw new NullPointerException("inputStream不能为空");
         }
 

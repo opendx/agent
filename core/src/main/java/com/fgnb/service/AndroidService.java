@@ -75,7 +75,6 @@ public class AndroidService {
         }
 
         String url = "http://127.0.0.1:" + localPort + "/wd/hub/session/888/source";
-
         String uiautomator2ServerResponse;
         try {
             uiautomator2ServerResponse = restTemplate.getForObject(url, String.class);
@@ -128,8 +127,8 @@ public class AndroidService {
         if (!apk.getOriginalFilename().endsWith(".apk")) {
             return Response.fail("无法安装非APK文件");
         }
-        AndroidDevice androidDevice = getAndroidDevice(deviceId);
 
+        AndroidDevice androidDevice = getAndroidDevice(deviceId);
         String apkPath = UUIDUtil.getUUID() + ".apk";
         File apkFile = new File(apkPath);
         try {

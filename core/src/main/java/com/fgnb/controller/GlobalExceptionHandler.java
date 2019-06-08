@@ -33,12 +33,13 @@ public class GlobalExceptionHandler {
 
     /**
      * BusinessException
+     *
      * @param e
      * @return
      */
     @ResponseBody
     @ExceptionHandler(BusinessException.class)
-    public Response handleBusinessException(BusinessException e){
+    public Response handleBusinessException(BusinessException e) {
         return Response.fail(e.getMessage());
     }
 

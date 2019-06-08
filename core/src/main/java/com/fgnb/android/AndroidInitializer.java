@@ -11,18 +11,18 @@ import java.io.IOException;
  * Created by jiangyitao.
  */
 @Component
-public class AndroidInitializer implements ApplicationRunner{
+public class AndroidInitializer implements ApplicationRunner {
 
     @Autowired
     private AndroidDeviceChangeListener deviceChangeListener;
 
     @Override
     public void run(ApplicationArguments args) throws IOException {
-        //agent每次启动都先kill adb server
+        // agent每次启动都先kill adb server
         ADB.killServer();
-        //初始化adb
+        // 初始化adb
         ADB.init();
-        //添加设备监听器，监听设备连接、断开
+        // 添加设备监听器，监听设备连接、断开
         ADB.addDeviceChangeListener(deviceChangeListener);
     }
 }

@@ -1,6 +1,7 @@
 package com.fgnb.model.action;
 
 import lombok.Data;
+
 import java.util.List;
 
 /**

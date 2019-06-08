@@ -51,6 +51,7 @@ public class AndroidController {
 
     /**
      * dump当前布局
+     *
      * @param deviceId
      * @return
      */
@@ -61,6 +62,7 @@ public class AndroidController {
 
     /**
      * 获取当前截图
+     *
      * @param deviceId
      * @return
      */
@@ -71,12 +73,13 @@ public class AndroidController {
 
     /**
      * 安装APK
+     *
      * @param apk
      * @param deviceId
      * @return
      */
     @PostMapping("/{deviceId}/installApk")
-    public Response installApk(MultipartFile apk,@PathVariable String deviceId) {
-        return androidService.installApk(apk,deviceId);
+    public Response installApk(MultipartFile apk, @PathVariable String deviceId) {
+        return androidService.installApk(apk, deviceId);
     }
 }

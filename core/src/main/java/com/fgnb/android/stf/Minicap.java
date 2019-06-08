@@ -53,7 +53,7 @@ public class Minicap {
         String startMinicapCmd = String.format(START_MINICAP_CMD, androidDevice.getResolution(), virtualResolution, orientation);
 
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        //启动minicap会阻塞线程，启一个线程运行minicap
+        // 启动minicap会阻塞线程，启一个线程运行minicap
         new Thread(() -> {
             try {
                 log.info("[{}][minicap]启动：{}", deviceId, startMinicapCmd);
@@ -63,7 +63,7 @@ public class Minicap {
                         for (String line : lines) {
                             log.info("[{}][minicap]手机控制台输出：{}", deviceId, line);
                             if (!StringUtils.isEmpty(line) && line.startsWith("INFO: (jni/minicap/JpgEncoder.cpp")) {
-                                //minicap启动完成
+                                // minicap启动完成
                                 countDownLatch.countDown();
                             }
                         }
@@ -104,7 +104,7 @@ public class Minicap {
                     imgQueue.offer(img);
                 }
             } catch (MinicapFrameSizeException e) {
-                log.info("[{}][minicap]无法获取minicap输出数据",deviceId);
+                log.info("[{}][minicap]无法获取minicap输出数据", deviceId);
             } catch (Exception e) {
                 log.error("[{}][minicap]处理minicap数据出错", deviceId, e);
             }
@@ -142,8 +142,8 @@ public class Minicap {
     public String convertVirtualResolution(int displayWidth) {
         int screenHeight = androidDevice.getDevice().getScreenHeight();
         int screenWidth = androidDevice.getDevice().getScreenWidth();
-        float scale = screenHeight / (float)screenWidth;
-        int displayHeight = (int)(scale * displayWidth);
+        float scale = screenHeight / (float) screenWidth;
+        int displayHeight = (int) (scale * displayWidth);
         return displayWidth + "x" + displayHeight;
     }
 }

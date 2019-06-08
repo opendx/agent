@@ -48,15 +48,15 @@ public class PortProvider {
         return availablePort;
     }
 
-    private static int getAvailablePort(int startPort,int endPort,int port) {
+    private static int getAvailablePort(int startPort, int endPort, int port) {
         while (true) {
-            if(port > endPort || port < startPort) {
+            if (port > endPort || port < startPort) {
                 port = startPort;
             }
-            if(NetUtil.isPortAvailable(port)) {
+            if (NetUtil.isPortAvailable(port)) {
                 return port;
             } else {
-                port ++;
+                port++;
             }
         }
     }

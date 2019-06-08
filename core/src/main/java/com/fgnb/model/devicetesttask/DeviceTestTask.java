@@ -4,6 +4,7 @@ package com.fgnb.model.devicetesttask;
 import com.fgnb.model.action.Action;
 import com.fgnb.model.action.GlobalVar;
 import lombok.Data;
+
 import java.util.Date;
 import java.util.List;
 
@@ -13,11 +14,17 @@ import java.util.List;
 @Data
 public class DeviceTestTask {
 
-    /** 未开始 */
+    /**
+     * 未开始
+     */
     public static final Integer UNSTART_STATUS = 0;
-    /** 运行中 */
+    /**
+     * 运行中
+     */
     public static final Integer RUNNING_STATUS = 1;
-    /** 完成 */
+    /**
+     * 完成
+     */
     public static final Integer FINISHED_STATUS = 2;
 
     private Integer id;

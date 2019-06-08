@@ -2,7 +2,6 @@ package com.fgnb.testng;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fgnb.model.action.*;
-import com.fgnb.model.devicetesttask.Testcase;
 import freemarker.template.TemplateException;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -45,30 +44,30 @@ public class TestNGCodeConverter {
         actionTreeList.addAll(testcases);
         dataModel.put("testcases", testcases.stream().map(testcase -> {
             JSONObject tc = new JSONObject();
-            tc.put("testcase",getCallMethodString(testcase));
-            tc.put("id",testcase.getId());
+            tc.put("testcase", getCallMethodString(testcase));
+            tc.put("id", testcase.getId());
             return tc;
         }).collect(Collectors.toList()));
 
-        if(beforeClass != null) {
+        if (beforeClass != null) {
             actionTreeList.add(beforeClass);
             String callBeforeClass = getCallMethodString(beforeClass);
             dataModel.put("beforeClass", callBeforeClass);
         }
 
-        if(afterClass != null) {
+        if (afterClass != null) {
             actionTreeList.add(afterClass);
             String callAfterClass = getCallMethodString(afterClass);
             dataModel.put("afterClass", callAfterClass);
         }
 
-        if(beforeMethod != null) {
+        if (beforeMethod != null) {
             actionTreeList.add(beforeMethod);
             String callBeforeMethod = getCallMethodString(beforeMethod);
             dataModel.put("beforeMethod", callBeforeMethod);
         }
 
-        if(afterMethod != null) {
+        if (afterMethod != null) {
             actionTreeList.add(afterMethod);
             String callAfterMethod = getCallMethodString(afterMethod);
             dataModel.put("afterMethod", callAfterMethod);
@@ -78,7 +77,7 @@ public class TestNGCodeConverter {
         dataModel.put("actions", cachedActions.values());
 
         dataModel.put("className", className);
-        dataModel.put("methodPrefix",METHOD_PREFIX);
+        dataModel.put("methodPrefix", METHOD_PREFIX);
         dataModel.put("globalVars", globalVars);
         dataModel.put("deviceId", deviceId);
         dataModel.put("port", port);
@@ -89,6 +88,7 @@ public class TestNGCodeConverter {
 
     /**
      * 获取调用方法的字符串。如在@Test下调用testcase的action，在@BeforeClass调用BeforeClass的action，等等...
+     *
      * @param action
      * @return
      */
@@ -107,14 +107,14 @@ public class TestNGCodeConverter {
      * 递归把每个action放到cachedActions里
      */
     private void parseAction(List<Action> actions) {
-        for(Action action : actions) {
+        for (Action action : actions) {
             Action cachedAction = cachedActions.get(action.getId());
             if (cachedAction == null) {
                 List<Step> steps = action.getSteps();
-                if(!CollectionUtils.isEmpty(steps)) {
-                    for(Step step : steps) {
+                if (!CollectionUtils.isEmpty(steps)) {
+                    for (Step step : steps) {
                         Action stepAction = step.getAction();
-                        if(stepAction != null) {
+                        if (stepAction != null) {
                             parseAction(Arrays.asList(stepAction));
                         }
                     }

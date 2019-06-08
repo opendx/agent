@@ -33,20 +33,20 @@ public class MinicapInstaller {
         String cpuAbi = AndroidUtils.getCpuAbi(iDevice);
         String apiLevel = AndroidUtils.getApiLevel(iDevice);
 
-        String minicapFilePath = String.format(MINICAP_PATH,cpuAbi);
-        String minicapSoFilePath = String.format(MINICAP_SO_PATH,apiLevel,cpuAbi);
+        String minicapFilePath = String.format(MINICAP_PATH, cpuAbi);
+        String minicapSoFilePath = String.format(MINICAP_SO_PATH, apiLevel, cpuAbi);
 
-        //push minicap 到手机
+        // push minicap 到手机
         String phoneMinicapPath = AndroidDevice.TMP_FOLDER + "minicap";
         log.info("[{}][minicap]push minicap到手机,{} -> {}", deviceId, minicapFilePath, phoneMinicapPath);
         iDevice.pushFile(minicapFilePath, phoneMinicapPath);
 
-        //push minicap.so 到手机
+        // push minicap.so 到手机
         String phoneMinicapSoPath = AndroidDevice.TMP_FOLDER + "minicap.so";
         log.info("[{}][minicap]push minicap.so到手机,{} -> {}", deviceId, minicapSoFilePath, phoneMinicapSoPath);
         iDevice.pushFile(minicapSoFilePath, phoneMinicapSoPath);
 
-        //给手机里的minicap/minicap.so 赋予777权限
+        // 给手机里的minicap/minicap.so 赋予777权限
         String chmodShellCmd = String.format(MINICAP_CHMOD_SHELL, phoneMinicapPath, phoneMinicapSoPath);
         log.info("[{}][minicap]{} ", deviceId, chmodShellCmd);
         iDevice.executeShellCommand(chmodShellCmd, new NullOutputReceiver());

@@ -108,7 +108,7 @@ public class MinicapSocketServer {
         if (minicap != null && androidDevice != null) {
             minicap.stop();
             Device device = androidDevice.getDevice();
-            //因为手机可能被拔出离线，AndroidDeviceChangeService.deviceDisconnected已经在数据库改为离线，这里不能改为闲置
+            // 因为手机可能被拔出离线，AndroidDeviceChangeService.deviceDisconnected已经在数据库改为离线，这里不能改为闲置
             if (device != null && device.getStatus() == Device.USING_STATUS) {
                 device.setStatus(Device.IDLE_STATUS);
                 MasterApi.getInstance().saveDevice(device);

@@ -1,6 +1,7 @@
 package com.fgnb.model;
 
 import lombok.Data;
+
 import java.util.Date;
 
 /**

@@ -81,7 +81,7 @@ public class AndroidUtils {
         }
         String kB = (output.replaceAll(" ", "")).replaceAll("\n", "").replaceAll("\r", "").split(":")[1];
         kB = kB.substring(0, kB.length() - 2);
-        //向上取整
+        // 向上取整
         double ceil = Math.ceil(Long.parseLong(kB) / (1024.0 * 1024));
         return ceil + " GB";
     }
@@ -108,9 +108,8 @@ public class AndroidUtils {
      * 截屏
      *
      * @return
-     * @throws Exception
      */
-    public static File screenshot(IDevice iDevice) throws Exception {
+    public static File screenshot(IDevice iDevice) throws AdbCommandRejectedException, IOException, TimeoutException {
         RawImage rawImage = iDevice.getScreenshot();
         BufferedImage image = new BufferedImage(rawImage.width, rawImage.height, BufferedImage.TYPE_INT_ARGB);
 
@@ -133,22 +132,23 @@ public class AndroidUtils {
 
     /**
      * 通过minicap截图
+     *
      * @param iDevice
-     * @param localPath 本地路径 eg. d:/path/img.jpg
+     * @param localPath  本地路径 eg. d:/path/img.jpg
      * @param resolution 手机分辨率 eg. 1080x1920
      * @throws Exception
      */
-    public static void screenshotByMinicap(IDevice iDevice,String localPath,String resolution) throws Exception {
+    public static void screenshotByMinicap(IDevice iDevice, String localPath, String resolution) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException, SyncException {
         String imgPhonePath = "/data/local/tmp/minicap.jpg";
-        String screenshotCmd = String.format("LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/minicap -P %s@%s/0 -s >%s",resolution,resolution,imgPhonePath);
+        String screenshotCmd = String.format("LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/minicap -P %s@%s/0 -s >%s", resolution, resolution, imgPhonePath);
         String minicapOutput = executeShellCommand(iDevice, screenshotCmd);
 
-        if(StringUtils.isEmpty(minicapOutput) || !minicapOutput.contains("bytes for JPG encoder")){
-            log.error("[{}]minicap截图失败,cmd: {},minicapOutput: {}",iDevice.getSerialNumber(),screenshotCmd,minicapOutput);
-            throw new RuntimeException("minicap截图失败,cmd: " + screenshotCmd + ",minicapOutput: " + minicapOutput);
+        if (StringUtils.isEmpty(minicapOutput) || !minicapOutput.contains("bytes for JPG encoder")) {
+            log.error("[{}]minicap截图失败, cmd: {}, minicapOutput: {}", iDevice.getSerialNumber(), screenshotCmd, minicapOutput);
+            throw new RuntimeException("minicap截图失败, cmd: " + screenshotCmd + ", minicapOutput: " + minicapOutput);
         }
-        //pull到本地
-        iDevice.pullFile(imgPhonePath,localPath);
+        // pull到本地
+        iDevice.pullFile(imgPhonePath, localPath);
     }
 
     /**
@@ -197,8 +197,7 @@ public class AndroidUtils {
      * @return
      */
     public static boolean hasInstalledApp(IDevice iDevice, String packageName) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
-        String result = executeShellCommand(iDevice, "pm list packages|grep " + packageName);
-        return !StringUtils.isEmpty(result);
+        return !StringUtils.isEmpty(executeShellCommand(iDevice, "pm list packages|grep " + packageName));
     }
 
     /**
@@ -209,8 +208,7 @@ public class AndroidUtils {
      * @return
      */
     public static boolean isAppRunning(IDevice iDevice, String packageName) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
-        String result = executeShellCommand(iDevice, "ps |grep " + packageName);
-        return !StringUtils.isEmpty(result);
+        return !StringUtils.isEmpty(executeShellCommand(iDevice, "ps |grep " + packageName));
     }
 
     /**
@@ -226,20 +224,22 @@ public class AndroidUtils {
     /**
      * input keyevent
      * keyCode对照表 https://blog.csdn.net/moyu123456789/article/details/71209893
+     *
      * @param keyCode
      */
-    public static void inputKeyevent(IDevice iDevice,int keyCode) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+    public static void inputKeyevent(IDevice iDevice, int keyCode) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         iDevice.executeShellCommand("input keyevent " + keyCode, new NullOutputReceiver());
     }
 
     /**
      * 安装APK
+     *
      * @param iDevice
      * @param apkPath
      * @throws InstallException
      */
-    public static void installApk(IDevice iDevice,String apkPath) throws InstallException {
-        iDevice.installPackage(apkPath,true);
+    public static void installApk(IDevice iDevice, String apkPath) throws InstallException {
+        iDevice.installPackage(apkPath, true);
     }
 
     /**

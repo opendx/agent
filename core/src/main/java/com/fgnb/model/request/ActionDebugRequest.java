@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Data
 public class ActionDebugRequest {
-    @NotNull(message = "action不能为空" )
+    @NotNull(message = "action不能为空")
     private Action action;
     private List<GlobalVar> globalVars;
     private String deviceId;

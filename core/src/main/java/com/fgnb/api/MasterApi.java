@@ -48,7 +48,7 @@ public class MasterApi {
     private String updateTestcaseApi;
 
     public synchronized static MasterApi getInstance() {
-        if(masterApi == null) {
+        if (masterApi == null) {
             masterApi = App.getBean(MasterApi.class);
         }
         return masterApi;
@@ -120,7 +120,7 @@ public class MasterApi {
     public DeviceTestTask findFirstUnStartDeviceTestTask(String deviceId) {
         Response response = restTemplate.getForObject(findFirstUnStartDeviceTestTaskApi + deviceId, Response.class);
         if (response.isSuccess()) {
-            return JSON.parseObject(JSON.toJSONString(response.getData()),DeviceTestTask.class);
+            return JSON.parseObject(JSON.toJSONString(response.getData()), DeviceTestTask.class);
         } else {
             throw new RuntimeException(response.getMsg());
         }
@@ -128,6 +128,7 @@ public class MasterApi {
 
     /**
      * 更新测试用例执行状态
+     *
      * @param deviceTestTaskId
      * @param testcase
      */

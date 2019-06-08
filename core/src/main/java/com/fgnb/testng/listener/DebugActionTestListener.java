@@ -8,7 +8,9 @@ import org.testng.TestListenerAdapter;
  */
 public class DebugActionTestListener extends TestListenerAdapter {
 
-    /** testng运行失败信息 */
+    /**
+     * testng运行失败信息
+     */
     public static ThreadLocal<String> failMsg = new ThreadLocal();
 
     @Override

@@ -1,8 +1,6 @@
 package com.fgnb.service;
 
 import com.fgnb.javacompile.JavaCompiler;
-import com.fgnb.model.Platform;
-import com.fgnb.model.devicetesttask.Testcase;
 import com.fgnb.testng.TestNGRunner;
 import com.fgnb.model.Response;
 import com.fgnb.model.request.ActionDebugRequest;
@@ -31,7 +29,7 @@ public class ActionService {
         String className = "Debug_" + UUIDUtil.getUUID();
         try {
             String testNGCode = new TestNGCodeConverter().setDeviceId(request.getDeviceId()).setPort(request.getPort()).setGlobalVars(request.getGlobalVars())
-                    .convert(className, Arrays.asList(request.getAction()),"/codetemplate","android.ftl");
+                    .convert(className, Arrays.asList(request.getAction()), "/codetemplate", "android.ftl");
             log.info("[调试action]: {}", testNGCode);
             if (StringUtils.isEmpty(testNGCode)) {
                 return Response.fail("转换testng代码失败");
