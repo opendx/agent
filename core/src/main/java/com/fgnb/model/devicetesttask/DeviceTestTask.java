@@ -1,6 +1,7 @@
 package com.fgnb.model.devicetesttask;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fgnb.model.action.Action;
 import com.fgnb.model.action.GlobalVar;
 import lombok.Data;
@@ -32,7 +33,9 @@ public class DeviceTestTask {
     private String testTaskName;
     private String deviceId;
     private Integer status;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date startTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
     private List<GlobalVar> globalVars;
     private Action beforeClass;

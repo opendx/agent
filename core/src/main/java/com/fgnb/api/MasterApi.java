@@ -1,7 +1,5 @@
 package com.fgnb.api;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.fgnb.App;
 import com.fgnb.model.Device;
 import com.fgnb.model.Response;
@@ -10,7 +8,10 @@ import com.fgnb.model.devicetesttask.Testcase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -42,7 +43,7 @@ public class MasterApi {
 
     @Value("${master}/deviceTestTask/update")
     private String updateDeviceTestTaskApi;
-    @Value("${master}/deviceTestTask/firstUnStart/device/")
+    @Value("${master}/deviceTestTask/firstUnStart/device/%s")
     private String findFirstUnStartDeviceTestTaskApi;
     @Value("${master}/deviceTestTask/%d/updateTestcase")
     private String updateTestcaseApi;
@@ -63,10 +64,9 @@ public class MasterApi {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("id", deviceId);
 
-        Response response = restTemplate.postForObject(deviceListApi, params, Response.class);
+        Response<List<Device>> response = restTemplate.exchange(deviceListApi, HttpMethod.POST, new HttpEntity(params), new ParameterizedTypeReference<Response<List<Device>>>() {}).getBody();
         if (response.isSuccess()) {
-            List<Device> devices = JSON.parseArray(JSONArray.toJSONString(response.getData()), Device.class);
-            return devices.stream().findFirst().orElse(null);
+            return response.getData().stream().findFirst().orElse(null);
         } else {
             throw new RuntimeException(response.getMsg());
         }
@@ -94,14 +94,14 @@ public class MasterApi {
         FileSystemResource resource = new FileSystemResource(file);
         MultiValueMap<String, Object> multiValueMap = new LinkedMultiValueMap<>();
         multiValueMap.add("file", resource);
+        HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(multiValueMap);
 
-        Response response = restTemplate.postForObject(uploadFileApi, multiValueMap, Response.class);
-        if (!response.isSuccess()) {
+        Response<Map<String, String>> response = restTemplate.exchange(uploadFileApi, HttpMethod.POST, httpEntity, new ParameterizedTypeReference<Response<Map<String, String>>>() {}).getBody();
+        if (response.isSuccess()) {
+            return response.getData().get("downloadURL");
+        } else {
             throw new RuntimeException(response.getMsg());
         }
-
-        Map<String, String> data = JSON.parseObject(JSON.toJSONString(response.getData()), Map.class);
-        return data.get("downloadURL");
     }
 
     /**
@@ -115,12 +115,13 @@ public class MasterApi {
     }
 
     /**
-     * 获取未开始的测试任务
+     * 获取最早的未开始的测试任务
      */
-    public DeviceTestTask findFirstUnStartDeviceTestTask(String deviceId) {
-        Response response = restTemplate.getForObject(findFirstUnStartDeviceTestTaskApi + deviceId, Response.class);
+    public DeviceTestTask getFirstUnStartDeviceTestTask(String deviceId) {
+        String url = String.format(findFirstUnStartDeviceTestTaskApi, deviceId);
+        Response<DeviceTestTask> response = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<Response<DeviceTestTask>>() {}).getBody();
         if (response.isSuccess()) {
-            return JSON.parseObject(JSON.toJSONString(response.getData()), DeviceTestTask.class);
+            return response.getData();
         } else {
             throw new RuntimeException(response.getMsg());
         }

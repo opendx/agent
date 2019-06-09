@@ -1,5 +1,6 @@
 package com.fgnb.model.devicetesttask;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fgnb.model.action.Action;
 import lombok.Data;
 
@@ -15,7 +16,9 @@ public class Testcase extends Action {
     public static final Integer PASS_STATUS = 1;
     public static final Integer SKIP_STATUS = 2;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date startTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
     /**
      * 失败截图
