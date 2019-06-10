@@ -1,5 +1,5 @@
 import macaca.client.MacacaClient;
-import com.fgnb.actions.utils.MacacaUtil;
+import com.daxiang.actions.utils.MacacaUtil;
 import org.testng.annotations.*;
 
 public class ${className} {
