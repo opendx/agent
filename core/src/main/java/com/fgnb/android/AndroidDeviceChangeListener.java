@@ -11,6 +11,7 @@ import com.fgnb.android.uiautomator.Uiautomator2Server;
 import com.fgnb.android.uiautomator.Uiautomator2ServerApkInstaller;
 import com.fgnb.api.MasterApi;
 import com.fgnb.model.Device;
+import com.fgnb.model.Platform;
 import com.fgnb.utils.NetUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -127,7 +128,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
     private AndroidDevice initDevice(IDevice iDevice) {
         Device device = new Device();
 
-        device.setPlatform(Device.ANDROID);
+        device.setPlatform(Platform.ANDROID);
         device.setCreateTime(new Date());
         device.setId(iDevice.getSerialNumber());
         try {
@@ -175,8 +176,6 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         } catch (Exception e) {
             throw new RuntimeException("安装必要程序到手机出错", e);
         }
-        device.setStfStatus(Device.STF_SUCCESS_STATUS);
-        device.setMacacaStatus(Device.MACACA_SUCCESS_STATUS);
 
         return androidDevice;
     }
