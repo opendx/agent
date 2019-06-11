@@ -27,25 +27,14 @@ public class SeleniumInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws IOException {
-        log.info("[selenium]启动ChromeDriverService: {}", chromeDriverPath);
-        ChromeDriverService service = new ChromeDriverService.Builder()
-                .usingDriverExecutable(new File(chromeDriverPath))
-                .usingAnyFreePort()
-                .build();
-        service.start();
-        chromeDriverServicePort = service.getUrl().getPort();
-        log.info("[selenium]ChromeDriverService启动完成，端口：{}", chromeDriverServicePort);
-    }
-
-    /**
-     * 获取chromedriver服务端口
-     *
-     * @return
-     */
-    public static int getChromeDriverServicePort() {
-        if (chromeDriverServicePort == -1) {
-            throw new RuntimeException("无法获取ChromeDriverServicePort");
-        }
-        return chromeDriverServicePort;
+        // todo 下两个版本 支持web
+//        log.info("[selenium]启动ChromeDriverService: {}", chromeDriverPath);
+//        ChromeDriverService service = new ChromeDriverService.Builder()
+//                .usingDriverExecutable(new File(chromeDriverPath))
+//                .usingAnyFreePort()
+//                .build();
+//        service.start();
+//        chromeDriverServicePort = service.getUrl().getPort();
+//        log.info("[selenium]ChromeDriverService启动完成，端口：{}", chromeDriverServicePort);
     }
 }
