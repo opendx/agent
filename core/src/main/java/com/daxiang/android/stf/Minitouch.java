@@ -58,7 +58,7 @@ public class Minitouch {
      */
     public void start() throws Exception {
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        //启动minitouch会阻塞线程，启一个线程运行minitouch
+        // 启动minitouch会阻塞线程，启一个线程运行minitouch
         new Thread(() -> {
             try {
                 log.info("[{}][minitouch]启动：{}", deviceId, START_MINITOUCH_CMD);

@@ -50,12 +50,11 @@ public class Minicap {
      * @param orientation       屏幕的旋转角度
      */
     public void start(String virtualResolution, Integer orientation) throws Exception {
-        String startMinicapCmd = String.format(START_MINICAP_CMD, androidDevice.getResolution(), virtualResolution, orientation);
-
         CountDownLatch countDownLatch = new CountDownLatch(1);
         // 启动minicap会阻塞线程，启一个线程运行minicap
         new Thread(() -> {
             try {
+                String startMinicapCmd = String.format(START_MINICAP_CMD, androidDevice.getResolution(), virtualResolution, orientation);
                 log.info("[{}][minicap]启动：{}", deviceId, startMinicapCmd);
                 androidDevice.getIDevice().executeShellCommand(startMinicapCmd, new MultiLineReceiver() {
                     @Override
