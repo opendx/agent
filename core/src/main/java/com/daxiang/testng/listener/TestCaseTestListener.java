@@ -5,6 +5,7 @@ import com.daxiang.android.AndroidDevice;
 import com.daxiang.android.AndroidDeviceHolder;
 import com.daxiang.api.MasterApi;
 import com.daxiang.model.Device;
+import com.daxiang.model.action.Step;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.model.devicetesttask.Testcase;
 import com.daxiang.service.AndroidService;
@@ -22,6 +23,7 @@ import org.testng.TestListenerAdapter;
 import javax.imageio.ImageIO;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
@@ -233,7 +235,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         if (!TL_NEED_RECORD_VIDEO.get()) {
             return null;
         }
-        //停止录制视频,imgQueue.take()捕获到InterruptedException跳出循环
+        // 停止录制视频,imgQueue.take()捕获到InterruptedException跳出循环
         TL_RECORD_VIDEO_THREAD.get().interrupt();
         try {
             return TL_RECORD_VIDEO_FUTURE_TASK.get().get();
@@ -241,5 +243,30 @@ public class TestCaseTestListener extends TestListenerAdapter {
             log.error("[{}][自动化测试]用例：{}，获取视频下载地址失败", TL_ANDROID_DEVICE.get().getId(), TL_TEST_CASE_ID.get(), e);
             return null;
         }
+    }
+
+    /**
+     * 提供给actions.ftl调用，记录用例步骤的执行开始/结束时间
+     */
+    public static void recordTestCaseStepTime(Integer actionId, String startOrEnd, Integer stepNumber) {
+        Integer testcaseId = TL_TEST_CASE_ID.get();
+        // 只记录当前正在执行的测试用例里的步骤
+        if (actionId != testcaseId) {
+            return;
+        }
+
+        Step step = new Step();
+        if ("start".equals(startOrEnd)) {
+            step.setStartTime(new Date());
+        } else if ("end".equals(startOrEnd)) {
+            step.setEndTime(new Date());
+        }
+        step.setNumber(stepNumber);
+
+        Testcase testcase = new Testcase();
+        testcase.setId(testcaseId);
+        testcase.setSteps(Arrays.asList(step));
+
+        MasterApi.getInstance().updateTestcase(TL_DEVICE_TEST_TASK_ID.get(), testcase);
     }
 }

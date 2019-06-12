@@ -1,6 +1,7 @@
 import macaca.client.MacacaClient;
 import com.daxiang.actions.utils.MacacaUtil;
 import org.testng.annotations.*;
+import com.daxiang.testng.listener.TestCaseTestListener;
 
 public class ${className} {
 
