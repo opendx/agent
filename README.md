@@ -1,23 +1,16 @@
 ## 环境
-* nodejs
-* ANDROID_HOME
-* adb
-* java1.8
+* nodejs （非必须。若要使用adb connect连接android手机，需要安装nodejs，并配置到环境变量）
+* adb （必须。必须配置ANDROID_HOME，且adb需要添加到环境变量）
+* java8 （必须）
 
-## 打包
-mvn clean install
+## ide运行
+运行core/src/main/java/com/daxiang/Application.java main方法即可
 
-## 运行
-1. 将 core/target下的lib目录,core-1.0-SNAPSHOT.jar，以及项目根目录下的vendor放在同一个目录下
-2. java -jar core-1.0-SNAPSHOT.jar --master=http://xxx.xxx.xx.xx:xxxx
+## 非ide打包运行
+  * 打包 mvn clean install
+  * core/target目录下lib目录与core-{version}.jar，以及agent根目录下的vendor放在同一个目录下
+  * 运行 java -jar core-{version}.jar --master=http://{master_ip:master_port}
+  > 示例：java -jar core-0.9.0.jar --master=http://192.168.1.2:8887
 
-## chromedriver
-chromedrivers http://npm.taobao.org/mirrors/chromedriver/
-
-## 注意
-jdk1.8.0_144\lib\tools.jar需要在classpath下，否则动态编译生成的测试代码会报错
-
-
-## todo
-* iOS支持
-* web支持
+## 备用chromedriver
+http://npm.taobao.org/mirrors/chromedriver/
