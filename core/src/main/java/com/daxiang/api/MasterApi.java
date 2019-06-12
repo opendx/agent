@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -63,8 +65,11 @@ public class MasterApi {
     public Device getDeviceById(String deviceId) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("id", deviceId);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity(params, headers);
 
-        Response<List<Device>> response = restTemplate.exchange(deviceListApi, HttpMethod.POST, new HttpEntity(params), new ParameterizedTypeReference<Response<List<Device>>>() {}).getBody();
+        Response<List<Device>> response = restTemplate.exchange(deviceListApi, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<Response<List<Device>>>() {}).getBody();
         if (response.isSuccess()) {
             return response.getData().stream().findFirst().orElse(null);
         } else {
@@ -87,7 +92,6 @@ public class MasterApi {
     /**
      * 上传文件
      *
-     * @param
      * @return 下载地址
      */
     public String uploadFile(File file) {
