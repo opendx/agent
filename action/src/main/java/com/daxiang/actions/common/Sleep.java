@@ -7,10 +7,9 @@ public class Sleep {
 
     /**
      * 休眠
-     * @param params
      */
-    public void excute(String params) throws InterruptedException {
-        long ms = Long.parseLong(params);
-        Thread.sleep(ms);
+    public void excute(Object second) throws InterruptedException {
+        long sleepTime = Integer.parseInt((String) second) * 1000;
+        Thread.sleep(sleepTime);
     }
 }

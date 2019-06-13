@@ -7,87 +7,74 @@ import java.io.IOException;
  */
 public class AndroidUtil {
 
-    public static final String DEVICE_FILE_PATH = "/data/local/tmp";
+    public static final String TMP_FOLDER = "/data/local/tmp/";
+
     /**
-     * 执行命令
-     * @param cmd
+     * 执行adb shell命令
      */
-    public static void excuteCmd(String deviceId,String cmd) throws IOException {
-        System.out.println("["+deviceId+"]执行 -> "+cmd);
-        String result = ShellExecutor.execReturnResult("adb -s " + deviceId + " shell \"" + cmd + "\"");
-        System.out.println("["+deviceId+"]返回 <- "+result);
+    public static String excuteAdbShellCmd(String deviceId, String cmd) throws IOException {
+        String adbShellCmd = "adb -s " + deviceId + " shell \"" + cmd + "\"";
+        System.out.println("[" + deviceId + "]执行 -> " + adbShellCmd);
+        String result = ShellExecutor.execReturnResult(adbShellCmd);
+        System.out.println("[" + deviceId + "]返回 <- " + result);
+        return result;
     }
 
     /**
-     * push APK到手机
+     * push apk to device
+     *
      * @param deviceId
-     * @param localAppPath
+     * @param localApkPath
+     * @return 手机apk位置
+     * @throws IOException
      */
-    public static String pushAppToDeviceByAdbShell(String deviceId,String localAppPath) throws IOException {
-        String remoteApkPath = DEVICE_FILE_PATH+"/autoTest.apk";
-        String cmd = "adb -s " + deviceId + " push "+localAppPath+" "+remoteApkPath;
-        System.out.println("["+deviceId+"]push APP到手机:"+cmd);
+    public static String pushApkToDevice(String deviceId, String localApkPath) throws IOException {
+        String remoteApkPath = TMP_FOLDER + "autoTest.apk";
+        String cmd = "adb -s " + deviceId + " push " + localApkPath + " " + remoteApkPath;
+        System.out.println("[" + deviceId + "]push apk to device: " + cmd);
         ShellExecutor.exec(cmd);
         return remoteApkPath;
     }
 
     /**
-     * 安装Android APP
-     * @param deviceId
-     * @param phoneAppPath
+     * 安装apk
      */
-    public static void installAppByAdbShell(String deviceId,String phoneAppPath) throws IOException {
-        String cmd = "pm install -t "+phoneAppPath;
-        System.out.println("["+deviceId+"]安装android app:"+cmd);
-        excuteCmd(deviceId,cmd);
+    public static void installApk(String deviceId, String remoteApkPath) throws IOException {
+        String cmd = "pm install -r " + remoteApkPath;
+        excuteAdbShellCmd(deviceId, cmd);
     }
 
     /**
-     * 重启APP
-     * @param deviceId
-     * @param packageName
-     * @param launchActivity
+     * 重启apk
      */
-    public static void restartAppByAdbShell(String deviceId,String packageName,String launchActivity) throws IOException {
-        String cmd = "am start -S -n "+packageName+"/"+launchActivity;
-        System.out.println("["+deviceId+"]重启APP:"+cmd);
-        excuteCmd(deviceId,cmd);
+    public static void restartApk(String deviceId, String packageName, String launchActivity) throws IOException {
+        String cmd = "am start -S -n " + packageName + "/" + launchActivity;
+        excuteAdbShellCmd(deviceId, cmd);
     }
 
     /**
-     * 清除APP数据
-     * @param deviceId
-     * @param packageName
-     * @throws Exception
+     * 清除apk数据
      */
-    public static void clearAppData(String deviceId,String packageName) throws IOException {
-        String cmd = "pm clear "+packageName;
-        System.out.println("["+deviceId+"]清除APP数据:"+cmd);
-        excuteCmd(deviceId,cmd);
+    public static void clearApkData(String deviceId, String packageName) throws IOException {
+        String cmd = "pm clear " + packageName;
+        excuteAdbShellCmd(deviceId, cmd);
     }
 
     /**
-     * 卸载Android APP
-     * @param deviceId
-     * @param appPackage
+     * 卸载apk
      */
-    public static void uninstallAppByAdbShell(String deviceId,String appPackage) throws IOException {
-        String cmd = "adb -s "+deviceId + " uninstall "+appPackage;
-        System.out.println("["+deviceId+"]卸载android app:"+cmd);
+    public static void uninstallApk(String deviceId, String packageName) throws IOException {
+        String cmd = "adb -s " + deviceId + " uninstall " + packageName;
+        System.out.println("[" + deviceId + "]uninstallApk: " + cmd);
         ShellExecutor.exec(cmd);
     }
 
     /**
-     * 检查安卓手机是否安装了APP
-     * @param deviceId
-     * @param appPackage
-     * @return
+     * 检查是否已安装apk
      */
-    public static boolean isInstalledApp(String deviceId,String appPackage) throws IOException {
-        String cmd = "adb -s " + deviceId + " shell \"pm list packages|grep " + appPackage + "\"";
-        System.out.println("[" + deviceId + "]检查是否安装了APP:" + cmd);
-        String result = ShellExecutor.execReturnResult(cmd);
-        System.out.println("[" + deviceId + "]"+result);
-        return result != null && result.contains(appPackage);
+    public static boolean checkApkInstalled(String deviceId, String packageName) throws IOException {
+        String cmd = "pm list packages|grep " + packageName;
+        String result = excuteAdbShellCmd(deviceId, cmd);
+        return result != null && result.contains(packageName);
     }
 }

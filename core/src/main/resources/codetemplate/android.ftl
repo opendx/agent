@@ -16,7 +16,7 @@ public class ${className} {
 
     @BeforeSuite
     public void beforeSuite() throws Exception {
-        driver = MacacaUtil.createMacacaClient("${deviceId}", ${port?c});
+        driver = MacacaUtil.createDriver("${deviceId}", ${port?c});
     }
 
     <#if beforeClass??>

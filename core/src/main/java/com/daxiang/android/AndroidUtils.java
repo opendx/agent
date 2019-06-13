@@ -19,7 +19,6 @@ public class AndroidUtils {
 
     private static final String CPU_INFO_SHELL = "cat /proc/cpuinfo |grep Hardware";
     private static final String MEM_SIZE_SHELL = "cat /proc/meminfo |grep MemTotal";
-    private static final String IP_SHELL = "ip addr show |grep inet |grep -v inet6 |grep -v \"127.0.0.1\"";
     private static final String RESOLUTION_SHELL = "wm size";
 
     private static Map<String, String> sdkMap = new HashMap();
@@ -126,7 +125,6 @@ public class AndroidUtils {
 
         File file = new File(iDevice.getSerialNumber() + ".png");
         ImageIO.write(image, "png", file);
-
         return file;
     }
 
@@ -187,28 +185,6 @@ public class AndroidUtils {
                 //ignore
             }
         }
-    }
-
-    /**
-     * 检查是否安装了app
-     *
-     * @param iDevice
-     * @param packageName 包名
-     * @return
-     */
-    public static boolean hasInstalledApp(IDevice iDevice, String packageName) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
-        return !StringUtils.isEmpty(executeShellCommand(iDevice, "pm list packages|grep " + packageName));
-    }
-
-    /**
-     * 检查APP是否在运行
-     *
-     * @param iDevice
-     * @param packageName
-     * @return
-     */
-    public static boolean isAppRunning(IDevice iDevice, String packageName) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
-        return !StringUtils.isEmpty(executeShellCommand(iDevice, "ps |grep " + packageName));
     }
 
     /**

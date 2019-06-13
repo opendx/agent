@@ -8,13 +8,13 @@ import macaca.client.MacacaClient;
  */
 public class PressBack {
 
-    private MacacaClient macacaClient;
+    private MacacaClient driver;
 
-    public PressBack(MacacaClient macacaClient) {
-        this.macacaClient = macacaClient;
+    public PressBack(MacacaClient driver) {
+        this.driver = driver;
     }
 
     public void excute() throws Exception {
-        macacaClient.keys("4");
+        driver.keys("4");
     }
 }

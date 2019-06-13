@@ -2,27 +2,29 @@ package com.daxiang.actions.macaca;
 
 import com.daxiang.actions.utils.MacacaUtil;
 import macaca.client.MacacaClient;
+import macaca.client.commands.Element;
 
 /**
  * Created by jiangyitao.
  */
 public class WaitForElement {
 
-    private MacacaClient macacaClient;
+    private MacacaClient driver;
 
-    public WaitForElement(MacacaClient macacaClient) {
-        this.macacaClient = macacaClient;
+    public WaitForElement(MacacaClient driver) {
+        this.driver = driver;
     }
 
-    public void excute(String findBy,String value,String timeoutSecond) throws Exception {
-        int timeOut;
-        try{
-            timeOut = (Integer.parseInt(timeoutSecond))*1000;
-        }catch (Exception e){
-            timeOut = 1;
-        }
-        MacacaUtil.waitForElement(macacaClient,findBy,value,timeOut);
-    }
+    /**
+     * 等待元素出现
+     */
+    public Object excute(Object findBy, Object value, Object timeoutSecond) throws Exception {
+        String _findBy = (String) findBy;
+        String _value = (String) value;
+        long timeout = Integer.parseInt((String) timeoutSecond) * 1000;
 
+        Element element = MacacaUtil.waitForElement(driver, _findBy, _value, timeout);
+        return element;
+    }
 }
 

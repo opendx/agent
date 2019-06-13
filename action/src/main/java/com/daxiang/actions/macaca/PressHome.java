@@ -8,13 +8,13 @@ import macaca.client.MacacaClient;
  */
 public class PressHome {
 
-    private MacacaClient macacaClient;
+    private MacacaClient driver;
 
-    public PressHome(MacacaClient macacaClient) {
-        this.macacaClient = macacaClient;
+    public PressHome(MacacaClient driver) {
+        this.driver = driver;
     }
 
     public void excute() throws Exception {
-        macacaClient.keys("3");
+        driver.keys("3");
     }
 }

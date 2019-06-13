@@ -11,14 +11,22 @@ import macaca.client.commands.Element;
  */
 public class SendKeys {
 
-    private MacacaClient macacaClient;
+    private MacacaClient driver;
 
-    public SendKeys(MacacaClient macacaClient) {
-        this.macacaClient = macacaClient;
+    public SendKeys(MacacaClient driver) {
+        this.driver = driver;
     }
 
-    public void excute(String findBy,String value,String content) throws Exception {
-        Element element = MacacaUtil.waitForElement(macacaClient, findBy, value, ImplicitlyWait.DEFAULT_WAIT_TIME_MS);
-        element.sendKeys(content);
+    /**
+     * 输入
+     */
+    public Object excute(Object findBy, Object value, Object content) throws Exception {
+        String _findBy = (String) findBy;
+        String _value = (String) value;
+        String _content = (String) content;
+
+        Element element = MacacaUtil.waitForElement(driver, _findBy, _value, ImplicitlyWait.DEFAULT_MILLISECOND);
+        element.sendKeys(_content);
+        return element;
     }
 }

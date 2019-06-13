@@ -8,34 +8,29 @@ import macaca.client.MacacaClient;
  */
 public class CheckToast {
 
-    private MacacaClient macacaClient;
+    private MacacaClient driver;
 
-    public CheckToast(MacacaClient macacaClient) {
-        this.macacaClient = macacaClient;
+    public CheckToast(MacacaClient driver) {
+        this.driver = driver;
     }
 
     /**
      * 检查toast
-     * @param toast
-     * @param timeoutSecond
      */
-    public void excute(String toast,String timeoutSecond) {
-
-        int timeout_second = (Integer.parseInt(timeoutSecond))*1000;
+    public void excute(Object toast, Object checkTimeOfSecond) {
+        long checkTimeOfMs = Integer.parseInt((String) checkTimeOfSecond) * 1000;
+        String _toast = (String) toast;
 
         long startTime = System.currentTimeMillis();
-        while(true){
-            if(System.currentTimeMillis() - startTime > timeout_second){
-                throw new RuntimeException("超时未检测到toast:"+toast);
+        while (true) {
+            if (System.currentTimeMillis() - startTime > checkTimeOfMs) {
+                throw new RuntimeException("超时未检测到toast: " + toast);
             }
             try {
-                String acturalToast = macacaClient.getToast();
-                if(toast.equals(acturalToast)){
-                    //检测到toast一致
+                if (_toast.equals(driver.getToast())) {
                     return;
                 }
             } catch (Exception e) {
-                //ignore
             }
         }
     }
