@@ -13,7 +13,7 @@ import java.util.Arrays;
 @Slf4j
 public class JavaCompiler {
 
-    public static Class compile(String className, String code) throws ClassNotFoundException {
+    public static Class compile(String className, String code) throws ClassNotFoundException, JavaCompileException {
         javax.tools.JavaCompiler systemJavaCompiler = ToolProvider.getSystemJavaCompiler();
         JavaFileManager javaFileManager = new ClassFileManager(systemJavaCompiler.getStandardFileManager(null, null, null));
         SimpleJavaFileObject simpleJavaFileObject = new JavaCode(className, code);
@@ -25,7 +25,8 @@ public class JavaCompiler {
         log.info("[java编译]编译{}完成，编译是否成功：{}，耗时：{} ms", className, compileSuccess, System.currentTimeMillis() - start);
 
         if (!compileSuccess) {
-            throw new RuntimeException("编译失败，请检查action是否符合规范");
+            // todo 失败原因
+            throw new JavaCompileException("编译失败");
         }
 
         ClassLoader classLoader = javaFileManager.getClassLoader(null);
