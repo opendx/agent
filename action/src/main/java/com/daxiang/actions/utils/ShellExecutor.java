@@ -10,7 +10,6 @@ import java.io.IOException;
  */
 public class ShellExecutor {
 
-
     /**
      * 执行命令
      *
@@ -29,23 +28,31 @@ public class ShellExecutor {
      * @throws IOException
      */
     public static String execReturnResult(String cmd) throws IOException {
-
         CommandLine commandLine = CommandLine.parse(cmd);
         DefaultExecutor executor = new DefaultExecutor();
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
-        PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(outputStream, errorStream);
-
-        executor.setStreamHandler(pumpStreamHandler);
-        try {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+             ByteArrayOutputStream errorStream = new ByteArrayOutputStream()) {
+            PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(outputStream, errorStream);
+            executor.setStreamHandler(pumpStreamHandler);
             executor.execute(commandLine);
-            String resp = outputStream.toString() + errorStream.toString();
-            return resp;
-        } finally {
-            outputStream.close();
-            errorStream.close();
+            return outputStream.toString() + errorStream.toString();
         }
+    }
 
+    /**
+     * 执行命令 返回watchdog watchdog可杀掉执行的进程
+     *
+     * @param cmd
+     * @return
+     * @throws IOException
+     */
+    public static ExecuteWatchdog execReturnWatchdog(String cmd) throws IOException {
+        CommandLine commandLine = CommandLine.parse(cmd);
+        ExecuteWatchdog watchdog = new ExecuteWatchdog(Integer.MAX_VALUE);
+        DefaultExecutor executor = new DefaultExecutor();
+        executor.setWatchdog(watchdog);
+        executor.execute(commandLine, new DefaultExecuteResultHandler());
+        return watchdog;
     }
 }
