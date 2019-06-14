@@ -3,16 +3,16 @@ package com.daxiang.utils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.net.*;
+import java.util.Enumeration;
 
 /**
  * Created by jiangyitao.
  */
 @Slf4j
 public class NetUtil {
+
+    private static String ip = null;
 
     /**
      * 检测本地端口是否可用
@@ -41,7 +41,22 @@ public class NetUtil {
      *
      * @return
      */
-    public static String getLocalHostAddress() throws UnknownHostException {
-        return InetAddress.getLocalHost().getHostAddress().toString();
+    public static String getIp() throws SocketException {
+        if(ip != null) {
+            return ip;
+        }
+        Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+        while (networkInterfaces.hasMoreElements()) {
+            NetworkInterface networkInterface = networkInterfaces.nextElement();
+            Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+            while (inetAddresses.hasMoreElements()) {
+                InetAddress inetAddress = inetAddresses.nextElement();
+                if (!inetAddress.isLinkLocalAddress() && !inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
+                    ip = inetAddress.getHostAddress();
+                    return ip;
+                }
+            }
+        }
+        return ip;
     }
 }

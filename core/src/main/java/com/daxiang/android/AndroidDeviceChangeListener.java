@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.net.UnknownHostException;
+import java.net.SocketException;
 import java.util.Date;
 
 /**
@@ -85,8 +85,8 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
 
         Device device = androidDevice.getDevice();
         try {
-            device.setAgentIp(NetUtil.getLocalHostAddress());
-        } catch (UnknownHostException e) {
+            device.setAgentIp(NetUtil.getIp());
+        } catch (SocketException e) {
             throw new RuntimeException("获取agent ip失败", e);
         }
         device.setAgentPort(Integer.parseInt(App.getProperty("server.port")));
