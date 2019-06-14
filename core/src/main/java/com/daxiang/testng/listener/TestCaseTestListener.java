@@ -251,7 +251,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
     public static void recordTestCaseStepTime(Integer actionId, String startOrEnd, Integer stepNumber) {
         Integer testcaseId = TL_TEST_CASE_ID.get();
         // 只记录当前正在执行的测试用例里的步骤
-        if (actionId != testcaseId) {
+        if (!actionId.equals(testcaseId)) {
             return;
         }
 
