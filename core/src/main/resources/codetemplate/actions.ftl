@@ -12,7 +12,7 @@
             <#lt>void <#rt>
         </#if>
         <#-- 方法名 -->
-        <#lt>${methodPrefix}${action.id}<#rt>
+        <#lt>${methodPrefix}${action.id?c}<#rt>
         <#lt>(<#rt>
         <#-- 方法参数 -->
         <#if action.params?? && (action.params?size>0)>
@@ -48,11 +48,11 @@
             <#if action.steps?? && (action.steps?size>0)>
                 <#list action.steps as step>
                     <#-- 步骤注释 -->
-                    <#lt>        // ${step.number}.<#if step.name?? && step.name!=''>${step.name}</#if>
+                    <#lt>        // ${step.number?c}.<#if step.name?? && step.name!=''>${step.name}</#if>
                     <#-- (设备任务id && 测试用例)记录步骤的执行开始时间 -->
-                    <#lt>        <#if deviceTestTaskId?? && action.type==3>TestCaseTestListener.recordTestCaseStepTime(${action.id}, "start", ${step.number});</#if>
+                    <#lt>        <#if deviceTestTaskId?? && action.type==3>TestCaseTestListener.recordTestCaseStepTime(${action.id?c}, "start", ${step.number});</#if>
                     <#-- 步骤赋值，方法调用 -->
-                    <#lt>        <#if step.evaluation?? && step.evaluation!=''>${step.evaluation} = </#if>${methodPrefix}${step.actionId}(<#rt>
+                    <#lt>        <#if step.evaluation?? && step.evaluation!=''>${step.evaluation} = </#if>${methodPrefix}${step.actionId?c}(<#rt>
                     <#if step.paramValues?? && (step.paramValues?size>0)>
                         <#list step.paramValues as paramValue>
                             <#lt>${paramValue.paramValue}<#rt>
@@ -62,7 +62,7 @@
                         </#list>
                     </#if><#lt>);
                     <#-- (设备任务id && 测试用例)记录步骤的执行结束时间 -->
-                    <#lt>        <#if deviceTestTaskId?? && action.type==3>TestCaseTestListener.recordTestCaseStepTime(${action.id}, "end", ${step.number});</#if>
+                    <#lt>        <#if deviceTestTaskId?? && action.type==3>TestCaseTestListener.recordTestCaseStepTime(${action.id?c}, "end", ${step.number?c});</#if>
                 </#list>
             </#if>
             <#-- 方法返回值 -->
