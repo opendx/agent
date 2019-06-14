@@ -1,7 +1,6 @@
 package com.daxiang.android;
 
 import com.android.ddmlib.*;
-import com.daxiang.App;
 import com.daxiang.android.stf.AdbKit;
 import com.daxiang.android.stf.Minicap;
 import com.daxiang.android.stf.MinicapInstaller;
@@ -12,14 +11,13 @@ import com.daxiang.android.uiautomator.Uiautomator2ServerApkInstaller;
 import com.daxiang.api.MasterApi;
 import com.daxiang.model.Device;
 import com.daxiang.model.Platform;
-import com.daxiang.utils.NetUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.net.SocketException;
 import java.util.Date;
 
 /**
@@ -31,6 +29,10 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
 
     @Autowired
     private MasterApi masterApi;
+    @Value("${server.address}")
+    private String ip;
+    @Value("${server.port}")
+    private Integer port;
 
     @Override
     public void deviceConnected(IDevice device) {
@@ -84,12 +86,8 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         }
 
         Device device = androidDevice.getDevice();
-        try {
-            device.setAgentIp(NetUtil.getIp());
-        } catch (SocketException e) {
-            throw new RuntimeException("获取agent ip失败", e);
-        }
-        device.setAgentPort(Integer.parseInt(App.getProperty("server.port")));
+        device.setAgentIp(ip);
+        device.setAgentPort(port);
         device.setStatus(Device.IDLE_STATUS);
         device.setLastOnlineTime(new Date());
 

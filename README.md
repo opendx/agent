@@ -9,8 +9,8 @@
 ## 非ide打包运行
   * 打包 mvn clean install
   * core/target目录下lib目录与core-{version}.jar，以及agent根目录下的vendor放在同一个目录下
-  * 运行 java -jar core-{version}.jar --master=http://{master_ip:master_port}
-  > 示例：java -jar core-0.9.0.jar --master=http://192.168.1.2:8887
+  * 运行 java -jar core-{version}.jar --server.address={server_address} --master=http://{master_ip:master_port}
+  > 示例：java -jar core-0.9.0.jar --server.address=192.168.1.8 --master=http://192.168.1.2:8887
 
 ## 备用chromedriver
 http://npm.taobao.org/mirrors/chromedriver/
