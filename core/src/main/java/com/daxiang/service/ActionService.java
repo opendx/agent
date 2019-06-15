@@ -44,7 +44,7 @@ public class ActionService {
             }
         } catch (Exception e) {
             log.error("调试出错", e);
-            return Response.fail("调试出错：" + e.getMessage());
+            return Response.fail(e.getMessage());
         }
     }
 }
