@@ -1,6 +1,7 @@
 ## 环境
 * nodejs （非必须。若要使用adb connect连接android手机，需要安装nodejs，并配置到环境变量）
 * adb （必须。必须配置ANDROID_HOME，且adb需要添加到环境变量）
+* aapt （非必须。若要dump apk信息获取packageName、启动activity等信息，需要将aapt(sdk/build-tools/{version})添加到环境变量）
 * java8 （必须）
 
 ## ide运行
