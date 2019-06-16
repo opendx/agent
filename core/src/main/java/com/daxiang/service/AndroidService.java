@@ -2,6 +2,7 @@ package com.daxiang.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.daxiang.actions.utils.AndroidUtil;
 import com.daxiang.android.AndroidDevice;
 import com.daxiang.android.AndroidDeviceHolder;
 import com.daxiang.android.AndroidUtils;
@@ -166,6 +167,25 @@ public class AndroidService {
             return masterApi.uploadFile(screenshotFile);
         } finally {
             FileUtils.deleteQuietly(screenshotFile);
+        }
+    }
+
+    public Response aaptDumpBadging(String apkDownloadUrl) {
+        if (StringUtils.isEmpty(apkDownloadUrl)) {
+            return Response.fail("apk下载地址不能为空");
+        }
+
+        byte[] apkByte = restTemplate.getForObject(apkDownloadUrl, byte[].class);
+        File apk = new File(UUIDUtil.getUUID() + ".apk");
+        try {
+            FileUtils.writeByteArrayToFile(apk, apkByte, false);
+            String result = AndroidUtil.aaptDumpBadging(apk.getAbsolutePath());
+            return Response.success("ok", result);
+        } catch (IOException e) {
+            log.error("io error", e);
+            return Response.fail(e.getMessage());
+        } finally {
+            FileUtils.deleteQuietly(apk);
         }
     }
 }

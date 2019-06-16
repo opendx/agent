@@ -77,4 +77,13 @@ public class AndroidUtil {
         String result = excuteAdbShellCmd(deviceId, cmd);
         return result != null && result.contains(packageName);
     }
+
+    /**
+     *  aapt dump badging
+     */
+    public static String aaptDumpBadging(String apkPath) throws IOException {
+        String cmd = "aapt dump badging " + apkPath;
+        System.out.println(cmd);
+        return ShellExecutor.execReturnResult(cmd);
+    }
 }

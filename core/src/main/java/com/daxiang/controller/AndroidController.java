@@ -82,4 +82,14 @@ public class AndroidController {
     public Response installApk(MultipartFile apk, @PathVariable String deviceId) {
         return androidService.installApk(apk, deviceId);
     }
+
+    /**
+     * aaptDumpBadging
+     * @param apkDownloadUrl
+     * @return
+     */
+    @PostMapping("/aaptDumpBadging")
+    public Response aaptDumpBadging(@RequestBody String apkDownloadUrl) {
+        return androidService.aaptDumpBadging(apkDownloadUrl);
+    }
 }
