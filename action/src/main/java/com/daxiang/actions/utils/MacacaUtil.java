@@ -34,7 +34,7 @@ public class MacacaUtil {
         long startTime = System.currentTimeMillis();
         while (true) {
             if (System.currentTimeMillis() - startTime > timeoutOfMillisecond) {
-                throw new RuntimeException("【 " + findBy + " ->" + value + " 】" + "元素不存在");
+                throw new RuntimeException("【 " + findBy + " -> " + value + " 】" + "元素不存在");
             }
             try {
                 Element element = driver.element(value, findBy);
