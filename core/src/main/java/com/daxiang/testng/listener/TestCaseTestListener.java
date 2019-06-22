@@ -194,7 +194,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
     public void onTestFailure(ITestResult tr) {
         AndroidDevice androidDevice = TL_ANDROID_DEVICE.get();
         Integer testcaseId = TL_TEST_CASE_ID.get();
-        log.info("[{}][自动化测试]onTestFailure: {}", androidDevice.getId(), testcaseId);
+        log.info("[{}][自动化测试]onTestFailure: {}", androidDevice.getId(), testcaseId, tr.getThrowable());
 
         Testcase testcase = new Testcase();
         testcase.setId(testcaseId);
@@ -210,7 +210,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
     public void onTestSkipped(ITestResult tr) {
         AndroidDevice androidDevice = TL_ANDROID_DEVICE.get();
         Integer testcaseId = TL_TEST_CASE_ID.get();
-        log.info("[{}][自动化测试]onTestSkipped: {}", androidDevice.getId(), testcaseId);
+        log.info("[{}][自动化测试]onTestSkipped: {}", androidDevice.getId(), testcaseId, tr.getThrowable());
 
         Testcase testcase = new Testcase();
         testcase.setId(testcaseId);
@@ -235,9 +235,9 @@ public class TestCaseTestListener extends TestListenerAdapter {
         if (!TL_NEED_RECORD_VIDEO.get()) {
             return null;
         }
-        // 停止录制视频,imgQueue.take()捕获到InterruptedException跳出循环
-        TL_RECORD_VIDEO_THREAD.get().interrupt();
         try {
+            // 停止录制视频,imgQueue.take()捕获到InterruptedException跳出循环
+            TL_RECORD_VIDEO_THREAD.get().interrupt();
             return TL_RECORD_VIDEO_FUTURE_TASK.get().get();
         } catch (Exception e) {
             log.error("[{}][自动化测试]用例：{}，获取视频下载地址失败", TL_ANDROID_DEVICE.get().getId(), TL_TEST_CASE_ID.get(), e);
