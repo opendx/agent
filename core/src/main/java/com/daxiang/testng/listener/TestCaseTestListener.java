@@ -150,6 +150,16 @@ public class TestCaseTestListener extends TestListenerAdapter {
                         try {
                             imgData = imgQueue.take();
                         } catch (InterruptedException e) {
+                            log.info("[{}][自动化测试]testcaseId: {}，flush剩余的minicap数据", deviceId, testcaseId);
+                            while (true) {
+                                byte[] surplusImgData = imgQueue.poll();
+                                if (surplusImgData == null) {
+                                    break;
+                                }
+                                try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(surplusImgData)) {
+                                    videoRecorder.record(Java2DFrameUtils.toFrame(ImageIO.read(byteArrayInputStream)));
+                                }
+                            }
                             log.info("[{}][自动化测试]testcaseId: {}，停止获取minicap数据", deviceId, testcaseId);
                             break;
                         }
