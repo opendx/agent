@@ -1,6 +1,6 @@
 package com.daxiang.service;
 
-import com.daxiang.javacompile.InMemoryJavaCompiler;
+import com.daxiang.javacompile.JavaCompiler;
 import com.daxiang.testng.TestNGRunner;
 import com.daxiang.model.Response;
 import com.daxiang.model.request.ActionDebugRequest;
@@ -35,7 +35,7 @@ public class ActionService {
                 return Response.fail("转换testng代码失败");
             }
 
-            Class clazz = InMemoryJavaCompiler.compile(className, code);
+            Class clazz = JavaCompiler.compile(className, code);
             String failMsg = TestNGRunner.debugAction(clazz);
             if (StringUtils.isEmpty(failMsg)) {
                 return Response.success("执行成功");
