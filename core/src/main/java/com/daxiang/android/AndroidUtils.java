@@ -1,6 +1,7 @@
 package com.daxiang.android;
 
 import com.android.ddmlib.*;
+import com.daxiang.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
@@ -123,7 +124,7 @@ public class AndroidUtils {
             }
         }
 
-        File file = new File(iDevice.getSerialNumber() + ".png");
+        File file = new File(UUIDUtil.getUUID() + ".png");
         ImageIO.write(image, "png", file);
         return file;
     }

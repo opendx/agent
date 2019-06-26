@@ -6,7 +6,7 @@ import com.daxiang.android.stf.Minicap;
 import com.daxiang.android.stf.Minitouch;
 import com.daxiang.android.uiautomator.Uiautomator2Server;
 import com.daxiang.api.MasterApi;
-import com.daxiang.javacompile.JavaCompiler;
+import com.daxiang.javacompile.InMemoryJavaCompiler;
 import com.daxiang.model.Device;
 import com.daxiang.model.action.Action;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
@@ -140,7 +140,7 @@ public class AndroidDevice {
                     }).collect(Collectors.toList()), "/codetemplate", "android.ftl");
             log.info("[{}][自动化测试]转换代码：{}", getId(), code);
             // todo 捕获到JavaCompileException即编译失败，通知master纠正用例，否则错误的用例会无限下发给agent执行
-            Class clazz = JavaCompiler.compile(className, code);
+            Class clazz = InMemoryJavaCompiler.compile(className, code);
             TestNGRunner.runTestCases(new Class[]{clazz});
         } finally {
             if (isConnected()) {
