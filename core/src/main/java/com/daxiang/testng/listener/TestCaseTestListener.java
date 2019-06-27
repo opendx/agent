@@ -151,7 +151,12 @@ public class TestCaseTestListener extends TestListenerAdapter {
                             imgData = imgQueue.take();
                         } catch (InterruptedException e) {
                             log.info("[{}][自动化测试]testcaseId: {}，flush剩余的minicap数据", deviceId, testcaseId);
+                            // 最多flush 10秒
+                            long start = System.currentTimeMillis();
                             while (true) {
+                                if (System.currentTimeMillis() - start >= 10000) {
+                                    break;
+                                }
                                 byte[] surplusImgData = imgQueue.poll();
                                 if (surplusImgData == null) {
                                     break;
