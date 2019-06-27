@@ -216,6 +216,12 @@ public class TestCaseTestListener extends TestListenerAdapter {
         MasterApi.getInstance().updateTestcase(TL_DEVICE_TEST_TASK_ID.get(), testcase);
     }
 
+    /**
+     * 当@BeforeClass或@BeforeMethod抛出异常时，所有@Test都不会执行，且所有Test都会先调用onTestStart然后直接调用onTestSkipped，且onTestSkipped tr.getThrowable为null
+     * Test抛出的SkipException，tr.getThrowable不为空，能获取到跳过的原因
+     *
+     * @param tr
+     */
     @Override
     public void onTestSkipped(ITestResult tr) {
         AndroidDevice androidDevice = TL_ANDROID_DEVICE.get();
@@ -227,7 +233,11 @@ public class TestCaseTestListener extends TestListenerAdapter {
         testcase.setEndTime(new Date());
         testcase.setStatus(Testcase.SKIP_STATUS);
         testcase.setFailImgUrl(getScreenshotDownloadUrl());
-        testcase.setFailInfo(tr.getThrowable().getMessage());
+        if (tr.getThrowable() == null) { // @BeforeClass或@BeforeMethod抛出异常导致的case跳过
+            testcase.setFailInfo("@BeforeClass或@BeforeMethod执行失败");
+        } else {
+            testcase.setFailInfo(tr.getThrowable().getMessage());
+        }
         testcase.setVideoUrl(getVideoDownloadUrl());
         MasterApi.getInstance().updateTestcase(TL_DEVICE_TEST_TASK_ID.get(), testcase);
     }
