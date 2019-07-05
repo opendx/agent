@@ -13,9 +13,9 @@ public class AndroidUtil {
      * 执行adb shell命令
      */
     public static String excuteAdbShellCmd(String deviceId, String cmd) throws IOException {
-        String adbShellCmd = "adb -s " + deviceId + " shell \"" + cmd + "\"";
+        String adbShellCmd = "adb -s " + deviceId + " shell " + cmd;
         System.out.println("[" + deviceId + "]执行 -> " + adbShellCmd);
-        String result = ShellExecutor.execReturnResult(adbShellCmd);
+        String result = ShellExecutor.execute(adbShellCmd);
         System.out.println("[" + deviceId + "]返回 <- " + result);
         return result;
     }
@@ -32,7 +32,7 @@ public class AndroidUtil {
         String remoteApkPath = TMP_FOLDER + "autoTest.apk";
         String cmd = "adb -s " + deviceId + " push " + localApkPath + " " + remoteApkPath;
         System.out.println("[" + deviceId + "]push apk to device: " + cmd);
-        ShellExecutor.exec(cmd);
+        ShellExecutor.execute(cmd);
         return remoteApkPath;
     }
 
@@ -66,7 +66,7 @@ public class AndroidUtil {
     public static void uninstallApk(String deviceId, String packageName) throws IOException {
         String cmd = "adb -s " + deviceId + " uninstall " + packageName;
         System.out.println("[" + deviceId + "]uninstallApk: " + cmd);
-        ShellExecutor.exec(cmd);
+        ShellExecutor.execute(cmd);
     }
 
     /**
@@ -79,11 +79,11 @@ public class AndroidUtil {
     }
 
     /**
-     *  aapt dump badging
+     * aapt dump badging
      */
     public static String aaptDumpBadging(String apkPath) throws IOException {
         String cmd = "aapt dump badging " + apkPath;
         System.out.println(cmd);
-        return ShellExecutor.execReturnResult(cmd);
+        return ShellExecutor.execute(cmd);
     }
 }

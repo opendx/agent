@@ -4,33 +4,27 @@ import org.apache.commons.exec.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by jiangyitao.
  */
 public class ShellExecutor {
 
-    /**
-     * 执行命令
-     *
-     * @param cmd
-     * @throws IOException
-     */
-    public static void exec(String cmd) throws IOException {
-        new DefaultExecutor().execute(CommandLine.parse(cmd));
+    public static String execute(String cmd, List<String> args) throws IOException {
+        CommandLine commandLine = new CommandLine(cmd);
+        if (args != null) {
+            args.forEach(arg -> commandLine.addArgument(arg));
+        }
+        return execute(commandLine);
     }
 
-    /**
-     * 执行命令返回执行结果
-     *
-     * @param cmd
-     * @return
-     * @throws IOException
-     */
-    public static String execReturnResult(String cmd) throws IOException {
-        CommandLine commandLine = CommandLine.parse(cmd);
-        DefaultExecutor executor = new DefaultExecutor();
+    public static String execute(String cmd) throws IOException {
+        return execute(CommandLine.parse(cmd));
+    }
 
+    private static String execute(CommandLine commandLine) throws IOException {
+        DefaultExecutor executor = new DefaultExecutor();
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
              ByteArrayOutputStream errorStream = new ByteArrayOutputStream()) {
             PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(outputStream, errorStream);
@@ -41,13 +35,13 @@ public class ShellExecutor {
     }
 
     /**
-     * 执行命令 返回watchdog watchdog可杀掉执行的进程
+     * 执行命令
      *
      * @param cmd
-     * @return
+     * @return watchdog，watchdog可杀掉正在执行的进程
      * @throws IOException
      */
-    public static ExecuteWatchdog execReturnWatchdog(String cmd) throws IOException {
+    public static ExecuteWatchdog excuteCmdAndGetWatchdog(String cmd) throws IOException {
         CommandLine commandLine = CommandLine.parse(cmd);
         ExecuteWatchdog watchdog = new ExecuteWatchdog(Integer.MAX_VALUE);
         DefaultExecutor executor = new DefaultExecutor();

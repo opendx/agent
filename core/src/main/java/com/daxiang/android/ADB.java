@@ -22,20 +22,20 @@ public class ADB {
      */
     public static synchronized void init() {
         if (adb == null) {
-            log.info("开始初始化adb");
+            log.info("[adb]开始初始化adb");
             AndroidDebugBridge.init(false);
             adb = AndroidDebugBridge.createBridge(getPath(), false);
 
-            log.info("等待adb连接");
+            log.info("[adb]等待adb连接");
             long start = System.currentTimeMillis();
             while (System.currentTimeMillis() - start <= 30000) {
                 if (adb.isConnected()) {
-                    log.info("adb已连接");
-                    log.info("adb初始化成功");
+                    log.info("[adb]adb已连接");
+                    log.info("[adb]adb初始化成功");
                     return;
                 }
             }
-            throw new RuntimeException("adb初始化失败");
+            throw new RuntimeException("[adb]adb初始化失败");
         }
     }
 
@@ -46,16 +46,16 @@ public class ADB {
      */
     public static void addDeviceChangeListener(AndroidDebugBridge.IDeviceChangeListener deviceChangeListener) {
         AndroidDebugBridge.addDeviceChangeListener(deviceChangeListener);
-        log.info("AndroidDeviceChangeListener添加完成");
+        log.info("[adb]AndroidDeviceChangeListener添加完成");
     }
 
     /**
      * 杀掉adb服务
      */
     public static void killServer() throws IOException {
-        log.info("开始kill adb-server");
-        ShellExecutor.exec("adb kill-server");
-        log.info("kill adb-server成功");
+        log.info("[adb]开始kill adb-server");
+        ShellExecutor.execute("adb kill-server");
+        log.info("[adb]kill adb-server完成");
     }
 
 
@@ -66,14 +66,14 @@ public class ADB {
      */
     private static String getPath() {
         String androidHome = System.getenv("ANDROID_HOME");
-        log.info("环境变量ANDROID_HOME: {}", androidHome);
+        log.info("[adb]环境变量ANDROID_HOME: {}", androidHome);
 
         if (StringUtils.isEmpty(androidHome)) {
             throw new RuntimeException("未获取到ANDROID_HOME，请配置ANDOIRD_HOME环境变量");
         }
 
         String adbPath = androidHome + File.separator + ADB_PLATFORM_TOOLS + File.separator + "adb";
-        log.info("adb路径: {}", adbPath);
+        log.info("[adb]adb路径: {}", adbPath);
         return adbPath;
     }
 }
