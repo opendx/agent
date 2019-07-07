@@ -53,9 +53,19 @@ public class ADB {
      * 杀掉adb服务
      */
     public static void killServer() throws IOException {
-        log.info("[adb]开始kill adb-server");
+        log.info("[adb]adb kill-server");
         ShellExecutor.execute("adb kill-server");
-        log.info("[adb]kill adb-server完成");
+        log.info("[adb]adb kill-server完成");
+    }
+
+    /**
+     * 启动adb服务
+     * @throws IOException
+     */
+    public static void startServer() throws IOException {
+        log.info("[adb]adb start-server");
+        ShellExecutor.execute("adb start-server");
+        log.info("[adb]adb start-server完成");
     }
 
 

@@ -20,7 +20,7 @@ public class AndroidInitializer implements ApplicationRunner {
     public void run(ApplicationArguments args) throws IOException {
         // agent每次启动都先kill adb server
         ADB.killServer();
-        // 初始化adb
+        ADB.startServer();
         ADB.init();
         // 添加设备监听器，监听设备连接、断开
         ADB.addDeviceChangeListener(deviceChangeListener);
