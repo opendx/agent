@@ -17,14 +17,14 @@ public class CheckToast {
     /**
      * 检查toast
      */
-    public void excute(Object toast, Object checkTimeOfSecond) {
+    public void excute(Object toast, Object checkTimeOfSecond) throws Exception {
         long checkTimeOfMs = Integer.parseInt((String) checkTimeOfSecond) * 1000;
         String _toast = (String) toast;
 
         long startTime = System.currentTimeMillis();
         while (true) {
             if (System.currentTimeMillis() - startTime > checkTimeOfMs) {
-                throw new RuntimeException("超时未检测到toast: " + toast);
+                throw new RuntimeException("超时未检测到toast: " + toast + "，driver获取到的toast：" + driver.getToast());
             }
             try {
                 if (_toast.equals(driver.getToast())) {
