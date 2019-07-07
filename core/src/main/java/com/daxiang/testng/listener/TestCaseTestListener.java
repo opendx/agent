@@ -209,7 +209,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
     public void onTestFailure(ITestResult tr) {
         AndroidDevice androidDevice = TL_ANDROID_DEVICE.get();
         Integer testcaseId = TL_TEST_CASE_ID.get();
-        log.info("[{}][自动化测试]onTestFailure: {}", androidDevice.getId(), testcaseId, tr.getThrowable());
+        log.error("[{}][自动化测试]onTestFailure: {}", androidDevice.getId(), testcaseId, tr.getThrowable());
 
         Testcase testcase = new Testcase();
         testcase.setId(testcaseId);
@@ -231,7 +231,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
     public void onTestSkipped(ITestResult tr) {
         AndroidDevice androidDevice = TL_ANDROID_DEVICE.get();
         Integer testcaseId = TL_TEST_CASE_ID.get();
-        log.info("[{}][自动化测试]onTestSkipped: {}", androidDevice.getId(), testcaseId, tr.getThrowable());
+        log.warn("[{}][自动化测试]onTestSkipped: {}", androidDevice.getId(), testcaseId, tr.getThrowable());
 
         Testcase testcase = new Testcase();
         testcase.setId(testcaseId);
