@@ -6,9 +6,8 @@ import com.daxiang.android.stf.Minicap;
 import com.daxiang.android.stf.MinicapInstaller;
 import com.daxiang.android.stf.Minitouch;
 import com.daxiang.android.stf.MinitouchInstaller;
-import com.daxiang.android.uiautomator.Uiautomator2Server;
-import com.daxiang.android.uiautomator.Uiautomator2ServerApkInstaller;
 import com.daxiang.api.MasterApi;
+import com.daxiang.appium.AppiumServer;
 import com.daxiang.model.Device;
 import com.daxiang.model.Platform;
 import lombok.extern.slf4j.Slf4j;
@@ -75,10 +74,15 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
                 androidDevice = new AndroidDevice(device, iDevice);
             }
 
+            log.info("[{}]启动appium server...", deviceId);
+            AppiumServer appiumServer = new AppiumServer();
+            appiumServer.start();
+            log.info("[{}]启动appium server完成，url: {}", deviceId, appiumServer.getUrl());
+            androidDevice.setAppiumServer(appiumServer);
+
             androidDevice.setMinicap(new Minicap(androidDevice));
             androidDevice.setMinitouch(new Minitouch(androidDevice));
             androidDevice.setAdbKit(new AdbKit(androidDevice));
-            androidDevice.setUiautomator2Server(new Uiautomator2Server(androidDevice));
 
             AndroidDeviceHolder.add(deviceId, androidDevice);
         } else {
@@ -168,22 +172,22 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
 
         AndroidDevice androidDevice = new AndroidDevice(device, iDevice);
 
-        // 安装minicap minitouch uiautomatorServerApk
+        // 安装minicap minitouch
         try {
-            installMinicapAndMinitouchAndUiAutomatorServerApk(androidDevice);
+            installMinicapAndMinitouch(androidDevice);
         } catch (Exception e) {
-            throw new RuntimeException("安装必要程序到手机出错", e);
+            throw new RuntimeException("安装stf minicap minitouch出错", e);
         }
 
         return androidDevice;
     }
 
     /**
-     * 安装minicap minitouch uiautomatorServerApk
+     * 安装minicap minitouch
      *
      * @param androidDevice
      */
-    private void installMinicapAndMinitouchAndUiAutomatorServerApk(AndroidDevice androidDevice) throws Exception {
+    private void installMinicapAndMinitouch(AndroidDevice androidDevice) throws Exception {
         String deviceId = androidDevice.getId();
         IDevice iDevice = androidDevice.getIDevice();
 
@@ -196,10 +200,5 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         MinitouchInstaller minitouchInstaller = new MinitouchInstaller(iDevice);
         minitouchInstaller.install();
         log.info("[{}]安装minitouch成功", deviceId);
-
-        log.info("[{}]开始安装UiautomatorServerApk", deviceId);
-        Uiautomator2ServerApkInstaller uiautomator2ServerApkInstaller = new Uiautomator2ServerApkInstaller(iDevice);
-        uiautomator2ServerApkInstaller.install();
-        log.info("[{}]安装UiautomatorServerApk成功", deviceId);
     }
 }

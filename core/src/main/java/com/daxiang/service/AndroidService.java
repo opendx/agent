@@ -57,7 +57,9 @@ public class AndroidService {
     public Response startUiautomator2server(String deviceId) {
         AndroidDevice androidDevice = getAndroidDevice(deviceId);
         try {
-            int port = androidDevice.getUiautomator2Server().start();
+            // todo remove
+            int port = 1;
+            // int port = androidDevice.getUiautomator2Server().start();
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("port", port);
             return Response.success(jsonObject);
@@ -70,7 +72,8 @@ public class AndroidService {
     public Response dump(String deviceId) {
         AndroidDevice androidDevice = getAndroidDevice(deviceId);
 
-        int localPort = androidDevice.getUiautomator2Server().getLocalPort();
+        // todo remove
+        int localPort = 1;
         if (localPort <= 0) {
             return Response.fail("未开启Uiautomator2Server");
         }

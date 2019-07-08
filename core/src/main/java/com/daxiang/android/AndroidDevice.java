@@ -4,8 +4,8 @@ import com.android.ddmlib.IDevice;
 import com.daxiang.android.stf.AdbKit;
 import com.daxiang.android.stf.Minicap;
 import com.daxiang.android.stf.Minitouch;
-import com.daxiang.android.uiautomator.Uiautomator2Server;
 import com.daxiang.api.MasterApi;
+import com.daxiang.appium.AppiumServer;
 import com.daxiang.javacompile.JavaCompiler;
 import com.daxiang.model.Device;
 import com.daxiang.model.action.Action;
@@ -13,6 +13,7 @@ import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.testng.TestNGCodeConverter;
 import com.daxiang.testng.TestNGRunner;
 import com.daxiang.utils.UUIDUtil;
+import io.appium.java_client.AppiumDriver;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -44,8 +45,9 @@ public class AndroidDevice {
 
     private Minicap minicap;
     private Minitouch minitouch;
-    private Uiautomator2Server uiautomator2Server;
     private AdbKit adbKit;
+    private AppiumServer appiumServer;
+    private AppiumDriver appiumDriver;
 
     public AndroidDevice(Device device, IDevice iDevice) {
         this.device = device;
@@ -122,7 +124,8 @@ public class AndroidDevice {
         MasterApi.getInstance().saveDevice(device);
 
         try {
-            int port = uiautomator2Server.start();
+            // todo remove
+            int port = 1;
             String className = "Test_" + UUIDUtil.getUUID();
             String code = new TestNGCodeConverter()
                     .setDeviceTestTaskId(deviceTestTask.getId())
