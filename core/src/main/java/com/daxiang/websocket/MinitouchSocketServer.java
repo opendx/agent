@@ -62,7 +62,7 @@ public class MinitouchSocketServer {
         sessionPool.put(deviceId, session);
 
         basicRemote.sendText("启动minitouch服务...");
-        minitouch = new Minitouch(androidDevice);
+        minitouch = androidDevice.getMinitouch();
         minitouch.start();
         basicRemote.sendText("启动minitouch服务完成");
     }

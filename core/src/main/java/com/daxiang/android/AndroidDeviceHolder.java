@@ -20,7 +20,7 @@ public class AndroidDeviceHolder {
         return androidDeviceHolder.get(deviceId);
     }
 
-    public static List<AndroidDevice> getAndroidDevices() {
+    public static List<AndroidDevice> getAll() {
         return new ArrayList<>(androidDeviceHolder.values());
     }
 }

@@ -65,7 +65,7 @@ public class MinicapSocketServer {
         sessionPool.put(deviceId, session);
 
         basicRemote.sendText("启动minicap服务...");
-        minicap = new Minicap(androidDevice);
+        minicap = androidDevice.getMinicap();
         minicap.start(minicap.convertVirtualResolution(Integer.parseInt(App.getProperty("displayWidth"))), 0);
         basicRemote.sendText("启动minicap服务完成");
 

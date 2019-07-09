@@ -13,7 +13,7 @@ import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.testng.TestNGCodeConverter;
 import com.daxiang.testng.TestNGRunner;
 import com.daxiang.utils.UUIDUtil;
-import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.android.AndroidDriver;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -47,7 +47,7 @@ public class AndroidDevice {
     private Minitouch minitouch;
     private AdbKit adbKit;
     private AppiumServer appiumServer;
-    private AppiumDriver appiumDriver;
+    private AndroidDriver androidDriver;
 
     public AndroidDevice(Device device, IDevice iDevice) {
         this.device = device;

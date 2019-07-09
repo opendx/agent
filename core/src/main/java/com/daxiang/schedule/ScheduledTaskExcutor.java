@@ -30,7 +30,7 @@ public class ScheduledTaskExcutor {
     @Scheduled(fixedRate = 10000)
     public void commitDeviceTestTask() {
         // 在线闲置的设备
-        List<String> idleAndroidDeviceIds = AndroidDeviceHolder.getAndroidDevices().stream()
+        List<String> idleAndroidDeviceIds = AndroidDeviceHolder.getAll().stream()
                 .filter(androidDevice -> androidDevice.getDevice().getStatus() == Device.IDLE_STATUS)
                 .map(AndroidDevice::getId)
                 .collect(Collectors.toList());

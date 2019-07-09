@@ -78,8 +78,8 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
             AppiumServer appiumServer = new AppiumServer();
             appiumServer.start();
             log.info("[{}]启动appium server完成，url: {}", deviceId, appiumServer.getUrl());
-            androidDevice.setAppiumServer(appiumServer);
 
+            androidDevice.setAppiumServer(appiumServer);
             androidDevice.setMinicap(new Minicap(androidDevice));
             androidDevice.setMinitouch(new Minitouch(androidDevice));
             androidDevice.setAdbKit(new AdbKit(androidDevice));
