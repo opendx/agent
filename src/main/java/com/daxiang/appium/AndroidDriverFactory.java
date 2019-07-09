@@ -20,7 +20,7 @@ public class AndroidDriverFactory {
     private static final String APP_ACTIVITY = ".Settings";
 
     /**
-     * 一个session，两次命令之间最大允许12小时间隔，超出12小时，session将会appium server被删除
+     * 一个session，两次命令之间最大允许12小时间隔，超出12小时，session将会被appium server删除
      */
     private static final int NEW_COMMAND_TIMEOUT = 60 * 60 * 12;
 
