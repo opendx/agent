@@ -15,6 +15,21 @@
 
     <dependencies>
         <dependency>
+            <groupId>io.appium</groupId>
+            <artifactId>java-client</artifactId>
+            <version>7.0.0</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-collections</artifactId>
+                    <groupId>commons-collections</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>de.codecentric</groupId>
             <artifactId>spring-boot-admin-starter-client</artifactId>
             <version>2.0.0</version>
@@ -127,17 +142,6 @@
             <groupId>org.dvare</groupId>
             <artifactId>dynamic-loader</artifactId>
             <version>2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>io.appium</groupId>
-            <artifactId>java-client</artifactId>
-            <version>7.1.0</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>commons-validator</artifactId>
-                    <groupId>commons-validator</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 

@@ -10,6 +10,9 @@ import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.remote.MobilePlatform;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 /**
  * Created by jiangyitao.
  */
@@ -41,5 +44,26 @@ public class AndroidDriverInitializer implements AppiumDriverInitializer {
         capabilities.setCapability(AndroidMobileCapabilityType.APP_ACTIVITY, APP_ACTIVITY);
         capabilities.setCapability(MobileCapabilityType.NO_RESET, true); // true代表不清除手机数据
         return new AndroidDriver(androidDevice.getAppiumServer().getUrl(), capabilities);
+    }
+
+    public static void main(String[] args) throws MalformedURLException, InterruptedException {
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, 60 * 60); // 60分钟
+        capabilities.setCapability(AndroidMobileCapabilityType.UNICODE_KEYBOARD, true); // 切换到appium输入法
+        capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "123");
+        capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
+        capabilities.setCapability(MobileCapabilityType.UDID, "192.168.67.102:5555");
+        capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.ANDROID_UIAUTOMATOR2);
+        capabilities.setCapability(AndroidMobileCapabilityType.SYSTEM_PORT, PortProvider.getUiautomator2ServerPort());
+
+        // todo 如果手机的chrome版本与appium默认的chromedriver不匹配，导致切换webview出错，可以指定chromeDriver位置
+        // capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, "");
+        capabilities.setCapability(AndroidMobileCapabilityType.APP_PACKAGE, APP_PACKAGE);
+        capabilities.setCapability(AndroidMobileCapabilityType.APP_ACTIVITY, APP_ACTIVITY);
+        capabilities.setCapability("autoLaunch", false);
+        capabilities.setCapability(MobileCapabilityType.NO_RESET, true); // true代表不清除手机数据
+        AndroidDriver androidDriver =  new AndroidDriver(new URL("http://127.0.0.1:4723/wd/hub"), capabilities);
+
+        Thread.sleep(100000);
     }
 }
