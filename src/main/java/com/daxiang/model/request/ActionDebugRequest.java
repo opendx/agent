@@ -16,6 +16,4 @@ public class ActionDebugRequest {
     private Action action;
     private List<GlobalVar> globalVars;
     private String deviceId;
-    @NotNull(message = "端口不能为空")
-    private Integer port;
 }

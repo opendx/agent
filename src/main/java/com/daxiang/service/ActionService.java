@@ -28,7 +28,7 @@ public class ActionService {
     public Response debug(ActionDebugRequest request) {
         String className = "Debug_" + UUIDUtil.getUUID();
         try {
-            String code = new TestNGCodeConverter().setDeviceId(request.getDeviceId()).setPort(request.getPort()).setGlobalVars(request.getGlobalVars())
+            String code = new TestNGCodeConverter().setDeviceId(request.getDeviceId()).setGlobalVars(request.getGlobalVars())
                     .convert(className, Arrays.asList(request.getAction()), "/codetemplate", "android.ftl");
             log.info("[调试action]: {}", code);
             if (StringUtils.isEmpty(code)) {

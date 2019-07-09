@@ -1,6 +1,5 @@
 package com.daxiang.service;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.daxiang.android.AndroidDevice;
 import com.daxiang.android.AndroidDeviceHolder;
@@ -10,6 +9,7 @@ import com.daxiang.exception.BusinessException;
 import com.daxiang.model.Response;
 import com.daxiang.utils.AndroidUtil;
 import com.daxiang.utils.UUIDUtil;
+import io.appium.java_client.android.AndroidDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.json.XML;
@@ -54,54 +54,28 @@ public class AndroidService {
         return Response.success("停止完成");
     }
 
-    public Response startUiautomator2server(String deviceId) {
+    public Response freshAndroidDriver(String deviceId) {
         AndroidDevice androidDevice = getAndroidDevice(deviceId);
-        try {
-            // todo remove
-            int port = 1;
-            // int port = androidDevice.getUiautomator2Server().start();
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("port", port);
-            return Response.success(jsonObject);
-        } catch (Exception e) {
-            log.error("[{}]启动uiautomator2server出错", deviceId, e);
-            return Response.fail(e.getMessage());
-        }
+        AndroidDriver androidDriver = androidDevice.freshAndroidDriver();
+        JSONObject data = new JSONObject();
+        data.put("appiumSessionId", androidDriver.getSessionId().toString());
+        return Response.success(data);
     }
 
     public Response dump(String deviceId) {
         AndroidDevice androidDevice = getAndroidDevice(deviceId);
 
-        // todo remove
-        int localPort = 1;
-        if (localPort <= 0) {
-            return Response.fail("未开启Uiautomator2Server");
+        AndroidDriver androidDriver = androidDevice.getAndroidDriver();
+        if (androidDriver == null) {
+            return Response.fail("androidDriver为空");
         }
 
-        String url = "http://127.0.0.1:" + localPort + "/wd/hub/session/888/source";
-        String uiautomator2ServerResponse;
-        try {
-            uiautomator2ServerResponse = restTemplate.getForObject(url, String.class);
-        } catch (Exception e) {
-            log.error("[{}]请求{}失败", deviceId, url, e);
-            return Response.fail("请求Uiautomator2Server失败，请确认是否已打开Uiautomator2Server");
+        String pageSource = androidDriver.getPageSource();
+        if (StringUtils.isEmpty(pageSource)) {
+            return Response.fail("pageSource为空");
         }
 
-        if (StringUtils.isEmpty(uiautomator2ServerResponse)) {
-            return Response.fail("Uiautomator2Server未返回dump数据");
-        }
-
-        JSONObject uiautomator2ServerResponseObject = JSON.parseObject(uiautomator2ServerResponse);
-        if (uiautomator2ServerResponseObject.getInteger("status") != 0) {
-            return Response.fail("Uiautomator2Server返回状态错误");
-        }
-
-        String dumpXml = uiautomator2ServerResponseObject.getString("value");
-        if (StringUtils.isEmpty(dumpXml)) {
-            return Response.fail("Uiautomator2Server dump数据为空");
-        }
-
-        return Response.success("ok", XML.toJSONObject(dumpXml).toString());
+        return Response.success("ok", XML.toJSONObject(pageSource).toString());
     }
 
     public Response screenshot(String deviceId) {
@@ -122,7 +96,6 @@ public class AndroidService {
 
         return Response.success(response);
     }
-
 
     public Response installApk(MultipartFile apk, String deviceId) {
         if (apk == null) {

@@ -7,9 +7,11 @@ import com.daxiang.android.stf.MinicapInstaller;
 import com.daxiang.android.stf.Minitouch;
 import com.daxiang.android.stf.MinitouchInstaller;
 import com.daxiang.api.MasterApi;
+import com.daxiang.appium.AndroidDriverFactory;
 import com.daxiang.appium.AppiumServer;
 import com.daxiang.model.Device;
 import com.daxiang.model.Platform;
+import io.appium.java_client.android.AndroidDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Date;
 
 /**
@@ -64,20 +67,22 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
         if (androidDevice == null) {
             log.info("[{}]首次在agent上线", deviceId);
-            log.info("[{}]检查是否已接入过master", deviceId);
-            Device device = masterApi.getDeviceById(deviceId);
-            if (device == null) {
-                log.info("[{}]首次接入master", deviceId);
-                androidDevice = initDevice(iDevice);
-            } else {
-                log.info("[{}]已接入过master", deviceId);
-                androidDevice = new AndroidDevice(device, iDevice);
-            }
 
             log.info("[{}]启动appium server...", deviceId);
             AppiumServer appiumServer = new AppiumServer();
             appiumServer.start();
             log.info("[{}]启动appium server完成，url: {}", deviceId, appiumServer.getUrl());
+
+            log.info("[{}]检查是否已接入过master", deviceId);
+            Device device = masterApi.getDeviceById(deviceId);
+            if (device == null) {
+                log.info("[{}]首次接入master，开始初始化设备", deviceId);
+                androidDevice = initDevice(iDevice, appiumServer.getUrl());
+                log.info("[{}]初始化设备完成", deviceId);
+            } else {
+                log.info("[{}]已接入过master", deviceId);
+                androidDevice = new AndroidDevice(device, iDevice);
+            }
 
             androidDevice.setAppiumServer(appiumServer);
             androidDevice.setMinicap(new Minicap(androidDevice));
@@ -123,11 +128,8 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
 
     /**
      * 首次接入系统，初始化Device
-     *
-     * @param iDevice
-     * @return
      */
-    private AndroidDevice initDevice(IDevice iDevice) {
+    private AndroidDevice initDevice(IDevice iDevice, URL url) {
         Device device = new Device();
 
         device.setPlatform(Platform.ANDROID);
@@ -158,19 +160,24 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         device.setScreenHeight(Integer.parseInt(resolution[1]));
 
         // 截图并上传到服务器
-        File screenshot = null;
+        File screenshotFile = null;
         try {
-            screenshot = AndroidUtils.screenshot(iDevice);
-            String downloadURL = masterApi.uploadFile(screenshot);
+            screenshotFile = AndroidUtils.screenshot(iDevice);
+            String downloadURL = masterApi.uploadFile(screenshotFile);
             device.setImgUrl(downloadURL);
         } catch (Exception e) {
             log.error("设置首次接入master屏幕截图失败", e);
         } finally {
             // 删除截图
-            FileUtils.deleteQuietly(screenshot);
+            FileUtils.deleteQuietly(screenshotFile);
         }
 
         AndroidDevice androidDevice = new AndroidDevice(device, iDevice);
+
+        log.info("[{}]开始初始化appium", device.getId());
+        AndroidDriver androidDriver = AndroidDriverFactory.create(androidDevice, url);
+        androidDevice.setAndroidDriver(androidDriver);
+        log.info("[{}]初始化appium完成", device.getId());
 
         // 安装minicap minitouch
         try {

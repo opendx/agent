@@ -39,14 +39,14 @@ public class AndroidController {
     }
 
     /**
-     * 开启Uiautomator2server
+     * freshAndroidDriver
      *
      * @param deviceId
      * @return
      */
-    @GetMapping("/{deviceId}/uiautomator2server/start")
-    public Response start(@PathVariable String deviceId) {
-        return androidService.startUiautomator2server(deviceId);
+    @GetMapping("/{deviceId}/freshAndroidDriver")
+    public Response freshAndroidDriver(@PathVariable String deviceId) {
+        return androidService.freshAndroidDriver(deviceId);
     }
 
     /**

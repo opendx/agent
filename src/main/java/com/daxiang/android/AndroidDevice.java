@@ -5,6 +5,7 @@ import com.daxiang.android.stf.AdbKit;
 import com.daxiang.android.stf.Minicap;
 import com.daxiang.android.stf.Minitouch;
 import com.daxiang.api.MasterApi;
+import com.daxiang.appium.AndroidDriverFactory;
 import com.daxiang.appium.AppiumServer;
 import com.daxiang.javacompile.JavaCompiler;
 import com.daxiang.model.Device;
@@ -112,6 +113,23 @@ public class AndroidDevice {
     }
 
     /**
+     *  刷新AndroidDriver
+     * @return
+     */
+    public AndroidDriver freshAndroidDriver() {
+        if(androidDriver != null) {
+            // 退出上次的会话
+            try {
+                androidDriver.quit();
+            } catch (Exception e) {
+                // 上次会话可能已经过期，quit会有异常，ignore
+            }
+        }
+        androidDriver = AndroidDriverFactory.create(this, appiumServer.getUrl());
+        return androidDriver;
+    }
+
+    /**
      * 执行测试任务
      *
      * @param deviceTestTask
@@ -124,13 +142,11 @@ public class AndroidDevice {
         MasterApi.getInstance().saveDevice(device);
 
         try {
-            // todo remove
-            int port = 1;
+            freshAndroidDriver();
             String className = "Test_" + UUIDUtil.getUUID();
             String code = new TestNGCodeConverter()
                     .setDeviceTestTaskId(deviceTestTask.getId())
                     .setDeviceId(deviceTestTask.getDeviceId())
-                    .setPort(port)
                     .setGlobalVars(deviceTestTask.getGlobalVars())
                     .setBeforeClass(deviceTestTask.getBeforeClass())
                     .setAfterClass(deviceTestTask.getAfterClass())

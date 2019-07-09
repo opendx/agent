@@ -45,11 +45,11 @@ public class AdbKit {
      * 关闭远程调试功能
      */
     public void stop() {
-        log.info("[{}][adbkit]关闭adbkit...", deviceId);
         if (watchdog != null) {
+            log.info("[{}][adbkit]关闭adbkit...", deviceId);
             watchdog.destroyProcess();
+            log.info("[{}][adbkit]关闭adbkit完成", deviceId);
         }
-        log.info("[{}][adbkit]关闭adbkit完成", deviceId);
     }
 
 }

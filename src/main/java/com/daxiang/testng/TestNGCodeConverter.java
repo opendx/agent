@@ -28,7 +28,6 @@ public class TestNGCodeConverter {
     private Integer deviceTestTaskId;
     private List<GlobalVar> globalVars;
     private String deviceId;
-    private Integer port;
 
     private Action beforeClass;
     private Action afterClass;
@@ -81,7 +80,6 @@ public class TestNGCodeConverter {
         dataModel.put("className", className);
         dataModel.put("methodPrefix", METHOD_PREFIX);
         dataModel.put("deviceId", deviceId);
-        dataModel.put("port", port);
         dataModel.put("deviceTestTaskId", deviceTestTaskId);
 
         return FreemarkerUtil.process(ftlBasePackagePath, ftlFileName, dataModel);
