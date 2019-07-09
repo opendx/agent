@@ -2,13 +2,13 @@ package com.daxiang.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.daxiang.actions.utils.AndroidUtil;
 import com.daxiang.android.AndroidDevice;
 import com.daxiang.android.AndroidDeviceHolder;
 import com.daxiang.android.AndroidUtils;
 import com.daxiang.api.MasterApi;
 import com.daxiang.exception.BusinessException;
 import com.daxiang.model.Response;
+import com.daxiang.utils.AndroidUtil;
 import com.daxiang.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;

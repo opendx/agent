@@ -1,7 +1,7 @@
 package com.daxiang.android;
 
 import com.android.ddmlib.AndroidDebugBridge;
-import com.daxiang.actions.utils.ShellExecutor;
+import com.daxiang.utils.ShellExecutor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
