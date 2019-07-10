@@ -25,6 +25,7 @@ public class AndroidDriverFactory {
     private static final int NEW_COMMAND_TIMEOUT = 60 * 60 * 12;
 
     public static AndroidDriver create(AndroidDevice androidDevice, URL url) {
+        // http://appium.io/docs/en/writing-running-appium/caps/
         DesiredCapabilities capabilities = new DesiredCapabilities();
 
         capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, NEW_COMMAND_TIMEOUT);
@@ -39,6 +40,8 @@ public class AndroidDriverFactory {
         capabilities.setCapability(AndroidMobileCapabilityType.APP_PACKAGE, APP_PACKAGE);
         capabilities.setCapability(AndroidMobileCapabilityType.APP_ACTIVITY, APP_ACTIVITY);
         capabilities.setCapability(MobileCapabilityType.NO_RESET, true); // true代表不清除手机数据
+        capabilities.setCapability("skipLogcatCapture", true);
+        capabilities.setCapability("autoLaunch", false);
 
         return new AndroidDriver(url, capabilities);
     }
