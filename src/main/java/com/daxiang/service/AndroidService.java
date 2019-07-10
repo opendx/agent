@@ -9,7 +9,7 @@ import com.daxiang.exception.BusinessException;
 import com.daxiang.model.Response;
 import com.daxiang.utils.AndroidUtil;
 import com.daxiang.utils.UUIDUtil;
-import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.json.XML;
@@ -56,21 +56,21 @@ public class AndroidService {
 
     public Response freshAndroidDriver(String deviceId) {
         AndroidDevice androidDevice = getAndroidDevice(deviceId);
-        AndroidDriver androidDriver = androidDevice.freshAndroidDriver();
+        AppiumDriver appiumDriver = androidDevice.freshAndroidDriver();
         JSONObject data = new JSONObject();
-        data.put("appiumSessionId", androidDriver.getSessionId().toString());
+        data.put("appiumSessionId", appiumDriver.getSessionId().toString());
         return Response.success(data);
     }
 
     public Response dump(String deviceId) {
         AndroidDevice androidDevice = getAndroidDevice(deviceId);
 
-        AndroidDriver androidDriver = androidDevice.getAndroidDriver();
-        if (androidDriver == null) {
+        AppiumDriver appiumDriver = androidDevice.getAppiumDriver();
+        if (appiumDriver == null) {
             return Response.fail("androidDriver为空");
         }
 
-        String pageSource = androidDriver.getPageSource();
+        String pageSource = appiumDriver.getPageSource();
         if (StringUtils.isEmpty(pageSource)) {
             return Response.fail("pageSource为空");
         }

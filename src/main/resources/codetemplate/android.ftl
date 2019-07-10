@@ -1,12 +1,12 @@
 import com.daxiang.android.AndroidDevice;
 import com.daxiang.android.AndroidDeviceHolder;
-import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.AppiumDriver;
 import org.testng.annotations.*;
 import com.daxiang.testng.listener.TestCaseTestListener;
 
 public class ${className} {
 
-    private AndroidDriver driver;
+    private AppiumDriver driver;
 
     <#-- 全局变量 -->
     <#if globalVars?? && (globalVars?size>0)>
@@ -17,7 +17,7 @@ public class ${className} {
 
     @BeforeSuite
     public void beforeSuite() throws Exception {
-        driver = AndroidDeviceHolder.get("${deviceId}").getAndroidDriver();
+        driver = AndroidDeviceHolder.get("${deviceId}").getAppiumDriver();
     }
 
     <#if beforeClass??>

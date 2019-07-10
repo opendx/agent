@@ -176,7 +176,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
 
         log.info("[{}]开始初始化appium", device.getId());
         AndroidDriver androidDriver = AndroidDriverFactory.create(androidDevice, url);
-        androidDevice.setAndroidDriver(androidDriver);
+        androidDevice.setAppiumDriver(androidDriver);
         log.info("[{}]初始化appium完成", device.getId());
 
         // 安装minicap minitouch

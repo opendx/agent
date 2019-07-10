@@ -14,7 +14,7 @@ import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.testng.TestNGCodeConverter;
 import com.daxiang.testng.TestNGRunner;
 import com.daxiang.utils.UUIDUtil;
-import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.AppiumDriver;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -48,7 +48,7 @@ public class AndroidDevice {
     private Minitouch minitouch;
     private AdbKit adbKit;
     private AppiumServer appiumServer;
-    private AndroidDriver androidDriver;
+    private AppiumDriver appiumDriver;
 
     public AndroidDevice(Device device, IDevice iDevice) {
         this.device = device;
@@ -116,17 +116,17 @@ public class AndroidDevice {
      *  刷新AndroidDriver
      * @return
      */
-    public AndroidDriver freshAndroidDriver() {
-        if(androidDriver != null) {
+    public AppiumDriver freshAndroidDriver() {
+        if(appiumDriver != null) {
             // 退出上次的会话
             try {
-                androidDriver.quit();
+                appiumDriver.quit();
             } catch (Exception e) {
                 // 上次会话可能已经过期，quit会有异常，ignore
             }
         }
-        androidDriver = AndroidDriverFactory.create(this, appiumServer.getUrl());
-        return androidDriver;
+        appiumDriver = AndroidDriverFactory.create(this, appiumServer.getUrl());
+        return appiumDriver;
     }
 
     /**
@@ -142,7 +142,6 @@ public class AndroidDevice {
         MasterApi.getInstance().saveDevice(device);
 
         try {
-            freshAndroidDriver();
             String className = "Test_" + UUIDUtil.getUUID();
             String code = new TestNGCodeConverter()
                     .setDeviceTestTaskId(deviceTestTask.getId())
@@ -160,6 +159,7 @@ public class AndroidDevice {
             log.info("[{}][自动化测试]转换代码：{}", getId(), code);
             // todo 捕获到DynamicCompilerException即编译失败，通知master纠正用例，否则错误的用例会无限下发给agent执行
             Class clazz = JavaCompiler.compile(className, code);
+            freshAndroidDriver();
             TestNGRunner.runTestCases(new Class[]{clazz});
         } finally {
             if (isConnected()) {
