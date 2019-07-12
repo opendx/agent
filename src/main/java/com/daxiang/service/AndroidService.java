@@ -1,6 +1,7 @@
 package com.daxiang.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.android.ddmlib.IDevice;
 import com.daxiang.android.AndroidDevice;
 import com.daxiang.android.AndroidDeviceHolder;
 import com.daxiang.android.AndroidUtils;
@@ -82,7 +83,7 @@ public class AndroidService {
         }
 
         // 由于appium pageSource返回的xml不是规范的xml，需要把除了hierarchy节点以外的节点替换成node，否则xml转json会出问题
-        try (InputStream in = new ByteArrayInputStream(pageSource.getBytes())){
+        try (InputStream in = new ByteArrayInputStream(pageSource.getBytes())) {
             SAXReader saxReader = new SAXReader();
             Document document = saxReader.read(in);
             Element rootElement = document.getRootElement();
@@ -98,15 +99,15 @@ public class AndroidService {
     }
 
     private void handleElement(Element element) {
-        if(element == null) {
+        if (element == null) {
             return;
         }
 
         String elementName = element.getName();
-        if(StringUtils.isEmpty(elementName)) {
+        if (StringUtils.isEmpty(elementName)) {
             return;
         }
-        if(!"hierarchy".equals(elementName)){
+        if (!"hierarchy".equals(elementName)) {
             element.setName("node");
         }
 
@@ -171,10 +172,14 @@ public class AndroidService {
     }
 
     public String screenshotByMinicapAndUploadToMaster(AndroidDevice androidDevice) throws Exception {
+        return screenshotByMinicapAndUploadToMaster(androidDevice.getIDevice(), androidDevice.getResolution());
+    }
+
+    public String screenshotByMinicapAndUploadToMaster(IDevice iDevice, String resolution) throws Exception {
         String screenshotFilePath = UUIDUtil.getUUID() + ".jpg";
         File screenshotFile = null;
         try {
-            AndroidUtils.screenshotByMinicap(androidDevice.getIDevice(), screenshotFilePath, androidDevice.getResolution());
+            AndroidUtils.screenshotByMinicap(iDevice, screenshotFilePath, resolution);
             screenshotFile = new File(screenshotFilePath);
             return masterApi.uploadFile(screenshotFile);
         } finally {

@@ -11,14 +11,13 @@ import com.daxiang.appium.AndroidDriverFactory;
 import com.daxiang.appium.AppiumServer;
 import com.daxiang.model.Device;
 import com.daxiang.model.Platform;
+import com.daxiang.service.AndroidService;
 import io.appium.java_client.android.AndroidDriver;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.net.URL;
 import java.util.Date;
 
@@ -31,6 +30,8 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
 
     @Autowired
     private MasterApi masterApi;
+    @Autowired
+    private AndroidService androidService;
     @Value("${server.address}")
     private String ip;
     @Value("${server.port}")
@@ -48,7 +49,6 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
 
     @Override
     public void deviceChanged(IDevice device, int changeMask) {
-        //ignore
     }
 
     /**
@@ -61,7 +61,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         log.info("[{}]已连接", deviceId);
 
         log.info("[{}]等待手机上线", deviceId);
-        AndroidUtils.waitForDeviceOnline(iDevice, 60);
+        AndroidUtils.waitForDeviceOnline(iDevice, 5 * 60);
         log.info("[{}]手机已上线", deviceId);
 
         AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
@@ -77,8 +77,12 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
             Device device = masterApi.getDeviceById(deviceId);
             if (device == null) {
                 log.info("[{}]首次接入master，开始初始化设备", deviceId);
-                androidDevice = initDevice(iDevice, appiumServer.getUrl());
-                log.info("[{}]初始化设备完成", deviceId);
+                try {
+                    androidDevice = initDevice(iDevice, appiumServer.getUrl());
+                    log.info("[{}]初始化设备完成", deviceId);
+                } catch (Exception e) {
+                    throw new RuntimeException("初始化设备" + deviceId + "出错", e);
+                }
             } else {
                 log.info("[{}]已接入过master", deviceId);
                 androidDevice = new AndroidDevice(device, iDevice);
@@ -127,14 +131,26 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
     }
 
     /**
-     * 首次接入系统，初始化Device
+     * 首次接入系统，初始化设备
      */
-    private AndroidDevice initDevice(IDevice iDevice, URL url) {
+    private AndroidDevice initDevice(IDevice iDevice, URL url) throws Exception {
+        String deviceId = iDevice.getSerialNumber();
+
+        log.info("[{}]开始安装minicap", deviceId);
+        MinicapInstaller minicapInstaller = new MinicapInstaller(iDevice);
+        minicapInstaller.install();
+        log.info("[{}]安装minicap成功", deviceId);
+
+        log.info("[{}]开始安装minitouch", deviceId);
+        MinitouchInstaller minitouchInstaller = new MinitouchInstaller(iDevice);
+        minitouchInstaller.install();
+        log.info("[{}]安装minitouch成功", deviceId);
+
         Device device = new Device();
 
         device.setPlatform(Platform.ANDROID);
         device.setCreateTime(new Date());
-        device.setId(iDevice.getSerialNumber());
+        device.setId(deviceId);
         try {
             device.setCpuInfo(AndroidUtils.getCpuInfo(iDevice));
         } catch (Exception e) {
@@ -150,27 +166,14 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         device.setName(AndroidUtils.getDeviceName(iDevice));
         device.setSystemVersion(AndroidUtils.getAndroidVersion(iDevice));
 
-        String[] resolution;
-        try {
-            resolution = AndroidUtils.getResolution(iDevice).split("x");
-        } catch (Exception e) {
-            throw new RuntimeException("获取屏幕分辨率失败", e);
-        }
-        device.setScreenWidth(Integer.parseInt(resolution[0]));
-        device.setScreenHeight(Integer.parseInt(resolution[1]));
+        String resolution = AndroidUtils.getResolution(iDevice);
+        String[] resolutionArray = resolution.split("x");
+        device.setScreenWidth(Integer.parseInt(resolutionArray[0]));
+        device.setScreenHeight(Integer.parseInt(resolutionArray[1]));
 
         // 截图并上传到服务器
-        File screenshotFile = null;
-        try {
-            screenshotFile = AndroidUtils.screenshot(iDevice);
-            String downloadURL = masterApi.uploadFile(screenshotFile);
-            device.setImgUrl(downloadURL);
-        } catch (Exception e) {
-            log.error("设置首次接入master屏幕截图失败", e);
-        } finally {
-            // 删除截图
-            FileUtils.deleteQuietly(screenshotFile);
-        }
+        String imgDownloadUrl = androidService.screenshotByMinicapAndUploadToMaster(iDevice, resolution);
+        device.setImgUrl(imgDownloadUrl);
 
         AndroidDevice androidDevice = new AndroidDevice(device, iDevice);
 
@@ -179,33 +182,6 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         androidDevice.setAppiumDriver(androidDriver);
         log.info("[{}]初始化appium完成", device.getId());
 
-        // 安装minicap minitouch
-        try {
-            installMinicapAndMinitouch(androidDevice);
-        } catch (Exception e) {
-            throw new RuntimeException("安装stf minicap minitouch出错", e);
-        }
-
         return androidDevice;
-    }
-
-    /**
-     * 安装minicap minitouch
-     *
-     * @param androidDevice
-     */
-    private void installMinicapAndMinitouch(AndroidDevice androidDevice) throws Exception {
-        String deviceId = androidDevice.getId();
-        IDevice iDevice = androidDevice.getIDevice();
-
-        log.info("[{}]开始安装minicap", deviceId);
-        MinicapInstaller minicapInstaller = new MinicapInstaller(iDevice);
-        minicapInstaller.install();
-        log.info("[{}]安装minicap成功", deviceId);
-
-        log.info("[{}]开始安装minitouch", deviceId);
-        MinitouchInstaller minitouchInstaller = new MinitouchInstaller(iDevice);
-        minitouchInstaller.install();
-        log.info("[{}]安装minitouch成功", deviceId);
     }
 }

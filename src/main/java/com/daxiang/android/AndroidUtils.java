@@ -2,13 +2,9 @@ package com.daxiang.android;
 
 import com.android.ddmlib.*;
 import com.daxiang.utils.ShellExecutor;
-import com.daxiang.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -106,37 +102,11 @@ public class AndroidUtils {
     }
 
     /**
-     * 截屏
-     *
-     * @return
-     */
-    public static File screenshot(IDevice iDevice) throws AdbCommandRejectedException, IOException, TimeoutException {
-        RawImage rawImage = iDevice.getScreenshot();
-        BufferedImage image = new BufferedImage(rawImage.width, rawImage.height, BufferedImage.TYPE_INT_ARGB);
-
-        int index = 0;
-        int IndexInc = rawImage.bpp >> 3;
-
-        for (int y = 0; y < rawImage.height; y++) {
-            for (int x = 0; x < rawImage.width; x++) {
-                int value = rawImage.getARGB(index);
-                index += IndexInc;
-                image.setRGB(x, y, value);
-            }
-        }
-
-        File file = new File(UUIDUtil.getUUID() + ".png");
-        ImageIO.write(image, "png", file);
-        return file;
-    }
-
-    /**
      * 通过minicap截图
      *
      * @param iDevice
      * @param localPath  本地路径 eg. d:/path/img.jpg
      * @param resolution 手机分辨率 eg. 1080x1920
-     * @throws Exception
      */
     public static void screenshotByMinicap(IDevice iDevice, String localPath, String resolution) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException, SyncException {
         String imgPhonePath = "/data/local/tmp/minicap.jpg";
