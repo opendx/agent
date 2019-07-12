@@ -13,7 +13,7 @@ import java.util.Map;
  * Created by jiangyitao.
  */
 @Slf4j
-public class AndroidUtils {
+public class AndroidUtil {
 
     private static final String CPU_INFO_SHELL = "cat /proc/cpuinfo |grep Hardware";
     private static final String MEM_SIZE_SHELL = "cat /proc/meminfo |grep MemTotal";

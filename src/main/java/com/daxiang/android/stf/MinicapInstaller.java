@@ -2,7 +2,7 @@ package com.daxiang.android.stf;
 
 import com.android.ddmlib.*;
 import com.daxiang.android.AndroidDevice;
-import com.daxiang.android.AndroidUtils;
+import com.daxiang.android.AndroidUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -30,8 +30,8 @@ public class MinicapInstaller {
     public void install() throws TimeoutException, AdbCommandRejectedException, SyncException, IOException, ShellCommandUnresponsiveException {
         String deviceId = iDevice.getSerialNumber();
 
-        String cpuAbi = AndroidUtils.getCpuAbi(iDevice);
-        String apiLevel = AndroidUtils.getApiLevel(iDevice);
+        String cpuAbi = AndroidUtil.getCpuAbi(iDevice);
+        String apiLevel = AndroidUtil.getApiLevel(iDevice);
 
         String minicapFilePath = String.format(MINICAP_PATH, cpuAbi);
         String minicapSoFilePath = String.format(MINICAP_SO_PATH, apiLevel, cpuAbi);

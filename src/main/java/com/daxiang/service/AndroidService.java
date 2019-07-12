@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.android.ddmlib.IDevice;
 import com.daxiang.android.AndroidDevice;
 import com.daxiang.android.AndroidDeviceHolder;
-import com.daxiang.android.AndroidUtils;
+import com.daxiang.android.AndroidUtil;
 import com.daxiang.api.MasterApi;
 import com.daxiang.exception.BusinessException;
 import com.daxiang.model.Response;
@@ -147,7 +147,7 @@ public class AndroidService {
         File apkFile = new File(apkPath);
         try {
             FileUtils.copyInputStreamToFile(apk.getInputStream(), apkFile);
-            AndroidUtils.installApk(androidDevice.getIDevice(), apkPath);
+            AndroidUtil.installApk(androidDevice.getIDevice(), apkPath);
             return Response.success("安装成功");
         } catch (Exception e) {
             log.error("安装apk失败", e);
@@ -179,7 +179,7 @@ public class AndroidService {
         String screenshotFilePath = UUIDUtil.getUUID() + ".jpg";
         File screenshotFile = null;
         try {
-            AndroidUtils.screenshotByMinicap(iDevice, screenshotFilePath, resolution);
+            AndroidUtil.screenshotByMinicap(iDevice, screenshotFilePath, resolution);
             screenshotFile = new File(screenshotFilePath);
             return masterApi.uploadFile(screenshotFile);
         } finally {
@@ -196,7 +196,7 @@ public class AndroidService {
         File apk = new File(UUIDUtil.getUUID() + ".apk");
         try {
             FileUtils.writeByteArrayToFile(apk, apkByte, false);
-            String result = AndroidUtils.aaptDumpBadging(apk.getAbsolutePath());
+            String result = AndroidUtil.aaptDumpBadging(apk.getAbsolutePath());
             return Response.success("ok", result);
         } catch (IOException e) {
             log.error("io error", e);

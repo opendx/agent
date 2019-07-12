@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.daxiang.android.AndroidDevice;
 import com.daxiang.android.AndroidDeviceHolder;
-import com.daxiang.android.AndroidUtils;
+import com.daxiang.android.AndroidUtil;
 import com.daxiang.android.stf.Minitouch;
 import com.daxiang.model.Device;
 import lombok.extern.slf4j.Slf4j;
@@ -107,28 +107,28 @@ public class MinitouchSocketServer {
                 break;
             case "home":
                 try {
-                    AndroidUtils.inputKeyEvent(androidDevice.getIDevice(), 3);
+                    AndroidUtil.inputKeyEvent(androidDevice.getIDevice(), 3);
                 } catch (Exception e) {
                     log.error("[{}][minitouch][socketserver]exec home error", deviceId, e);
                 }
                 break;
             case "back":
                 try {
-                    AndroidUtils.inputKeyEvent(androidDevice.getIDevice(), 4);
+                    AndroidUtil.inputKeyEvent(androidDevice.getIDevice(), 4);
                 } catch (Exception e) {
                     log.error("[{}][minitouch][socketserver]exec back error", deviceId, e);
                 }
                 break;
             case "power":
                 try {
-                    AndroidUtils.inputKeyEvent(androidDevice.getIDevice(), 26);
+                    AndroidUtil.inputKeyEvent(androidDevice.getIDevice(), 26);
                 } catch (Exception e) {
                     log.error("[{}][minitouch][socketserver]exec power error", deviceId, e);
                 }
                 break;
             case "menu":
                 try {
-                    AndroidUtils.inputKeyEvent(androidDevice.getIDevice(), 82);
+                    AndroidUtil.inputKeyEvent(androidDevice.getIDevice(), 82);
                 } catch (Exception e) {
                     log.error("[{}][minitouch][socketserver]exec menu error", deviceId, e);
                 }

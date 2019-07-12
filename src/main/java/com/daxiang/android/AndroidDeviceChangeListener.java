@@ -61,7 +61,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         log.info("[{}]已连接", deviceId);
 
         log.info("[{}]等待手机上线", deviceId);
-        AndroidUtils.waitForDeviceOnline(iDevice, 5 * 60);
+        AndroidUtil.waitForDeviceOnline(iDevice, 5 * 60);
         log.info("[{}]手机已上线", deviceId);
 
         AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
@@ -152,21 +152,21 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         device.setCreateTime(new Date());
         device.setId(deviceId);
         try {
-            device.setCpuInfo(AndroidUtils.getCpuInfo(iDevice));
+            device.setCpuInfo(AndroidUtil.getCpuInfo(iDevice));
         } catch (Exception e) {
             log.error("获取cpu信息失败", e);
             device.setCpuInfo("获取cpu信息失败");
         }
         try {
-            device.setMemSize(AndroidUtils.getMemSize(iDevice));
+            device.setMemSize(AndroidUtil.getMemSize(iDevice));
         } catch (Exception e) {
             log.error("获取内存大小失败", e);
             device.setMemSize("获取内存大小失败");
         }
-        device.setName(AndroidUtils.getDeviceName(iDevice));
-        device.setSystemVersion(AndroidUtils.getAndroidVersion(iDevice));
+        device.setName(AndroidUtil.getDeviceName(iDevice));
+        device.setSystemVersion(AndroidUtil.getAndroidVersion(iDevice));
 
-        String resolution = AndroidUtils.getResolution(iDevice);
+        String resolution = AndroidUtil.getResolution(iDevice);
         String[] resolutionArray = resolution.split("x");
         device.setScreenWidth(Integer.parseInt(resolutionArray[0]));
         device.setScreenHeight(Integer.parseInt(resolutionArray[1]));

@@ -2,7 +2,7 @@ package com.daxiang.android.stf;
 
 import com.android.ddmlib.*;
 import com.daxiang.android.AndroidDevice;
-import com.daxiang.android.AndroidUtils;
+import com.daxiang.android.AndroidUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -28,7 +28,7 @@ public class MinitouchInstaller {
     public void install() throws TimeoutException, AdbCommandRejectedException, SyncException, IOException, ShellCommandUnresponsiveException {
         String deviceId = iDevice.getSerialNumber();
 
-        String cpuAbi = AndroidUtils.getCpuAbi(iDevice);
+        String cpuAbi = AndroidUtil.getCpuAbi(iDevice);
         String minitouchFilePath = String.format(MINITOUCH_PATH, cpuAbi);
 
         String phoneMinitouchPath = AndroidDevice.TMP_FOLDER + "minitouch";
