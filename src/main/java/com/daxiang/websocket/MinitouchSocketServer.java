@@ -107,28 +107,28 @@ public class MinitouchSocketServer {
                 break;
             case "home":
                 try {
-                    AndroidUtils.inputKeyevent(androidDevice.getIDevice(), 3);
+                    AndroidUtils.inputKeyEvent(androidDevice.getIDevice(), 3);
                 } catch (Exception e) {
                     log.error("[{}][minitouch][socketserver]exec home error", deviceId, e);
                 }
                 break;
             case "back":
                 try {
-                    AndroidUtils.inputKeyevent(androidDevice.getIDevice(), 4);
+                    AndroidUtils.inputKeyEvent(androidDevice.getIDevice(), 4);
                 } catch (Exception e) {
                     log.error("[{}][minitouch][socketserver]exec back error", deviceId, e);
                 }
                 break;
             case "power":
                 try {
-                    AndroidUtils.inputKeyevent(androidDevice.getIDevice(), 26);
+                    AndroidUtils.inputKeyEvent(androidDevice.getIDevice(), 26);
                 } catch (Exception e) {
                     log.error("[{}][minitouch][socketserver]exec power error", deviceId, e);
                 }
                 break;
             case "menu":
                 try {
-                    AndroidUtils.inputKeyevent(androidDevice.getIDevice(), 82);
+                    AndroidUtils.inputKeyEvent(androidDevice.getIDevice(), 82);
                 } catch (Exception e) {
                     log.error("[{}][minitouch][socketserver]exec menu error", deviceId, e);
                 }

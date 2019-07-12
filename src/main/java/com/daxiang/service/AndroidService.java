@@ -7,7 +7,6 @@ import com.daxiang.android.AndroidUtils;
 import com.daxiang.api.MasterApi;
 import com.daxiang.exception.BusinessException;
 import com.daxiang.model.Response;
-import com.daxiang.utils.AndroidUtil;
 import com.daxiang.utils.UUIDUtil;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
@@ -192,7 +191,7 @@ public class AndroidService {
         File apk = new File(UUIDUtil.getUUID() + ".apk");
         try {
             FileUtils.writeByteArrayToFile(apk, apkByte, false);
-            String result = AndroidUtil.aaptDumpBadging(apk.getAbsolutePath());
+            String result = AndroidUtils.aaptDumpBadging(apk.getAbsolutePath());
             return Response.success("ok", result);
         } catch (IOException e) {
             log.error("io error", e);

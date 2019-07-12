@@ -1,6 +1,7 @@
 package com.daxiang.android;
 
 import com.android.ddmlib.*;
+import com.daxiang.utils.ShellExecutor;
 import com.daxiang.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
@@ -194,7 +195,7 @@ public class AndroidUtils {
      * @param iDevice
      * @param packageName
      */
-    public static void forceStopApp(IDevice iDevice, String packageName) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+    public static void forceStopApk(IDevice iDevice, String packageName) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         iDevice.executeShellCommand("am force-stop " + packageName, new NullOutputReceiver());
     }
 
@@ -204,7 +205,7 @@ public class AndroidUtils {
      *
      * @param keyCode
      */
-    public static void inputKeyevent(IDevice iDevice, int keyCode) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+    public static void inputKeyEvent(IDevice iDevice, int keyCode) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         iDevice.executeShellCommand("input keyevent " + keyCode, new NullOutputReceiver());
     }
 
@@ -231,4 +232,11 @@ public class AndroidUtils {
         return collectingOutputReceiver.getOutput();
     }
 
+    /**
+     * aapt dump badging
+     */
+    public static String aaptDumpBadging(String apkPath) throws IOException {
+        String cmd = "aapt dump badging " + apkPath;
+        return ShellExecutor.execute(cmd);
+    }
 }
