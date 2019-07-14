@@ -1,5 +1,8 @@
 package com.daxiang.android;
 
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.remote.MobileCapabilityType;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +21,11 @@ public class AndroidDeviceHolder {
 
     public static AndroidDevice get(String deviceId) {
         return androidDeviceHolder.get(deviceId);
+    }
+
+    public static AndroidDevice get(AppiumDriver appiumDriver) {
+        String deviceId = (String) appiumDriver.getCapabilities().getCapability(MobileCapabilityType.UDID);
+        return get(deviceId);
     }
 
     public static List<AndroidDevice> getAll() {

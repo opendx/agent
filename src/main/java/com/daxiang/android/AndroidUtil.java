@@ -142,10 +142,10 @@ public class AndroidUtil {
     /**
      * 等待设备上线
      */
-    public static void waitForDeviceOnline(IDevice iDevice, long maxWaitTimeSeconds) {
+    public static void waitForDeviceOnline(IDevice iDevice, long maxWaitTimeInSeconds) {
         long startTime = System.currentTimeMillis();
         while (true) {
-            if (System.currentTimeMillis() - startTime > maxWaitTimeSeconds * 1000) {
+            if (System.currentTimeMillis() - startTime > maxWaitTimeInSeconds * 1000) {
                 throw new RuntimeException("[" + iDevice.getSerialNumber() + "]设备未上线");
             }
             if (iDevice.isOnline()) {
@@ -208,5 +208,19 @@ public class AndroidUtil {
     public static String aaptDumpBadging(String apkPath) throws IOException {
         String cmd = "aapt dump badging " + apkPath;
         return ShellExecutor.execute(cmd);
+    }
+
+    /**
+     * 清除apk数据
+     */
+    public static void clearApkData(IDevice iDevice, String packageName) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+        iDevice.executeShellCommand("pm clear " + packageName, new NullOutputReceiver());
+    }
+
+    /**
+     * 重启apk
+     */
+    public static void restartApk(IDevice iDevice, String packageName, String launchActivity) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+        iDevice.executeShellCommand("am start -S -n " + packageName + "/" + launchActivity, new NullOutputReceiver());
     }
 }

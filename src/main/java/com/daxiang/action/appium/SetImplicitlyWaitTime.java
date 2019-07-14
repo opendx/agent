@@ -1,4 +1,4 @@
-package com.daxiang.action;
+package com.daxiang.action.appium;
 
 import io.appium.java_client.AppiumDriver;
 import org.springframework.util.Assert;
@@ -16,9 +16,9 @@ public class SetImplicitlyWaitTime {
         this.driver = driver;
     }
 
-    public void excute(Object implicitlyWaitTime) {
-        Assert.notNull(implicitlyWaitTime, "隐士等待时间不能为空");
-        long _implicitlyWaitTime = Long.parseLong((String) implicitlyWaitTime);
+    public void excute(Object implicitlyWaitTimeInSeconds) {
+        Assert.notNull(implicitlyWaitTimeInSeconds, "隐士等待时间不能为空");
+        long _implicitlyWaitTime = Long.parseLong((String) implicitlyWaitTimeInSeconds);
         driver.manage().timeouts().implicitlyWait(_implicitlyWaitTime, TimeUnit.SECONDS);
     }
 }
