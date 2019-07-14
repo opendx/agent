@@ -4,9 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.daxiang.android.AndroidDevice;
 import com.daxiang.android.AndroidDeviceHolder;
-import com.daxiang.android.AndroidUtil;
 import com.daxiang.android.stf.Minitouch;
 import com.daxiang.model.Device;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.nativekey.AndroidKey;
+import io.appium.java_client.android.nativekey.KeyEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -106,32 +108,16 @@ public class MinitouchSocketServer {
                 minitouch.touchUp();
                 break;
             case "home":
-                try {
-                    AndroidUtil.inputKeyEvent(androidDevice.getIDevice(), 3);
-                } catch (Exception e) {
-                    log.error("[{}][minitouch][socketserver]exec home error", deviceId, e);
-                }
+                ((AndroidDriver) androidDevice.getAppiumDriver()).pressKey(new KeyEvent(AndroidKey.HOME));
                 break;
             case "back":
-                try {
-                    AndroidUtil.inputKeyEvent(androidDevice.getIDevice(), 4);
-                } catch (Exception e) {
-                    log.error("[{}][minitouch][socketserver]exec back error", deviceId, e);
-                }
+                ((AndroidDriver) androidDevice.getAppiumDriver()).pressKey(new KeyEvent(AndroidKey.BACK));
                 break;
             case "power":
-                try {
-                    AndroidUtil.inputKeyEvent(androidDevice.getIDevice(), 26);
-                } catch (Exception e) {
-                    log.error("[{}][minitouch][socketserver]exec power error", deviceId, e);
-                }
+                ((AndroidDriver) androidDevice.getAppiumDriver()).pressKey(new KeyEvent(AndroidKey.POWER));
                 break;
             case "menu":
-                try {
-                    AndroidUtil.inputKeyEvent(androidDevice.getIDevice(), 82);
-                } catch (Exception e) {
-                    log.error("[{}][minitouch][socketserver]exec menu error", deviceId, e);
-                }
+                ((AndroidDriver) androidDevice.getAppiumDriver()).pressKey(new KeyEvent(AndroidKey.MENU));
                 break;
         }
     }
