@@ -2,6 +2,7 @@ package com.daxiang.action.appium;
 
 import com.daxiang.action.utils.ByUtil;
 import io.appium.java_client.AppiumDriver;
+import org.openqa.selenium.WebElement;
 import org.springframework.util.Assert;
 
 /**
@@ -15,7 +16,7 @@ public class SendKeys {
         this.driver = driver;
     }
 
-    public void excute(Object findBy, Object value, Object content) {
+    public WebElement excute(Object findBy, Object value, Object content) {
         Assert.notNull(findBy, "findBy不能为空");
         Assert.notNull(value, "value不能为空");
         Assert.notNull(content, "content不能为空");
@@ -24,6 +25,8 @@ public class SendKeys {
         String _value = (String) value;
         String _content = (String) content;
 
-        driver.findElement(ByUtil.getBy(_findBy, _value)).sendKeys(_content);
+        WebElement element = driver.findElement(ByUtil.getBy(_findBy, _value));
+        element.sendKeys(_content);
+        return element;
     }
 }
