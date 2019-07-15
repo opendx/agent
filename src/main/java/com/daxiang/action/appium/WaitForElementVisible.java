@@ -25,7 +25,7 @@ public class WaitForElementVisible {
 
         String _findBy = (String) findBy;
         String _value = (String) value;
-        long _maxWaitTimeInSeconds = (long) maxWaitTimeInSeconds;
+        long _maxWaitTimeInSeconds = Long.parseLong((String) maxWaitTimeInSeconds);
 
         return new WebDriverWait(driver, _maxWaitTimeInSeconds).until(ExpectedConditions.visibilityOfElementLocated(ByUtil.getBy(_findBy, _value)));
     }

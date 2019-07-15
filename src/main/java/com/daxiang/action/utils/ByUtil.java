@@ -13,14 +13,14 @@ public class ByUtil {
             case "id":
                 by = By.id(value);
                 break;
+            case "xpath":
+                by = By.xpath(value);
+                break;
             case "name":
                 by = By.name(value);
                 break;
             case "className":
                 by = By.className(value);
-                break;
-            case "xpath":
-                by = By.xpath(value);
                 break;
             default:
                 throw new RuntimeException("暂不支持：" + findBy);

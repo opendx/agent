@@ -160,26 +160,6 @@ public class AndroidUtil {
     }
 
     /**
-     * 强制关闭app
-     *
-     * @param iDevice
-     * @param packageName
-     */
-    public static void forceStopApk(IDevice iDevice, String packageName) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
-        iDevice.executeShellCommand("am force-stop " + packageName, new NullOutputReceiver());
-    }
-
-    /**
-     * input keyevent
-     * keyCode对照表 https://blog.csdn.net/moyu123456789/article/details/71209893
-     *
-     * @param keyCode
-     */
-    public static void inputKeyEvent(IDevice iDevice, int keyCode) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
-        iDevice.executeShellCommand("input keyevent " + keyCode, new NullOutputReceiver());
-    }
-
-    /**
      * 安装APK
      *
      * @param iDevice

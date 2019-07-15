@@ -16,10 +16,10 @@ public class ExcuteAdbShellCommond {
         this.driver = driver;
     }
 
-    public void excute(Object cmd) throws Exception {
+    public String excute(Object cmd) throws Exception {
         Assert.notNull(cmd, "命令不能为空");
         String _cmd = (String) cmd;
 
-        AndroidUtil.executeShellCommand(AndroidDeviceHolder.get(driver).getIDevice(), _cmd);
+        return AndroidUtil.executeShellCommand(AndroidDeviceHolder.get(driver).getIDevice(), _cmd);
     }
 }

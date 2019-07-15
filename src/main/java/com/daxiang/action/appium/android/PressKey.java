@@ -20,7 +20,7 @@ public class PressKey {
      */
     public void excute(Object code) {
         Assert.notNull(code, "code不能为空");
-        int _code = (int) code;
+        int _code = Integer.parseInt((String) code);
 
         if (!(driver instanceof AndroidDriver)) {
             throw new RuntimeException("AppiumDriver不是AndroidDriver");
