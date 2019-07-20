@@ -22,21 +22,21 @@ public class AndroidUtil {
     public static final Map<String, String> ANDROID_VERSION = new HashMap();
 
     static {
-        ANDROID_VERSION.put("8", "2.2");
-        ANDROID_VERSION.put("10", "2.3");
-        ANDROID_VERSION.put("14", "4.0");
-        ANDROID_VERSION.put("15", "4.0.3");
-        ANDROID_VERSION.put("16", "4.1.2");
-        ANDROID_VERSION.put("18", "4.3.1");
-        ANDROID_VERSION.put("19", "4.4.2");
-        ANDROID_VERSION.put("20", "4.4w.2");
-        ANDROID_VERSION.put("21", "5.0.1");
-        ANDROID_VERSION.put("22", "5.1.1");
+        // https://source.android.com/setup/start/build-numbers
+        // uiautomator需要 >= 4.2
+        ANDROID_VERSION.put("17", "4.2");
+        ANDROID_VERSION.put("18", "4.3");
+        ANDROID_VERSION.put("19", "4.4");
+        ANDROID_VERSION.put("20", "4.4W");
+        ANDROID_VERSION.put("21", "5.0");
+        ANDROID_VERSION.put("22", "5.1");
         ANDROID_VERSION.put("23", "6.0");
         ANDROID_VERSION.put("24", "7.0");
-        ANDROID_VERSION.put("25", "7.1.1");
+        ANDROID_VERSION.put("25", "7.1");
         ANDROID_VERSION.put("26", "8.0");
-        ANDROID_VERSION.put("27", "8.1.0");
+        ANDROID_VERSION.put("27", "8.1");
+        ANDROID_VERSION.put("28", "9");
+        ANDROID_VERSION.put("29", "10");
     }
 
     /**
@@ -98,7 +98,7 @@ public class AndroidUtil {
      * @return
      */
     public static String getAndroidVersion(IDevice iDevice) {
-        return ANDROID_VERSION.get(getApiLevel(iDevice));
+        return ANDROID_VERSION.get(getSdkVersion(iDevice));
     }
 
     /**
@@ -135,7 +135,7 @@ public class AndroidUtil {
      *
      * @return
      */
-    public static String getApiLevel(IDevice iDevice) {
+    public static String getSdkVersion(IDevice iDevice) {
         return iDevice.getProperty("ro.build.version.sdk");
     }
 

@@ -31,10 +31,10 @@ public class MinicapInstaller {
         String deviceId = iDevice.getSerialNumber();
 
         String cpuAbi = AndroidUtil.getCpuAbi(iDevice);
-        String apiLevel = AndroidUtil.getApiLevel(iDevice);
+        String sdkVersion = AndroidUtil.getSdkVersion(iDevice);
 
         String minicapFilePath = String.format(MINICAP_PATH, cpuAbi);
-        String minicapSoFilePath = String.format(MINICAP_SO_PATH, apiLevel, cpuAbi);
+        String minicapSoFilePath = String.format(MINICAP_SO_PATH, sdkVersion, cpuAbi);
 
         // push minicap 到手机
         String phoneMinicapPath = AndroidDevice.TMP_FOLDER + "minicap";
