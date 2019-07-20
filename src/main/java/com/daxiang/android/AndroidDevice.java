@@ -113,11 +113,12 @@ public class AndroidDevice {
     }
 
     /**
-     *  刷新AndroidDriver
+     * 刷新AndroidDriver
+     *
      * @return
      */
     public AppiumDriver freshAndroidDriver() {
-        if(appiumDriver != null) {
+        if (appiumDriver != null) {
             // 退出上次的会话
             try {
                 appiumDriver.quit();
@@ -167,5 +168,23 @@ public class AndroidDevice {
                 MasterApi.getInstance().saveDevice(device);
             }
         }
+    }
+
+    public String getAndroidVersion() {
+        return device.getSystemVersion();
+    }
+
+    public boolean canUseUiautomator2() {
+        String androidVersion = getAndroidVersion();
+        for (String sdkVersion : AndroidUtil.ANDROID_VERSION.keySet()) {
+            if (androidVersion.equals(AndroidUtil.ANDROID_VERSION.get(sdkVersion))) {
+                if (Integer.parseInt(sdkVersion) > 20) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+        throw new RuntimeException("无法判断是否能用Uiautomator2，请更新AndroidUtil.ANDROID_VERSION");
     }
 }

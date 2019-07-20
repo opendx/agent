@@ -19,24 +19,24 @@ public class AndroidUtil {
     private static final String MEM_SIZE_SHELL = "cat /proc/meminfo |grep MemTotal";
     private static final String RESOLUTION_SHELL = "wm size";
 
-    private static Map<String, String> sdkMap = new HashMap();
+    public static final Map<String, String> ANDROID_VERSION = new HashMap();
 
     static {
-        sdkMap.put("8", "2.2");
-        sdkMap.put("10", "2.3");
-        sdkMap.put("14", "4.0");
-        sdkMap.put("15", "4.0.3");
-        sdkMap.put("16", "4.1.2");
-        sdkMap.put("18", "4.3.1");
-        sdkMap.put("19", "4.4.2");
-        sdkMap.put("20", "4.4w.2");
-        sdkMap.put("21", "5.0.1");
-        sdkMap.put("22", "5.1.1");
-        sdkMap.put("23", "6.0");
-        sdkMap.put("24", "7.0");
-        sdkMap.put("25", "7.1.1");
-        sdkMap.put("26", "8.0");
-        sdkMap.put("27", "8.1.0");
+        ANDROID_VERSION.put("8", "2.2");
+        ANDROID_VERSION.put("10", "2.3");
+        ANDROID_VERSION.put("14", "4.0");
+        ANDROID_VERSION.put("15", "4.0.3");
+        ANDROID_VERSION.put("16", "4.1.2");
+        ANDROID_VERSION.put("18", "4.3.1");
+        ANDROID_VERSION.put("19", "4.4.2");
+        ANDROID_VERSION.put("20", "4.4w.2");
+        ANDROID_VERSION.put("21", "5.0.1");
+        ANDROID_VERSION.put("22", "5.1.1");
+        ANDROID_VERSION.put("23", "6.0");
+        ANDROID_VERSION.put("24", "7.0");
+        ANDROID_VERSION.put("25", "7.1.1");
+        ANDROID_VERSION.put("26", "8.0");
+        ANDROID_VERSION.put("27", "8.1.0");
     }
 
     /**
@@ -98,7 +98,7 @@ public class AndroidUtil {
      * @return
      */
     public static String getAndroidVersion(IDevice iDevice) {
-        return sdkMap.get(getApiLevel(iDevice));
+        return ANDROID_VERSION.get(getApiLevel(iDevice));
     }
 
     /**
