@@ -17,9 +17,10 @@ public class AndroidInitializer implements ApplicationRunner {
     private AndroidDeviceChangeListener deviceChangeListener;
 
     @Override
-    public void run(ApplicationArguments args) throws IOException {
+    public void run(ApplicationArguments args) throws IOException, InterruptedException {
         // agent每次启动都先kill adb server
         ADB.killServer();
+        Thread.sleep(1000);
         ADB.startServer();
         ADB.init();
         // 添加设备监听器，监听设备连接、断开
