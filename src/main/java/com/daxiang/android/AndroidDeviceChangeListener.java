@@ -177,6 +177,9 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
 
         AndroidDevice androidDevice = new AndroidDevice(device, iDevice);
 
+        // 安装一个测试apk，用于初始化appium driver
+        AndroidUtil.installApk(iDevice, "vendor/apk/ApiDemos-debug.apk");
+
         log.info("[{}]开始初始化appium", device.getId());
         AndroidDriver androidDriver = AndroidDriverFactory.create(androidDevice, url);
         androidDevice.setAppiumDriver(androidDriver);

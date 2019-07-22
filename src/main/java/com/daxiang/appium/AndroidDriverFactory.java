@@ -16,8 +16,8 @@ import java.net.URL;
  */
 public class AndroidDriverFactory {
 
-    private static final String APP_PACKAGE = "io.appium.settings";
-    private static final String APP_ACTIVITY = ".Settings";
+    private static final String APP_PACKAGE = "io.appium.android.apis";
+    private static final String APP_ACTIVITY = "io.appium.android.apis.ApiDemos";
 
     /**
      * 一个session，两次命令之间最大允许12小时间隔，超出12小时，session将会被appium server删除
