@@ -19,6 +19,7 @@ public class AppiumServer {
         AppiumServiceBuilder builder = new AppiumServiceBuilder();
         builder.usingAnyFreePort().withArgument(GeneralServerFlag.SESSION_OVERRIDE);
         service = AppiumDriverLocalService.buildService(builder);
+        service.enableDefaultSlf4jLoggingOfOutputData();
         service.start();
     }
 
