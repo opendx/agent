@@ -38,6 +38,7 @@ public class MinicapSocketServer {
         log.info("[{}][minicap][socketserver]onOpen: username -> {}", deviceId, username);
         this.deviceId = deviceId;
 
+        // todo 这里使用getAsyncRemote可以解决卡顿
         RemoteEndpoint.Basic basicRemote = session.getBasicRemote();
         basicRemote.sendText("minicap websocket连接成功");
 
