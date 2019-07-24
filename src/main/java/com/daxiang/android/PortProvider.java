@@ -42,7 +42,7 @@ public class PortProvider {
         return availablePort;
     }
 
-    public static synchronized int getUiautomator2ServerPort() {
+    public static synchronized int getUiautomator2ServerAvailablePort() {
         int availablePort = getAvailablePort(UIAUTOMATOR2_SERVER_PORT_START, UIAUTOMATOR2_SERVER_PORT_END, uiautomator2ServerPort);
         uiautomator2ServerPort = availablePort + 1;
         return availablePort;
@@ -60,6 +60,4 @@ public class PortProvider {
             }
         }
     }
-
-
 }
