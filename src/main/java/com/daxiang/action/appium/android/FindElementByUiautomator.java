@@ -19,6 +19,7 @@ public class FindElementByUiautomator {
     public WebElement excute(Object uiautomator) {
         Assert.notNull(uiautomator, "uiautomator不能为空");
         String _uiautomator = (String) uiautomator;
+        _uiautomator = _uiautomator.replaceAll("'", "\"");
 
         if(!(driver instanceof AndroidDriver)) {
             throw new RuntimeException("AppiumDriver非AndroidDriver");
