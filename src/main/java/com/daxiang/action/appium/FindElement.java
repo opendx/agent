@@ -2,7 +2,6 @@ package com.daxiang.action.appium;
 
 import com.daxiang.action.utils.ByUtil;
 import io.appium.java_client.AppiumDriver;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.springframework.util.Assert;
 
