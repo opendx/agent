@@ -32,7 +32,7 @@ public class AndroidDriverFactory {
         capabilities.setCapability(AndroidMobileCapabilityType.UNICODE_KEYBOARD, true); // 切换到appium输入法
         capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, androidDevice.getDevice().getName());
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
-        capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, androidDevice.getAndroidVersion());
+        capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, androidDevice.getSystemVersion());
         capabilities.setCapability(MobileCapabilityType.UDID, androidDevice.getId());
         if (androidDevice.canUseUiautomator2()) {
             capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.ANDROID_UIAUTOMATOR2); // UIAutomation2 is only supported since Android 5.0 (Lollipop)

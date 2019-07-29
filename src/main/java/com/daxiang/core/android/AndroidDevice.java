@@ -117,7 +117,7 @@ public class AndroidDevice {
      *
      * @return
      */
-    public AppiumDriver freshAndroidDriver() {
+    public AppiumDriver freshDriver() {
         if (appiumDriver != null) {
             // 退出上次的会话
             try {
@@ -160,7 +160,7 @@ public class AndroidDevice {
             log.info("[{}][自动化测试]转换代码：{}", getId(), code);
             // todo 捕获到DynamicCompilerException即编译失败，通知master纠正用例，否则错误的用例会无限下发给agent执行
             Class clazz = JavaCompiler.compile(className, code);
-            freshAndroidDriver();
+            freshDriver();
             TestNGRunner.runTestCases(new Class[]{clazz});
         } finally {
             if (isConnected()) {
@@ -170,12 +170,12 @@ public class AndroidDevice {
         }
     }
 
-    public String getAndroidVersion() {
+    public String getSystemVersion() {
         return device.getSystemVersion();
     }
 
     public boolean canUseUiautomator2() {
-        String androidVersion = getAndroidVersion();
+        String androidVersion = getSystemVersion();
         for (String sdkVersion : AndroidUtil.ANDROID_VERSION.keySet()) {
             if (androidVersion.equals(AndroidUtil.ANDROID_VERSION.get(sdkVersion))) {
                 if (Integer.parseInt(sdkVersion) > 20) {

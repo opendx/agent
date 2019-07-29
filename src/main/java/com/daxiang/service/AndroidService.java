@@ -56,7 +56,7 @@ public class AndroidService {
 
     public Response freshAndroidDriver(String deviceId) {
         AndroidDevice androidDevice = getAndroidDevice(deviceId);
-        AppiumDriver appiumDriver = androidDevice.freshAndroidDriver();
+        AppiumDriver appiumDriver = androidDevice.freshDriver();
         JSONObject data = new JSONObject();
         data.put("appiumSessionId", appiumDriver.getSessionId().toString());
         return Response.success(data);
