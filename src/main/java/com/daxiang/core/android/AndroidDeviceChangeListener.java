@@ -59,54 +59,57 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
      */
     private void androidDeviceConnected(IDevice iDevice) {
         String deviceId = iDevice.getSerialNumber();
-        log.info("[{}]已连接", deviceId);
+        log.info("[android][{}]已连接", deviceId);
 
-        log.info("[{}]等待手机上线", deviceId);
+        log.info("[android][{}]等待手机上线", deviceId);
         AndroidUtil.waitForDeviceOnline(iDevice, 5 * 60);
-        log.info("[{}]手机已上线", deviceId);
+        log.info("[android][{}]手机已上线", deviceId);
 
-        AndroidDevice androidDevice = MobileDeviceHolder.getAndroidDevice(deviceId);
-        if (androidDevice == null) {
-            log.info("[{}]首次在agent上线", deviceId);
+        MobileDevice mobileDevice = MobileDeviceHolder.get(deviceId);
+        if (mobileDevice == null) {
+            log.info("[android][{}]首次在agent上线", deviceId);
 
-            log.info("[{}]启动appium server...", deviceId);
+            log.info("[android][{}]启动appium server...", deviceId);
             AppiumServer appiumServer = new AppiumServer();
             appiumServer.start();
-            log.info("[{}]启动appium server完成，url: {}", deviceId, appiumServer.getUrl());
+            log.info("[android][{}]启动appium server完成，url: {}", deviceId, appiumServer.getUrl());
 
-            log.info("[{}]检查是否已接入过master", deviceId);
+            log.info("[android][{}]检查是否已接入过master", deviceId);
             Device device = masterApi.getDeviceById(deviceId);
             if (device == null) {
-                log.info("[{}]首次接入master，开始初始化设备", deviceId);
+                log.info("[android][{}]首次接入master，开始初始化设备", deviceId);
                 try {
-                    androidDevice = initDevice(iDevice, appiumServer.getUrl());
-                    log.info("[{}]初始化设备完成", deviceId);
+                    mobileDevice = initDevice(iDevice, appiumServer.getUrl());
+                    log.info("[android][{}]初始化设备完成", deviceId);
                 } catch (Exception e) {
                     throw new RuntimeException("初始化设备" + deviceId + "出错", e);
                 }
             } else {
-                log.info("[{}]已接入过master", deviceId);
-                androidDevice = new AndroidDevice(device, iDevice);
+                log.info("[android][{}]已接入过master", deviceId);
+                mobileDevice = new AndroidDevice(device, iDevice);
             }
 
-            androidDevice.setAppiumServer(appiumServer);
+
+            mobileDevice.setAppiumServer(appiumServer);
+
+            AndroidDevice androidDevice = (AndroidDevice) mobileDevice;
             androidDevice.setMinicap(new Minicap(androidDevice));
             androidDevice.setMinitouch(new Minitouch(androidDevice));
             androidDevice.setAdbKit(new AdbKit(androidDevice));
 
-            MobileDeviceHolder.add(deviceId, androidDevice);
+            MobileDeviceHolder.add(deviceId, mobileDevice);
         } else {
-            log.info("[{}]非首次在agent上线", deviceId);
+            log.info("[android][{}]非首次在agent上线", deviceId);
         }
 
-        Device device = androidDevice.getDevice();
+        Device device = mobileDevice.getDevice();
         device.setAgentIp(ip);
         device.setAgentPort(port);
         device.setStatus(Device.IDLE_STATUS);
         device.setLastOnlineTime(new Date());
 
         masterApi.saveDevice(device);
-        log.info("[{}]deviceConnected处理完成", deviceId);
+        log.info("[android][{}]deviceConnected处理完成", deviceId);
     }
 
     /**
@@ -116,7 +119,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
      */
     public void androidDeviceDisconnected(IDevice iDevice) {
         String deviceId = iDevice.getSerialNumber();
-        log.info("[{}]断开连接", deviceId);
+        log.info("[android][{}]断开连接", deviceId);
 
         MobileDevice mobileDevice = MobileDeviceHolder.get(deviceId);
         if (mobileDevice == null) {
@@ -128,24 +131,24 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         device.setLastOfflineTime(new Date());
 
         masterApi.saveDevice(device);
-        log.info("[{}]deviceDisconnected处理完成", deviceId);
+        log.info("[android][{}]deviceDisconnected处理完成", deviceId);
     }
 
     /**
      * 首次接入系统，初始化设备
      */
-    private AndroidDevice initDevice(IDevice iDevice, URL url) throws Exception {
+    private MobileDevice initDevice(IDevice iDevice, URL url) throws Exception {
         String deviceId = iDevice.getSerialNumber();
 
-        log.info("[{}]开始安装minicap", deviceId);
+        log.info("[android][{}]开始安装minicap", deviceId);
         MinicapInstaller minicapInstaller = new MinicapInstaller(iDevice);
         minicapInstaller.install();
-        log.info("[{}]安装minicap成功", deviceId);
+        log.info("[android][{}]安装minicap成功", deviceId);
 
-        log.info("[{}]开始安装minitouch", deviceId);
+        log.info("[android][{}]开始安装minitouch", deviceId);
         MinitouchInstaller minitouchInstaller = new MinitouchInstaller(iDevice);
         minitouchInstaller.install();
-        log.info("[{}]安装minitouch成功", deviceId);
+        log.info("[android][{}]安装minitouch成功", deviceId);
 
         Device device = new Device();
 
@@ -181,10 +184,10 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         // 安装一个测试apk，用于初始化appium driver
         AndroidUtil.installApk(iDevice, "vendor/apk/ApiDemos-debug.apk");
 
-        log.info("[{}]开始初始化appium", device.getId());
+        log.info("[android][{}]开始初始化appium", device.getId());
         AppiumDriver appiumDriver = AppiumDriverFactory.create(androidDevice, url);
         androidDevice.setAppiumDriver(appiumDriver);
-        log.info("[{}]初始化appium完成", device.getId());
+        log.info("[android][{}]初始化appium完成", device.getId());
 
         return androidDevice;
     }

@@ -6,10 +6,7 @@ import com.daxiang.core.android.AndroidDevice;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.remote.AndroidMobileCapabilityType;
-import io.appium.java_client.remote.AutomationName;
-import io.appium.java_client.remote.MobileCapabilityType;
-import io.appium.java_client.remote.MobilePlatform;
+import io.appium.java_client.remote.*;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.net.URL;
@@ -21,6 +18,7 @@ public class AppiumDriverFactory {
 
     private static final String APP_PACKAGE = "io.appium.android.apis";
     private static final String APP_ACTIVITY = "io.appium.android.apis.ApiDemos";
+    private static final String BUNDLE_ID = "com.apple.mobilesafari";
 
     /**
      * 一个session两次命令之间最大允许12小时间隔，超出12小时，session将会被appium server删除
@@ -38,12 +36,12 @@ public class AppiumDriverFactory {
 
         capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, NEW_COMMAND_TIMEOUT);
         capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, mobileDevice.getDevice().getName());
-        capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
         capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, mobileDevice.getDevice().getSystemVersion());
         capabilities.setCapability(MobileCapabilityType.UDID, mobileDevice.getId());
         capabilities.setCapability(MobileCapabilityType.NO_RESET, true); // http://appium.io/docs/en/writing-running-appium/other/reset-strategies/index.html
 
         if (isAndroid) {
+            capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
             capabilities.setCapability(AndroidMobileCapabilityType.UNICODE_KEYBOARD, true); // 切换到appium输入法
             if (((AndroidDevice) mobileDevice).canUseUiautomator2()) {
                 capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.ANDROID_UIAUTOMATOR2); // UIAutomation2 is only supported since Android 5.0 (Lollipop)
@@ -57,12 +55,15 @@ public class AppiumDriverFactory {
             capabilities.setCapability(AndroidMobileCapabilityType.APP_ACTIVITY, APP_ACTIVITY);
             capabilities.setCapability("autoLaunch", false);
             capabilities.setCapability("skipLogcatCapture", true);
-        }
-
-
-        if (isAndroid) {
             return new AndroidDriver(url, capabilities);
         } else {
+            capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
+            capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.IOS_XCUI_TEST);
+            capabilities.setCapability(IOSMobileCapabilityType.WDA_LOCAL_PORT, PortProvider.getWdaLocalAvailablePort());
+            capabilities.setCapability("mjpegServerPort", PortProvider.getWdaMjpegServerAvailablePort());
+            capabilities.setCapability(IOSMobileCapabilityType.BUNDLE_ID, BUNDLE_ID);
+            capabilities.setCapability("waitForQuiescence", false);
+            capabilities.setCapability("skipLogCapture", true);
             return new IOSDriver(url, capabilities);
         }
     }

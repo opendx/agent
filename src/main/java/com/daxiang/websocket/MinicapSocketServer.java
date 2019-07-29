@@ -1,6 +1,7 @@
 package com.daxiang.websocket;
 
 import com.daxiang.App;
+import com.daxiang.core.MobileDevice;
 import com.daxiang.core.android.AndroidDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.stf.Minicap;
@@ -29,7 +30,7 @@ public class MinicapSocketServer {
     private static Map<String, Session> sessionPool = new ConcurrentHashMap<>();
 
     private Minicap minicap;
-    private AndroidDevice androidDevice;
+    private MobileDevice mobileDevice;
     private String deviceId;
     private Thread handleImgDataThread;
 
@@ -42,16 +43,16 @@ public class MinicapSocketServer {
         RemoteEndpoint.Basic basicRemote = session.getBasicRemote();
         basicRemote.sendText("minicap websocket连接成功");
 
-        androidDevice = MobileDeviceHolder.getAndroidDevice(deviceId);
+        mobileDevice = MobileDeviceHolder.get(deviceId);
 
-        if (androidDevice == null || !androidDevice.isConnected()) {
+        if (mobileDevice == null || !mobileDevice.isConnected()) {
             basicRemote.sendText(deviceId + "手机未连接");
             session.close();
             return;
         }
 
-        if (androidDevice.getDevice().getStatus() != Device.IDLE_STATUS) {
-            basicRemote.sendText(deviceId + "设备未处于闲置状态，" + androidDevice.getDevice().getUsername() + "使用中");
+        if (mobileDevice.getDevice().getStatus() != Device.IDLE_STATUS) {
+            basicRemote.sendText(deviceId + "设备未处于闲置状态，" + mobileDevice.getDevice().getUsername() + "使用中");
             session.close();
             return;
         }
@@ -66,7 +67,7 @@ public class MinicapSocketServer {
         sessionPool.put(deviceId, session);
 
         basicRemote.sendText("启动minicap服务...");
-        minicap = androidDevice.getMinicap();
+        minicap = ((AndroidDevice) mobileDevice).getMinicap();
         minicap.start(minicap.convertVirtualResolution(Integer.parseInt(App.getProperty("displayWidth"))), 0);
         basicRemote.sendText("启动minicap服务完成");
 
@@ -90,7 +91,7 @@ public class MinicapSocketServer {
         }, "MinicapSocketServer-ImageDataTakerAndSender-" + deviceId);
         handleImgDataThread.start();
 
-        Device device = androidDevice.getDevice();
+        Device device = mobileDevice.getDevice();
         device.setStatus(Device.USING_STATUS);
         device.setUsername(username);
         MasterApi.getInstance().saveDevice(device);
@@ -106,9 +107,9 @@ public class MinicapSocketServer {
             handleImgDataThread.interrupt();
         }
 
-        if (minicap != null && androidDevice != null) {
+        if (minicap != null && mobileDevice != null) {
             minicap.stop();
-            Device device = androidDevice.getDevice();
+            Device device = mobileDevice.getDevice();
             // 因为手机可能被拔出离线，AndroidDeviceChangeListener.deviceDisconnected已经在数据库改为离线，这里不能改为闲置
             if (device != null && device.getStatus() == Device.USING_STATUS) {
                 device.setStatus(Device.IDLE_STATUS);

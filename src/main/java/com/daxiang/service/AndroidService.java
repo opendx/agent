@@ -2,6 +2,7 @@ package com.daxiang.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.android.ddmlib.IDevice;
+import com.daxiang.core.MobileDevice;
 import com.daxiang.core.android.AndroidDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.AndroidUtil;
@@ -130,14 +131,14 @@ public class AndroidService {
         if (StringUtils.isEmpty(deviceId)) {
             throw new BusinessException("设备id不能为空");
         }
-        AndroidDevice androidDevice = MobileDeviceHolder.getAndroidDevice(deviceId);
-        if (androidDevice == null) {
+        MobileDevice mobileDevice = MobileDeviceHolder.get(deviceId);
+        if (mobileDevice == null) {
             throw new BusinessException("设备不存在");
         }
-        if (!androidDevice.isConnected()) {
+        if (!mobileDevice.isConnected()) {
             throw new BusinessException("设备未连接");
         }
-        return androidDevice;
+        return (AndroidDevice) mobileDevice;
     }
 
     public String screenshotByMinicapAndUploadToMaster(AndroidDevice androidDevice) throws Exception {

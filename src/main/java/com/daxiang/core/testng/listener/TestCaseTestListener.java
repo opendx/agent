@@ -55,7 +55,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         Integer deviceTestTaskId = Integer.parseInt(testDesc[1]);
         Boolean needRecordVideo = true; // 这个版本先设置为需要录制视频，以后可能改成从前端传过来
 
-        AndroidDevice androidDevice = MobileDeviceHolder.getAndroidDevice(deviceId);
+        AndroidDevice androidDevice = (AndroidDevice) MobileDeviceHolder.get(deviceId);
         log.info("[{}][自动化测试]onStart, deviceTestTaskId：{}", deviceId, deviceTestTaskId);
 
         TL_ANDROID_DEVICE.set(androidDevice);
