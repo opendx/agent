@@ -1,10 +1,10 @@
 package com.daxiang.service;
 
-import com.daxiang.javacompile.JavaCompiler;
-import com.daxiang.testng.TestNGRunner;
+import com.daxiang.core.javacompile.JavaCompiler;
+import com.daxiang.core.testng.TestNGRunner;
 import com.daxiang.model.Response;
 import com.daxiang.model.request.ActionDebugRequest;
-import com.daxiang.testng.TestNGCodeConverter;
+import com.daxiang.core.testng.TestNGCodeConverter;
 import com.daxiang.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

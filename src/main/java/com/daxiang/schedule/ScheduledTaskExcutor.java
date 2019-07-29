@@ -1,7 +1,7 @@
 package com.daxiang.schedule;
 
-import com.daxiang.android.AndroidDevice;
-import com.daxiang.android.AndroidDeviceHolder;
+import com.daxiang.core.android.AndroidDevice;
+import com.daxiang.core.android.AndroidDeviceHolder;
 import com.daxiang.api.MasterApi;
 import com.daxiang.model.Device;
 import com.daxiang.model.devicetesttask.DeviceTestTask;

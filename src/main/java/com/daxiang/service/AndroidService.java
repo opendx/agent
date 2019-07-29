@@ -2,9 +2,9 @@ package com.daxiang.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.android.ddmlib.IDevice;
-import com.daxiang.android.AndroidDevice;
-import com.daxiang.android.AndroidDeviceHolder;
-import com.daxiang.android.AndroidUtil;
+import com.daxiang.core.android.AndroidDevice;
+import com.daxiang.core.android.AndroidDeviceHolder;
+import com.daxiang.core.android.AndroidUtil;
 import com.daxiang.api.MasterApi;
 import com.daxiang.exception.BusinessException;
 import com.daxiang.model.Response;

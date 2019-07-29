@@ -1,7 +1,7 @@
 package com.daxiang.action.android;
 
-import com.daxiang.android.AndroidDeviceHolder;
-import com.daxiang.android.AndroidUtil;
+import com.daxiang.core.android.AndroidDeviceHolder;
+import com.daxiang.core.android.AndroidUtil;
 import io.appium.java_client.AppiumDriver;
 import org.springframework.util.Assert;
 

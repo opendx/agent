@@ -1,8 +1,8 @@
 package com.daxiang.action.android;
 
 import com.daxiang.App;
-import com.daxiang.android.AndroidDeviceHolder;
-import com.daxiang.android.AndroidUtil;
+import com.daxiang.core.android.AndroidDeviceHolder;
+import com.daxiang.core.android.AndroidUtil;
 import com.daxiang.utils.UUIDUtil;
 import io.appium.java_client.AppiumDriver;
 import org.apache.commons.io.FileUtils;
