@@ -1,6 +1,6 @@
 package com.daxiang.action.android;
 
-import com.daxiang.core.android.AndroidDeviceHolder;
+import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.AndroidUtil;
 import io.appium.java_client.AppiumDriver;
 import org.springframework.util.Assert;
@@ -23,6 +23,6 @@ public class RestartApk {
         String _packageName = (String) packageName;
         String _launchActivity = (String) launchActivity;
 
-        AndroidUtil.restartApk(AndroidDeviceHolder.get(driver).getIDevice(), _packageName, _launchActivity);
+        AndroidUtil.restartApk(MobileDeviceHolder.getIDeviceByAppiumDriver(driver), _packageName, _launchActivity);
     }
 }

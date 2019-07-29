@@ -1,8 +1,8 @@
 package com.daxiang.core.testng.listener;
 
 import com.daxiang.App;
+import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.AndroidDevice;
-import com.daxiang.core.android.AndroidDeviceHolder;
 import com.daxiang.api.MasterApi;
 import com.daxiang.model.Device;
 import com.daxiang.model.action.Step;
@@ -55,7 +55,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         Integer deviceTestTaskId = Integer.parseInt(testDesc[1]);
         Boolean needRecordVideo = true; // 这个版本先设置为需要录制视频，以后可能改成从前端传过来
 
-        AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
+        AndroidDevice androidDevice = MobileDeviceHolder.getAndroidDevice(deviceId);
         log.info("[{}][自动化测试]onStart, deviceTestTaskId：{}", deviceId, deviceTestTaskId);
 
         TL_ANDROID_DEVICE.set(androidDevice);

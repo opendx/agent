@@ -3,7 +3,7 @@ package com.daxiang.websocket;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.daxiang.core.android.AndroidDevice;
-import com.daxiang.core.android.AndroidDeviceHolder;
+import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.stf.Minitouch;
 import com.daxiang.model.Device;
 import io.appium.java_client.android.AndroidDriver;
@@ -41,7 +41,7 @@ public class MinitouchSocketServer {
         RemoteEndpoint.Basic basicRemote = session.getBasicRemote();
         basicRemote.sendText("minitouch websocket连接成功");
 
-        androidDevice = AndroidDeviceHolder.get(deviceId);
+        androidDevice = MobileDeviceHolder.getAndroidDevice(deviceId);
         if (androidDevice == null || !androidDevice.isConnected()) {
             basicRemote.sendText(deviceId + "手机未连接");
             session.close();

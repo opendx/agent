@@ -2,7 +2,7 @@ package com.daxiang.websocket;
 
 import com.daxiang.App;
 import com.daxiang.core.android.AndroidDevice;
-import com.daxiang.core.android.AndroidDeviceHolder;
+import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.stf.Minicap;
 import com.daxiang.api.MasterApi;
 import com.daxiang.model.Device;
@@ -42,7 +42,7 @@ public class MinicapSocketServer {
         RemoteEndpoint.Basic basicRemote = session.getBasicRemote();
         basicRemote.sendText("minicap websocket连接成功");
 
-        androidDevice = AndroidDeviceHolder.get(deviceId);
+        androidDevice = MobileDeviceHolder.getAndroidDevice(deviceId);
 
         if (androidDevice == null || !androidDevice.isConnected()) {
             basicRemote.sendText(deviceId + "手机未连接");

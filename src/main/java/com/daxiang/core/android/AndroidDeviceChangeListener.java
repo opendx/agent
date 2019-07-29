@@ -1,18 +1,19 @@
 package com.daxiang.core.android;
 
 import com.android.ddmlib.*;
+import com.daxiang.core.MobileDeviceHolder;
+import com.daxiang.core.MobileDevice;
 import com.daxiang.core.android.stf.AdbKit;
 import com.daxiang.core.android.stf.Minicap;
 import com.daxiang.core.android.stf.MinicapInstaller;
 import com.daxiang.core.android.stf.Minitouch;
 import com.daxiang.core.android.stf.MinitouchInstaller;
 import com.daxiang.api.MasterApi;
-import com.daxiang.core.appium.AndroidDriverFactory;
+import com.daxiang.core.appium.AppiumDriverFactory;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
-import com.daxiang.model.Platform;
 import com.daxiang.service.AndroidService;
-import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,7 +65,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         AndroidUtil.waitForDeviceOnline(iDevice, 5 * 60);
         log.info("[{}]手机已上线", deviceId);
 
-        AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
+        AndroidDevice androidDevice = MobileDeviceHolder.getAndroidDevice(deviceId);
         if (androidDevice == null) {
             log.info("[{}]首次在agent上线", deviceId);
 
@@ -93,7 +94,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
             androidDevice.setMinitouch(new Minitouch(androidDevice));
             androidDevice.setAdbKit(new AdbKit(androidDevice));
 
-            AndroidDeviceHolder.add(deviceId, androidDevice);
+            MobileDeviceHolder.add(deviceId, androidDevice);
         } else {
             log.info("[{}]非首次在agent上线", deviceId);
         }
@@ -117,7 +118,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         String deviceId = iDevice.getSerialNumber();
         log.info("[{}]断开连接", deviceId);
 
-        AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
+        AndroidDevice androidDevice = MobileDeviceHolder.getAndroidDevice(deviceId);
         if (androidDevice == null) {
             return;
         }
@@ -148,7 +149,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
 
         Device device = new Device();
 
-        device.setPlatform(Platform.ANDROID);
+        device.setPlatform(MobileDevice.ANDROID);
         device.setCreateTime(new Date());
         device.setId(deviceId);
         try {
@@ -181,8 +182,8 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         AndroidUtil.installApk(iDevice, "vendor/apk/ApiDemos-debug.apk");
 
         log.info("[{}]开始初始化appium", device.getId());
-        AndroidDriver androidDriver = AndroidDriverFactory.create(androidDevice, url);
-        androidDevice.setAppiumDriver(androidDriver);
+        AppiumDriver appiumDriver = AppiumDriverFactory.create(androidDevice, url);
+        androidDevice.setAppiumDriver(appiumDriver);
         log.info("[{}]初始化appium完成", device.getId());
 
         return androidDevice;

@@ -3,7 +3,7 @@ package com.daxiang.service;
 import com.alibaba.fastjson.JSONObject;
 import com.android.ddmlib.IDevice;
 import com.daxiang.core.android.AndroidDevice;
-import com.daxiang.core.android.AndroidDeviceHolder;
+import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.AndroidUtil;
 import com.daxiang.api.MasterApi;
 import com.daxiang.core.appium.AndroidNativePageSourceConverter;
@@ -130,7 +130,7 @@ public class AndroidService {
         if (StringUtils.isEmpty(deviceId)) {
             throw new BusinessException("设备id不能为空");
         }
-        AndroidDevice androidDevice = AndroidDeviceHolder.get(deviceId);
+        AndroidDevice androidDevice = MobileDeviceHolder.getAndroidDevice(deviceId);
         if (androidDevice == null) {
             throw new BusinessException("设备不存在");
         }

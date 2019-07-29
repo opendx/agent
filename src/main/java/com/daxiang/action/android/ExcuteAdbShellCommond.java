@@ -1,6 +1,6 @@
 package com.daxiang.action.android;
 
-import com.daxiang.core.android.AndroidDeviceHolder;
+import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.AndroidUtil;
 import io.appium.java_client.AppiumDriver;
 import org.springframework.util.Assert;
@@ -20,6 +20,6 @@ public class ExcuteAdbShellCommond {
         Assert.notNull(cmd, "命令不能为空");
         String _cmd = (String) cmd;
 
-        return AndroidUtil.executeShellCommand(AndroidDeviceHolder.get(driver).getIDevice(), _cmd);
+        return AndroidUtil.executeShellCommand(MobileDeviceHolder.getIDeviceByAppiumDriver(driver), _cmd);
     }
 }

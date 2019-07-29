@@ -1,6 +1,6 @@
 package com.daxiang.action.android;
 
-import com.daxiang.core.android.AndroidDeviceHolder;
+import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.AndroidUtil;
 import io.appium.java_client.AppiumDriver;
 import org.springframework.util.Assert;
@@ -19,6 +19,6 @@ public class ClearApkData {
     public void excute(Object packageName) throws Exception {
         Assert.notNull(packageName, "包名不能为空");
         String _packageName = (String) packageName;
-        AndroidUtil.clearApkData(AndroidDeviceHolder.get(driver).getIDevice(), _packageName);
+        AndroidUtil.clearApkData(MobileDeviceHolder.getIDeviceByAppiumDriver(driver), _packageName);
     }
 }

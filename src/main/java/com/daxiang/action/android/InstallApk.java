@@ -1,7 +1,7 @@
 package com.daxiang.action.android;
 
 import com.daxiang.App;
-import com.daxiang.core.android.AndroidDeviceHolder;
+import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.AndroidUtil;
 import com.daxiang.utils.UUIDUtil;
 import io.appium.java_client.AppiumDriver;
@@ -34,7 +34,7 @@ public class InstallApk {
         try {
             FileUtils.writeByteArrayToFile(apk, apkBytes, false);
             // install apk
-            AndroidUtil.installApk(AndroidDeviceHolder.get(driver).getIDevice(), apk.getAbsolutePath());
+            AndroidUtil.installApk(MobileDeviceHolder.getIDeviceByAppiumDriver(driver), apk.getAbsolutePath());
         } finally {
             // delete apk
             FileUtils.deleteQuietly(apk);

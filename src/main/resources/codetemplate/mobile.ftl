@@ -1,5 +1,5 @@
 import com.daxiang.core.android.AndroidDevice;
-import com.daxiang.core.android.AndroidDeviceHolder;
+import com.daxiang.core.MobileDeviceHolder;
 import io.appium.java_client.AppiumDriver;
 import org.testng.annotations.*;
 import com.daxiang.core.testng.listener.TestCaseTestListener;

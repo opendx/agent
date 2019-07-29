@@ -1,7 +1,7 @@
 package com.daxiang.schedule;
 
-import com.daxiang.core.android.AndroidDevice;
-import com.daxiang.core.android.AndroidDeviceHolder;
+import com.daxiang.core.MobileDevice;
+import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.api.MasterApi;
 import com.daxiang.model.Device;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
@@ -30,18 +30,18 @@ public class ScheduledTaskExcutor {
     @Scheduled(fixedRate = 10000)
     public void commitDeviceTestTask() {
         // 在线闲置的设备
-        List<String> idleAndroidDeviceIds = AndroidDeviceHolder.getAll().stream()
-                .filter(androidDevice -> androidDevice.getDevice().getStatus() == Device.IDLE_STATUS)
-                .map(AndroidDevice::getId)
+        List<String> idleMobileDeviceIds = MobileDeviceHolder.getAll().stream()
+                .filter(mobileDevice -> mobileDevice.getDevice().getStatus() == Device.IDLE_STATUS)
+                .map(MobileDevice::getId)
                 .collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(idleAndroidDeviceIds)) {
+        if (CollectionUtils.isEmpty(idleMobileDeviceIds)) {
             return;
         }
 
-        idleAndroidDeviceIds.stream().parallel().forEach(deviceId -> {
+        idleMobileDeviceIds.stream().parallel().forEach(deviceId -> {
             DeviceTestTask unStartDeviceTestTask = masterApi.getFirstUnStartDeviceTestTask(deviceId);
             if (unStartDeviceTestTask != null) {
-                AndroidDeviceHolder.get(deviceId).commitTestTask(unStartDeviceTestTask);
+                MobileDeviceHolder.get(deviceId).getDeviceTestTaskExcutor().commitTestTask(unStartDeviceTestTask);
                 log.info("[{}][自动化测试]提交测试任务: {}", deviceId, unStartDeviceTestTask.getTestTaskName());
             }
         });

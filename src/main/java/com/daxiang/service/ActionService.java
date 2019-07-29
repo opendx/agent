@@ -29,7 +29,7 @@ public class ActionService {
         String className = "Debug_" + UUIDUtil.getUUID();
         try {
             String code = new TestNGCodeConverter().setDeviceId(request.getDeviceId()).setGlobalVars(request.getGlobalVars())
-                    .convert(className, Arrays.asList(request.getAction()), "/codetemplate", "android.ftl");
+                    .convert(className, Arrays.asList(request.getAction()), "/codetemplate", "mobile.ftl");
             log.info("[调试action]: {}", code);
             if (StringUtils.isEmpty(code)) {
                 return Response.fail("转换testng代码失败");
