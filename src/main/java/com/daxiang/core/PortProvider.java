@@ -24,6 +24,15 @@ public class PortProvider {
     private static final int UIAUTOMATOR2_SERVER_PORT_END = 8999;
     private static int uiautomator2ServerPort = UIAUTOMATOR2_SERVER_PORT_START;
 
+    private static final int WDA_LOCAL_PORT_START = 9000;
+    private static final int WDA_LOCAL_PORT_END = 9499;
+    private static int wdaLocalPort = WDA_LOCAL_PORT_START;
+
+    private static final int WDA_MJPEG_SERVER_PORT_START = 9500;
+    private static final int WDA_MJPEG_SERVER_PORT_END = 9999;
+    private static int wdaMjpegServerPort = WDA_MJPEG_SERVER_PORT_START;
+
+
     public static synchronized int getMinitouchAvailablePort() {
         int availablePort = getAvailablePort(MINITOUCH_PORT_START, MINITOUCH_PORT_END, minitouchPort);
         minitouchPort = availablePort + 1;
@@ -45,6 +54,18 @@ public class PortProvider {
     public static synchronized int getUiautomator2ServerAvailablePort() {
         int availablePort = getAvailablePort(UIAUTOMATOR2_SERVER_PORT_START, UIAUTOMATOR2_SERVER_PORT_END, uiautomator2ServerPort);
         uiautomator2ServerPort = availablePort + 1;
+        return availablePort;
+    }
+
+    public static synchronized int getWdaLocalAvailablePort() {
+        int availablePort = getAvailablePort(WDA_LOCAL_PORT_START, WDA_LOCAL_PORT_END, wdaLocalPort);
+        wdaLocalPort = availablePort + 1;
+        return availablePort;
+    }
+
+    public static synchronized int getWdaMjpegServerAvailablePort() {
+        int availablePort = getAvailablePort(WDA_MJPEG_SERVER_PORT_START, WDA_MJPEG_SERVER_PORT_END, uiautomator2ServerPort);
+        wdaMjpegServerPort = availablePort + 1;
         return availablePort;
     }
 
