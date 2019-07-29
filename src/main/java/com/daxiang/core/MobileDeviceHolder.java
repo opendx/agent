@@ -2,6 +2,7 @@ package com.daxiang.core;
 
 import com.android.ddmlib.IDevice;
 import com.daxiang.core.android.AndroidDevice;
+import com.daxiang.core.ios.IosDevice;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.remote.MobileCapabilityType;
 
@@ -53,5 +54,18 @@ public class MobileDeviceHolder {
         }
 
         return (AndroidDevice) mobileDevice;
+    }
+
+    public static IosDevice getIosDevice(String deviceId) {
+        MobileDevice mobileDevice = get(deviceId);
+        if (mobileDevice == null) {
+            throw new RuntimeException("获取MobileDevice为空");
+        }
+
+        if (!(mobileDevice instanceof IosDevice)) {
+            throw new RuntimeException("MobileDevice不是IosDevice");
+        }
+
+        return (IosDevice) mobileDevice;
     }
 }

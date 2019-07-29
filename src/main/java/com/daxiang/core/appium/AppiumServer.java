@@ -24,7 +24,7 @@ public class AppiumServer {
     }
 
     public URL getUrl() {
-        if(service != null && service.isRunning()) {
+        if (service != null && service.isRunning()) {
             return service.getUrl();
         }
         return null;

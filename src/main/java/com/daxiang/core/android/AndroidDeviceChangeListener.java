@@ -118,12 +118,12 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         String deviceId = iDevice.getSerialNumber();
         log.info("[{}]断开连接", deviceId);
 
-        AndroidDevice androidDevice = MobileDeviceHolder.getAndroidDevice(deviceId);
-        if (androidDevice == null) {
+        MobileDevice mobileDevice = MobileDeviceHolder.get(deviceId);
+        if (mobileDevice == null) {
             return;
         }
 
-        Device device = androidDevice.getDevice();
+        Device device = mobileDevice.getDevice();
         device.setStatus(Device.OFFLINE_STATUS);
         device.setLastOfflineTime(new Date());
 

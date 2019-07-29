@@ -64,7 +64,7 @@ public class PortProvider {
     }
 
     public static synchronized int getWdaMjpegServerAvailablePort() {
-        int availablePort = getAvailablePort(WDA_MJPEG_SERVER_PORT_START, WDA_MJPEG_SERVER_PORT_END, uiautomator2ServerPort);
+        int availablePort = getAvailablePort(WDA_MJPEG_SERVER_PORT_START, WDA_MJPEG_SERVER_PORT_END, wdaMjpegServerPort);
         wdaMjpegServerPort = availablePort + 1;
         return availablePort;
     }

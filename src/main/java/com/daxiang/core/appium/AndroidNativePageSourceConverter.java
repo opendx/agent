@@ -1,6 +1,5 @@
 package com.daxiang.core.appium;
 
-import io.appium.java_client.AppiumDriver;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
