@@ -19,10 +19,9 @@ import java.util.List;
 public class AndroidNativePageSourceConverter {
 
 
-    public static String convert(AppiumDriver appiumDriver) throws IOException, DocumentException {
-        String pageSource = appiumDriver.getPageSource();
+    public static String convert(String pageSource) throws IOException, DocumentException {
         if (StringUtils.isEmpty(pageSource)) {
-            throw new RuntimeException("pageSource为空");
+            throw new IllegalArgumentException("pageSource不能为空");
         }
 
         // 由于appium pageSource返回的xml不是规范的xml，需要把除了hierarchy节点以外的节点替换成node，否则xml转json会出问题

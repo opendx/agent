@@ -72,7 +72,7 @@ public class AndroidService {
 
         // 由于appium pageSource返回的xml不是规范的xml，需要把除了hierarchy节点以外的节点替换成node，否则xml转json会出问题
         try {
-            String pageSource = AndroidNativePageSourceConverter.convert(appiumDriver);
+            String pageSource = AndroidNativePageSourceConverter.convert(appiumDriver.getPageSource());
             return Response.success("ok", pageSource);
         } catch (DocumentException e) {
             log.error("读取pageSource出错", e);
