@@ -35,7 +35,7 @@ public class AndroidDevice {
     /**
      * 执行自动化测试任务队列
      */
-    private final BlockingQueue<DeviceTestTask> testTaskQueue = new LinkedBlockingQueue();
+    private final BlockingQueue<DeviceTestTask> testTaskQueue = new LinkedBlockingQueue<>();
     /**
      * 执行自动化测试任务线程
      */
