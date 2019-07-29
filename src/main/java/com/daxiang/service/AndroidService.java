@@ -6,29 +6,22 @@ import com.daxiang.core.android.AndroidDevice;
 import com.daxiang.core.android.AndroidDeviceHolder;
 import com.daxiang.core.android.AndroidUtil;
 import com.daxiang.api.MasterApi;
+import com.daxiang.core.appium.AndroidNativePageSourceConverter;
 import com.daxiang.exception.BusinessException;
 import com.daxiang.model.Response;
 import com.daxiang.utils.UUIDUtil;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.dom4j.Document;
 import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
-import org.json.XML;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-
 
 /**
  * Created by jiangyitao.
@@ -77,20 +70,12 @@ public class AndroidService {
             return Response.fail("androidDriver为空");
         }
 
-        String pageSource = appiumDriver.getPageSource();
-        if (StringUtils.isEmpty(pageSource)) {
-            return Response.fail("pageSource为空");
-        }
-
         // 由于appium pageSource返回的xml不是规范的xml，需要把除了hierarchy节点以外的节点替换成node，否则xml转json会出问题
-        try (InputStream in = new ByteArrayInputStream(pageSource.getBytes())) {
-            SAXReader saxReader = new SAXReader();
-            Document document = saxReader.read(in);
-            Element rootElement = document.getRootElement();
-            handleElement(rootElement);
-            return Response.success("ok", XML.toJSONObject(document.asXML()).toString());
+        try {
+            String pageSource = AndroidNativePageSourceConverter.convert(appiumDriver);
+            return Response.success("ok", pageSource);
         } catch (DocumentException e) {
-            log.error("读取pageSource出错，pageSource: {}", pageSource, e);
+            log.error("读取pageSource出错", e);
             return Response.fail("读取pageSource出错，请稍后重试");
         } catch (IOException e) {
             log.error(e.getMessage(), e);
@@ -98,22 +83,6 @@ public class AndroidService {
         }
     }
 
-    private void handleElement(Element element) {
-        if (element == null) {
-            return;
-        }
-
-        String elementName = element.getName();
-        if (StringUtils.isEmpty(elementName)) {
-            return;
-        }
-        if (!"hierarchy".equals(elementName)) {
-            element.setName("node");
-        }
-
-        List<Element> elements = element.elements();
-        elements.forEach(e -> handleElement(e));
-    }
 
     public Response screenshot(String deviceId) {
         AndroidDevice androidDevice = getAndroidDevice(deviceId);
