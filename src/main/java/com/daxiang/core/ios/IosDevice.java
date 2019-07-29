@@ -1,20 +1,14 @@
 package com.daxiang.core.ios;
 
-import com.daxiang.core.appium.AppiumServer;
+import com.daxiang.core.MobileDevice;
 import com.daxiang.model.Device;
-import io.appium.java_client.AppiumDriver;
 
 /**
  * Created by jiangyitao.
  */
-public class IosDevice {
-
-    private Device device;
-
-    private AppiumServer appiumServer;
-    private AppiumDriver appiumDriver;
+public class IosDevice extends MobileDevice {
 
     public IosDevice(Device device) {
-        this.device = device;
+        super(device);
     }
 }

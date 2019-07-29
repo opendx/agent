@@ -41,6 +41,7 @@ public class AppiumDriverFactory {
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
         capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, mobileDevice.getDevice().getSystemVersion());
         capabilities.setCapability(MobileCapabilityType.UDID, mobileDevice.getId());
+        capabilities.setCapability(MobileCapabilityType.NO_RESET, true); // http://appium.io/docs/en/writing-running-appium/other/reset-strategies/index.html
 
         if (isAndroid) {
             capabilities.setCapability(AndroidMobileCapabilityType.UNICODE_KEYBOARD, true); // 切换到appium输入法
@@ -58,7 +59,6 @@ public class AppiumDriverFactory {
             capabilities.setCapability("skipLogcatCapture", true);
         }
 
-        capabilities.setCapability(MobileCapabilityType.NO_RESET, true); // true代表不清除手机数据
 
         if (isAndroid) {
             return new AndroidDriver(url, capabilities);
