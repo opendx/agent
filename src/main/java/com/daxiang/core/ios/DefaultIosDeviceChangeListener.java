@@ -9,12 +9,12 @@ import com.daxiang.model.Device;
 import com.daxiang.service.IosService;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.util.Date;
-
 
 /**
  * Created by jiangyitao.
@@ -103,9 +103,9 @@ public class DefaultIosDeviceChangeListener extends MobileDeviceChangeHandler im
         iosDevice.setAppiumDriver(appiumDriver);
         log.info("[ios][{}]初始化appium完成", device.getId());
 
-        // todo appiumDriver获取屏幕分辨率
-        device.setScreenWidth();
-        device.setScreenHeight();
+        Point windowPosition = appiumDriver.manage().window().getPosition();
+        device.setScreenWidth(windowPosition.getX());
+        device.setScreenHeight(windowPosition.getY());
 
         return iosDevice;
     }
