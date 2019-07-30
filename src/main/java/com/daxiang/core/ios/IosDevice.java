@@ -11,4 +11,9 @@ public class IosDevice extends MobileDevice {
     public IosDevice(Device device) {
         super(device);
     }
+
+    public int getMjpegServerPort() {
+        Object mjpegServerPort = getAppiumDriver().getCapabilities().asMap().get("mjpegServerPort");
+        return (int) mjpegServerPort;
+    }
 }
