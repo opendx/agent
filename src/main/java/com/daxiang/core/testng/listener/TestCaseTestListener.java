@@ -144,27 +144,13 @@ public class TestCaseTestListener extends TestListenerAdapter {
             File video = new File(videoPath);
             Callable<String> recordVideo = () -> {
                 BlockingQueue<byte[]> imgQueue = androidDevice.getMinicap().getImgQueue();
+                imgQueue.clear(); // 防止录制到上一条用例的视频数据
                 try {
                     while (true) {
                         byte[] imgData;
                         try {
                             imgData = imgQueue.take();
                         } catch (InterruptedException e) {
-                            log.info("[{}][自动化测试]testcaseId: {}，flush剩余的minicap数据", deviceId, testcaseId);
-                            // 最多flush 10秒
-                            long start = System.currentTimeMillis();
-                            while (true) {
-                                if (System.currentTimeMillis() - start >= 10000) {
-                                    break;
-                                }
-                                byte[] surplusImgData = imgQueue.poll();
-                                if (surplusImgData == null) {
-                                    break;
-                                }
-                                try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(surplusImgData)) {
-                                    videoRecorder.record(Java2DFrameUtils.toFrame(ImageIO.read(byteArrayInputStream)));
-                                }
-                            }
                             log.info("[{}][自动化测试]testcaseId: {}，停止获取minicap数据", deviceId, testcaseId);
                             break;
                         }
