@@ -1,4 +1,3 @@
-import com.daxiang.core.android.AndroidDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import io.appium.java_client.AppiumDriver;
 import org.testng.annotations.*;
@@ -17,7 +16,7 @@ public class ${className} {
 
     @BeforeSuite
     public void beforeSuite() throws Exception {
-        driver = AndroidDeviceHolder.get("${deviceId}").getAppiumDriver();
+        driver = MobileDeviceHolder.get("${deviceId}").getAppiumDriver();
     }
 
     <#if beforeClass??>
