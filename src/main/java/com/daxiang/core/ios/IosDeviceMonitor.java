@@ -34,6 +34,7 @@ public class IosDeviceMonitor {
         }
         isMonitorDevice = true;
         new Thread(() -> {
+            log.info("[ios]开始检查设备连接状态");
             while (isMonitorDevice) {
                 if(iosDeviceChangeListener != null) {
                     currentDeviceList = IosUtil.getDeviceList();
@@ -56,6 +57,7 @@ public class IosDeviceMonitor {
                     log.error("sleep err", e);
                 }
             }
+            log.info("[ios]已停止检查设备连接状态");
         }).start();
     }
 

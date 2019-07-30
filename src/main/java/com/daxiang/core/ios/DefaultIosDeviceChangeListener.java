@@ -3,7 +3,7 @@ package com.daxiang.core.ios;
 import com.daxiang.api.MasterApi;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
-import com.daxiang.core.appium.AppiumDriverFactory;
+import com.daxiang.core.appium.AppiumDriverBuilder;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
 import com.daxiang.service.IosService;
@@ -102,7 +102,7 @@ public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
         log.info("[ios][{}]deviceDisconnected处理完成", deviceId);
     }
 
-    public MobileDevice initDevice(String deviceId, URL url) throws Exception {
+    private MobileDevice initDevice(String deviceId, URL url) throws Exception {
         Device device = new Device();
 
         device.setPlatform(MobileDevice.IOS);
@@ -125,7 +125,7 @@ public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
         IosDevice iosDevice = new IosDevice(device);
 
         log.info("[ios][{}]开始初始化appium", device.getId());
-        AppiumDriver appiumDriver = AppiumDriverFactory.create(iosDevice, url);
+        AppiumDriver appiumDriver = AppiumDriverBuilder.build(iosDevice, url);
         iosDevice.setAppiumDriver(appiumDriver);
         log.info("[ios][{}]初始化appium完成", device.getId());
 

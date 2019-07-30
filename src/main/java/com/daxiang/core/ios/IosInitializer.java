@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 public class IosInitializer implements ApplicationRunner {
 
     @Autowired
-    private DefaultIosDeviceChangeListener iosDeviceChangeListener;
+    private IosDeviceChangeListener iosDeviceChangeListener;
 
     @Override
     public void run(ApplicationArguments args) {

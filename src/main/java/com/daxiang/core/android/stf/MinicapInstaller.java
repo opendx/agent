@@ -37,17 +37,17 @@ public class MinicapInstaller {
         String minicapSoFilePath = String.format(MINICAP_SO_PATH, sdkVersion, cpuAbi);
 
         // push minicap 到手机
-        String phoneMinicapPath = AndroidDevice.TMP_FOLDER + "minicap";
-        log.info("[{}][minicap]push minicap到手机,{} -> {}", deviceId, minicapFilePath, phoneMinicapPath);
-        iDevice.pushFile(minicapFilePath, phoneMinicapPath);
+        String androidDeviceMinicapPath = AndroidDevice.TMP_FOLDER + "minicap";
+        log.info("[{}][minicap]push minicap到手机,{} -> {}", deviceId, minicapFilePath, androidDeviceMinicapPath);
+        iDevice.pushFile(minicapFilePath, androidDeviceMinicapPath);
 
         // push minicap.so 到手机
-        String phoneMinicapSoPath = AndroidDevice.TMP_FOLDER + "minicap.so";
-        log.info("[{}][minicap]push minicap.so到手机,{} -> {}", deviceId, minicapSoFilePath, phoneMinicapSoPath);
-        iDevice.pushFile(minicapSoFilePath, phoneMinicapSoPath);
+        String androidDeviceMinicapSoPath = AndroidDevice.TMP_FOLDER + "minicap.so";
+        log.info("[{}][minicap]push minicap.so到手机,{} -> {}", deviceId, minicapSoFilePath, androidDeviceMinicapSoPath);
+        iDevice.pushFile(minicapSoFilePath, androidDeviceMinicapSoPath);
 
         // 给手机里的minicap/minicap.so 赋予777权限
-        String chmodShellCmd = String.format(MINICAP_CHMOD_SHELL, phoneMinicapPath, phoneMinicapSoPath);
+        String chmodShellCmd = String.format(MINICAP_CHMOD_SHELL, androidDeviceMinicapPath, androidDeviceMinicapSoPath);
         log.info("[{}][minicap]{} ", deviceId, chmodShellCmd);
         iDevice.executeShellCommand(chmodShellCmd, new NullOutputReceiver());
     }

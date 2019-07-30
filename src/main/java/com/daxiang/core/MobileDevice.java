@@ -1,6 +1,6 @@
 package com.daxiang.core;
 
-import com.daxiang.core.appium.AppiumDriverFactory;
+import com.daxiang.core.appium.AppiumDriverBuilder;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
 import io.appium.java_client.AppiumDriver;
@@ -46,7 +46,7 @@ public class MobileDevice {
                 // 上次会话可能已经过期，quit会有异常，ignore
             }
         }
-        appiumDriver = AppiumDriverFactory.create(this, appiumServer.getUrl());
+        appiumDriver = AppiumDriverBuilder.build(this, appiumServer.getUrl());
         return appiumDriver;
     }
 

@@ -9,7 +9,7 @@ import com.daxiang.core.android.stf.MinicapInstaller;
 import com.daxiang.core.android.stf.Minitouch;
 import com.daxiang.core.android.stf.MinitouchInstaller;
 import com.daxiang.api.MasterApi;
-import com.daxiang.core.appium.AppiumDriverFactory;
+import com.daxiang.core.appium.AppiumDriverBuilder;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
 import com.daxiang.service.AndroidService;
@@ -88,7 +88,6 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
                 log.info("[android][{}]已接入过master", deviceId);
                 mobileDevice = new AndroidDevice(device, iDevice);
             }
-
 
             mobileDevice.setAppiumServer(appiumServer);
 
@@ -185,7 +184,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         AndroidUtil.installApk(iDevice, "vendor/apk/ApiDemos-debug.apk");
 
         log.info("[android][{}]开始初始化appium", device.getId());
-        AppiumDriver appiumDriver = AppiumDriverFactory.create(androidDevice, url);
+        AppiumDriver appiumDriver = AppiumDriverBuilder.build(androidDevice, url);
         androidDevice.setAppiumDriver(appiumDriver);
         log.info("[android][{}]初始化appium完成", device.getId());
 

@@ -14,7 +14,7 @@ import java.net.URL;
 /**
  * Created by jiangyitao.
  */
-public class AppiumDriverFactory {
+public class AppiumDriverBuilder {
 
     private static final String APP_PACKAGE = "io.appium.android.apis";
     private static final String APP_ACTIVITY = "io.appium.android.apis.ApiDemos";
@@ -25,7 +25,7 @@ public class AppiumDriverFactory {
      */
     private static final int NEW_COMMAND_TIMEOUT = 60 * 60 * 12;
 
-    public static AppiumDriver create(MobileDevice mobileDevice, URL url) {
+    public static AppiumDriver build(MobileDevice mobileDevice, URL url) {
         boolean isAndroid = false;
         if (mobileDevice instanceof AndroidDevice) {
             isAndroid = true;

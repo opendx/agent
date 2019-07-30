@@ -14,7 +14,6 @@ import java.util.*;
 @Slf4j
 public class IosUtil {
 
-
     public static List<String> getDeviceList() {
         try {
             String result = ShellExecutor.execute("idevice_id -l");
@@ -49,10 +48,11 @@ public class IosUtil {
     public static File screenshotByIdeviceScreenshot(String deviceId) throws IOException {
         // Screenshot saved to screenshot-xxx.png
         String result = ShellExecutor.execute("idevicescreenshot -u " + deviceId);
-        if (StringUtils.isEmpty(result) || !result.endsWith(".png")) {
+        if (StringUtils.isEmpty(result)) {
             throw new RuntimeException("截图失败，idevicescreenshot返回：" + result);
         }
-        return new File(result.split(" ")[3]);
+        String[] resultArr = result.split(" ");
+        return new File(resultArr[resultArr.length - 1]);
     }
 
 }

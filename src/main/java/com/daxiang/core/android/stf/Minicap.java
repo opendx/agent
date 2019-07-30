@@ -109,7 +109,7 @@ public class Minicap {
             }
             log.info("[{}][minicap]已停止向imgQueue推送图片数据", deviceId);
 
-            //手机未连接 adb forward会自己移除
+            // 手机未连接 adb forward会自己移除
             if (androidDevice.isConnected()) {
                 try {
                     log.info("[{}][minicap]移除adb forward: {} -> remote minicap", deviceId, localPort);
