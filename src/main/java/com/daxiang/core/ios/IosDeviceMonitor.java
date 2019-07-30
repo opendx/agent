@@ -46,7 +46,7 @@ public class IosDeviceMonitor {
                     // 减少的设备
                     lastDeviceList.stream()
                             .filter(deviceId -> !currentDeviceList.contains(deviceId))
-                            .forEach(deviceId -> iosDeviceChangeListener.onDeviceDisConnected(deviceId));
+                            .forEach(deviceId -> iosDeviceChangeListener.onDeviceDisconnected(deviceId));
 
                     lastDeviceList = currentDeviceList;
                 }

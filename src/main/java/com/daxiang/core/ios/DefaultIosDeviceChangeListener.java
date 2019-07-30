@@ -1,7 +1,7 @@
 package com.daxiang.core.ios;
 
-import com.daxiang.api.MasterApi;
 import com.daxiang.core.MobileDevice;
+import com.daxiang.core.MobileDeviceChangeHandler;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.appium.AppiumDriverBuilder;
 import com.daxiang.core.appium.AppiumServer;
@@ -10,7 +10,6 @@ import com.daxiang.service.IosService;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
@@ -22,16 +21,10 @@ import java.util.Date;
  */
 @Slf4j
 @Component
-public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
+public class DefaultIosDeviceChangeListener extends MobileDeviceChangeHandler implements IosDeviceChangeListener {
 
     @Autowired
-    private MasterApi masterApi;
-    @Autowired
     private IosService iosService;
-    @Value("${server.address}")
-    private String ip;
-    @Value("${server.port}")
-    private Integer port;
 
     @Override
     public void onDeviceConnected(String deviceId) {
@@ -39,7 +32,7 @@ public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
     }
 
     @Override
-    public void onDeviceDisConnected(String deviceId) {
+    public void onDeviceDisconnected(String deviceId) {
         new Thread(() -> iosDeviceDisconnected(deviceId)).start();
     }
 
@@ -56,11 +49,11 @@ public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
             log.info("[ios][{}]启动appium server完成，url: {}", deviceId, appiumServer.getUrl());
 
             log.info("[ios][{}]检查是否已接入过master", deviceId);
-            Device device = masterApi.getDeviceById(deviceId);
+            Device device = getDeviceById(deviceId);
             if (device == null) {
                 log.info("[ios][{}]首次接入master，开始初始化设备", deviceId);
                 try {
-                    mobileDevice = initDevice(deviceId, appiumServer.getUrl());
+                    mobileDevice = initIosDevice(deviceId, appiumServer.getUrl());
                     log.info("[ios][{}]初始化设备完成", deviceId);
                 } catch (Exception e) {
                     throw new RuntimeException("初始化设备" + deviceId + "出错", e);
@@ -76,33 +69,17 @@ public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
             log.info("[ios][{}]非首次在agent上线", deviceId);
         }
 
-        Device device = mobileDevice.getDevice();
-        device.setAgentIp(ip);
-        device.setAgentPort(port);
-        device.setStatus(Device.IDLE_STATUS);
-        device.setLastOnlineTime(new Date());
-
-        masterApi.saveDevice(device);
+        mobileOnline(mobileDevice);
         log.info("[ios][{}]deviceConnected处理完成", deviceId);
     }
 
     private void iosDeviceDisconnected(String deviceId) {
         log.info("[ios][{}]断开连接", deviceId);
-
-        MobileDevice mobileDevice = MobileDeviceHolder.get(deviceId);
-        if (mobileDevice == null) {
-            return;
-        }
-
-        Device device = mobileDevice.getDevice();
-        device.setStatus(Device.OFFLINE_STATUS);
-        device.setLastOfflineTime(new Date());
-
-        masterApi.saveDevice(device);
+        mobileDisconnected(deviceId);
         log.info("[ios][{}]deviceDisconnected处理完成", deviceId);
     }
 
-    private MobileDevice initDevice(String deviceId, URL url) throws Exception {
+    private MobileDevice initIosDevice(String deviceId, URL url) throws Exception {
         Device device = new Device();
 
         device.setPlatform(MobileDevice.IOS);

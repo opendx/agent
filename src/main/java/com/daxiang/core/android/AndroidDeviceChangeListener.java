@@ -1,6 +1,7 @@
 package com.daxiang.core.android;
 
 import com.android.ddmlib.*;
+import com.daxiang.core.MobileDeviceChangeHandler;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.android.stf.AdbKit;
@@ -8,7 +9,6 @@ import com.daxiang.core.android.stf.Minicap;
 import com.daxiang.core.android.stf.MinicapInstaller;
 import com.daxiang.core.android.stf.Minitouch;
 import com.daxiang.core.android.stf.MinitouchInstaller;
-import com.daxiang.api.MasterApi;
 import com.daxiang.core.appium.AppiumDriverBuilder;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
@@ -16,7 +16,6 @@ import com.daxiang.service.AndroidService;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
@@ -27,16 +26,10 @@ import java.util.Date;
  */
 @Component
 @Slf4j
-public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceChangeListener {
+public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler implements AndroidDebugBridge.IDeviceChangeListener {
 
     @Autowired
-    private MasterApi masterApi;
-    @Autowired
     private AndroidService androidService;
-    @Value("${server.address}")
-    private String ip;
-    @Value("${server.port}")
-    private Integer port;
 
     @Override
     public void deviceConnected(IDevice device) {
@@ -75,11 +68,11 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
             log.info("[android][{}]启动appium server完成，url: {}", deviceId, appiumServer.getUrl());
 
             log.info("[android][{}]检查是否已接入过master", deviceId);
-            Device device = masterApi.getDeviceById(deviceId);
+            Device device = getDeviceById(deviceId);
             if (device == null) {
                 log.info("[android][{}]首次接入master，开始初始化设备", deviceId);
                 try {
-                    mobileDevice = initDevice(iDevice, appiumServer.getUrl());
+                    mobileDevice = initAndroidDevice(iDevice, appiumServer.getUrl());
                     log.info("[android][{}]初始化设备完成", deviceId);
                 } catch (Exception e) {
                     throw new RuntimeException("初始化设备" + deviceId + "出错", e);
@@ -89,25 +82,18 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
                 mobileDevice = new AndroidDevice(device, iDevice);
             }
 
-            mobileDevice.setAppiumServer(appiumServer);
-
             AndroidDevice androidDevice = (AndroidDevice) mobileDevice;
             androidDevice.setMinicap(new Minicap(androidDevice));
             androidDevice.setMinitouch(new Minitouch(androidDevice));
             androidDevice.setAdbKit(new AdbKit(androidDevice));
 
+            mobileDevice.setAppiumServer(appiumServer);
             MobileDeviceHolder.add(deviceId, mobileDevice);
         } else {
             log.info("[android][{}]非首次在agent上线", deviceId);
         }
 
-        Device device = mobileDevice.getDevice();
-        device.setAgentIp(ip);
-        device.setAgentPort(port);
-        device.setStatus(Device.IDLE_STATUS);
-        device.setLastOnlineTime(new Date());
-
-        masterApi.saveDevice(device);
+        mobileOnline(mobileDevice);
         log.info("[android][{}]deviceConnected处理完成", deviceId);
     }
 
@@ -119,24 +105,14 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
     public void androidDeviceDisconnected(IDevice iDevice) {
         String deviceId = iDevice.getSerialNumber();
         log.info("[android][{}]断开连接", deviceId);
-
-        MobileDevice mobileDevice = MobileDeviceHolder.get(deviceId);
-        if (mobileDevice == null) {
-            return;
-        }
-
-        Device device = mobileDevice.getDevice();
-        device.setStatus(Device.OFFLINE_STATUS);
-        device.setLastOfflineTime(new Date());
-
-        masterApi.saveDevice(device);
+        mobileDisconnected(deviceId);
         log.info("[android][{}]deviceDisconnected处理完成", deviceId);
     }
 
     /**
-     * 首次接入系统，初始化设备
+     * 首次接入系统，初始化Android设备
      */
-    private MobileDevice initDevice(IDevice iDevice, URL url) throws Exception {
+    private MobileDevice initAndroidDevice(IDevice iDevice, URL url) throws Exception {
         String deviceId = iDevice.getSerialNumber();
 
         log.info("[android][{}]开始安装minicap", deviceId);
