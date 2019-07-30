@@ -45,6 +45,10 @@ public class IosUtil {
         return ShellExecutor.execute("ideviceinfo -k ProductType -u " + deviceId);
     }
 
+    public static String getDeviceName(String deviceId) throws IOException {
+        return ShellExecutor.execute("ideviceinfo -k DeviceName -u " + deviceId);
+    }
+
     public static File screenshotByIdeviceScreenshot(String deviceId) throws IOException {
         // Screenshot saved to screenshot-xxx.png
         String result = ShellExecutor.execute("idevicescreenshot -u " + deviceId);

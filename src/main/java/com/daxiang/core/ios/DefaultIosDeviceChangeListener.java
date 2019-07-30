@@ -86,14 +86,11 @@ public class DefaultIosDeviceChangeListener extends MobileDeviceChangeHandler im
         device.setCreateTime(new Date());
         device.setId(deviceId);
         device.setSystemVersion(IosUtil.getSystemVersion(deviceId));
+        device.setName(IosUtil.getDeviceName(deviceId));
 
-        String productType = IosUtil.getProductType(deviceId);
-        // todo master findbyProductType
-//        device.setCpuInfo();
-//        device.setMemSize();
-//        device.setName();
-//        device.setScreenWidth();
-//        device.setScreenHeight();
+        String msg = "请根据productType：" + IosUtil.getProductType(deviceId) + "查出相应的信息，补充到device表";
+        device.setCpuInfo(msg);
+        device.setMemSize(msg);
 
         // 截图并上传到服务器
         String imgDownloadUrl = iosService.screenshotAndUploadToMaster(deviceId);
@@ -105,6 +102,10 @@ public class DefaultIosDeviceChangeListener extends MobileDeviceChangeHandler im
         AppiumDriver appiumDriver = AppiumDriverBuilder.build(iosDevice, url);
         iosDevice.setAppiumDriver(appiumDriver);
         log.info("[ios][{}]初始化appium完成", device.getId());
+
+        // todo appiumDriver获取屏幕分辨率
+        device.setScreenWidth();
+        device.setScreenHeight();
 
         return iosDevice;
     }
