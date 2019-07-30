@@ -56,7 +56,7 @@ public class IosUtil {
             throw new RuntimeException("截图失败，idevicescreenshot返回：" + result);
         }
         String[] resultArr = result.split(" ");
-        return new File(resultArr[resultArr.length - 1]);
+        return new File(resultArr[resultArr.length - 1].replaceAll("\n", ""));
     }
 
 }
