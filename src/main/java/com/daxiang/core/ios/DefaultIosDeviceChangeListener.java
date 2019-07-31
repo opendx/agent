@@ -93,7 +93,7 @@ public class DefaultIosDeviceChangeListener extends MobileDeviceChangeHandler im
         device.setMemSize(msg);
 
         // 截图并上传到服务器
-        String imgDownloadUrl = iosService.screenshotAndUploadToMaster(deviceId);
+        String imgDownloadUrl = iosService.screenshotByIdeviceScreenshotAndUploadToMaster(deviceId);
         device.setImgUrl(imgDownloadUrl);
 
         IosDevice iosDevice = new IosDevice(device);

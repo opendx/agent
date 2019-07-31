@@ -18,7 +18,7 @@ public class IosService {
     private MasterApi masterApi;
 
 
-    public String screenshotAndUploadToMaster(String deviceId) throws Exception {
+    public String screenshotByIdeviceScreenshotAndUploadToMaster(String deviceId) throws Exception {
         File screenshotFile = null;
         try {
             screenshotFile = IosUtil.screenshotByIdeviceScreenshot(deviceId);
