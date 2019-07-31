@@ -4,6 +4,7 @@ import com.android.ddmlib.IDevice;
 import com.daxiang.core.android.AndroidDevice;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.remote.MobileCapabilityType;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,5 +41,24 @@ public class MobileDeviceHolder {
             throw new RuntimeException("非androidDevice无法获取IDevice");
         }
         return ((AndroidDevice) mobileDevice).getIDevice();
+    }
+
+    public static MobileDevice getConnectedDevice(String deviceId) {
+        if (StringUtils.isEmpty(deviceId)) {
+            return null;
+        }
+        MobileDevice mobileDevice = get(deviceId);
+        if (mobileDevice == null || !mobileDevice.isConnected()) {
+            return null;
+        }
+        return mobileDevice;
+    }
+
+    public static MobileDevice getIdleDevice(String deviceId) {
+        MobileDevice mobileDevice = getConnectedDevice(deviceId);
+        if (mobileDevice != null && mobileDevice.isIdle()) {
+            return mobileDevice;
+        }
+        return null;
     }
 }

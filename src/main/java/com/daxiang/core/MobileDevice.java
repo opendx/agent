@@ -28,10 +28,6 @@ public class MobileDevice {
         deviceTestTaskExcutor = new DeviceTestTaskExcutor(this);
     }
 
-    public String getId() {
-        return device.getId();
-    }
-
     /**
      * 刷新AppiumDriver
      *
@@ -50,6 +46,10 @@ public class MobileDevice {
         return appiumDriver;
     }
 
+    public String getId() {
+        return device.getId();
+    }
+
     /**
      * 设备是否连接
      *
@@ -60,6 +60,14 @@ public class MobileDevice {
     }
 
     /**
+     * 是否在线闲置
+     * @return
+     */
+    public boolean isIdle() {
+        return device.getStatus() == Device.IDLE_STATUS;
+    }
+
+    /**
      * 获取设备屏幕分辨率
      *
      * @return eg.1080x1920
@@ -67,5 +75,4 @@ public class MobileDevice {
     public String getResolution() {
         return String.valueOf(device.getScreenWidth()) + "x" + String.valueOf(device.getScreenHeight());
     }
-
 }
