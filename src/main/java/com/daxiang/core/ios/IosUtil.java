@@ -1,6 +1,8 @@
 package com.daxiang.core.ios;
 
 import com.daxiang.utils.ShellExecutor;
+import com.google.common.collect.ImmutableMap;
+import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
@@ -57,6 +59,11 @@ public class IosUtil {
         }
         String[] resultArr = result.split(" ");
         return new File(resultArr[resultArr.length - 1].replaceAll("\n", ""));
+    }
+
+    // http://appium.io/docs/en/commands/mobile-command/
+    public static void pressHome(AppiumDriver appiumDriver) {
+        appiumDriver.executeScript("mobile:pressButton", ImmutableMap.of("name", "home"));
     }
 
 }

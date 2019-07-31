@@ -3,7 +3,7 @@ package com.daxiang.core.appium;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.PortProvider;
 import com.daxiang.core.android.AndroidDevice;
-import com.google.common.collect.ImmutableMap;
+import com.daxiang.core.ios.IosUtil;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
@@ -68,7 +68,7 @@ public class AppiumDriverBuilder {
             capabilities.setCapability("waitForQuiescence", false);
             capabilities.setCapability("skipLogCapture", true);
             IOSDriver iosDriver = new IOSDriver(url, capabilities);
-            iosDriver.executeScript("mobile:pressButton", ImmutableMap.of("name", "home"));
+            IosUtil.pressHome(iosDriver);
             return iosDriver;
         }
     }
