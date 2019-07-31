@@ -43,16 +43,9 @@ public class MinicapSocketServer {
         RemoteEndpoint.Basic basicRemote = session.getBasicRemote();
         basicRemote.sendText("minicap websocket连接成功");
 
-        mobileDevice = MobileDeviceHolder.get(deviceId);
-
-        if (mobileDevice == null || !mobileDevice.isConnected()) {
-            basicRemote.sendText(deviceId + "手机未连接");
-            session.close();
-            return;
-        }
-
-        if (mobileDevice.getDevice().getStatus() != Device.IDLE_STATUS) {
-            basicRemote.sendText(deviceId + "设备未处于闲置状态，" + mobileDevice.getDevice().getUsername() + "使用中");
+        mobileDevice = MobileDeviceHolder.getIdleDevice(deviceId);
+        if (mobileDevice == null) {
+            basicRemote.sendText("手机未处于闲置状态，无法使用");
             session.close();
             return;
         }
