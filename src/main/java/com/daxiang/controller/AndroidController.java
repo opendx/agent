@@ -39,6 +39,7 @@ public class AndroidController {
 
     /**
      * aaptDumpBadging
+     *
      * @param apkDownloadUrl
      * @return
      */

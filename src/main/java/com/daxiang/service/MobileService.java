@@ -88,8 +88,18 @@ public class MobileService {
         if (mobileDevice == null) {
             return Response.fail("设备未连接");
         }
-        // todo android and ios
 
+        try {
+            if (mobileDevice instanceof AndroidDevice) {
+                androidService.installApk(app, ((AndroidDevice) mobileDevice).getIDevice());
+            } else {
+                // todo ios
+            }
+            return Response.success("安装成功");
+        } catch (Exception e) {
+            log.error("安装app失败", e);
+            return Response.fail(e.getMessage());
+        }
     }
 
 }
