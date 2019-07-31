@@ -61,6 +61,7 @@ public class MobileDevice {
 
     /**
      * 是否在线闲置
+     *
      * @return
      */
     public boolean isIdle() {
@@ -74,5 +75,17 @@ public class MobileDevice {
      */
     public String getResolution() {
         return String.valueOf(device.getScreenWidth()) + "x" + String.valueOf(device.getScreenHeight());
+    }
+
+    /**
+     * 按照比例计算高度
+     * @param width
+     * @return
+     */
+    public int getScreenScaledHeight(int width) {
+        int screenHeight = getDevice().getScreenHeight();
+        int screenWidth = getDevice().getScreenWidth();
+        float scale = screenHeight / (float) screenWidth;
+        return (int) (scale * width);
     }
 }

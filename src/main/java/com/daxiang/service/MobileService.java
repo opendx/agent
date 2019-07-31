@@ -1,6 +1,7 @@
 package com.daxiang.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.daxiang.App;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.AndroidDevice;
@@ -86,6 +87,12 @@ public class MobileService {
 
         if (mobileDevice instanceof IosDevice) {
             data.put("mjpegServerPort", ((IosDevice) mobileDevice).getMjpegServerPort());
+
+            int displayWidth = Integer.parseInt(App.getProperty("displayWidth"));
+            int displayHeight = mobileDevice.getScreenScaledHeight(displayWidth);
+
+            data.put("displayWidth", displayWidth);
+            data.put("displayHeight", displayHeight);
         }
 
         return Response.success(data);
