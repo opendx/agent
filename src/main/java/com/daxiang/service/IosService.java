@@ -17,7 +17,6 @@ public class IosService {
     @Autowired
     private MasterApi masterApi;
 
-
     public String screenshotByIdeviceScreenshotAndUploadToMaster(String deviceId) throws Exception {
         File screenshotFile = null;
         try {
