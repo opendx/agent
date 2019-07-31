@@ -5,8 +5,8 @@ import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.AndroidDevice;
 import com.daxiang.core.appium.AndroidNativePageSourceConverter;
+import com.daxiang.core.ios.IosDevice;
 import com.daxiang.model.Response;
-import com.google.common.collect.ImmutableMap;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.dom4j.DocumentException;
@@ -80,7 +80,15 @@ public class MobileService {
         }
 
         AppiumDriver appiumDriver = mobileDevice.freshDriver();
-        return Response.success(ImmutableMap.of("appiumSessionId", appiumDriver.getSessionId().toString()));
+
+        JSONObject data = new JSONObject();
+        data.put("appiumSessionId", appiumDriver.getSessionId().toString());
+
+        if (mobileDevice instanceof IosDevice) {
+            data.put("mjpegServerPort", ((IosDevice) mobileDevice).getMjpegServerPort());
+        }
+
+        return Response.success(data);
     }
 
     public Response installApp(MultipartFile app, String deviceId) {
