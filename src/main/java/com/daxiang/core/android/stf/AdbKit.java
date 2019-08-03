@@ -37,7 +37,7 @@ public class AdbKit {
         int localPort = PortProvider.getAdbKitAvailablePort();
         String cmd = String.format(START_ADBKIT_CMD, localPort, deviceId);
         log.info("[{}][adbkit]开启远程调试功能：{}", deviceId, cmd);
-        watchdog = ShellExecutor.excuteCmdAndGetWatchdog(cmd);
+        watchdog = ShellExecutor.excuteAsyncAndGetWatchdog(cmd, null);
         return localPort;
     }
 

@@ -68,7 +68,7 @@ public class Minitouch {
                         for (String line : lines) {
                             log.info("[{}][minitouch]手机控制台输出：{}", deviceId, line);
                             if (!StringUtils.isEmpty(line) && line.startsWith("Type")) {
-                                //minitouch启动完成
+                                // minitouch启动完成
                                 countDownLatch.countDown();
                             }
                         }
@@ -125,7 +125,7 @@ public class Minitouch {
                 printWriter.close();
             }
 
-            //手机未连接 adb forward会自己移除
+            // 手机未连接 adb forward会自己移除
             if (androidDevice.isConnected()) {
                 try {
                     log.info("[{}][minitouch]移除adb forward: {} -> remote minitouch", deviceId, localPort);
@@ -144,7 +144,7 @@ public class Minitouch {
     public void stop() {
         log.info("[{}][minitouch]开始停止minitouch", deviceId);
 
-        //手机未连接，minitouch会自己退出
+        // 手机未连接，minitouch会自己退出
         if (pid > 0 && androidDevice.isConnected()) {
             String cmd = "kill -9 " + pid;
             log.info("[{}][minitouch]kill minitouch：{}", deviceId, cmd);

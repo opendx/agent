@@ -35,17 +35,20 @@ public class ShellExecutor {
     }
 
     /**
-     * 执行命令
+     * 异步执行命令
      *
      * @param cmd
      * @return watchdog，watchdog可杀掉正在执行的进程
      * @throws IOException
      */
-    public static ExecuteWatchdog excuteCmdAndGetWatchdog(String cmd) throws IOException {
+    public static ExecuteWatchdog excuteAsyncAndGetWatchdog(String cmd, PumpStreamHandler pumpStreamHandler) throws IOException {
         CommandLine commandLine = CommandLine.parse(cmd);
         ExecuteWatchdog watchdog = new ExecuteWatchdog(Integer.MAX_VALUE);
         DefaultExecutor executor = new DefaultExecutor();
         executor.setWatchdog(watchdog);
+        if (pumpStreamHandler != null) {
+            executor.setStreamHandler(pumpStreamHandler);
+        }
         executor.execute(commandLine, new DefaultExecuteResultHandler());
         return watchdog;
     }
