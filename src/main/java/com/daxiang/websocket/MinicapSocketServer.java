@@ -94,9 +94,9 @@ public class MinicapSocketServer {
     @OnClose
     public void onClose() {
         log.info("[{}][minicap][socketserver]onClose", deviceId);
-        sessionPool.remove(deviceId);
 
         if (handleImgDataThread != null) {
+            sessionPool.remove(deviceId);
             handleImgDataThread.interrupt();
         }
 

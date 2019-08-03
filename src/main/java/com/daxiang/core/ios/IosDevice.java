@@ -2,11 +2,23 @@ package com.daxiang.core.ios;
 
 import com.daxiang.core.MobileDevice;
 import com.daxiang.model.Device;
+import com.daxiang.utils.ShellExecutor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.exec.ExecuteWatchdog;
+
+import java.io.IOException;
 
 /**
  * Created by jiangyitao.
  */
+@Slf4j
 public class IosDevice extends MobileDevice {
+
+    /**
+     * iproxy localPort remotePort deviceId
+     */
+    private static final String IPROXY = "iproxy %d %d %s";
+    private ExecuteWatchdog mjpegServerIproxyWatchdog;
 
     public IosDevice(Device device) {
         super(device);
@@ -14,6 +26,20 @@ public class IosDevice extends MobileDevice {
 
     public int getMjpegServerPort() {
         Object mjpegServerPort = getAppiumDriver().getCapabilities().asMap().get("mjpegServerPort");
-        return (int)((long) mjpegServerPort);
+        return (int) ((long) mjpegServerPort);
+    }
+
+    public void startMjpegServerIproxy() throws IOException {
+        int mjpegServerPort = getMjpegServerPort();
+        String cmd = String.format(IPROXY, mjpegServerPort, mjpegServerPort, getId());
+        mjpegServerIproxyWatchdog = ShellExecutor.excuteCmdAndGetWatchdog(cmd);
+        log.info("[ios][{}]mjpegServer: {}", getId(), cmd);
+    }
+
+    public void stopMjpegServerIproxy() {
+        if (mjpegServerIproxyWatchdog != null) {
+            mjpegServerIproxyWatchdog.destroyProcess();
+            log.info("[ios][{}]mjpegServer iproxy stop", getId());
+        }
     }
 }
