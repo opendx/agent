@@ -21,11 +21,6 @@ public class MobileController {
         return mobileService.installApp(app, deviceId);
     }
 
-    @GetMapping("/{deviceId}/freshDriver")
-    public Response freshDriver(@PathVariable String deviceId) {
-        return mobileService.freshDriver(deviceId);
-    }
-
     @GetMapping("/{deviceId}/dump")
     public Response dump(@PathVariable String deviceId) {
         return mobileService.dump(deviceId);

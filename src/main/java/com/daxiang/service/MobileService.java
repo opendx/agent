@@ -61,9 +61,12 @@ public class MobileService {
             return Response.fail("设备未连接");
         }
         // todo ios
-        // 由于appium pageSource返回的xml不是规范的xml，需要把除了hierarchy节点以外的节点替换成node，否则xml转json会出问题
+        long start = System.currentTimeMillis();
+        String pageSource1 = mobileDevice.getAppiumDriver().getPageSource();
+        log.info("[]pagesource: {} ms", System.currentTimeMillis() - start);
         try {
-            String pageSource = AndroidNativePageSourceConverter.convert(mobileDevice.getAppiumDriver().getPageSource());
+            // 由于appium pageSource返回的xml不是规范的xml，需要把除了hierarchy节点以外的节点替换成node，否则xml转json会出问题
+            String pageSource = AndroidNativePageSourceConverter.convert(pageSource1);
             return Response.success("ok", pageSource);
         } catch (DocumentException e) {
             log.error("读取pageSource出错", e);

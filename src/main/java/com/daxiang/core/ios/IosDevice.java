@@ -3,6 +3,7 @@ package com.daxiang.core.ios;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.model.Device;
 import com.daxiang.utils.ShellExecutor;
+import io.appium.java_client.touch.offset.PointOption;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.LogOutputStream;
@@ -49,5 +50,11 @@ public class IosDevice extends MobileDevice {
             mjpegServerIproxyWatchdog.destroyProcess();
             log.info("[ios][{}]mjpegServer iproxy stop", getId());
         }
+    }
+
+    public PointOption getPointOption(float percentOfX, float percentOfY) {
+        int screenWidth = getDevice().getScreenWidth();
+        int screenHeight = getDevice().getScreenHeight();
+        return PointOption.point((int) (percentOfX * screenWidth), (int) (percentOfY * screenHeight));
     }
 }

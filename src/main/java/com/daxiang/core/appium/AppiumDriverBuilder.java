@@ -67,6 +67,7 @@ public class AppiumDriverBuilder {
             capabilities.setCapability(IOSMobileCapabilityType.BUNDLE_ID, BUNDLE_ID);
             capabilities.setCapability("waitForQuiescence", false);
             capabilities.setCapability("skipLogCapture", true);
+//            capabilities.setCapability("useJSONSource", true); // https://github.com/appium/appium-xcuitest-driver#desired-capabilities
             IOSDriver iosDriver = new IOSDriver(url, capabilities);
             IosUtil.pressHome(iosDriver);
             return iosDriver;
