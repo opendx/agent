@@ -74,6 +74,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
                 androidDevice.getMinicap().start(androidDevice.getResolution(), 0);
             } catch (Exception e) {
                 log.error("[{}]启动minicap失败", deviceId, e);
+                TL_NEED_RECORD_VIDEO.set(false);
             }
         }
     }
