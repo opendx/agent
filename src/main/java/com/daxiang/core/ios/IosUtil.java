@@ -66,4 +66,8 @@ public class IosUtil {
         appiumDriver.executeScript("mobile:pressButton", ImmutableMap.of("name", "home"));
     }
 
+    public static void installIpa(String ipaPath, String deviceId) throws IOException {
+        ShellExecutor.execute("ideviceinstaller -i " + ipaPath + " -u " + deviceId);
+    }
+
 }

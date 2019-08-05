@@ -107,7 +107,7 @@ public class MobileService {
             if (mobileDevice instanceof AndroidDevice) {
                 androidService.installApk(app, ((AndroidDevice) mobileDevice).getIDevice());
             } else {
-                // todo ios
+                iosService.installIpa(app, deviceId);
             }
             return Response.success("安装成功");
         } catch (Exception e) {
