@@ -5,7 +5,7 @@ import com.daxiang.App;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.AndroidDevice;
-import com.daxiang.core.appium.AndroidNativePageSourceConverter;
+import com.daxiang.core.appium.AppiumPageSourceConverter;
 import com.daxiang.core.ios.IosDevice;
 import com.daxiang.model.Response;
 import io.appium.java_client.AppiumDriver;
@@ -60,13 +60,9 @@ public class MobileService {
         if (mobileDevice == null) {
             return Response.fail("设备未连接");
         }
-        // todo ios
-        long start = System.currentTimeMillis();
-        String pageSource1 = mobileDevice.getAppiumDriver().getPageSource();
-        log.info("[]pagesource: {} ms", System.currentTimeMillis() - start);
+
         try {
-            // 由于appium pageSource返回的xml不是规范的xml，需要把除了hierarchy节点以外的节点替换成node，否则xml转json会出问题
-            String pageSource = AndroidNativePageSourceConverter.convert(pageSource1);
+            String pageSource = AppiumPageSourceConverter.getJSONStringPageSource(mobileDevice.getAppiumDriver());
             return Response.success("ok", pageSource);
         } catch (DocumentException e) {
             log.error("读取pageSource出错", e);
