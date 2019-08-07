@@ -6,11 +6,9 @@ import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.appium.AppiumDriverBuilder;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
-import com.daxiang.service.IosService;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.Dimension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
@@ -22,9 +20,6 @@ import java.util.Date;
 @Slf4j
 @Component
 public class DefaultIosDeviceChangeListener extends MobileDeviceChangeHandler implements IosDeviceChangeListener {
-
-    @Autowired
-    private IosService iosService;
 
     @Override
     public void onDeviceConnected(String deviceId) {
@@ -70,13 +65,13 @@ public class DefaultIosDeviceChangeListener extends MobileDeviceChangeHandler im
         }
 
         mobileOnline(mobileDevice);
-        log.info("[ios][{}]deviceConnected处理完成", deviceId);
+        log.info("[ios][{}]iosDeviceConnected处理完成", deviceId);
     }
 
     private void iosDeviceDisconnected(String deviceId) {
         log.info("[ios][{}]断开连接", deviceId);
         mobileDisconnected(deviceId);
-        log.info("[ios][{}]deviceDisconnected处理完成", deviceId);
+        log.info("[ios][{}]iosDeviceDisconnected处理完成", deviceId);
     }
 
     private MobileDevice initIosDevice(String deviceId, URL url) throws Exception {
@@ -92,11 +87,11 @@ public class DefaultIosDeviceChangeListener extends MobileDeviceChangeHandler im
         device.setCpuInfo(msg);
         device.setMemSize(msg);
 
-        // 截图并上传到服务器
-        String imgDownloadUrl = iosService.screenshotByIdeviceScreenshotAndUploadToMaster(deviceId);
-        device.setImgUrl(imgDownloadUrl);
-
         IosDevice iosDevice = new IosDevice(device);
+
+        // 截图并上传到服务器
+        String imgDownloadUrl = iosDevice.screenshotAndUploadToMaster();
+        device.setImgUrl(imgDownloadUrl);
 
         log.info("[ios][{}]开始初始化appium", device.getId());
         AppiumDriver appiumDriver = AppiumDriverBuilder.build(iosDevice, url);

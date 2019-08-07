@@ -1,14 +1,16 @@
 package com.daxiang.core.ios;
 
 import com.daxiang.core.MobileDevice;
+import com.daxiang.core.appium.IosPageSourceHandler;
 import com.daxiang.model.Device;
 import com.daxiang.utils.ShellExecutor;
-import io.appium.java_client.touch.offset.PointOption;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.LogOutputStream;
 import org.apache.commons.exec.PumpStreamHandler;
+import org.dom4j.DocumentException;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -27,6 +29,21 @@ public class IosDevice extends MobileDevice {
         super(device);
     }
 
+    @Override
+    public File screenshot() throws Exception {
+        return IosUtil.screenshotByIdeviceScreenshot(getId());
+    }
+
+    @Override
+    public void installApp(File app) throws IOException {
+        IosUtil.installIpa(app.getAbsolutePath(), getId());
+    }
+
+    @Override
+    public String dump() throws IOException, DocumentException {
+        return new IosPageSourceHandler(getAppiumDriver()).getPageSource();
+    }
+
     public int getMjpegServerPort() {
         Object mjpegServerPort = getAppiumDriver().getCapabilities().asMap().get("mjpegServerPort");
         return (int) ((long) mjpegServerPort);
@@ -37,8 +54,8 @@ public class IosDevice extends MobileDevice {
         String cmd = String.format(IPROXY, mjpegServerPort, mjpegServerPort, getId());
         PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(new LogOutputStream() {
             @Override
-            protected void processLine(String s, int i) {
-                log.info("[ios][{}]iproxy -> {}", getId(), s);
+            protected void processLine(String line, int i) {
+                log.info("[ios][{}]iproxy -> {}", getId(), line);
             }
         });
         mjpegServerIproxyWatchdog = ShellExecutor.excuteAsyncAndGetWatchdog(cmd, pumpStreamHandler);
@@ -50,11 +67,5 @@ public class IosDevice extends MobileDevice {
             mjpegServerIproxyWatchdog.destroyProcess();
             log.info("[ios][{}]mjpegServer iproxy stop", getId());
         }
-    }
-
-    public PointOption getPointOption(float percentOfX, float percentOfY) {
-        int screenWidth = getDevice().getScreenWidth();
-        int screenHeight = getDevice().getScreenHeight();
-        return PointOption.point((int) (percentOfX * screenWidth), (int) (percentOfY * screenHeight));
     }
 }

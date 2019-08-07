@@ -12,10 +12,8 @@ import com.daxiang.core.android.stf.MinitouchInstaller;
 import com.daxiang.core.appium.AppiumDriverBuilder;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
-import com.daxiang.service.AndroidService;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
@@ -27,9 +25,6 @@ import java.util.Date;
 @Component
 @Slf4j
 public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler implements AndroidDebugBridge.IDeviceChangeListener {
-
-    @Autowired
-    private AndroidService androidService;
 
     @Override
     public void deviceConnected(IDevice device) {
@@ -94,7 +89,7 @@ public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler imple
         }
 
         mobileOnline(mobileDevice);
-        log.info("[android][{}]deviceConnected处理完成", deviceId);
+        log.info("[android][{}]androidDeviceConnected处理完成", deviceId);
     }
 
     /**
@@ -106,7 +101,7 @@ public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler imple
         String deviceId = iDevice.getSerialNumber();
         log.info("[android][{}]断开连接", deviceId);
         mobileDisconnected(deviceId);
-        log.info("[android][{}]deviceDisconnected处理完成", deviceId);
+        log.info("[android][{}]androidDeviceDisconnected处理完成", deviceId);
     }
 
     /**
@@ -150,11 +145,11 @@ public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler imple
         device.setScreenWidth(Integer.parseInt(resolutionArray[0]));
         device.setScreenHeight(Integer.parseInt(resolutionArray[1]));
 
-        // 截图并上传到服务器
-        String imgDownloadUrl = androidService.screenshotByMinicapAndUploadToMaster(iDevice, resolution);
-        device.setImgUrl(imgDownloadUrl);
-
         AndroidDevice androidDevice = new AndroidDevice(device, iDevice);
+
+        // 截图并上传到服务器
+        String imgDownloadUrl = androidDevice.screenshotAndUploadToMaster();
+        device.setImgUrl(imgDownloadUrl);
 
         // 安装一个测试apk，用于初始化appium driver
         AndroidUtil.installApk(iDevice, "vendor/apk/ApiDemos-debug.apk");

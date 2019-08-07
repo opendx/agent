@@ -1,33 +1,26 @@
 package com.daxiang.core.testng.listener;
 
-import com.daxiang.App;
+import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
-import com.daxiang.core.android.AndroidDevice;
 import com.daxiang.api.MasterApi;
-import com.daxiang.model.Device;
 import com.daxiang.model.action.Step;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.model.devicetesttask.Testcase;
-import com.daxiang.service.AndroidService;
 import com.daxiang.utils.UUIDUtil;
+import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.bytedeco.ffmpeg.global.avcodec;
-import org.bytedeco.javacv.FFmpegFrameRecorder;
-import org.bytedeco.javacv.FrameRecorder;
-import org.bytedeco.javacv.Java2DFrameUtils;
+import org.springframework.util.StringUtils;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
 
-import javax.imageio.ImageIO;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Date;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
 
 /**
  * Created by jiangyitao.
@@ -35,12 +28,10 @@ import java.util.concurrent.FutureTask;
 @Slf4j
 public class TestCaseTestListener extends TestListenerAdapter {
 
-    private static final ThreadLocal<AndroidDevice> TL_ANDROID_DEVICE = new ThreadLocal<>();
+    private static final ThreadLocal<MobileDevice> TL_MOBILE_DEVICE = new ThreadLocal<>();
     private static final ThreadLocal<Integer> TL_DEVICE_TEST_TASK_ID = new ThreadLocal<>();
     private static final ThreadLocal<Integer> TL_TEST_CASE_ID = new ThreadLocal<>();
     private static final ThreadLocal<Boolean> TL_NEED_RECORD_VIDEO = new ThreadLocal<>();
-    private static final ThreadLocal<FutureTask<String>> TL_RECORD_VIDEO_FUTURE_TASK = new ThreadLocal<>();
-    private static final ThreadLocal<Thread> TL_RECORD_VIDEO_THREAD = new ThreadLocal<>();
 
     /**
      * 每个设备开始测试调用的方法，这里可能有多个线程同时调用
@@ -55,10 +46,10 @@ public class TestCaseTestListener extends TestListenerAdapter {
         Integer deviceTestTaskId = Integer.parseInt(testDesc[1]);
         Boolean needRecordVideo = true; // 这个版本先设置为需要录制视频，以后可能改成从前端传过来
 
-        AndroidDevice androidDevice = (AndroidDevice) MobileDeviceHolder.get(deviceId);
+        MobileDevice mobileDevice = MobileDeviceHolder.get(deviceId);
         log.info("[{}][自动化测试]onStart, deviceTestTaskId：{}", deviceId, deviceTestTaskId);
 
-        TL_ANDROID_DEVICE.set(androidDevice);
+        TL_MOBILE_DEVICE.set(mobileDevice);
         TL_DEVICE_TEST_TASK_ID.set(deviceTestTaskId);
         TL_NEED_RECORD_VIDEO.set(needRecordVideo);
 
@@ -67,17 +58,6 @@ public class TestCaseTestListener extends TestListenerAdapter {
         deviceTestTask.setStartTime(new Date());
         deviceTestTask.setStatus(DeviceTestTask.RUNNING_STATUS);
         MasterApi.getInstance().updateDeviceTestTask(deviceTestTask);
-
-        if (needRecordVideo) {
-            try {
-                // 启动minicap，视频录制从minicap获取屏幕数据
-                // todo 使用appium录制视频
-                //androidDevice.getMinicap().start(androidDevice.getResolution(), 0);
-            } catch (Exception e) {
-                log.error("[{}]启动minicap失败", deviceId, e);
-                TL_NEED_RECORD_VIDEO.set(false);
-            }
-        }
     }
 
     /**
@@ -87,10 +67,9 @@ public class TestCaseTestListener extends TestListenerAdapter {
      */
     @Override
     public void onFinish(ITestContext testContext) {
-        AndroidDevice androidDevice = TL_ANDROID_DEVICE.get();
-        String deviceId = androidDevice.getId();
+        MobileDevice mobileDevice = TL_MOBILE_DEVICE.get();
+        String deviceId = mobileDevice.getId();
         Integer deviceTestTaskId = TL_DEVICE_TEST_TASK_ID.get();
-        Boolean needRecordVideo = TL_NEED_RECORD_VIDEO.get();
 
         log.info("[{}][自动化测试]onFinish, deviceTestTaskId: {}", deviceId, deviceTestTaskId);
         DeviceTestTask deviceTestTask = new DeviceTestTask();
@@ -98,11 +77,6 @@ public class TestCaseTestListener extends TestListenerAdapter {
         deviceTestTask.setEndTime(new Date());
         deviceTestTask.setStatus(DeviceTestTask.FINISHED_STATUS);
         MasterApi.getInstance().updateDeviceTestTask(deviceTestTask);
-
-        if (needRecordVideo && androidDevice.getMinicap() != null) {
-            // 测试结束，停止minicap
-            androidDevice.getMinicap().stop();
-        }
     }
 
     /**
@@ -115,8 +89,8 @@ public class TestCaseTestListener extends TestListenerAdapter {
     public void onTestStart(ITestResult tr) {
         Integer deviceTestTaskId = TL_DEVICE_TEST_TASK_ID.get();
         Boolean needRecordVideo = TL_NEED_RECORD_VIDEO.get();
-        AndroidDevice androidDevice = TL_ANDROID_DEVICE.get();
-        String deviceId = androidDevice.getId();
+        MobileDevice mobileDevice = TL_MOBILE_DEVICE.get();
+        String deviceId = mobileDevice.getId();
         // deviceId_deviceTestTaskId_testcaseId
         Integer testcaseId = Integer.parseInt(tr.getMethod().getDescription().split("_")[2]);
         TL_TEST_CASE_ID.set(testcaseId);
@@ -129,61 +103,26 @@ public class TestCaseTestListener extends TestListenerAdapter {
         MasterApi.getInstance().updateTestcase(deviceTestTaskId, testcase);
 
         if (needRecordVideo) {
-            String videoPath = UUIDUtil.getUUID() + ".mp4";
-            log.info("[{}][自动化测试]testcaseId: {}，开始录制视频: {}", deviceId, testcaseId, videoPath);
-
-            Device device = androidDevice.getDevice();
-            final FFmpegFrameRecorder videoRecorder = new FFmpegFrameRecorder(videoPath, device.getScreenWidth(), device.getScreenHeight());
-            videoRecorder.setVideoCodec(avcodec.AV_CODEC_ID_H264); // 编码
-            videoRecorder.setFrameRate(30); // 帧率
-            videoRecorder.setFormat("mp4");
+            AppiumDriver appiumDriver = mobileDevice.getAppiumDriver();
             try {
-                videoRecorder.start();
-            } catch (FrameRecorder.Exception e) {
-                log.error("[{}][自动化测试]testcaseId: {}，录制视频出错", deviceId, testcaseId, e);
-            }
-
-            File video = new File(videoPath);
-            Callable<String> recordVideo = () -> {
-                BlockingQueue<byte[]> imgQueue = androidDevice.getMinicap().getImgQueue();
-                imgQueue.clear(); // 防止录制到上一条用例的视频数据
-                try {
-                    while (true) {
-                        byte[] imgData;
-                        try {
-                            imgData = imgQueue.take();
-                        } catch (InterruptedException e) {
-                            log.info("[{}][自动化测试]testcaseId: {}，停止获取minicap数据", deviceId, testcaseId);
-                            break;
-                        }
-                        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(imgData)) {
-                            videoRecorder.record(Java2DFrameUtils.toFrame(ImageIO.read(byteArrayInputStream)));
-                        }
-                    }
-                    videoRecorder.stop();
-                    log.info("[{}][自动化测试]testcaseId: {}，停止录制视频：{}", deviceId, testcaseId, videoPath);
-
-                    return MasterApi.getInstance().uploadFile(video);
-                } finally {
-                    FileUtils.deleteQuietly(video);
+                log.info("[{}][自动化测试]testcaseId: {},开始录制视频...", deviceId, testcaseId);
+                if (appiumDriver instanceof AndroidDriver) {
+                    ((AndroidDriver) appiumDriver).startRecordingScreen();
+                } else {
+                    ((IOSDriver) appiumDriver).startRecordingScreen();
                 }
-            };
-
-            FutureTask<String> recordVideoFutureTask = new FutureTask<>(recordVideo);
-            TL_RECORD_VIDEO_FUTURE_TASK.set(recordVideoFutureTask);
-
-            Thread recordVideoThread = new Thread(recordVideoFutureTask);
-            TL_RECORD_VIDEO_THREAD.set(recordVideoThread);
-
-            recordVideoThread.start();
+            } catch (Exception e) {
+                log.error("[{}][自动化测试]testcaseId: {},启动录制视频失败", deviceId, testcaseId, e);
+                TL_NEED_RECORD_VIDEO.set(false);
+            }
         }
     }
 
     @Override
     public void onTestSuccess(ITestResult tr) {
-        AndroidDevice androidDevice = TL_ANDROID_DEVICE.get();
+        MobileDevice mobileDevice = TL_MOBILE_DEVICE.get();
         Integer testcaseId = TL_TEST_CASE_ID.get();
-        log.info("[{}][自动化测试]onTestSuccess: {}", androidDevice.getId(), testcaseId);
+        log.info("[{}][自动化测试]onTestSuccess, testcaseId: {}", mobileDevice.getId(), testcaseId);
 
         Testcase testcase = new Testcase();
         testcase.setId(testcaseId);
@@ -195,9 +134,9 @@ public class TestCaseTestListener extends TestListenerAdapter {
 
     @Override
     public void onTestFailure(ITestResult tr) {
-        AndroidDevice androidDevice = TL_ANDROID_DEVICE.get();
+        MobileDevice mobileDevice = TL_MOBILE_DEVICE.get();
         Integer testcaseId = TL_TEST_CASE_ID.get();
-        log.error("[{}][自动化测试]onTestFailure: {}", androidDevice.getId(), testcaseId, tr.getThrowable());
+        log.error("[{}][自动化测试]onTestFailure, testcaseId: {}", mobileDevice.getId(), testcaseId, tr.getThrowable());
 
         Testcase testcase = new Testcase();
         testcase.setId(testcaseId);
@@ -217,9 +156,9 @@ public class TestCaseTestListener extends TestListenerAdapter {
      */
     @Override
     public void onTestSkipped(ITestResult tr) {
-        AndroidDevice androidDevice = TL_ANDROID_DEVICE.get();
+        MobileDevice mobileDevice = TL_MOBILE_DEVICE.get();
         Integer testcaseId = TL_TEST_CASE_ID.get();
-        log.warn("[{}][自动化测试]onTestSkipped: {}", androidDevice.getId(), testcaseId, tr.getThrowable());
+        log.warn("[{}][自动化测试]onTestSkipped, testcaseId: {}", mobileDevice.getId(), testcaseId, tr.getThrowable());
 
         Testcase testcase = new Testcase();
         testcase.setId(testcaseId);
@@ -227,7 +166,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         testcase.setStatus(Testcase.SKIP_STATUS);
         testcase.setFailImgUrl(getScreenshotDownloadUrl());
         if (tr.getThrowable() == null) { // @BeforeClass或@BeforeMethod抛出异常导致的case跳过
-            testcase.setFailInfo("@BeforeClass或@BeforeMethod执行失败");
+            testcase.setFailInfo("前置任务执行失败");
         } else {
             testcase.setFailInfo(tr.getThrowable().getMessage());
         }
@@ -236,10 +175,11 @@ public class TestCaseTestListener extends TestListenerAdapter {
     }
 
     private String getScreenshotDownloadUrl() {
+        MobileDevice mobileDevice = TL_MOBILE_DEVICE.get();
         try {
-            return App.getBean(AndroidService.class).screenshotByMinicapAndUploadToMaster(TL_ANDROID_DEVICE.get());
+            return mobileDevice.screenshotAndUploadToMaster();
         } catch (Exception e) {
-            log.error("[{}][自动化测试]用例：{}，截图并上传到master失败", TL_ANDROID_DEVICE.get().getId(), TL_TEST_CASE_ID.get(), e);
+            log.error("[{}][自动化测试]testcaseId: {}，截图并上传到master失败", mobileDevice.getId(), TL_TEST_CASE_ID.get(), e);
             return null;
         }
     }
@@ -248,13 +188,42 @@ public class TestCaseTestListener extends TestListenerAdapter {
         if (!TL_NEED_RECORD_VIDEO.get()) {
             return null;
         }
+
+        MobileDevice mobileDevice = TL_MOBILE_DEVICE.get();
+        String deviceId = mobileDevice.getId();
+        Integer testcaseId = TL_TEST_CASE_ID.get();
+
+        AppiumDriver appiumDriver = mobileDevice.getAppiumDriver();
+
+        String base64Video;
+        File videoFile = new File(UUIDUtil.getUUID() + ".mp4");
+
         try {
-            // 停止录制视频,imgQueue.take()捕获到InterruptedException跳出循环
-            TL_RECORD_VIDEO_THREAD.get().interrupt();
-            return TL_RECORD_VIDEO_FUTURE_TASK.get().get();
+            log.info("[{}][自动化测试]testcaseId: {}, 停止录制视频...", deviceId, testcaseId);
+            long startStopRecordingScreenTime = System.currentTimeMillis();
+            if (appiumDriver instanceof AndroidDriver) {
+                base64Video = ((AndroidDriver) appiumDriver).stopRecordingScreen();
+            } else {
+                base64Video = ((IOSDriver) appiumDriver).stopRecordingScreen();
+            }
+            log.info("[{}][自动化测试]testcaseId: {}, base64视频已生成，耗时: {} ms", deviceId, testcaseId, System.currentTimeMillis() - startStopRecordingScreenTime);
+
+            if (StringUtils.isEmpty(base64Video)) {
+                return null;
+            }
+
+            log.info("[{}][自动化测试]testcaseId: {}, 开始将base64视频转换成mp4上传到master", deviceId, testcaseId);
+            long startGenerateMp4FileAndUploadToMasterTime = System.currentTimeMillis();
+            FileUtils.writeByteArrayToFile(videoFile, Base64.getDecoder().decode(base64Video), false);
+            String downloadUrl = MasterApi.getInstance().uploadFile(videoFile);
+            log.info("[{}][自动化测试]testcaseId: {}, base64视频转换成mp4上传到master完成，耗时: {} ms", deviceId, testcaseId, System.currentTimeMillis() - startGenerateMp4FileAndUploadToMasterTime);
+
+            return downloadUrl;
         } catch (Exception e) {
-            log.error("[{}][自动化测试]用例：{}，获取视频下载地址失败", TL_ANDROID_DEVICE.get().getId(), TL_TEST_CASE_ID.get(), e);
+            log.error("[{}][自动化测试]testcaseId: {}，getVideoDownloadUrl err", deviceId, testcaseId, e);
             return null;
+        } finally {
+            FileUtils.deleteQuietly(videoFile);
         }
     }
 

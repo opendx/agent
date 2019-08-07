@@ -1,18 +1,28 @@
 package com.daxiang.core;
 
+import com.daxiang.api.MasterApi;
 import com.daxiang.core.appium.AppiumDriverBuilder;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
+import com.daxiang.utils.UUIDUtil;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.touch.offset.PointOption;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.dom4j.DocumentException;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by jiangyitao.
  */
 @Slf4j
 @Data
-public class MobileDevice {
+public abstract class MobileDevice {
 
     public static final int ANDROID = 1;
     public static final int IOS = 2;
@@ -79,6 +89,7 @@ public class MobileDevice {
 
     /**
      * 按照比例计算高度
+     *
      * @param width
      * @return
      */
@@ -88,4 +99,36 @@ public class MobileDevice {
         float scale = screenHeight / (float) screenWidth;
         return (int) (scale * width);
     }
+
+    public PointOption getPointOption(float percentOfX, float percentOfY) {
+        int screenWidth = getDevice().getScreenWidth();
+        int screenHeight = getDevice().getScreenHeight();
+        return PointOption.point((int) (percentOfX * screenWidth), (int) (percentOfY * screenHeight));
+    }
+
+    public abstract File screenshot() throws Exception;
+
+    public String screenshotAndUploadToMaster() throws Exception {
+        File screenshotFile = null;
+        try {
+            screenshotFile = screenshot();
+            return MasterApi.getInstance().uploadFile(screenshotFile);
+        } finally {
+            FileUtils.deleteQuietly(screenshotFile);
+        }
+    }
+
+    public abstract void installApp(File appFile) throws Exception;
+
+    public void installApp(MultipartFile app) throws Exception {
+        File appFile = new File(UUIDUtil.getUUID() + "." + StringUtils.unqualify(app.getOriginalFilename()));
+        try {
+            FileUtils.copyInputStreamToFile(app.getInputStream(), appFile);
+            installApp(appFile);
+        } finally {
+            FileUtils.deleteQuietly(appFile);
+        }
+    }
+
+    public abstract String dump() throws IOException, DocumentException;
 }

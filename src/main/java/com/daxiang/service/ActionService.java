@@ -30,9 +30,9 @@ public class ActionService {
             String className = "Debug_" + UUIDUtil.getUUID();
             String code = new TestNGCodeConverter().setDeviceId(request.getDeviceId()).setGlobalVars(request.getGlobalVars())
                     .convert(className, Arrays.asList(request.getAction()), "/codetemplate", "mobile.ftl");
-            log.info("[调试action]: {}", code);
+            log.info("[{}][调试action]: {}", request.getDeviceId(), code);
             if (StringUtils.isEmpty(code)) {
-                return Response.fail("转换testng代码失败");
+                return Response.fail("转换后的代码为空");
             }
 
             Class clazz = JavaCompiler.compile(className, code);

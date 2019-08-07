@@ -3,7 +3,6 @@ package com.daxiang.schedule;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.api.MasterApi;
-import com.daxiang.model.Device;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,13 +1,19 @@
 package com.daxiang.core.android;
 
 import com.android.ddmlib.IDevice;
+import com.android.ddmlib.InstallException;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.android.stf.AdbKit;
 import com.daxiang.core.android.stf.Minicap;
 import com.daxiang.core.android.stf.Minitouch;
+import com.daxiang.core.appium.AndroidPageSourceHandler;
 import com.daxiang.model.Device;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.dom4j.DocumentException;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by jiangyitao.
@@ -42,4 +48,20 @@ public class AndroidDevice extends MobileDevice {
         }
         throw new RuntimeException("无法判断是否能用Uiautomator2，请更新AndroidUtil.ANDROID_VERSION");
     }
+
+    @Override
+    public File screenshot() throws Exception {
+        return AndroidUtil.screenshotByMinicap(iDevice, getResolution());
+    }
+
+    @Override
+    public void installApp(File appFile) throws InstallException {
+        AndroidUtil.installApk(iDevice, appFile.getAbsolutePath());
+    }
+
+    @Override
+    public String dump() throws IOException, DocumentException {
+        return new AndroidPageSourceHandler(getAppiumDriver()).getPageSource();
+    }
+
 }

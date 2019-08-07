@@ -47,11 +47,12 @@ public class IosIproxyController {
                 (ClientHttpRequest request) -> {
                 },
                 responseExtractor -> {
+                    // mjpeg视频流的响应头，不加这个头，浏览器不播放视频流
                     response.setContentType("multipart/x-mixed-replace; boundary=--BoundaryString");
                     try {
                         IOUtils.copy(responseExtractor.getBody(), response.getOutputStream());
                     } catch (Exception e) {
-
+                        // ignore
                     }
                     return null;
                 }
