@@ -31,7 +31,7 @@ public class ScheduledTaskExcutor {
     public void commitDeviceTestTask() {
         // 在线闲置的设备
         List<String> idleMobileDeviceIds = MobileDeviceHolder.getAll().stream()
-                .filter(mobileDevice -> mobileDevice.getDevice().getStatus() == Device.IDLE_STATUS)
+                .filter(MobileDevice::isIdle)
                 .map(MobileDevice::getId)
                 .collect(Collectors.toList());
         if (CollectionUtils.isEmpty(idleMobileDeviceIds)) {
