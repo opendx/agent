@@ -71,7 +71,8 @@ public class TestCaseTestListener extends TestListenerAdapter {
         if (needRecordVideo) {
             try {
                 // 启动minicap，视频录制从minicap获取屏幕数据
-                androidDevice.getMinicap().start(androidDevice.getResolution(), 0);
+                // todo 使用appium录制视频
+                //androidDevice.getMinicap().start(androidDevice.getResolution(), 0);
             } catch (Exception e) {
                 log.error("[{}]启动minicap失败", deviceId, e);
                 TL_NEED_RECORD_VIDEO.set(false);

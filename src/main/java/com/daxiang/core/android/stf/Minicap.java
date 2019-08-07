@@ -16,7 +16,7 @@ import java.util.concurrent.*;
 @Slf4j
 public class Minicap {
 
-    private static final String START_MINICAP_CMD = "LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/minicap -P %s@%s/%d";
+    private static final String START_MINICAP_CMD = "LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/minicap -Q %d -P %s@%s/%d";
 
     /**
      * minicap输出的图片存放的队列
@@ -46,15 +46,16 @@ public class Minicap {
     /**
      * 启动minicap
      *
+     * @param quality           图像质量 0-100
      * @param virtualResolution minicap输出的图片分辨率 eg.1080x1920
      * @param orientation       屏幕的旋转角度
      */
-    public void start(String virtualResolution, Integer orientation) throws Exception {
+    public void start(Integer quality, String virtualResolution, Integer orientation) throws Exception {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         // 启动minicap会阻塞线程，启一个线程运行minicap
         new Thread(() -> {
             try {
-                String startMinicapCmd = String.format(START_MINICAP_CMD, androidDevice.getResolution(), virtualResolution, orientation);
+                String startMinicapCmd = String.format(START_MINICAP_CMD, quality, androidDevice.getResolution(), virtualResolution, orientation);
                 log.info("[{}][minicap]启动：{}", deviceId, startMinicapCmd);
                 androidDevice.getIDevice().executeShellCommand(startMinicapCmd, new MultiLineReceiver() {
                     @Override
