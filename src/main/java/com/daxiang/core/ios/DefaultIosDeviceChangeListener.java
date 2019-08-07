@@ -92,7 +92,7 @@ public class DefaultIosDeviceChangeListener extends MobileDeviceChangeHandler im
         device.setImgUrl(imgDownloadUrl);
 
         log.info("[ios][{}]开始初始化appium", device.getId());
-        AppiumDriver appiumDriver = iosDevice.newDriver();
+        AppiumDriver appiumDriver = iosDevice.newAppiumDriver();
         iosDevice.setAppiumDriver(appiumDriver);
         log.info("[ios][{}]初始化appium完成", device.getId());
 

@@ -152,11 +152,10 @@ public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler imple
         // 安装一个测试apk，用于初始化appium driver
         AndroidUtil.installApk(iDevice, "vendor/apk/ApiDemos-debug.apk");
 
-        log.info("[android][{}]开始初始化appium", device.getId());
-
-        AppiumDriver appiumDriver = androidDevice.newDriver();
+        log.info("[android][{}]开始初始化appium", deviceId);
+        AppiumDriver appiumDriver = androidDevice.newAppiumDriver();
         androidDevice.setAppiumDriver(appiumDriver);
-        log.info("[android][{}]初始化appium完成", device.getId());
+        log.info("[android][{}]初始化appium完成", deviceId);
 
         return androidDevice;
     }

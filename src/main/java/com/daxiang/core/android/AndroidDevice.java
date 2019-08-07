@@ -53,7 +53,7 @@ public class AndroidDevice extends MobileDevice {
     }
 
     @Override
-    public AppiumDriver newDriver() {
+    public AppiumDriver newAppiumDriver() {
         return new AndroidDriverBuilder().build(this);
     }
 

@@ -52,11 +52,11 @@ public abstract class MobileDevice {
                 // 上次会话可能已经过期，quit会有异常，ignore
             }
         }
-        appiumDriver = newDriver();
+        appiumDriver = newAppiumDriver();
         return appiumDriver;
     }
 
-    public abstract AppiumDriver newDriver();
+    public abstract AppiumDriver newAppiumDriver();
 
     public String getId() {
         return device.getId();
