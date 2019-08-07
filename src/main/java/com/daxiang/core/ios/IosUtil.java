@@ -55,7 +55,7 @@ public class IosUtil {
         // Screenshot saved to screenshot-xxx.png
         String result = ShellExecutor.execute("idevicescreenshot -u " + deviceId);
         if (StringUtils.isEmpty(result)) {
-            throw new RuntimeException("截图失败，idevicescreenshot返回：" + result);
+            throw new RuntimeException("截图失败，idevicescreenshot返回空");
         }
         String[] resultArr = result.split(" ");
         return new File(resultArr[resultArr.length - 1].replaceAll("\n", ""));

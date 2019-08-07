@@ -78,11 +78,11 @@ public class AndroidUtil {
         if (StringUtils.isEmpty(output)) {
             throw new RuntimeException("获取内存信息失败");
         }
-        String kB = (output.replaceAll(" ", "")).replaceAll("\n", "").replaceAll("\r", "").split(":")[1];
-        kB = kB.substring(0, kB.length() - 2);
+        String memKB = (output.replaceAll(" ", "")).replaceAll("\n", "").replaceAll("\r", "").split(":")[1];
+        memKB = memKB.substring(0, memKB.length() - 2);
         // 向上取整
-        double ceil = Math.ceil(Long.parseLong(kB) / (1024.0 * 1024));
-        return ceil + " GB";
+        double memGB = Math.ceil(Long.parseLong(memKB) / (1024.0 * 1024));
+        return memGB + " GB";
     }
 
     /**
@@ -157,7 +157,7 @@ public class AndroidUtil {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
-                //ignore
+                // ignore
             }
         }
     }

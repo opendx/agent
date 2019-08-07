@@ -56,7 +56,6 @@ public class DefaultIosDeviceChangeListener extends MobileDeviceChangeHandler im
                 mobileDevice = new IosDevice(device, appiumServer);
             }
 
-            mobileDevice.setAppiumServer(appiumServer);
             MobileDeviceHolder.add(deviceId, mobileDevice);
         } else {
             log.info("[ios][{}]非首次在agent上线", deviceId);

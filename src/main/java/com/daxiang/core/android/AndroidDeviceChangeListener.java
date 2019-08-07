@@ -15,6 +15,7 @@ import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.util.Date;
 
 /**
@@ -80,7 +81,6 @@ public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler imple
             androidDevice.setMinitouch(new Minitouch(androidDevice));
             androidDevice.setAdbKit(new AdbKit(deviceId));
 
-            mobileDevice.setAppiumServer(appiumServer);
             MobileDeviceHolder.add(deviceId, mobileDevice);
         } else {
             log.info("[android][{}]非首次在agent上线", deviceId);
@@ -150,7 +150,7 @@ public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler imple
         device.setImgUrl(imgDownloadUrl);
 
         // 安装一个测试apk，用于初始化appium driver
-        AndroidUtil.installApk(iDevice, "vendor/apk/ApiDemos-debug.apk");
+        androidDevice.installApp(new File("vendor/apk/ApiDemos-debug.apk"));
 
         log.info("[android][{}]开始初始化appium", deviceId);
         AppiumDriver appiumDriver = androidDevice.newAppiumDriver();
