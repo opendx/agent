@@ -1,9 +1,12 @@
 package com.daxiang.core.ios;
 
 import com.daxiang.core.MobileDevice;
+import com.daxiang.core.appium.AppiumServer;
+import com.daxiang.core.appium.IosDriverBuilder;
 import com.daxiang.core.appium.IosPageSourceHandler;
 import com.daxiang.model.Device;
 import com.daxiang.utils.ShellExecutor;
+import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.LogOutputStream;
@@ -25,8 +28,13 @@ public class IosDevice extends MobileDevice {
     private static final String IPROXY = "iproxy %d %d %s";
     private ExecuteWatchdog mjpegServerIproxyWatchdog;
 
-    public IosDevice(Device device) {
-        super(device);
+    public IosDevice(Device device, AppiumServer appiumServer) {
+        super(device, appiumServer);
+    }
+
+    @Override
+    public AppiumDriver newDriver() {
+        return new IosDriverBuilder().build(this);
     }
 
     @Override

@@ -9,14 +9,12 @@ import com.daxiang.core.android.stf.Minicap;
 import com.daxiang.core.android.stf.MinicapInstaller;
 import com.daxiang.core.android.stf.Minitouch;
 import com.daxiang.core.android.stf.MinitouchInstaller;
-import com.daxiang.core.appium.AppiumDriverBuilder;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.net.URL;
 import java.util.Date;
 
 /**
@@ -67,14 +65,14 @@ public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler imple
             if (device == null) {
                 log.info("[android][{}]首次接入master，开始初始化设备", deviceId);
                 try {
-                    mobileDevice = initAndroidDevice(iDevice, appiumServer.getUrl());
+                    mobileDevice = initAndroidDevice(iDevice, appiumServer);
                     log.info("[android][{}]初始化设备完成", deviceId);
                 } catch (Exception e) {
                     throw new RuntimeException("初始化设备" + deviceId + "出错", e);
                 }
             } else {
                 log.info("[android][{}]已接入过master", deviceId);
-                mobileDevice = new AndroidDevice(device, iDevice);
+                mobileDevice = new AndroidDevice(device, iDevice, appiumServer);
             }
 
             AndroidDevice androidDevice = (AndroidDevice) mobileDevice;
@@ -107,7 +105,7 @@ public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler imple
     /**
      * 首次接入系统，初始化Android设备
      */
-    private MobileDevice initAndroidDevice(IDevice iDevice, URL url) throws Exception {
+    private MobileDevice initAndroidDevice(IDevice iDevice, AppiumServer appiumServer) throws Exception {
         String deviceId = iDevice.getSerialNumber();
 
         log.info("[android][{}]开始安装minicap", deviceId);
@@ -145,7 +143,7 @@ public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler imple
         device.setScreenWidth(Integer.parseInt(resolutionArray[0]));
         device.setScreenHeight(Integer.parseInt(resolutionArray[1]));
 
-        AndroidDevice androidDevice = new AndroidDevice(device, iDevice);
+        AndroidDevice androidDevice = new AndroidDevice(device, iDevice, appiumServer);
 
         // 截图并上传到服务器
         String imgDownloadUrl = androidDevice.screenshotAndUploadToMaster();
@@ -155,7 +153,8 @@ public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler imple
         AndroidUtil.installApk(iDevice, "vendor/apk/ApiDemos-debug.apk");
 
         log.info("[android][{}]开始初始化appium", device.getId());
-        AppiumDriver appiumDriver = AppiumDriverBuilder.build(androidDevice, url);
+
+        AppiumDriver appiumDriver = androidDevice.newDriver();
         androidDevice.setAppiumDriver(appiumDriver);
         log.info("[android][{}]初始化appium完成", device.getId());
 

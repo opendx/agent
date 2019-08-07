@@ -6,8 +6,11 @@ import com.daxiang.core.MobileDevice;
 import com.daxiang.core.android.stf.AdbKit;
 import com.daxiang.core.android.stf.Minicap;
 import com.daxiang.core.android.stf.Minitouch;
+import com.daxiang.core.appium.AndroidDriverBuilder;
 import com.daxiang.core.appium.AndroidPageSourceHandler;
+import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
+import io.appium.java_client.AppiumDriver;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.dom4j.DocumentException;
@@ -30,8 +33,8 @@ public class AndroidDevice extends MobileDevice {
     private Minitouch minitouch;
     private AdbKit adbKit;
 
-    public AndroidDevice(Device device, IDevice iDevice) {
-        super(device);
+    public AndroidDevice(Device device, IDevice iDevice, AppiumServer appiumServer) {
+        super(device, appiumServer);
         this.iDevice = iDevice;
     }
 
@@ -47,6 +50,11 @@ public class AndroidDevice extends MobileDevice {
             }
         }
         throw new RuntimeException("无法判断是否能用Uiautomator2，请更新AndroidUtil.ANDROID_VERSION");
+    }
+
+    @Override
+    public AppiumDriver newDriver() {
+        return new AndroidDriverBuilder().build(this);
     }
 
     @Override

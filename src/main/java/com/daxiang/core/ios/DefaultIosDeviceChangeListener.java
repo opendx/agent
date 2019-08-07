@@ -3,7 +3,6 @@ package com.daxiang.core.ios;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceChangeHandler;
 import com.daxiang.core.MobileDeviceHolder;
-import com.daxiang.core.appium.AppiumDriverBuilder;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
 import io.appium.java_client.AppiumDriver;
@@ -11,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.Dimension;
 import org.springframework.stereotype.Component;
 
-import java.net.URL;
 import java.util.Date;
 
 /**
@@ -48,14 +46,14 @@ public class DefaultIosDeviceChangeListener extends MobileDeviceChangeHandler im
             if (device == null) {
                 log.info("[ios][{}]首次接入master，开始初始化设备", deviceId);
                 try {
-                    mobileDevice = initIosDevice(deviceId, appiumServer.getUrl());
+                    mobileDevice = initIosDevice(deviceId, appiumServer);
                     log.info("[ios][{}]初始化设备完成", deviceId);
                 } catch (Exception e) {
                     throw new RuntimeException("初始化设备" + deviceId + "出错", e);
                 }
             } else {
                 log.info("[ios][{}]已接入过master", deviceId);
-                mobileDevice = new IosDevice(device);
+                mobileDevice = new IosDevice(device, appiumServer);
             }
 
             mobileDevice.setAppiumServer(appiumServer);
@@ -74,7 +72,7 @@ public class DefaultIosDeviceChangeListener extends MobileDeviceChangeHandler im
         log.info("[ios][{}]iosDeviceDisconnected处理完成", deviceId);
     }
 
-    private MobileDevice initIosDevice(String deviceId, URL url) throws Exception {
+    private MobileDevice initIosDevice(String deviceId, AppiumServer appiumServer) throws Exception {
         Device device = new Device();
 
         device.setPlatform(MobileDevice.IOS);
@@ -87,14 +85,14 @@ public class DefaultIosDeviceChangeListener extends MobileDeviceChangeHandler im
         device.setCpuInfo(msg);
         device.setMemSize(msg);
 
-        IosDevice iosDevice = new IosDevice(device);
+        IosDevice iosDevice = new IosDevice(device, appiumServer);
 
         // 截图并上传到服务器
         String imgDownloadUrl = iosDevice.screenshotAndUploadToMaster();
         device.setImgUrl(imgDownloadUrl);
 
         log.info("[ios][{}]开始初始化appium", device.getId());
-        AppiumDriver appiumDriver = AppiumDriverBuilder.build(iosDevice, url);
+        AppiumDriver appiumDriver = iosDevice.newDriver();
         iosDevice.setAppiumDriver(appiumDriver);
         log.info("[ios][{}]初始化appium完成", device.getId());
 

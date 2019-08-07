@@ -1,7 +1,6 @@
 package com.daxiang.core;
 
 import com.daxiang.api.MasterApi;
-import com.daxiang.core.appium.AppiumDriverBuilder;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
 import com.daxiang.utils.UUIDUtil;
@@ -33,8 +32,9 @@ public abstract class MobileDevice {
     private AppiumServer appiumServer;
     private AppiumDriver appiumDriver;
 
-    public MobileDevice(Device device) {
+    public MobileDevice(Device device, AppiumServer appiumServer) {
         this.device = device;
+        this.appiumServer = appiumServer;
         deviceTestTaskExcutor = new DeviceTestTaskExcutor(this);
     }
 
@@ -52,9 +52,11 @@ public abstract class MobileDevice {
                 // 上次会话可能已经过期，quit会有异常，ignore
             }
         }
-        appiumDriver = AppiumDriverBuilder.build(this, appiumServer.getUrl());
+        appiumDriver = newDriver();
         return appiumDriver;
     }
+
+    public abstract AppiumDriver newDriver();
 
     public String getId() {
         return device.getId();
