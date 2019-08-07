@@ -24,9 +24,6 @@ public class MobileDeviceChangeHandler {
     }
 
     public void mobileOnline(MobileDevice mobileDevice) {
-        if (mobileDevice == null) {
-            throw new IllegalArgumentException("mobileDevice不能为空");
-        }
         Device device = mobileDevice.getDevice();
         device.setAgentIp(ip);
         device.setAgentPort(port);
