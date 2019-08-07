@@ -45,13 +45,13 @@ public class DeviceTestTaskExcutor {
                     deviceTestTask = testTaskQueue.take(); // 没有测试任务，线程阻塞在此
                 } catch (InterruptedException e) {
                     // 调用excuteTestTaskThread.interrupt()可以执行到这里
-                    log.info("[{}][自动化测试]停止获取测试任务", deviceId);
+                    log.info("[自动化测试][{}]停止获取测试任务", deviceId);
                     break;
                 }
                 try {
                     excuteTestTask(deviceTestTask);
                 } catch (Exception e) {
-                    log.error("[{}][自动化测试]执行测试任务'{}'出错", deviceId, deviceTestTask.getTestTaskName(), e);
+                    log.error("[自动化测试][{}]执行测试任务出错: {}", deviceId, deviceTestTask.getTestTaskName(), e);
                 }
             }
         });
@@ -65,7 +65,7 @@ public class DeviceTestTaskExcutor {
      */
     public void commitTestTask(DeviceTestTask deviceTestTask) {
         if (!testTaskQueue.offer(deviceTestTask)) {
-            throw new RuntimeException("提交测试任务'" + deviceTestTask.getTestTaskName() + "'失败");
+            throw new RuntimeException("提交测试任务失败: " + deviceTestTask.getTestTaskName());
         }
     }
 
@@ -75,7 +75,7 @@ public class DeviceTestTaskExcutor {
      * @param deviceTestTask
      */
     private void excuteTestTask(DeviceTestTask deviceTestTask) throws Exception {
-        log.info("[{}][自动化测试]开始执行测试任务: {}", deviceId, deviceTestTask.getTestTaskName());
+        log.info("[自动化测试][{}]开始执行测试任务: {}", deviceId, deviceTestTask.getTestTaskName());
 
         device.setStatus(Device.USING_STATUS);
         device.setUsername(deviceTestTask.getTestTaskName());
@@ -96,7 +96,7 @@ public class DeviceTestTaskExcutor {
                         BeanUtils.copyProperties(testcase, action);
                         return action;
                     }).collect(Collectors.toList()), "/codetemplate", "mobile.ftl");
-            log.info("[{}][自动化测试]转换代码：{}", deviceId, code);
+            log.info("[自动化测试][{}]转换代码: {}", deviceId, code);
             // todo 捕获到DynamicCompilerException即编译失败，通知master纠正用例，否则错误的用例会无限下发给agent执行
             Class clazz = JavaCompiler.compile(className, code);
             mobileDevice.freshDriver();

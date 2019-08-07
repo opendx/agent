@@ -41,7 +41,7 @@ public class ScheduledTaskExcutor {
             DeviceTestTask unStartDeviceTestTask = masterApi.getFirstUnStartDeviceTestTask(deviceId);
             if (unStartDeviceTestTask != null) {
                 MobileDeviceHolder.get(deviceId).getDeviceTestTaskExcutor().commitTestTask(unStartDeviceTestTask);
-                log.info("[{}][自动化测试]提交测试任务: {}", deviceId, unStartDeviceTestTask.getTestTaskName());
+                log.info("[自动化测试][{}]提交测试任务: {}", deviceId, unStartDeviceTestTask.getTestTaskName());
             }
         });
     }
