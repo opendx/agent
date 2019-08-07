@@ -9,7 +9,9 @@ import com.daxiang.model.devicetesttask.Testcase;
 import com.daxiang.utils.UUIDUtil;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.AndroidStartScreenRecordingOptions;
 import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.ios.IOSStartScreenRecordingOptions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.util.StringUtils;
@@ -18,6 +20,7 @@ import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
@@ -47,7 +50,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         Boolean needRecordVideo = true; // 这个版本先设置为需要录制视频，以后可能改成从前端传过来
 
         MobileDevice mobileDevice = MobileDeviceHolder.get(deviceId);
-        log.info("[{}][自动化测试]onStart, deviceTestTaskId：{}", deviceId, deviceTestTaskId);
+        log.info("[自动化测试][{}]onStart, deviceTestTaskId：{}", deviceId, deviceTestTaskId);
 
         TL_MOBILE_DEVICE.set(mobileDevice);
         TL_DEVICE_TEST_TASK_ID.set(deviceTestTaskId);
@@ -71,7 +74,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         String deviceId = mobileDevice.getId();
         Integer deviceTestTaskId = TL_DEVICE_TEST_TASK_ID.get();
 
-        log.info("[{}][自动化测试]onFinish, deviceTestTaskId: {}", deviceId, deviceTestTaskId);
+        log.info("[自动化测试][{}]onFinish, deviceTestTaskId: {}", deviceId, deviceTestTaskId);
         DeviceTestTask deviceTestTask = new DeviceTestTask();
         deviceTestTask.setId(deviceTestTaskId);
         deviceTestTask.setEndTime(new Date());
@@ -95,7 +98,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         Integer testcaseId = Integer.parseInt(tr.getMethod().getDescription().split("_")[2]);
         TL_TEST_CASE_ID.set(testcaseId);
 
-        log.info("[{}][自动化测试]onTestStart, testcaseId: {}", deviceId, testcaseId);
+        log.info("[自动化测试][{}]onTestStart, testcaseId: {}", deviceId, testcaseId);
 
         Testcase testcase = new Testcase();
         testcase.setId(testcaseId);
@@ -105,14 +108,24 @@ public class TestCaseTestListener extends TestListenerAdapter {
         if (needRecordVideo) {
             AppiumDriver appiumDriver = mobileDevice.getAppiumDriver();
             try {
-                log.info("[{}][自动化测试]testcaseId: {},开始录制视频...", deviceId, testcaseId);
+                log.info("[自动化测试][{}]testcaseId: {}, 开始录制视频...", deviceId, testcaseId);
                 if (appiumDriver instanceof AndroidDriver) {
-                    ((AndroidDriver) appiumDriver).startRecordingScreen();
+                    AndroidStartScreenRecordingOptions androidOptions = new AndroidStartScreenRecordingOptions();
+                    // Since Appium 1.8.2 the time limit can be up to 1800 seconds (30 minutes).
+                    androidOptions.withTimeLimit(Duration.ofMinutes(30));
+                    androidOptions.withBitRate(200000); // default 4000000
+                    ((AndroidDriver) appiumDriver).startRecordingScreen(androidOptions);
                 } else {
-                    ((IOSDriver) appiumDriver).startRecordingScreen();
+                    IOSStartScreenRecordingOptions iosOptions = new IOSStartScreenRecordingOptions();
+                    // The maximum value is 30 minutes.
+                    iosOptions.withTimeLimit(Duration.ofMinutes(30));
+                    iosOptions.withFps(10); // default 10
+                    iosOptions.withVideoQuality(IOSStartScreenRecordingOptions.VideoQuality.LOW);
+                    iosOptions.withVideoType("libx264");
+                    ((IOSDriver) appiumDriver).startRecordingScreen(iosOptions);
                 }
             } catch (Exception e) {
-                log.error("[{}][自动化测试]testcaseId: {},启动录制视频失败", deviceId, testcaseId, e);
+                log.error("[自动化测试][{}]testcaseId: {}, 启动录制视频失败", deviceId, testcaseId, e);
                 TL_NEED_RECORD_VIDEO.set(false);
             }
         }
@@ -122,7 +135,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
     public void onTestSuccess(ITestResult tr) {
         MobileDevice mobileDevice = TL_MOBILE_DEVICE.get();
         Integer testcaseId = TL_TEST_CASE_ID.get();
-        log.info("[{}][自动化测试]onTestSuccess, testcaseId: {}", mobileDevice.getId(), testcaseId);
+        log.info("[自动化测试][{}]onTestSuccess, testcaseId: {}", mobileDevice.getId(), testcaseId);
 
         Testcase testcase = new Testcase();
         testcase.setId(testcaseId);
@@ -136,7 +149,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
     public void onTestFailure(ITestResult tr) {
         MobileDevice mobileDevice = TL_MOBILE_DEVICE.get();
         Integer testcaseId = TL_TEST_CASE_ID.get();
-        log.error("[{}][自动化测试]onTestFailure, testcaseId: {}", mobileDevice.getId(), testcaseId, tr.getThrowable());
+        log.error("[自动化测试][{}]onTestFailure, testcaseId: {}", mobileDevice.getId(), testcaseId, tr.getThrowable());
 
         Testcase testcase = new Testcase();
         testcase.setId(testcaseId);
@@ -158,7 +171,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
     public void onTestSkipped(ITestResult tr) {
         MobileDevice mobileDevice = TL_MOBILE_DEVICE.get();
         Integer testcaseId = TL_TEST_CASE_ID.get();
-        log.warn("[{}][自动化测试]onTestSkipped, testcaseId: {}", mobileDevice.getId(), testcaseId, tr.getThrowable());
+        log.warn("[自动化测试][{}]onTestSkipped, testcaseId: {}", mobileDevice.getId(), testcaseId, tr.getThrowable());
 
         Testcase testcase = new Testcase();
         testcase.setId(testcaseId);
@@ -179,7 +192,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         try {
             return mobileDevice.screenshotAndUploadToMaster();
         } catch (Exception e) {
-            log.error("[{}][自动化测试]testcaseId: {}，截图并上传到master失败", mobileDevice.getId(), TL_TEST_CASE_ID.get(), e);
+            log.error("[自动化测试][{}]testcaseId: {}，截图并上传到master失败", mobileDevice.getId(), TL_TEST_CASE_ID.get(), e);
             return null;
         }
     }
@@ -199,28 +212,28 @@ public class TestCaseTestListener extends TestListenerAdapter {
         File videoFile = new File(UUIDUtil.getUUID() + ".mp4");
 
         try {
-            log.info("[{}][自动化测试]testcaseId: {}, 停止录制视频...", deviceId, testcaseId);
+            log.info("[自动化测试][{}]testcaseId: {}, 停止录制视频...", deviceId, testcaseId);
             long startStopRecordingScreenTime = System.currentTimeMillis();
             if (appiumDriver instanceof AndroidDriver) {
                 base64Video = ((AndroidDriver) appiumDriver).stopRecordingScreen();
             } else {
                 base64Video = ((IOSDriver) appiumDriver).stopRecordingScreen();
             }
-            log.info("[{}][自动化测试]testcaseId: {}, base64视频已生成，耗时: {} ms", deviceId, testcaseId, System.currentTimeMillis() - startStopRecordingScreenTime);
+            log.info("[自动化测试][{}]testcaseId: {}, base64视频已生成，耗时: {} ms", deviceId, testcaseId, System.currentTimeMillis() - startStopRecordingScreenTime);
 
             if (StringUtils.isEmpty(base64Video)) {
                 return null;
             }
 
-            log.info("[{}][自动化测试]testcaseId: {}, 开始将base64视频转换成mp4上传到master", deviceId, testcaseId);
+            log.info("[自动化测试][{}]testcaseId: {}, 开始将base64视频转换成mp4上传到master", deviceId, testcaseId);
             long startGenerateMp4FileAndUploadToMasterTime = System.currentTimeMillis();
             FileUtils.writeByteArrayToFile(videoFile, Base64.getDecoder().decode(base64Video), false);
             String downloadUrl = MasterApi.getInstance().uploadFile(videoFile);
-            log.info("[{}][自动化测试]testcaseId: {}, base64视频转换成mp4上传到master完成，耗时: {} ms", deviceId, testcaseId, System.currentTimeMillis() - startGenerateMp4FileAndUploadToMasterTime);
+            log.info("[自动化测试][{}]testcaseId: {}, base64视频转换成mp4上传到master完成，耗时: {} ms", deviceId, testcaseId, System.currentTimeMillis() - startGenerateMp4FileAndUploadToMasterTime);
 
             return downloadUrl;
         } catch (Exception e) {
-            log.error("[{}][自动化测试]testcaseId: {}，getVideoDownloadUrl err", deviceId, testcaseId, e);
+            log.error("[自动化测试][{}]testcaseId: {}，getVideoDownloadUrl err", deviceId, testcaseId, e);
             return null;
         } finally {
             FileUtils.deleteQuietly(videoFile);
@@ -248,7 +261,6 @@ public class TestCaseTestListener extends TestListenerAdapter {
         Testcase testcase = new Testcase();
         testcase.setId(testcaseId);
         testcase.setSteps(Arrays.asList(step));
-
         MasterApi.getInstance().updateTestcase(TL_DEVICE_TEST_TASK_ID.get(), testcase);
     }
 }

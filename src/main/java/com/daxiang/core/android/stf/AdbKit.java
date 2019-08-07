@@ -1,6 +1,5 @@
 package com.daxiang.core.android.stf;
 
-import com.daxiang.core.android.AndroidDevice;
 import com.daxiang.core.PortProvider;
 import com.daxiang.utils.ShellExecutor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +21,8 @@ public class AdbKit {
     private ExecuteWatchdog watchdog;
     private String deviceId;
 
-    public AdbKit(AndroidDevice androidDevice) {
-        this.deviceId = androidDevice.getId();
+    public AdbKit(String deviceId) {
+        this.deviceId = deviceId;
     }
 
     /**
@@ -36,7 +35,8 @@ public class AdbKit {
 
         int localPort = PortProvider.getAdbKitAvailablePort();
         String cmd = String.format(START_ADBKIT_CMD, localPort, deviceId);
-        log.info("[{}][adbkit]开启远程调试功能：{}", deviceId, cmd);
+        log.info("[adbkit][{}]开启远程调试功能: {}", deviceId, cmd);
+
         watchdog = ShellExecutor.excuteAsyncAndGetWatchdog(cmd, null);
         return localPort;
     }
@@ -46,9 +46,9 @@ public class AdbKit {
      */
     public void stop() {
         if (watchdog != null) {
-            log.info("[{}][adbkit]关闭adbkit...", deviceId);
+            log.info("[adbkit][{}]关闭adbkit...", deviceId);
             watchdog.destroyProcess();
-            log.info("[{}][adbkit]关闭adbkit完成", deviceId);
+            log.info("[adbkit][{}]关闭adbkit完成", deviceId);
         }
     }
 

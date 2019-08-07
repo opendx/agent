@@ -61,12 +61,12 @@ public class Minitouch {
         // 启动minitouch会阻塞线程，启一个线程运行minitouch
         new Thread(() -> {
             try {
-                log.info("[{}][minitouch]启动：{}", deviceId, START_MINITOUCH_CMD);
+                log.info("[minitouch][{}]启动: {}", deviceId, START_MINITOUCH_CMD);
                 androidDevice.getIDevice().executeShellCommand(START_MINITOUCH_CMD, new MultiLineReceiver() {
                     @Override
                     public void processNewLines(String[] lines) {
                         for (String line : lines) {
-                            log.info("[{}][minitouch]手机控制台输出：{}", deviceId, line);
+                            log.info("[minitouch][{}]手机控制台输出: {}", deviceId, line);
                             if (!StringUtils.isEmpty(line) && line.startsWith("Type")) {
                                 // minitouch启动完成
                                 countDownLatch.countDown();
@@ -79,30 +79,30 @@ public class Minitouch {
                         return false;
                     }
                 }, 0, TimeUnit.SECONDS);
-                log.info("[{}][minitouch]已停止运行", deviceId);
+                log.info("[minitouch][{}]已停止运行", deviceId);
             } catch (Exception e) {
-                log.error("[{}][minitouch]启动出错", deviceId, e);
+                log.error("[minitouch][{}]启动出错", deviceId, e);
             }
         }).start();
 
         this.localPort = PortProvider.getMinitouchAvailablePort();
 
-        log.info("[{}][minitouch]adb forward: {} -> remote minitouch", deviceId, localPort);
+        log.info("[minitouch][{}]adb forward: {} -> remote minitouch", deviceId, localPort);
         androidDevice.getIDevice().createForward(localPort, "minitouch", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
 
         countDownLatch.await();
-        log.info("[{}][minitouch]minitouch启动完成", deviceId);
+        log.info("[minitouch][{}]minitouch启动完成", deviceId);
 
         new Thread(() -> {
             try (Socket socket = new Socket("127.0.0.1", localPort);
                  BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                  PrintWriter printWriter = new PrintWriter(socket.getOutputStream())) {
-                log.info("[{}][minitouch]创建socket获取minitouch输出的数据：127.0.0.1:{}", deviceId, localPort);
+                log.info("[minitouch][{}]创建socket获取minitouch输出的数据: 127.0.0.1:{}", deviceId, localPort);
                 this.printWriter = printWriter;
 
                 String line;
                 while ((line = br.readLine()) != null) {
-                    log.info("[{}][minitouch]socket获取：{}", deviceId, line);
+                    log.info("[minitouch][{}]socket获取: {}", deviceId, line);
                     // https://github.com/openstf/minitouch#readable-from-the-socket
                     if (line.startsWith("^")) {
                         // ^ <max-contacts> <max-x> <max-y> <max-pressure>
@@ -110,15 +110,15 @@ public class Minitouch {
                         String[] content = line.split(" ");
                         width = Integer.parseInt(content[2]);
                         height = Integer.parseInt(content[3]);
-                        log.info("[{}][minitouch]minitouch输出设备宽度:{},高度:{}", deviceId, width, height);
+                        log.info("[minitouch][{}]minitouch输出设备宽度:{},高度:{}", deviceId, width, height);
                     } else if (line.startsWith("$")) {
                         // $ 12310
                         pid = Integer.parseInt(line.split(" ")[1]);
-                        log.info("[{}][minitouch]运行进程id: {}", deviceId, pid);
+                        log.info("[minitouch][{}]运行进程id: {}", deviceId, pid);
                     }
                 }
             } catch (Exception e) {
-                log.error("[{}][minitouch]处理minitouch数据出错", deviceId, e);
+                log.error("[minitouch][{}]处理minitouch数据出错", deviceId, e);
             }
 
             if (printWriter != null) {
@@ -128,10 +128,10 @@ public class Minitouch {
             // 手机未连接 adb forward会自己移除
             if (androidDevice.isConnected()) {
                 try {
-                    log.info("[{}][minitouch]移除adb forward: {} -> remote minitouch", deviceId, localPort);
+                    log.info("[minitouch][{}]移除adb forward: {} -> remote minitouch", deviceId, localPort);
                     androidDevice.getIDevice().removeForward(localPort, "minitouch", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
                 } catch (Exception e) {
-                    log.error("[{}][minitouch]移除adb forward出错", deviceId, e);
+                    log.error("[minitouch][{}]移除adb forward出错", deviceId, e);
                 }
             }
         }).start();
@@ -142,19 +142,17 @@ public class Minitouch {
      * 停止运行monitouch
      */
     public void stop() {
-        log.info("[{}][minitouch]开始停止minitouch", deviceId);
-
         // 手机未连接，minitouch会自己退出
         if (pid > 0 && androidDevice.isConnected()) {
+            log.info("[minitouch][{}]开始停止minitouch", deviceId);
             String cmd = "kill -9 " + pid;
-            log.info("[{}][minitouch]kill minitouch：{}", deviceId, cmd);
+            log.info("[minitouch][{}]kill minitouch: {}", deviceId, cmd);
             try {
                 androidDevice.getIDevice().executeShellCommand(cmd, new NullOutputReceiver());
             } catch (Exception e) {
-                log.error("[{}][minitouch]{}执行出错", deviceId, cmd, e);
+                log.error("[minitouch][{}]{}执行出错", deviceId, cmd, e);
             }
         }
-
     }
 
     /**

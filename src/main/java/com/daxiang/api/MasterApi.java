@@ -69,7 +69,9 @@ public class MasterApi {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity(params, headers);
 
-        Response<List<Device>> response = restTemplate.exchange(deviceListApi, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<Response<List<Device>>>() {}).getBody();
+        Response<List<Device>> response = restTemplate.exchange(deviceListApi, HttpMethod.POST, requestEntity,
+                new ParameterizedTypeReference<Response<List<Device>>>() {}).getBody();
+
         if (response.isSuccess()) {
             return response.getData().stream().findFirst().orElse(null);
         } else {
@@ -100,7 +102,9 @@ public class MasterApi {
         multiValueMap.add("file", resource);
         HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(multiValueMap);
 
-        Response<Map<String, String>> response = restTemplate.exchange(uploadFileApi, HttpMethod.POST, httpEntity, new ParameterizedTypeReference<Response<Map<String, String>>>() {}).getBody();
+        Response<Map<String, String>> response = restTemplate.exchange(uploadFileApi, HttpMethod.POST, httpEntity,
+                new ParameterizedTypeReference<Response<Map<String, String>>>() {}).getBody();
+
         if (response.isSuccess()) {
             return response.getData().get("downloadURL");
         } else {
@@ -123,7 +127,9 @@ public class MasterApi {
      */
     public DeviceTestTask getFirstUnStartDeviceTestTask(String deviceId) {
         String url = String.format(findFirstUnStartDeviceTestTaskApi, deviceId);
-        Response<DeviceTestTask> response = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<Response<DeviceTestTask>>() {}).getBody();
+        Response<DeviceTestTask> response = restTemplate.exchange(url, HttpMethod.GET, null,
+                new ParameterizedTypeReference<Response<DeviceTestTask>>() {}).getBody();
+
         if (response.isSuccess()) {
             return response.getData();
         } else {

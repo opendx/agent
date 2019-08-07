@@ -80,7 +80,7 @@ public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler imple
             AndroidDevice androidDevice = (AndroidDevice) mobileDevice;
             androidDevice.setMinicap(new Minicap(androidDevice));
             androidDevice.setMinitouch(new Minitouch(androidDevice));
-            androidDevice.setAdbKit(new AdbKit(androidDevice));
+            androidDevice.setAdbKit(new AdbKit(deviceId));
 
             mobileDevice.setAppiumServer(appiumServer);
             MobileDeviceHolder.add(deviceId, mobileDevice);

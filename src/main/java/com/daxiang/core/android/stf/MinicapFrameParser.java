@@ -21,10 +21,12 @@ public class MinicapFrameParser {
         if (inputStream == null) {
             throw new IllegalArgumentException("inputStream不能为空");
         }
+
         int frameSize = IOUtil.readUInt32LE(inputStream);
         if (frameSize <= 0) {
-            throw new MinicapFrameSizeException("获取图片数据失败,frameSize:" + frameSize);
+            throw new MinicapFrameSizeException("获取图片数据失败,frameSize: " + frameSize);
         }
+
         // todo这里可能不需要每次都new
         byte[] img = new byte[frameSize];
         for (int i = 0; i < frameSize; i++) {
