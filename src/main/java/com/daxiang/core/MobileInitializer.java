@@ -1,5 +1,10 @@
-package com.daxiang.core.android;
+package com.daxiang.core;
 
+import com.daxiang.core.android.ADB;
+import com.daxiang.core.android.AndroidDeviceChangeListener;
+import com.daxiang.core.ios.IosDeviceChangeListener;
+import com.daxiang.core.ios.IosDeviceMonitor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -11,14 +16,19 @@ import java.io.IOException;
 /**
  * Created by jiangyitao.
  */
+@Slf4j
 @Component
-public class AndroidInitializer implements ApplicationRunner {
+public class MobileInitializer implements ApplicationRunner {
 
     @Autowired
     private AndroidDeviceChangeListener androidDeviceChangeListener;
+    @Autowired
+    private IosDeviceChangeListener iosDeviceChangeListener;
 
     @Value("${android}")
     private boolean needAndroid;
+    @Value("${ios}")
+    private boolean needIos;
 
     @Override
     public void run(ApplicationArguments args) throws IOException, InterruptedException {
@@ -27,8 +37,14 @@ public class AndroidInitializer implements ApplicationRunner {
             Thread.sleep(1000);
             ADB.startServer();
             ADB.init();
-            // 添加设备监听器，监听设备连接、断开
             ADB.addDeviceChangeListener(androidDeviceChangeListener);
+            log.info("[android]开始监听设备连接/断开");
+        }
+
+        if (needIos) {
+            IosDeviceMonitor iosDeviceMonitor = IosDeviceMonitor.getInstance();
+            iosDeviceMonitor.start(iosDeviceChangeListener);
+            log.info("[ios]开始监听设备连接/断开");
         }
     }
 }

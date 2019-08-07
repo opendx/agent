@@ -46,7 +46,6 @@ public class ADB {
      */
     public static void addDeviceChangeListener(AndroidDebugBridge.IDeviceChangeListener deviceChangeListener) {
         AndroidDebugBridge.addDeviceChangeListener(deviceChangeListener);
-        log.info("[adb]AndroidDeviceChangeListener添加完成");
     }
 
     /**
