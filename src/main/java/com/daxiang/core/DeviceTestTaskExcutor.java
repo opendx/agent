@@ -1,10 +1,8 @@
 package com.daxiang.core;
 
-import com.daxiang.api.MasterApi;
 import com.daxiang.core.javacompile.JavaCompiler;
 import com.daxiang.core.testng.TestNGCodeConverter;
 import com.daxiang.core.testng.TestNGRunner;
-import com.daxiang.model.Device;
 import com.daxiang.model.action.Action;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.utils.UUIDUtil;
@@ -30,12 +28,10 @@ public class DeviceTestTaskExcutor {
     private Thread excuteTestTaskThread;
 
     private MobileDevice mobileDevice;
-    private Device device;
     private String deviceId;
 
     public DeviceTestTaskExcutor(MobileDevice mobileDevice) {
         this.mobileDevice = mobileDevice;
-        this.device = mobileDevice.getDevice();
         this.deviceId = mobileDevice.getId();
 
         excuteTestTaskThread = new Thread(() -> {
