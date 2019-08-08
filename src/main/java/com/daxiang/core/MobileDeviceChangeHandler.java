@@ -32,7 +32,7 @@ public class MobileDeviceChangeHandler {
         masterApi.saveDevice(device);
     }
 
-    public void mobileDisconnected(String deviceId) {
+    public void mobileOffline(String deviceId) {
         MobileDevice mobileDevice = MobileDeviceHolder.get(deviceId);
         if (mobileDevice == null) {
             return;

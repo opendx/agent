@@ -99,7 +99,7 @@ public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler imple
     public void androidDeviceDisconnected(IDevice iDevice) {
         String deviceId = iDevice.getSerialNumber();
         log.info("[android][{}]断开连接", deviceId);
-        mobileDisconnected(deviceId);
+        mobileOffline(deviceId);
         log.info("[android][{}]androidDeviceDisconnected处理完成", deviceId);
     }
 

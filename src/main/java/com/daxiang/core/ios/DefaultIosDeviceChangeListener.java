@@ -67,7 +67,7 @@ public class DefaultIosDeviceChangeListener extends MobileDeviceChangeHandler im
 
     private void iosDeviceDisconnected(String deviceId) {
         log.info("[ios][{}]断开连接", deviceId);
-        mobileDisconnected(deviceId);
+        mobileOffline(deviceId);
         log.info("[ios][{}]iosDeviceDisconnected处理完成", deviceId);
     }
 
