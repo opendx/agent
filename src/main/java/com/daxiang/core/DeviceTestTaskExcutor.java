@@ -77,9 +77,7 @@ public class DeviceTestTaskExcutor {
     private void excuteTestTask(DeviceTestTask deviceTestTask) throws Exception {
         log.info("[自动化测试][{}]开始执行测试任务: {}", deviceId, deviceTestTask.getTestTaskName());
 
-        device.setStatus(Device.USING_STATUS);
-        device.setUsername(deviceTestTask.getTestTaskName());
-        MasterApi.getInstance().saveDevice(device);
+        mobileDevice.saveUsingDeviceToMaster(deviceTestTask.getTestTaskName());
 
         try {
             String className = "Test_" + UUIDUtil.getUUID();
@@ -102,10 +100,7 @@ public class DeviceTestTaskExcutor {
             mobileDevice.freshDriver();
             TestNGRunner.runTestCases(new Class[]{clazz});
         } finally {
-            if (mobileDevice.isConnected()) {
-                device.setStatus(Device.IDLE_STATUS);
-                MasterApi.getInstance().saveDevice(device);
-            }
+            mobileDevice.saveIdleDeviceToMaster();
         }
     }
 }

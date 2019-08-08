@@ -3,12 +3,10 @@ package com.daxiang.websocket;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.daxiang.App;
-import com.daxiang.api.MasterApi;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.ios.IosDevice;
 import com.daxiang.core.ios.IosUtil;
-import com.daxiang.model.Device;
 import com.daxiang.model.Response;
 import com.daxiang.service.MobileService;
 import io.appium.java_client.TouchAction;
@@ -67,11 +65,7 @@ public class IosSocketServer {
         SESSION_POOL.put(deviceId, session);
         iosDevice = (IosDevice) mobileDevice;
 
-        Device device = iosDevice.getDevice();
-        device.setStatus(Device.USING_STATUS);
-        device.setUsername(username);
-        MasterApi.getInstance().saveDevice(device);
-        log.info("[ios-websocket][{}]数据库状态改为{}使用中", deviceId, username);
+        mobileDevice.saveUsingDeviceToMaster(username);
 
         Response response = App.getBean(MobileService.class).freshDriver(deviceId);
         basicRemote.sendText(JSON.toJSONString(response));
@@ -91,14 +85,7 @@ public class IosSocketServer {
         if (iosDevice != null) {
             SESSION_POOL.remove(deviceId);
             iosDevice.stopMjpegServerIproxy();
-
-            Device device = iosDevice.getDevice();
-            // 因为手机可能被拔出离线,DefaultIosDeviceChangeListener.iosDeviceDisconnected已经在数据库改为离线，这里不能改为闲置
-            if (device != null && device.getStatus() == Device.USING_STATUS) {
-                device.setStatus(Device.IDLE_STATUS);
-                MasterApi.getInstance().saveDevice(device);
-                log.info("[ios-websocket][{}]数据库状态改为闲置", deviceId);
-            }
+            iosDevice.saveIdleDeviceToMaster();
         }
     }
 

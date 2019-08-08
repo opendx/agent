@@ -3,13 +3,11 @@ package com.daxiang.websocket;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.daxiang.App;
-import com.daxiang.api.MasterApi;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.AndroidDevice;
 import com.daxiang.core.android.stf.Minicap;
 import com.daxiang.core.android.stf.Minitouch;
-import com.daxiang.model.Device;
 import com.daxiang.model.Response;
 import com.daxiang.service.MobileService;
 import io.appium.java_client.android.AndroidDriver;
@@ -69,11 +67,7 @@ public class AndroidSocketServer {
         SESSION_POOL.put(deviceId, session);
         androidDevice = (AndroidDevice) mobileDevice;
 
-        Device device = mobileDevice.getDevice();
-        device.setStatus(Device.USING_STATUS);
-        device.setUsername(username);
-        MasterApi.getInstance().saveDevice(device);
-        log.info("[android-websocket][{}]数据库状态改为{}使用中", deviceId, username);
+        mobileDevice.saveUsingDeviceToMaster(username);
 
         basicRemote.sendText("启动minicap服务...");
         minicap = androidDevice.getMinicap();
@@ -130,13 +124,7 @@ public class AndroidSocketServer {
         }
 
         if (androidDevice != null) {
-            Device device = androidDevice.getDevice();
-            // 因为手机可能被拔出离线，AndroidDeviceChangeListener.deviceDisconnected已经在数据库改为离线，这里不能改为闲置
-            if (device != null && device.getStatus() == Device.USING_STATUS) {
-                device.setStatus(Device.IDLE_STATUS);
-                MasterApi.getInstance().saveDevice(device);
-                log.info("[android-websocket][{}]数据库状态改为闲置", deviceId);
-            }
+            androidDevice.saveIdleDeviceToMaster();
         }
     }
 

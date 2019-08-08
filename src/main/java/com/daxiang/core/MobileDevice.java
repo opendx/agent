@@ -1,5 +1,6 @@
 package com.daxiang.core;
 
+import com.daxiang.App;
 import com.daxiang.api.MasterApi;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * Created by jiangyitao.
@@ -138,4 +140,33 @@ public abstract class MobileDevice {
     }
 
     public abstract String dump() throws IOException, DocumentException;
+
+    public void saveOnlineDeviceToMaster() {
+        device.setAgentIp(App.getProperty("server.address"));
+        device.setAgentPort(Integer.parseInt(App.getProperty("server.port")));
+        device.setStatus(Device.IDLE_STATUS);
+        device.setLastOnlineTime(new Date());
+        MasterApi.getInstance().saveDevice(device);
+    }
+
+    public void saveUsingDeviceToMaster(String username) {
+        if (isConnected()) {
+            device.setStatus(Device.USING_STATUS);
+            device.setUsername(username);
+            MasterApi.getInstance().saveDevice(device);
+        }
+    }
+
+    public void saveIdleDeviceToMaster() {
+        if (isConnected()) {
+            device.setStatus(Device.IDLE_STATUS);
+            MasterApi.getInstance().saveDevice(device);
+        }
+    }
+
+    public void saveOfflineDeviceToMaster() {
+        device.setStatus(Device.OFFLINE_STATUS);
+        device.setLastOfflineTime(new Date());
+        MasterApi.getInstance().saveDevice(device);
+    }
 }
