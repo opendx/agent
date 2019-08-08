@@ -13,6 +13,7 @@ import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.Dimension;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -123,6 +124,9 @@ public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler imple
         device.setPlatform(MobileDevice.ANDROID);
         device.setCreateTime(new Date());
         device.setId(deviceId);
+        device.setSystemVersion(AndroidUtil.getAndroidVersion(iDevice));
+        device.setName(AndroidUtil.getDeviceName(iDevice));
+
         try {
             device.setCpuInfo(AndroidUtil.getCpuInfo(iDevice));
         } catch (Exception e) {
@@ -135,13 +139,6 @@ public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler imple
             log.error("获取内存大小失败", e);
             device.setMemSize("获取内存大小失败");
         }
-        device.setName(AndroidUtil.getDeviceName(iDevice));
-        device.setSystemVersion(AndroidUtil.getAndroidVersion(iDevice));
-
-        String resolution = AndroidUtil.getResolution(iDevice);
-        String[] resolutionArray = resolution.split("x");
-        device.setScreenWidth(Integer.parseInt(resolutionArray[0]));
-        device.setScreenHeight(Integer.parseInt(resolutionArray[1]));
 
         AndroidDevice androidDevice = new AndroidDevice(device, iDevice, appiumServer);
 
@@ -154,9 +151,13 @@ public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler imple
 
         log.info("[android][{}]开始初始化appium", deviceId);
         AppiumDriver appiumDriver = androidDevice.newAppiumDriver();
-        appiumDriver.quit();
         log.info("[android][{}]初始化appium完成", deviceId);
 
+        Dimension size = appiumDriver.manage().window().getSize();
+        device.setScreenWidth(size.getWidth());
+        device.setScreenHeight(size.getHeight());
+
+        appiumDriver.quit();
         return androidDevice;
     }
 }

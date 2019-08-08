@@ -19,7 +19,6 @@ public class AndroidUtil {
 
     private static final String CPU_INFO_SHELL = "cat /proc/cpuinfo |grep Hardware";
     private static final String MEM_SIZE_SHELL = "cat /proc/meminfo |grep MemTotal";
-    private static final String RESOLUTION_SHELL = "wm size";
 
     public static final Map<String, String> ANDROID_VERSION = new HashMap();
 
@@ -39,20 +38,6 @@ public class AndroidUtil {
         ANDROID_VERSION.put("27", "8.1");
         ANDROID_VERSION.put("28", "9");
         ANDROID_VERSION.put("29", "10");
-    }
-
-    /**
-     * 获取分辨率
-     *
-     * @param iDevice
-     * @return eg.1080 X 1920
-     * @throws TimeoutException
-     * @throws AdbCommandRejectedException
-     * @throws ShellCommandUnresponsiveException
-     * @throws IOException
-     */
-    public static String getResolution(IDevice iDevice) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
-        return executeShellCommand(iDevice, RESOLUTION_SHELL).split(":")[1].trim();
     }
 
     /**
