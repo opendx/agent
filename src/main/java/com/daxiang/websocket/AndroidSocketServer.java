@@ -77,7 +77,10 @@ public class AndroidSocketServer {
 
         basicRemote.sendText("启动minicap服务...");
         minicap = androidDevice.getMinicap();
-        minicap.start(Integer.parseInt(App.getProperty("minicap-quality")), minicap.convertVirtualResolution(Integer.parseInt(App.getProperty("displayWidth"))), 0);
+        minicap.start(Integer.parseInt(App.getProperty("minicap-quality")),
+                androidDevice.getResolution(),
+                androidDevice.getVirtualResolution(Integer.parseInt(App.getProperty("displayWidth"))),
+                0);
         basicRemote.sendText("启动minicap服务完成");
 
         handleImgDataThread = new Thread(() -> {

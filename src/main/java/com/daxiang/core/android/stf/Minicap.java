@@ -1,7 +1,6 @@
 package com.daxiang.core.android.stf;
 
 import com.android.ddmlib.*;
-import com.daxiang.core.android.AndroidDevice;
 import com.daxiang.core.PortProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
@@ -23,7 +22,7 @@ public class Minicap {
      */
     private BlockingQueue<byte[]> imgQueue = new LinkedBlockingQueue<>();
 
-    private AndroidDevice androidDevice;
+    private IDevice iDevice;
     private String deviceId;
     /**
      * 本地端口，adb forward 本地端口到手机端口
@@ -34,9 +33,9 @@ public class Minicap {
      */
     private int pid;
 
-    public Minicap(AndroidDevice androidDevice) {
-        this.androidDevice = androidDevice;
-        deviceId = androidDevice.getId();
+    public Minicap(IDevice iDevice) {
+        this.iDevice = iDevice;
+        deviceId = iDevice.getSerialNumber();
     }
 
     public BlockingQueue<byte[]> getImgQueue() {
@@ -47,17 +46,18 @@ public class Minicap {
      * 启动minicap
      *
      * @param quality           图像质量 0-100
+     * @param realResolution    设备真实分辨率 eg.1080x1920
      * @param virtualResolution minicap输出的图片分辨率 eg.1080x1920
      * @param orientation       屏幕的旋转角度
      */
-    public void start(Integer quality, String virtualResolution, Integer orientation) throws Exception {
+    public void start(Integer quality, String realResolution, String virtualResolution, Integer orientation) throws Exception {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         // 启动minicap会阻塞线程，启一个线程运行minicap
         new Thread(() -> {
             try {
-                String startMinicapCmd = String.format(START_MINICAP_CMD, quality, androidDevice.getResolution(), virtualResolution, orientation);
+                String startMinicapCmd = String.format(START_MINICAP_CMD, quality, realResolution, virtualResolution, orientation);
                 log.info("[minicap][{}]启动: {}", deviceId, startMinicapCmd);
-                androidDevice.getIDevice().executeShellCommand(startMinicapCmd, new MultiLineReceiver() {
+                iDevice.executeShellCommand(startMinicapCmd, new MultiLineReceiver() {
                     @Override
                     public void processNewLines(String[] lines) {
                         for (String line : lines) {
@@ -83,7 +83,7 @@ public class Minicap {
         this.localPort = PortProvider.getMinicapAvailablePort();
 
         log.info("[minicap][{}]adb forward: {} -> remote minicap", deviceId, localPort);
-        androidDevice.getIDevice().createForward(localPort, "minicap", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
+        iDevice.createForward(localPort, "minicap", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
 
         countDownLatch.await();
         log.info("[minicap][{}]minicap启动完成", deviceId);
@@ -111,10 +111,10 @@ public class Minicap {
             log.info("[minicap][{}]已停止向imgQueue推送图片数据", deviceId);
 
             // 手机未连接 adb forward会自己移除
-            if (androidDevice.isConnected()) {
+            if (iDevice.isOnline()) {
                 try {
                     log.info("[minicap][{}]移除adb forward: {} -> remote minicap", deviceId, localPort);
-                    androidDevice.getIDevice().removeForward(localPort, "minicap", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
+                    iDevice.removeForward(localPort, "minicap", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
                 } catch (Exception e) {
                     log.error("[minicap][{}]移除adb forward出错", deviceId, e);
                 }
@@ -127,20 +127,15 @@ public class Minicap {
 
     public void stop() {
         // 手机未连接，minicap会自己退出
-        if (pid > 0 && androidDevice.isConnected()) {
+        if (pid > 0 && iDevice.isOnline()) {
             log.info("[minicap][{}]开始停止minicap", deviceId);
             String cmd = "kill -9 " + pid;
             log.info("[minicap][{}]kill minicap: {}", deviceId, cmd);
             try {
-                androidDevice.getIDevice().executeShellCommand(cmd, new NullOutputReceiver());
+                iDevice.executeShellCommand(cmd, new NullOutputReceiver());
             } catch (Exception e) {
                 log.error("[minicap][{}]{}执行出错", deviceId, cmd, e);
             }
         }
-    }
-
-    public String convertVirtualResolution(int displayWidth) {
-        int displayHeight = androidDevice.getScreenScaledHeight(displayWidth);
-        return displayWidth + "x" + displayHeight;
     }
 }

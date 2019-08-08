@@ -51,5 +51,4 @@ public class AdbKit {
             log.info("[adbkit][{}]关闭adbkit完成", deviceId);
         }
     }
-
 }

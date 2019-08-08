@@ -89,6 +89,11 @@ public abstract class MobileDevice {
         return String.valueOf(device.getScreenWidth()) + "x" + String.valueOf(device.getScreenHeight());
     }
 
+    public String getVirtualResolution(Integer width) {
+        int height = getScreenScaledHeight(width);
+        return width + "x" + height;
+    }
+
     /**
      * 按照比例计算高度
      *
