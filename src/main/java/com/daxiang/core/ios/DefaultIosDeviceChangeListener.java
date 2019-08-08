@@ -86,10 +86,6 @@ public class DefaultIosDeviceChangeListener extends MobileDeviceChangeHandler im
 
         IosDevice iosDevice = new IosDevice(device, appiumServer);
 
-        // 截图并上传到服务器
-        String imgDownloadUrl = iosDevice.screenshotAndUploadToMaster();
-        device.setImgUrl(imgDownloadUrl);
-
         log.info("[ios][{}]开始初始化appium", device.getId());
         AppiumDriver appiumDriver = iosDevice.newAppiumDriver();
         log.info("[ios][{}]初始化appium完成", device.getId());
@@ -97,6 +93,10 @@ public class DefaultIosDeviceChangeListener extends MobileDeviceChangeHandler im
         Dimension size = appiumDriver.manage().window().getSize();
         device.setScreenWidth(size.getWidth());
         device.setScreenHeight(size.getHeight());
+
+        // 截图并上传到服务器
+        String imgDownloadUrl = iosDevice.screenshotAndUploadToMaster();
+        device.setImgUrl(imgDownloadUrl);
 
         appiumDriver.quit();
         return iosDevice;

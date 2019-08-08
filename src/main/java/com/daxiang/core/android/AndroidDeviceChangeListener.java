@@ -142,10 +142,6 @@ public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler imple
 
         AndroidDevice androidDevice = new AndroidDevice(device, iDevice, appiumServer);
 
-        // 截图并上传到服务器
-        String imgDownloadUrl = androidDevice.screenshotAndUploadToMaster();
-        device.setImgUrl(imgDownloadUrl);
-
         // 安装一个测试apk，用于初始化appium driver
         androidDevice.installApp(new File("vendor/apk/ApiDemos-debug.apk"));
 
@@ -156,6 +152,10 @@ public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler imple
         Dimension size = appiumDriver.manage().window().getSize();
         device.setScreenWidth(size.getWidth());
         device.setScreenHeight(size.getHeight());
+
+        // 截图并上传到服务器
+        String imgDownloadUrl = androidDevice.screenshotAndUploadToMaster();
+        device.setImgUrl(imgDownloadUrl);
 
         appiumDriver.quit();
         return androidDevice;
