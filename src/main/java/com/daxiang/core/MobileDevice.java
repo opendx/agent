@@ -45,7 +45,13 @@ public abstract class MobileDevice {
      *
      * @return
      */
-    public AppiumDriver freshDriver() {
+    public AppiumDriver freshAppiumDriver() {
+        quitAppiumDriver();
+        appiumDriver = newAppiumDriver();
+        return appiumDriver;
+    }
+
+    public void quitAppiumDriver() {
         if (appiumDriver != null) {
             // 退出上次的会话
             try {
@@ -54,8 +60,6 @@ public abstract class MobileDevice {
                 // 上次会话可能已经过期，quit会有异常，ignore
             }
         }
-        appiumDriver = newAppiumDriver();
-        return appiumDriver;
     }
 
     public abstract AppiumDriver newAppiumDriver();

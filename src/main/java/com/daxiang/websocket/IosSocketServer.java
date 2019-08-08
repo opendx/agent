@@ -85,6 +85,7 @@ public class IosSocketServer {
         if (iosDevice != null) {
             SESSION_POOL.remove(deviceId);
             iosDevice.stopMjpegServerIproxy();
+            iosDevice.quitAppiumDriver();
             iosDevice.saveIdleDeviceToMaster();
         }
     }

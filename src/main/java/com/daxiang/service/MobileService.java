@@ -67,7 +67,7 @@ public class MobileService {
             return Response.fail("设备未连接");
         }
 
-        AppiumDriver appiumDriver = mobileDevice.freshDriver();
+        AppiumDriver appiumDriver = mobileDevice.freshAppiumDriver();
 
         JSONObject data = new JSONObject();
         data.put("appiumSessionId", appiumDriver.getSessionId().toString());

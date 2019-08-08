@@ -124,6 +124,7 @@ public class AndroidSocketServer {
         }
 
         if (androidDevice != null) {
+            androidDevice.quitAppiumDriver();
             androidDevice.saveIdleDeviceToMaster();
         }
     }
