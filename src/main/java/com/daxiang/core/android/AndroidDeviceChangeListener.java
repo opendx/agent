@@ -154,7 +154,7 @@ public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler imple
 
         log.info("[android][{}]开始初始化appium", deviceId);
         AppiumDriver appiumDriver = androidDevice.newAppiumDriver();
-        androidDevice.setAppiumDriver(appiumDriver);
+        appiumDriver.quit();
         log.info("[android][{}]初始化appium完成", deviceId);
 
         return androidDevice;

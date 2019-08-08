@@ -92,7 +92,7 @@ public class DefaultIosDeviceChangeListener extends MobileDeviceChangeHandler im
 
         log.info("[ios][{}]开始初始化appium", device.getId());
         AppiumDriver appiumDriver = iosDevice.newAppiumDriver();
-        iosDevice.setAppiumDriver(appiumDriver);
+        appiumDriver.quit();
         log.info("[ios][{}]初始化appium完成", device.getId());
 
         Dimension size = appiumDriver.manage().window().getSize();
