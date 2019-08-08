@@ -47,4 +47,25 @@ public class ActionService {
             return Response.fail(e.getMessage());
         }
     }
+
+    /**
+     * 开发者调试专用
+     *
+     * @param code
+     * @return
+     */
+    public Response developerDebug(String className, String code) {
+        try {
+            Class clazz = JavaCompiler.compile(className, code);
+            String failMsg = TestNGRunner.debugAction(clazz);
+            if (StringUtils.isEmpty(failMsg)) {
+                return Response.success("执行成功");
+            } else {
+                return Response.fail(failMsg);
+            }
+        } catch (Exception e) {
+            log.error("调试出错", e);
+            return Response.fail(e.getMessage());
+        }
+    }
 }

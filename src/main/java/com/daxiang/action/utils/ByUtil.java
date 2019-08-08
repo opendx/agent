@@ -1,5 +1,6 @@
 package com.daxiang.action.utils;
 
+import io.appium.java_client.MobileBy;
 import org.openqa.selenium.By;
 
 /**
@@ -11,19 +12,29 @@ public class ByUtil {
         By by;
         switch (findBy) {
             case "id":
-                by = By.id(value);
+                by = MobileBy.id(value);
+                break;
+            case "AccessibilityId":
+                by = MobileBy.AccessibilityId(value);
                 break;
             case "xpath":
-                by = By.xpath(value);
+                by = MobileBy.xpath(value);
                 break;
-            case "name":
-                by = By.name(value);
+            case "AndroidUIAutomator":
+                value = value.replaceAll("'", "\"");
+                by = MobileBy.AndroidUIAutomator(value);
                 break;
-            case "className":
-                by = By.className(value);
+            case "iOSClassChain":
+                by = MobileBy.iOSClassChain(value);
+                break;
+            case "iOSNsPredicateString":
+                by = MobileBy.iOSNsPredicateString(value);
+                break;
+            case "image":
+                by = MobileBy.image(value);
                 break;
             default:
-                throw new RuntimeException("暂不支持：" + findBy);
+                throw new RuntimeException("暂不支持: " + findBy);
         }
         return by;
     }
