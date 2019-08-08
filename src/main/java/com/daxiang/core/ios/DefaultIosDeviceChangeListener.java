@@ -1,13 +1,14 @@
 package com.daxiang.core.ios;
 
+import com.daxiang.api.MasterApi;
 import com.daxiang.core.MobileDevice;
-import com.daxiang.core.MobileDeviceChangeHandler;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.Dimension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -17,7 +18,10 @@ import java.util.Date;
  */
 @Slf4j
 @Component
-public class DefaultIosDeviceChangeListener extends MobileDeviceChangeHandler implements IosDeviceChangeListener {
+public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
+
+    @Autowired
+    private MasterApi masterApi;
 
     @Override
     public void onDeviceConnected(String deviceId) {
@@ -42,7 +46,7 @@ public class DefaultIosDeviceChangeListener extends MobileDeviceChangeHandler im
             log.info("[ios][{}]启动appium server完成，url: {}", deviceId, appiumServer.getUrl());
 
             log.info("[ios][{}]检查是否已接入过master", deviceId);
-            Device device = getDeviceById(deviceId);
+            Device device = masterApi.getDeviceById(deviceId);
             if (device == null) {
                 log.info("[ios][{}]首次接入master，开始初始化设备", deviceId);
                 try {
@@ -61,13 +65,17 @@ public class DefaultIosDeviceChangeListener extends MobileDeviceChangeHandler im
             log.info("[ios][{}]非首次在agent上线", deviceId);
         }
 
-        mobileOnline(mobileDevice);
+        mobileDevice.saveOnlineDeviceToMaster();
         log.info("[ios][{}]iosDeviceConnected处理完成", deviceId);
     }
 
     private void iosDeviceDisconnected(String deviceId) {
         log.info("[ios][{}]断开连接", deviceId);
-        mobileOffline(deviceId);
+        MobileDevice mobileDevice = MobileDeviceHolder.get(deviceId);
+        if (mobileDevice == null) {
+            return;
+        }
+        mobileDevice.saveOfflineDeviceToMaster();
         log.info("[ios][{}]iosDeviceDisconnected处理完成", deviceId);
     }
 

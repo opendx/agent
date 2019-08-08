@@ -1,7 +1,7 @@
 package com.daxiang.core.android;
 
 import com.android.ddmlib.*;
-import com.daxiang.core.MobileDeviceChangeHandler;
+import com.daxiang.api.MasterApi;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.android.stf.AdbKit;
@@ -14,6 +14,7 @@ import com.daxiang.model.Device;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.Dimension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -24,7 +25,10 @@ import java.util.Date;
  */
 @Component
 @Slf4j
-public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler implements AndroidDebugBridge.IDeviceChangeListener {
+public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceChangeListener {
+
+    @Autowired
+    private MasterApi masterApi;
 
     @Override
     public void deviceConnected(IDevice device) {
@@ -63,7 +67,7 @@ public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler imple
             log.info("[android][{}]启动appium server完成，url: {}", deviceId, appiumServer.getUrl());
 
             log.info("[android][{}]检查是否已接入过master", deviceId);
-            Device device = getDeviceById(deviceId);
+            Device device = masterApi.getDeviceById(deviceId);
             if (device == null) {
                 log.info("[android][{}]首次接入master，开始初始化设备", deviceId);
                 try {
@@ -87,7 +91,7 @@ public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler imple
             log.info("[android][{}]非首次在agent上线", deviceId);
         }
 
-        mobileOnline(mobileDevice);
+        mobileDevice.saveOnlineDeviceToMaster();
         log.info("[android][{}]androidDeviceConnected处理完成", deviceId);
     }
 
@@ -99,7 +103,11 @@ public class AndroidDeviceChangeListener extends MobileDeviceChangeHandler imple
     public void androidDeviceDisconnected(IDevice iDevice) {
         String deviceId = iDevice.getSerialNumber();
         log.info("[android][{}]断开连接", deviceId);
-        mobileOffline(deviceId);
+        MobileDevice mobileDevice = MobileDeviceHolder.get(deviceId);
+        if (mobileDevice == null) {
+            return;
+        }
+        mobileDevice.saveOfflineDeviceToMaster();
         log.info("[android][{}]androidDeviceDisconnected处理完成", deviceId);
     }
 
