@@ -16,17 +16,17 @@ public class PressKey {
     }
 
     /**
-     * @param code io.appium.java_client.android.nativekey.AndroidKey
+     * @param androidKeyCode io.appium.java_client.android.nativekey.AndroidKey
      */
-    public void excute(Object code) {
-        Assert.notNull(code, "code不能为空");
-        int _code = Integer.parseInt((String) code);
+    public void excute(Object androidKeyCode) {
+        Assert.notNull(androidKeyCode, "androidKeyCode不能为空");
+        int _androidKeyCode = Integer.parseInt((String) androidKeyCode);
 
         if (!(driver instanceof AndroidDriver)) {
             throw new RuntimeException("AppiumDriver不是AndroidDriver");
         }
 
         AndroidDriver androidDriver = (AndroidDriver) driver;
-        androidDriver.pressKeyCode(_code);
+        androidDriver.pressKeyCode(_androidKeyCode);
     }
 }
