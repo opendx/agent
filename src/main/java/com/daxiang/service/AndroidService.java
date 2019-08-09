@@ -58,17 +58,17 @@ public class AndroidService {
         }
 
         // download apk
-        byte[] apkByte = restTemplate.getForObject(apkDownloadUrl, byte[].class);
-        File apk = new File(UUIDUtil.getUUID() + ".apk");
+        byte[] apkByteArr = restTemplate.getForObject(apkDownloadUrl, byte[].class);
+        File apkFile = new File(UUIDUtil.getUUID() + ".apk");
         try {
-            FileUtils.writeByteArrayToFile(apk, apkByte, false);
-            String result = AndroidUtil.aaptDumpBadging(apk.getAbsolutePath());
+            FileUtils.writeByteArrayToFile(apkFile, apkByteArr, false);
+            String result = AndroidUtil.aaptDumpBadging(apkFile.getAbsolutePath());
             return Response.success("ok", result);
         } catch (IOException e) {
             log.error("io error", e);
             return Response.fail(e.getMessage());
         } finally {
-            FileUtils.deleteQuietly(apk);
+            FileUtils.deleteQuietly(apkFile);
         }
     }
 

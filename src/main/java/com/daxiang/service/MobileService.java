@@ -56,7 +56,7 @@ public class MobileService {
             log.error("读取pageSource出错", e);
             return Response.fail("读取pageSource出错，请稍后重试");
         } catch (IOException e) {
-            log.error(e.getMessage(), e);
+            log.error("io err", e);
             return Response.fail(e.getMessage());
         }
     }

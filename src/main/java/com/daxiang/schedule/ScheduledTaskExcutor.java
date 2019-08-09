@@ -29,19 +29,19 @@ public class ScheduledTaskExcutor {
     @Scheduled(fixedRate = 10000)
     public void commitDeviceTestTask() {
         // 在线闲置的设备
-        List<String> idleMobileDeviceIds = MobileDeviceHolder.getAll().stream()
+        List<MobileDevice> idleMobileDevices = MobileDeviceHolder.getAll().stream()
                 .filter(MobileDevice::isIdle)
-                .map(MobileDevice::getId)
                 .collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(idleMobileDeviceIds)) {
+        if (CollectionUtils.isEmpty(idleMobileDevices)) {
             return;
         }
 
-        idleMobileDeviceIds.stream().parallel().forEach(deviceId -> {
-            DeviceTestTask unStartDeviceTestTask = masterApi.getFirstUnStartDeviceTestTask(deviceId);
+        idleMobileDevices.stream().parallel().forEach(idleMobileDevice -> {
+            // 获取最早的一个未开始的设备测试任务
+            DeviceTestTask unStartDeviceTestTask = masterApi.getFirstUnStartDeviceTestTask(idleMobileDevice.getId());
             if (unStartDeviceTestTask != null) {
-                MobileDeviceHolder.get(deviceId).getDeviceTestTaskExcutor().commitTestTask(unStartDeviceTestTask);
-                log.info("[自动化测试][{}]提交测试任务: {}", deviceId, unStartDeviceTestTask.getTestTaskName());
+                idleMobileDevice.getDeviceTestTaskExcutor().commitTestTask(unStartDeviceTestTask);
+                log.info("[自动化测试][{}]提交测试任务: {}", idleMobileDevice.getId(), unStartDeviceTestTask.getTestTaskName());
             }
         });
     }
