@@ -91,6 +91,28 @@ VALUES
 	1,
 	'[{"name": "packageName", "description": "包名"},{"name": "launchActivity", "description": "启动Activity名"}]'
 );
+-- 5.UninstallApk
+INSERT INTO `action` (
+	`id`,
+	`name`,
+	`description`,
+	`class_name`,
+	`need_driver`,
+	`has_return_value`,
+	`platform`,
+	`params`
+)
+VALUES
+(
+	5,
+	'卸载Apk',
+	'pm unintall {packageName}',
+	'com.daxiang.action.android.UnInstallApk',
+	1,
+	0,
+	1,
+	'[{"name": "packageName", "description": "包名"}]'
+);
 -- -----------------------------------------------com.daxiang.action.android(1-100)-----------------------------------------------
 
 -- ################################################################################################################################

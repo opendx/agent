@@ -158,6 +158,10 @@ public class AndroidUtil {
         iDevice.installPackage(apkPath, true);
     }
 
+    public static void uninstallApk(IDevice iDevice, String packageName) throws InstallException {
+        iDevice.uninstallPackage(packageName);
+    }
+
     /**
      * 执行命令
      *
