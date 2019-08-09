@@ -27,7 +27,6 @@ public class TestNGCodeConverter {
 
     private Integer deviceTestTaskId;
     private List<GlobalVar> globalVars;
-    private String deviceId;
 
     private Action beforeClass;
     private Action afterClass;
@@ -37,17 +36,19 @@ public class TestNGCodeConverter {
     /**
      * 转换为testng代码
      */
-    public String convert(String className, List<Action> testcases, String ftlBasePackagePath, String ftlFileName) throws IOException, TemplateException {
-        Map<String, Object> dataModel = new HashMap();
+    public String convert(String deviceId, String className, List<Action> testcases, String ftlBasePackagePath, String ftlFileName) throws IOException, TemplateException {
         List<Action> actionTreeList = new ArrayList<>();
-
         actionTreeList.addAll(testcases);
+
+        Map<String, Object> dataModel = new HashMap();
+
         dataModel.put("testcases", testcases.stream().map(testcase -> {
             JSONObject tc = new JSONObject();
             tc.put("testcase", getCallMethodString(testcase));
             tc.put("id", testcase.getId());
             return tc;
         }).collect(Collectors.toList()));
+
         if (beforeClass != null) {
             actionTreeList.add(beforeClass);
             String callBeforeClass = getCallMethodString(beforeClass);
@@ -87,7 +88,7 @@ public class TestNGCodeConverter {
 
     /**
      * 获取调用方法的字符串。如在@Test下调用testcase的action，在@BeforeClass调用BeforeClass的action，等等...
-     *
+     * todo /////////////xxxx
      * @param action
      * @return
      */
