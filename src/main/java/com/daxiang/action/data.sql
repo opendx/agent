@@ -162,7 +162,7 @@ VALUES
 
 -- ################################################################################################################################
 
--- -------------------------------------------com.daxiang.action.appium.android(201-300)-------------------------------------------
+-- -------------------------------------------com.daxiang.action.appium.android(201-250)-------------------------------------------
 -- 202.PressKey
 INSERT INTO `action` (
 	`id`,
@@ -185,7 +185,101 @@ VALUES
 	1,
 	'[{"name": "androidKeyCode", "description": "AndroidKeyCode https://www.jianshu.com/p/f7ec856ff56f"}]'
 );
--- -------------------------------------------com.daxiang.action.appium.android(201-300)-------------------------------------------
+-- -------------------------------------------com.daxiang.action.appium.android(201-250)-------------------------------------------
+
+-- -------------------------------------------com.daxiang.action.appium.ios(251-300)-------------------------------------------
+-- 251.InstallApp
+INSERT INTO `action` (
+	`id`,
+	`name`,
+	`description`,
+	`class_name`,
+	`need_driver`,
+	`has_return_value`,
+	`platform`,
+	`params`
+)
+VALUES
+(
+	251,
+	'安装app',
+	'AppiumDriver.executeScript("mobile: installApp")',
+	'com.daxiang.action.appium.ios.InstallApp',
+	1,
+	0,
+	2,
+	'[{"name": "appDownloadUrl", "description": "app下载地址"}]'
+);
+
+-- 252.LaunchApp
+INSERT INTO `action` (
+	`id`,
+	`name`,
+	`description`,
+	`class_name`,
+	`need_driver`,
+	`has_return_value`,
+	`platform`,
+	`params`
+)
+VALUES
+(
+	252,
+	'启动app',
+	'AppiumDriver.executeScript("mobile: launchApp")',
+	'com.daxiang.action.appium.ios.LaunchApp',
+	1,
+	0,
+	2,
+	'[{"name": "bundleId", "description": "bundleId"}]'
+);
+
+-- 253.TerminateApp
+INSERT INTO `action` (
+	`id`,
+	`name`,
+	`description`,
+	`class_name`,
+	`need_driver`,
+	`has_return_value`,
+	`platform`,
+	`params`
+)
+VALUES
+(
+	253,
+	'停止app',
+	'AppiumDriver.executeScript("mobile: terminateApp")',
+	'com.daxiang.action.appium.ios.TerminateApp',
+	1,
+	0,
+	2,
+	'[{"name": "bundleId", "description": "bundleId"}]'
+);
+
+-- 254.UninstallApp
+INSERT INTO `action` (
+	`id`,
+	`name`,
+	`description`,
+	`class_name`,
+	`need_driver`,
+	`has_return_value`,
+	`platform`,
+	`params`
+)
+VALUES
+(
+	254,
+	'卸载app',
+	'AppiumDriver.executeScript("mobile: removeApp")',
+	'com.daxiang.action.appium.ios.UninstallApp',
+	1,
+	0,
+	2,
+	'[{"name": "bundleId", "description": "bundleId"}]'
+);
+-- -------------------------------------------com.daxiang.action.appium.ios(251-300)-------------------------------------------
 
 -- ################################################################################################################################
 
