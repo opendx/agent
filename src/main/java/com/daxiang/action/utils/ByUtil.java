@@ -21,6 +21,7 @@ public class ByUtil {
                 by = MobileBy.xpath(value);
                 break;
             case "AndroidUIAutomator":
+                // http://appium.io/docs/en/writing-running-appium/android/uiautomator-uiselector/
                 value = value.replaceAll("'", "\"");
                 by = MobileBy.AndroidUIAutomator(value);
                 break;
@@ -28,6 +29,7 @@ public class ByUtil {
                 by = MobileBy.iOSClassChain(value);
                 break;
             case "iOSNsPredicateString":
+                // http://appium.io/docs/en/writing-running-appium/ios/ios-predicate/
                 by = MobileBy.iOSNsPredicateString(value);
                 break;
             case "image":

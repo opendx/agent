@@ -342,6 +342,28 @@ VALUES
 	'WebElement',
 	'[{"name": "webElement", "description": "元素对象"}, {"name": "content", "description": "输入内容"}]'
 );
+-- 309.ExecuteScript
+INSERT INTO `action` (
+  `id`,
+  `name`,
+  `description`,
+  `class_name`,
+  `need_driver`,
+  `has_return_value`,
+  `return_value_desc`,
+  `params`
+)
+VALUES
+(
+  309,
+  '执行脚本',
+  'AppiumDriver.executeScript',
+  'com.daxiang.action.appium.ExecuteScript',
+  1,
+  1,
+  'Object',
+  '[{"name": "script", "description": "脚本内容 http://appium.io/docs/en/commands/mobile-command/"},{"name": "args", "description": "参数值"}]'
+);
 
 -- 310.GetAttribute
 INSERT INTO `action` (
