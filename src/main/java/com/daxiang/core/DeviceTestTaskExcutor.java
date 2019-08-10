@@ -79,13 +79,12 @@ public class DeviceTestTaskExcutor {
             String className = "Test_" + UUIDUtil.getUUID();
             String code = new TestNGCodeConverter()
                     .setDeviceTestTaskId(deviceTestTask.getId())
-                    .setDeviceId(deviceTestTask.getDeviceId())
                     .setGlobalVars(deviceTestTask.getGlobalVars())
                     .setBeforeClass(deviceTestTask.getBeforeClass())
                     .setAfterClass(deviceTestTask.getAfterClass())
                     .setBeforeMethod(deviceTestTask.getBeforeMethod())
                     .setAfterMethod(deviceTestTask.getAfterMethod())
-                    .convert(className, deviceTestTask.getTestcases().stream().map(testcase -> {
+                    .convert(deviceTestTask.getDeviceId(), className, deviceTestTask.getTestcases().stream().map(testcase -> {
                         Action action = new Action();
                         BeanUtils.copyProperties(testcase, action);
                         return action;

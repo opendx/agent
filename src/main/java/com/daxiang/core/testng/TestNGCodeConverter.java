@@ -36,7 +36,9 @@ public class TestNGCodeConverter {
     /**
      * 转换为testng代码
      */
-    public String convert(String deviceId, String className, List<Action> testcases, String ftlBasePackagePath, String ftlFileName) throws IOException, TemplateException {
+    public String convert(String deviceId, String className, List<Action> testcases,
+                          String ftlBasePackagePath, String ftlFileName) throws IOException, TemplateException {
+
         List<Action> actionTreeList = new ArrayList<>();
         actionTreeList.addAll(testcases);
 
@@ -44,29 +46,29 @@ public class TestNGCodeConverter {
 
         dataModel.put("testcases", testcases.stream().map(testcase -> {
             JSONObject tc = new JSONObject();
-            tc.put("testcase", getCallMethodString(testcase));
+            tc.put("testcase", parseActionToCallMethodString(testcase));
             tc.put("id", testcase.getId());
             return tc;
         }).collect(Collectors.toList()));
 
         if (beforeClass != null) {
             actionTreeList.add(beforeClass);
-            String callBeforeClass = getCallMethodString(beforeClass);
+            String callBeforeClass = parseActionToCallMethodString(beforeClass);
             dataModel.put("beforeClass", callBeforeClass);
         }
         if (afterClass != null) {
             actionTreeList.add(afterClass);
-            String callAfterClass = getCallMethodString(afterClass);
+            String callAfterClass = parseActionToCallMethodString(afterClass);
             dataModel.put("afterClass", callAfterClass);
         }
         if (beforeMethod != null) {
             actionTreeList.add(beforeMethod);
-            String callBeforeMethod = getCallMethodString(beforeMethod);
+            String callBeforeMethod = parseActionToCallMethodString(beforeMethod);
             dataModel.put("beforeMethod", callBeforeMethod);
         }
         if (afterMethod != null) {
             actionTreeList.add(afterMethod);
-            String callAfterMethod = getCallMethodString(afterMethod);
+            String callAfterMethod = parseActionToCallMethodString(afterMethod);
             dataModel.put("afterMethod", callAfterMethod);
         }
 
@@ -87,12 +89,12 @@ public class TestNGCodeConverter {
     }
 
     /**
-     * 获取调用方法的字符串。如在@Test下调用testcase的action，在@BeforeClass调用BeforeClass的action，等等...
-     * todo /////////////xxxx
+     * 解析Action为方法调用的字符串
+     *
      * @param action
      * @return
      */
-    private String getCallMethodString(Action action) {
+    private String parseActionToCallMethodString(Action action) {
         StringBuilder callMethodString = new StringBuilder(METHOD_PREFIX + action.getId() + "(");
         List<Param> actionParams = action.getParams();
         // 如果有参数 则都传入null
