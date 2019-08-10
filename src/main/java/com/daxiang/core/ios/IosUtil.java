@@ -80,7 +80,6 @@ public class IosUtil {
         appiumDriver.executeScript("mobile: removeApp", ImmutableMap.of("bundleId", bundleId));
     }
 
-    // todo test
     public static void launchApp(AppiumDriver appiumDriver, String bundleId) {
         appiumDriver.executeScript("mobile: launchApp", ImmutableMap.of("bundleId", bundleId));
     }
