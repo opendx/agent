@@ -1,5 +1,6 @@
 package com.daxiang.core.appium;
 
+import com.daxiang.core.MobileDevice;
 import io.appium.java_client.AppiumDriver;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
@@ -34,6 +35,7 @@ public class IosPageSourceHandler extends AppiumPageSourceHandler {
 
         if ("AppiumAUT".equals(elementName)) {
             element.setName("hierarchy");
+            element.addAttribute("platform", MobileDevice.IOS + "");
         } else {
             element.setName("node");
 
@@ -58,13 +60,6 @@ public class IosPageSourceHandler extends AppiumPageSourceHandler {
 
             String bounds = String.format("[%s,%s][%s,%s]", startX, startY, endX, endY);
             element.addAttribute("bounds", bounds);
-
-            // 前端el-tree
-            // defaultProps: {
-            //   children: 'nodes',
-            //   label: 'class'
-            // }
-            element.addAttribute("class", elementName);
         }
 
         List<Element> elements = element.elements();
