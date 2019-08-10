@@ -1,5 +1,6 @@
 package com.daxiang.core.appium;
 
+import com.daxiang.App;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.PortProvider;
 import com.daxiang.core.ios.IosUtil;
@@ -20,6 +21,7 @@ public class IosDriverBuilder implements AppiumDriverBuilder {
 
     @Override
     public AppiumDriver build(MobileDevice mobileDevice) {
+        // https://github.com/appium/appium-xcuitest-driver
         DesiredCapabilities capabilities = createDesiredCapabilities(mobileDevice);
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
         capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.IOS_XCUI_TEST);
@@ -28,7 +30,10 @@ public class IosDriverBuilder implements AppiumDriverBuilder {
         capabilities.setCapability(IOSMobileCapabilityType.BUNDLE_ID, BUNDLE_ID);
         capabilities.setCapability("waitForQuiescence", false);
         capabilities.setCapability("skipLogCapture", true);
-//            capabilities.setCapability("useJSONSource", true); // https://github.com/appium/appium-xcuitest-driver#desired-capabilities
+        // Get JSON source from WDA and parse into XML on Appium server. This can be much faster, especially on large devices.
+        capabilities.setCapability("useJSONSource", true);
+        // http://appium.io/docs/en/advanced-concepts/settings/
+        capabilities.setCapability("mjpegServerFramerate", Integer.parseInt(App.getProperty("mjpegServerFramerate")));
         IOSDriver iosDriver = new IOSDriver(mobileDevice.getAppiumServer().getUrl(), capabilities);
         IosUtil.pressHome(iosDriver);
         return iosDriver;
