@@ -60,6 +60,13 @@ public class IosPageSourceHandler extends AppiumPageSourceHandler {
 
             String bounds = String.format("[%s,%s][%s,%s]", startX, startY, endX, endY);
             element.addAttribute("bounds", bounds);
+
+            // 前端el-tree
+            // defaultProps: {
+            //   children: 'nodes',
+            //   label: 'class'
+            // }
+            element.addAttribute("class", elementName);
         }
 
         List<Element> elements = element.elements();
