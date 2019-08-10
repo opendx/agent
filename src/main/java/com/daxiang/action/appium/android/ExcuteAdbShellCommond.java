@@ -1,4 +1,4 @@
-package com.daxiang.action.android;
+package com.daxiang.action.appium.android;
 
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.AndroidUtil;

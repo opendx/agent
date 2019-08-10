@@ -150,6 +150,7 @@ public abstract class MobileDevice {
         device.setAgentPort(Integer.parseInt(App.getProperty("server.port")));
         device.setStatus(Device.IDLE_STATUS);
         device.setLastOnlineTime(new Date());
+        log.info("saveOnlineDeviceToMaster: {}", device);
         MasterApi.getInstance().saveDevice(device);
     }
 
@@ -157,6 +158,7 @@ public abstract class MobileDevice {
         if (isConnected()) {
             device.setStatus(Device.USING_STATUS);
             device.setUsername(username);
+            log.info("saveUsingDeviceToMaster: {}", device);
             MasterApi.getInstance().saveDevice(device);
         }
     }
@@ -164,6 +166,7 @@ public abstract class MobileDevice {
     public void saveIdleDeviceToMaster() {
         if (isConnected()) {
             device.setStatus(Device.IDLE_STATUS);
+            log.info("saveIdleDeviceToMaster: {}", device);
             MasterApi.getInstance().saveDevice(device);
         }
     }
@@ -171,6 +174,7 @@ public abstract class MobileDevice {
     public void saveOfflineDeviceToMaster() {
         device.setStatus(Device.OFFLINE_STATUS);
         device.setLastOfflineTime(new Date());
+        log.info("saveOfflineDeviceToMaster: {}", device);
         MasterApi.getInstance().saveDevice(device);
     }
 }

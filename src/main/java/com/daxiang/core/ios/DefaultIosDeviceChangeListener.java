@@ -94,13 +94,24 @@ public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
 
         IosDevice iosDevice = new IosDevice(device, appiumServer);
 
-        log.info("[ios][{}]开始初始化appium", device.getId());
+        log.info("[ios][{}]开始初始化appium", deviceId);
         AppiumDriver appiumDriver = iosDevice.newAppiumDriver();
-        log.info("[ios][{}]初始化appium完成", device.getId());
+        log.info("[ios][{}]初始化appium完成", deviceId);
 
-        Dimension size = appiumDriver.manage().window().getSize();
-        device.setScreenWidth(size.getWidth());
-        device.setScreenHeight(size.getHeight());
+        // 有时window获取的宽高可能为0
+        while (true) {
+            Dimension window = appiumDriver.manage().window().getSize();
+            int width = window.getWidth();
+            int height = window.getHeight();
+
+            if (width > 0 && height > 0) {
+                device.setScreenWidth(window.getWidth());
+                device.setScreenHeight(window.getHeight());
+                break;
+            } else {
+                log.warn("[ios][{}]未获取到正确的屏幕宽高: {}", deviceId, window);
+            }
+        }
 
         // 截图并上传到服务器
         String imgDownloadUrl = iosDevice.screenshotAndUploadToMaster();
