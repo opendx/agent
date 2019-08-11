@@ -8,30 +8,39 @@ import com.daxiang.utils.NetUtil;
  */
 public class PortProvider {
 
-    private static final int MINITOUCH_PORT_START = 7000;
-    private static final int MINITOUCH_PORT_END = 7499;
+    private static final int APPIUM_SERVER_PORT_START = 20000;
+    private static final int APPIUM_SERVER_PORT_END = 20999;
+    private static int appiumServerPort = APPIUM_SERVER_PORT_START;
+
+    private static final int MINITOUCH_PORT_START = 21000;
+    private static final int MINITOUCH_PORT_END = 21999;
     private static int minitouchPort = MINITOUCH_PORT_START;
 
-    private static final int MINICAP_PORT_START = 7500;
-    private static final int MINICAP_PORT_END = 7999;
+    private static final int MINICAP_PORT_START = 22000;
+    private static final int MINICAP_PORT_END = 22999;
     private static int minicapPort = MINICAP_PORT_START;
 
-    private static final int ADBKIT_PORT_START = 8000;
-    private static final int ADBKIT_PORT_END = 8499;
+    private static final int ADBKIT_PORT_START = 23000;
+    private static final int ADBKIT_PORT_END = 23999;
     private static int adbKitPort = ADBKIT_PORT_START;
 
-    private static final int UIAUTOMATOR2_SERVER_PORT_START = 8500;
-    private static final int UIAUTOMATOR2_SERVER_PORT_END = 8999;
+    private static final int UIAUTOMATOR2_SERVER_PORT_START = 24000;
+    private static final int UIAUTOMATOR2_SERVER_PORT_END = 24999;
     private static int uiautomator2ServerPort = UIAUTOMATOR2_SERVER_PORT_START;
 
-    private static final int WDA_LOCAL_PORT_START = 9000;
-    private static final int WDA_LOCAL_PORT_END = 9499;
+    private static final int WDA_LOCAL_PORT_START = 25000;
+    private static final int WDA_LOCAL_PORT_END = 25999;
     private static int wdaLocalPort = WDA_LOCAL_PORT_START;
 
-    private static final int WDA_MJPEG_SERVER_PORT_START = 9500;
-    private static final int WDA_MJPEG_SERVER_PORT_END = 9999;
+    private static final int WDA_MJPEG_SERVER_PORT_START = 26000;
+    private static final int WDA_MJPEG_SERVER_PORT_END = 26999;
     private static int wdaMjpegServerPort = WDA_MJPEG_SERVER_PORT_START;
 
+    public static synchronized int getAppiumServerAvailablePort() {
+        int availablePort = getAvailablePort(APPIUM_SERVER_PORT_START, APPIUM_SERVER_PORT_END, appiumServerPort);
+        appiumServerPort = availablePort + 1;
+        return availablePort;
+    }
 
     public static synchronized int getMinitouchAvailablePort() {
         int availablePort = getAvailablePort(MINITOUCH_PORT_START, MINITOUCH_PORT_END, minitouchPort);

@@ -1,6 +1,7 @@
 package com.daxiang.core.appium;
 
 import com.daxiang.App;
+import com.daxiang.core.PortProvider;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
 import io.appium.java_client.service.local.flags.GeneralServerFlag;
@@ -20,7 +21,7 @@ public class AppiumServer {
 
     public void start() {
         AppiumServiceBuilder builder = new AppiumServiceBuilder();
-        builder.usingAnyFreePort().withArgument(GeneralServerFlag.SESSION_OVERRIDE);
+        builder.usingPort(PortProvider.getAppiumServerAvailablePort()).withArgument(GeneralServerFlag.SESSION_OVERRIDE);
         String appiumJs = App.getProperty("appiumJs");
         if (!StringUtils.isEmpty(appiumJs)) {
             log.info("[appium-server]appiumJs: {}", appiumJs);

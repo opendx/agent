@@ -34,6 +34,8 @@ public class IosDriverBuilder implements AppiumDriverBuilder {
         capabilities.setCapability("useJSONSource", true);
         // http://appium.io/docs/en/advanced-concepts/settings/
         capabilities.setCapability("mjpegServerFramerate", Integer.parseInt(App.getProperty("mjpegServerFramerate")));
+        // todo webview support
+        // capabilities.setCapability("webkitDebugProxyPort", PortProvider.xxx);
         IOSDriver iosDriver = new IOSDriver(mobileDevice.getAppiumServer().getUrl(), capabilities);
         IosUtil.pressHome(iosDriver);
         return iosDriver;
