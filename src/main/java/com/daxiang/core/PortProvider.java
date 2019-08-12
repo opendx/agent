@@ -36,6 +36,26 @@ public class PortProvider {
     private static final int WDA_MJPEG_SERVER_PORT_END = 26999;
     private static int wdaMjpegServerPort = WDA_MJPEG_SERVER_PORT_START;
 
+    private static final int CHROME_DRIVER_PORT_START = 27000;
+    private static final int CHROME_DRIVER_PORT_END = 27999;
+    private static int chromeDriverPort = CHROME_DRIVER_PORT_START;
+
+    private static final int WEBKIT_DEBUG_PROXY_PORT_START = 28000;
+    private static final int WEBKIT_DEBUG_PROXY_PORT_END = 28999;
+    private static int webkitDebugProxyPort = WEBKIT_DEBUG_PROXY_PORT_START;
+
+    public static synchronized int getChromeDriverAvailablePort() {
+        int availablePort = getAvailablePort(CHROME_DRIVER_PORT_START, CHROME_DRIVER_PORT_END, chromeDriverPort);
+        chromeDriverPort = availablePort + 1;
+        return availablePort;
+    }
+
+    public static synchronized int getWebkitDebugProxyAvalilablePort() {
+        int availablePort = getAvailablePort(WEBKIT_DEBUG_PROXY_PORT_START, WEBKIT_DEBUG_PROXY_PORT_END, webkitDebugProxyPort);
+        webkitDebugProxyPort = availablePort + 1;
+        return availablePort;
+    }
+
     public static synchronized int getAppiumServerAvailablePort() {
         int availablePort = getAvailablePort(APPIUM_SERVER_PORT_START, APPIUM_SERVER_PORT_END, appiumServerPort);
         appiumServerPort = availablePort + 1;
