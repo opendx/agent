@@ -26,6 +26,7 @@ public class IosDriverBuilder implements AppiumDriverBuilder {
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
         capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.IOS_XCUI_TEST);
         capabilities.setCapability(IOSMobileCapabilityType.WDA_LOCAL_PORT, PortProvider.getWdaLocalAvailablePort());
+        capabilities.setCapability(IOSMobileCapabilityType.WDA_STARTUP_RETRY_INTERVAL, 60000);
         capabilities.setCapability("mjpegServerPort", PortProvider.getWdaMjpegServerAvailablePort());
         capabilities.setCapability(IOSMobileCapabilityType.BUNDLE_ID, BUNDLE_ID);
         capabilities.setCapability("waitForQuiescence", false);
