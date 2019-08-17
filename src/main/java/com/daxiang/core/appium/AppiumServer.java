@@ -2,6 +2,7 @@ package com.daxiang.core.appium;
 
 import com.daxiang.App;
 import com.daxiang.core.PortProvider;
+import com.daxiang.utils.ShellExecutor;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
 import io.appium.java_client.service.local.flags.GeneralServerFlag;
@@ -16,6 +17,20 @@ import java.net.URL;
  */
 @Slf4j
 public class AppiumServer {
+
+    private static String version;
+
+    public static String getVersion() {
+        if (version == null) {
+            try {
+                version = ShellExecutor.execute("appium -v");
+            } catch (Exception e) {
+                log.error("获取appium版本失败", e);
+                return null;
+            }
+        }
+        return version;
+    }
 
     private AppiumDriverLocalService service;
 

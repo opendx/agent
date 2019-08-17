@@ -140,69 +140,67 @@ public class TestNGCodeConverter {
      */
     private void handleActions() {
         List<Action> actions = new ArrayList<>(cachedActions.values());
-        if (!CollectionUtils.isEmpty(actions)) {
-            for (Action action : actions) {
-                // 在每个方法参数前加上前缀，防止和全局变量、局部变量冲突
-                List<Param> params = action.getParams();
-                if (!CollectionUtils.isEmpty(params)) {
-                    params.forEach(param -> param.setName(Param.NAME_PREFIX + param.getName()));
-                }
-                List<LocalVar> localVars = action.getLocalVars();
-                // 在每个局部变量前加上前缀，防止和全局变量、方法参数冲突
-                if (!CollectionUtils.isEmpty(localVars)) {
-                    localVars.forEach(localVar -> {
-                        localVar.setName(LocalVar.NAME_PREFIX + localVar.getName());
-                        if (StringUtils.isEmpty(localVar.getValue())) {
-                            localVar.setValue("null");
-                        } else {
-                            localVar.setValue("\"" + localVar.getValue() + "\"");
-                        }
-                    });
-                }
-                // 非基础Action有返回值时，可能是普通字符串 or 方法参数 or 局部变量 or 全局变量
-                if (action.getType() != Action.TYPE_BASE && action.getHasReturnValue() == Action.HAS_RETURN_VALUE) {
-                    String returnValue = action.getReturnValue();
-                    if (returnValue.startsWith(Param.QUOTE_PREFIX) && returnValue.endsWith(Param.QUOTE_SUFFIX)) { // 方法参数
-                        action.setReturnValue(Param.NAME_PREFIX + returnValue.substring(2, returnValue.length() - 1));
-                    } else if (returnValue.startsWith(LocalVar.QUOTE_PREFIX) && returnValue.endsWith(LocalVar.QUOTE_SUFFIX)) { // 局部变量
-                        action.setReturnValue(LocalVar.NAME_PREFIX + returnValue.substring(2, returnValue.length() - 1));
-                    } else if (returnValue.startsWith(GlobalVar.QUOTE_PREFIX) && returnValue.endsWith(GlobalVar.QUOTE_SUFFIX)) { // 全局变量
-                        action.setReturnValue(GlobalVar.NAME_PREFIX + returnValue.substring(2, returnValue.length() - 1));
-                    } else { // 普通字符串
-                        action.setReturnValue("\"" + returnValue + "\"");
+        for (Action action : actions) {
+            // 在每个方法参数前加上前缀，防止和全局变量、局部变量冲突
+            List<Param> params = action.getParams();
+            if (!CollectionUtils.isEmpty(params)) {
+                params.forEach(param -> param.setName(Param.NAME_PREFIX + param.getName()));
+            }
+            List<LocalVar> localVars = action.getLocalVars();
+            // 在每个局部变量前加上前缀，防止和全局变量、方法参数冲突
+            if (!CollectionUtils.isEmpty(localVars)) {
+                localVars.forEach(localVar -> {
+                    localVar.setName(LocalVar.NAME_PREFIX + localVar.getName());
+                    if (StringUtils.isEmpty(localVar.getValue())) {
+                        localVar.setValue("null");
+                    } else {
+                        localVar.setValue("\"" + localVar.getValue() + "\"");
                     }
+                });
+            }
+            // 非基础Action有返回值时，可能是普通字符串 or 方法参数 or 局部变量 or 全局变量
+            if (action.getType() != Action.TYPE_BASE && action.getHasReturnValue() == Action.HAS_RETURN_VALUE) {
+                String returnValue = action.getReturnValue();
+                if (returnValue.startsWith(Param.QUOTE_PREFIX) && returnValue.endsWith(Param.QUOTE_SUFFIX)) { // 方法参数
+                    action.setReturnValue(Param.NAME_PREFIX + returnValue.substring(2, returnValue.length() - 1));
+                } else if (returnValue.startsWith(LocalVar.QUOTE_PREFIX) && returnValue.endsWith(LocalVar.QUOTE_SUFFIX)) { // 局部变量
+                    action.setReturnValue(LocalVar.NAME_PREFIX + returnValue.substring(2, returnValue.length() - 1));
+                } else if (returnValue.startsWith(GlobalVar.QUOTE_PREFIX) && returnValue.endsWith(GlobalVar.QUOTE_SUFFIX)) { // 全局变量
+                    action.setReturnValue(GlobalVar.NAME_PREFIX + returnValue.substring(2, returnValue.length() - 1));
+                } else { // 普通字符串
+                    action.setReturnValue("\"" + returnValue + "\"");
                 }
-                // 步骤
-                List<Step> steps = action.getSteps();
-                if (!CollectionUtils.isEmpty(steps)) {
-                    steps.forEach(step -> {
-                        String evaluation = step.getEvaluation();
-                        // 处理赋值，只要赋值不为空一定是局部变量
-                        if (!StringUtils.isEmpty(evaluation)) {
-                            step.setEvaluation(LocalVar.NAME_PREFIX + evaluation.substring(2, evaluation.length() - 1));
-                        }
-                        // 处理步骤传入的参数值
-                        List<ParamValue> paramValues = step.getParamValues();
-                        if (!CollectionUtils.isEmpty(paramValues)) {
-                            for (ParamValue paramValue : paramValues) {
-                                String value = paramValue.getParamValue();
-                                if (StringUtils.isEmpty(value)) {
-                                    paramValue.setParamValue("null");
-                                } else {
-                                    if (value.startsWith(Param.QUOTE_PREFIX) && value.endsWith(Param.QUOTE_SUFFIX)) { // 方法参数
-                                        paramValue.setParamValue(Param.NAME_PREFIX + value.substring(2, value.length() - 1));
-                                    } else if (value.startsWith(LocalVar.QUOTE_PREFIX) && value.endsWith(LocalVar.QUOTE_SUFFIX)) { // 局部变量
-                                        paramValue.setParamValue(LocalVar.NAME_PREFIX + value.substring(2, value.length() - 1));
-                                    } else if (value.startsWith(GlobalVar.QUOTE_PREFIX) && value.endsWith(GlobalVar.QUOTE_SUFFIX)) { // 全局变量
-                                        paramValue.setParamValue(GlobalVar.NAME_PREFIX + value.substring(2, value.length() - 1));
-                                    } else { // 普通字符串
-                                        paramValue.setParamValue("\"" + value + "\"");
-                                    }
+            }
+            // 步骤
+            List<Step> steps = action.getSteps();
+            if (!CollectionUtils.isEmpty(steps)) {
+                steps.forEach(step -> {
+                    String evaluation = step.getEvaluation();
+                    // 处理赋值，只要赋值不为空一定是局部变量
+                    if (!StringUtils.isEmpty(evaluation)) {
+                        step.setEvaluation(LocalVar.NAME_PREFIX + evaluation.substring(2, evaluation.length() - 1));
+                    }
+                    // 处理步骤传入的参数值
+                    List<ParamValue> paramValues = step.getParamValues();
+                    if (!CollectionUtils.isEmpty(paramValues)) {
+                        for (ParamValue paramValue : paramValues) {
+                            String value = paramValue.getParamValue();
+                            if (StringUtils.isEmpty(value)) {
+                                paramValue.setParamValue("null");
+                            } else {
+                                if (value.startsWith(Param.QUOTE_PREFIX) && value.endsWith(Param.QUOTE_SUFFIX)) { // 方法参数
+                                    paramValue.setParamValue(Param.NAME_PREFIX + value.substring(2, value.length() - 1));
+                                } else if (value.startsWith(LocalVar.QUOTE_PREFIX) && value.endsWith(LocalVar.QUOTE_SUFFIX)) { // 局部变量
+                                    paramValue.setParamValue(LocalVar.NAME_PREFIX + value.substring(2, value.length() - 1));
+                                } else if (value.startsWith(GlobalVar.QUOTE_PREFIX) && value.endsWith(GlobalVar.QUOTE_SUFFIX)) { // 全局变量
+                                    paramValue.setParamValue(GlobalVar.NAME_PREFIX + value.substring(2, value.length() - 1));
+                                } else { // 普通字符串
+                                    paramValue.setParamValue("\"" + value + "\"");
                                 }
                             }
                         }
-                    });
-                }
+                    }
+                });
             }
         }
     }
