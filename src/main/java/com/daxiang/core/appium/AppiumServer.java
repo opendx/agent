@@ -7,6 +7,7 @@ import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
 import io.appium.java_client.service.local.flags.GeneralServerFlag;
 import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.Platform;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
@@ -23,10 +24,14 @@ public class AppiumServer {
     public static String getVersion() {
         if (version == null) {
             try {
-                version = ShellExecutor.execute("appium -v");
+                String cmd = "appium -v";
+                if (Platform.getCurrent().is(Platform.WINDOWS)) {
+                    cmd = "cmd /C " + cmd;
+                }
+                version = ShellExecutor.execute(cmd);
             } catch (Exception e) {
                 log.error("获取appium版本失败", e);
-                return null;
+                return "控制台输入appium -v无法获取appium版本，请检查配置";
             }
         }
         return version;
