@@ -1,6 +1,7 @@
 package com.daxiang.core.appium;
 
 import com.daxiang.core.MobileDevice;
+import com.daxiang.core.MobileInitializer;
 import com.daxiang.core.PortProvider;
 import com.daxiang.core.android.AndroidDevice;
 import io.appium.java_client.AppiumDriver;
@@ -10,6 +11,7 @@ import io.appium.java_client.remote.AutomationName;
 import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.remote.MobilePlatform;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.springframework.util.StringUtils;
 
 /**
  * Created by jiangyitao.
@@ -24,15 +26,21 @@ public class AndroidDriverBuilder implements AppiumDriverBuilder {
         DesiredCapabilities capabilities = createDesiredCapabilities(mobileDevice);
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
         capabilities.setCapability(AndroidMobileCapabilityType.UNICODE_KEYBOARD, true); // 切换到appium输入法
+
         if (((AndroidDevice) mobileDevice).canUseUiautomator2()) {
             capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.ANDROID_UIAUTOMATOR2); // UIAutomation2 is only supported since Android 5.0 (Lollipop)
         } else {
             capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, "UIAutomator1");
         }
+
         capabilities.setCapability(AndroidMobileCapabilityType.SYSTEM_PORT, PortProvider.getUiautomator2ServerAvailablePort());
         capabilities.setCapability("chromedriverPort", PortProvider.getChromeDriverAvailablePort());
-        // todo 如果手机的chrome版本与appium默认的chromedriver不匹配，导致切换webview出错，可以指定chromeDriver位置
-        // capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, "");
+
+        String chromeDriverFilePath = MobileInitializer.getChromeDriverFilePath(mobileDevice.getId());
+        if (!StringUtils.isEmpty(chromeDriverFilePath)) {
+            capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, chromeDriverFilePath);
+        }
+
         capabilities.setCapability(AndroidMobileCapabilityType.APP_PACKAGE, APP_PACKAGE);
         capabilities.setCapability(AndroidMobileCapabilityType.APP_ACTIVITY, APP_ACTIVITY);
         capabilities.setCapability(AndroidMobileCapabilityType.NO_SIGN, true);
