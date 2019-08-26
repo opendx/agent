@@ -225,3 +225,26 @@ VALUES
 	'元素属性值',
 	'[{"name": "webElement", "description": "元素对象"},{"name": "attributeName", "description": "属性名"}]'
 );
+
+-- 11.GetElementId
+INSERT INTO `action` (
+	`id`,
+	`name`,
+	`description`,
+	`class_name`,
+	`need_driver`,
+	`has_return_value`,
+	`return_value_desc`,
+	`params`
+)
+VALUES
+(
+	11,
+	'获取元素id',
+	'WebElement.getId',
+	'com.daxiang.action.appium.GetElementId',
+	0,
+	1,
+	'元素id',
+	'[{"name": "webElement", "description": "元素对象"}]'
+);
