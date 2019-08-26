@@ -53,10 +53,17 @@ public class AppiumServer {
     }
 
     public URL getUrl() {
-        if (service != null && service.isRunning()) {
-            return service.getUrl();
+        if (service == null) {
+            throw new RuntimeException("appium服务未启动");
         }
-        return null;
+        if (!service.isRunning()) {
+            throw new RuntimeException("appium服务未运行");
+        }
+        URL url = service.getUrl();
+        if (url == null) {
+            throw new RuntimeException("appium服务url为空");
+        }
+        return url;
     }
 
     public void stop() {
