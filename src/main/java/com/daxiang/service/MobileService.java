@@ -48,6 +48,9 @@ public class MobileService {
         if (mobileDevice == null) {
             return Response.fail("设备未连接");
         }
+        if (!mobileDevice.isNativeContext()) {
+            return Response.fail("当前不是原生context，无法获取原生布局");
+        }
 
         try {
             String pageSource = mobileDevice.dump();

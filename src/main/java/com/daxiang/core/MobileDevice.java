@@ -25,6 +25,8 @@ import java.util.Date;
 @Data
 public abstract class MobileDevice {
 
+    public static final String NATIVE_CONTEXT = "NATIVE_APP";
+
     public static final int ANDROID = 1;
     public static final int IOS = 2;
 
@@ -176,5 +178,17 @@ public abstract class MobileDevice {
         device.setLastOfflineTime(new Date());
         log.info("saveOfflineDeviceToMaster: {}", device);
         MasterApi.getInstance().saveDevice(device);
+    }
+
+    /**
+     * 当前是否是原生context
+     *
+     * @return
+     */
+    public boolean isNativeContext() {
+        if (appiumDriver == null) {
+            throw new RuntimeException("appiumDriver未初始化");
+        }
+        return NATIVE_CONTEXT.equals(appiumDriver.getContext());
     }
 }

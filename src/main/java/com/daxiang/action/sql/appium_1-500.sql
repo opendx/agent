@@ -248,3 +248,24 @@ VALUES
 	'元素id',
 	'[{"name": "webElement", "description": "元素对象"}]'
 );
+
+-- 12.SwitchContext
+INSERT INTO `action` (
+	`id`,
+	`name`,
+	`description`,
+	`class_name`,
+	`need_driver`,
+	`has_return_value`,
+	`params`
+)
+VALUES
+(
+	12,
+	'切换context',
+	'AppiumDriver.context',
+	'com.daxiang.action.appium.SwitchContext',
+	1,
+	0,
+	'[{"name":"context","description":"context","possibleValues":[{"value":"NATIVE_APP","description":"原生"},{"value":"WEBVIEW","description":"webview"}]}]'
+);
