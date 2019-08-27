@@ -56,9 +56,10 @@ public class AppiumServer {
         if (service == null) {
             throw new RuntimeException("appium服务未启动");
         }
-        if (!service.isRunning()) {
-            throw new RuntimeException("appium服务未运行");
-        }
+        // 从日志里看到很多人服务已经成功运行，但是这个方法检测不到isRunning，先注掉
+//        if (!service.isRunning()) {
+//            throw new RuntimeException("appium服务未运行");
+//        }
         URL url = service.getUrl();
         if (url == null) {
             throw new RuntimeException("appium服务url为空");
@@ -67,7 +68,11 @@ public class AppiumServer {
     }
 
     public void stop() {
-        if (service != null && service.isRunning()) {
+//        if (service != null && service.isRunning()) {
+//            service.stop();
+//        }
+        // 很多人服务已经在运行但是service.isRunning()检测不到已运行，所有先这样处理
+        if (service != null) {
             service.stop();
         }
     }
