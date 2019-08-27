@@ -6,8 +6,6 @@ import com.daxiang.App;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.AndroidDevice;
-import com.daxiang.core.android.stf.Minicap;
-import com.daxiang.core.android.stf.Minitouch;
 import com.daxiang.model.Response;
 import com.daxiang.service.MobileService;
 import io.appium.java_client.android.AndroidDriver;
@@ -20,9 +18,7 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -35,31 +31,28 @@ public class AndroidSocketServer {
 
     private static final Map<String, Session> SESSION_POOL = new ConcurrentHashMap<>();
 
-    private Minicap minicap;
-    private Minitouch minitouch;
     private AndroidDevice androidDevice;
+    private AndroidDriver androidDriver;
     private String deviceId;
-    private Thread handleImgDataThread;
 
     @OnOpen
     public void onOpen(@PathParam("deviceId") String deviceId, @PathParam("username") String username, Session session) throws Exception {
         log.info("[android-websocket][{}]onOpen: username -> {}", deviceId, username);
         this.deviceId = deviceId;
 
-        // todo 这里使用getAsyncRemote可以解决卡顿
-        RemoteEndpoint.Basic basicRemote = session.getBasicRemote();
-        basicRemote.sendText("android websocket连接成功");
+        RemoteEndpoint.Basic remoteEndpoint = session.getBasicRemote();
+        remoteEndpoint.sendText("android websocket连接成功");
 
         MobileDevice mobileDevice = MobileDeviceHolder.getIdleDevice(deviceId);
         if (mobileDevice == null) {
-            basicRemote.sendText("手机未处于闲置状态，无法使用");
+            remoteEndpoint.sendText("手机未处于闲置状态，无法使用");
             session.close();
             return;
         }
 
         Session otherSession = SESSION_POOL.get(deviceId);
         if (otherSession != null && otherSession.isOpen()) {
-            basicRemote.sendText(deviceId + "手机正在被" + otherSession.getId() + "连接占用，请稍后重试");
+            remoteEndpoint.sendText(deviceId + "手机正在被" + otherSession.getId() + "连接占用，请稍后重试");
             session.close();
             return;
         }
@@ -67,63 +60,39 @@ public class AndroidSocketServer {
         SESSION_POOL.put(deviceId, session);
         androidDevice = (AndroidDevice) mobileDevice;
 
-        mobileDevice.saveUsingDeviceToMaster(username);
+        androidDevice.saveUsingDeviceToMaster(username);
 
-        basicRemote.sendText("启动minicap服务...");
-        minicap = androidDevice.getMinicap();
-        minicap.start(Integer.parseInt(App.getProperty("minicap-quality")),
+        remoteEndpoint.sendText("启动minicap...");
+        androidDevice.getMinicap().start(Integer.parseInt(App.getProperty("minicap-quality")),
                 androidDevice.getResolution(),
                 androidDevice.getVirtualResolution(Integer.parseInt(App.getProperty("displayWidth"))),
-                0);
-        basicRemote.sendText("启动minicap服务完成");
+                0,
+                minicapImgData -> {
+                    try {
+                        remoteEndpoint.sendBinary(minicapImgData);
+                    } catch (IOException e) {
+                        log.error("[android-websocket][minicap][{}]通过websocket发送minicap数据异常", deviceId, e);
+                    }
+                });
+        remoteEndpoint.sendText("启动minicap完成");
 
-        handleImgDataThread = new Thread(() -> {
-            BlockingQueue<byte[]> imgQueue = minicap.getImgQueue();
-            while (true) {
-                byte[] img;
-                try {
-                    img = imgQueue.take();
-                } catch (InterruptedException e) {
-                    log.info("[android-websocket][minicap][{}]停止从imgQueue获取数据", deviceId);
-                    break;
-                }
-                try {
-                    basicRemote.sendBinary(ByteBuffer.wrap(img));
-                } catch (IOException e) {
-                    log.error("[android-websocket][minicap][{}]发送图片数据出错", deviceId, e);
-                }
-            }
-            log.info("[android-websocket][minicap][{}]停止发送图片数据", deviceId);
-        }, "AndroidWebSocket-ImageDataHandler-" + deviceId);
-        handleImgDataThread.start();
-
-        basicRemote.sendText("启动minitouch服务...");
-        minitouch = androidDevice.getMinitouch();
-        minitouch.start();
-        basicRemote.sendText("启动minitouch服务完成");
+        remoteEndpoint.sendText("启动minitouch...");
+        androidDevice.getMinitouch().start();
+        remoteEndpoint.sendText("启动minitouch完成");
 
         Response response = App.getBean(MobileService.class).freshDriver(deviceId);
-        basicRemote.sendText(JSON.toJSONString(response));
+        remoteEndpoint.sendText(JSON.toJSONString(response));
+        androidDriver = (AndroidDriver) androidDevice.getAppiumDriver();
     }
 
     @OnClose
     public void onClose() {
         log.info("[android-websocket][{}]onClose", deviceId);
 
-        if (handleImgDataThread != null) {
-            SESSION_POOL.remove(deviceId);
-            handleImgDataThread.interrupt();
-        }
-
-        if (minitouch != null) {
-            minitouch.stop();
-        }
-
-        if (minicap != null) {
-            minicap.stop();
-        }
-
         if (androidDevice != null) {
+            SESSION_POOL.remove(deviceId);
+            androidDevice.getMinitouch().stop();
+            androidDevice.getMinicap().stop();
             androidDevice.quitAppiumDriver();
             androidDevice.saveIdleDeviceToMaster();
         }
@@ -150,27 +119,26 @@ public class AndroidSocketServer {
         String operation = jsonObject.getString("operation");
         switch (operation) {
             case "m":
-                minitouch.moveTo(jsonObject.getFloat("percentOfX"), jsonObject.getFloat("percentOfY"));
+                androidDevice.getMinitouch().moveTo(jsonObject.getFloat("percentOfX"), jsonObject.getFloat("percentOfY"));
                 break;
             case "d":
-                minitouch.touchDown(jsonObject.getFloat("percentOfX"), jsonObject.getFloat("percentOfY"));
+                androidDevice.getMinitouch().touchDown(jsonObject.getFloat("percentOfX"), jsonObject.getFloat("percentOfY"));
                 break;
             case "u":
-                minitouch.touchUp();
+                androidDevice.getMinitouch().touchUp();
                 break;
             case "home":
-                ((AndroidDriver) androidDevice.getAppiumDriver()).pressKey(new KeyEvent(AndroidKey.HOME));
+                androidDriver.pressKey(new KeyEvent(AndroidKey.HOME));
                 break;
             case "back":
-                ((AndroidDriver) androidDevice.getAppiumDriver()).pressKey(new KeyEvent(AndroidKey.BACK));
+                androidDriver.pressKey(new KeyEvent(AndroidKey.BACK));
                 break;
             case "power":
-                ((AndroidDriver) androidDevice.getAppiumDriver()).pressKey(new KeyEvent(AndroidKey.POWER));
+                androidDriver.pressKey(new KeyEvent(AndroidKey.POWER));
                 break;
             case "menu":
-                ((AndroidDriver) androidDevice.getAppiumDriver()).pressKey(new KeyEvent(AndroidKey.MENU));
+                androidDriver.pressKey(new KeyEvent(AndroidKey.MENU));
                 break;
         }
     }
-
 }

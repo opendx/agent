@@ -18,7 +18,7 @@ public class MinicapBannerParser {
      * @return
      * @throws IOException
      */
-    public static MinicapBanner parse(InputStream inputStream) throws IOException {
+    public MinicapBanner parse(InputStream inputStream) throws IOException {
         if (inputStream == null) {
             throw new IllegalArgumentException("inputStream不能为空");
         }
