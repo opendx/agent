@@ -245,7 +245,7 @@ VALUES
 	'com.daxiang.action.appium.GetElementId',
 	0,
 	1,
-	'元素id',
+	'WebElementId',
 	'[{"name": "webElement", "description": "元素对象"}]'
 );
 
@@ -268,4 +268,92 @@ VALUES
 	1,
 	0,
 	'[{"name":"context","description":"context","possibleValues":[{"value":"NATIVE_APP","description":"原生"},{"value":"WEBVIEW","description":"webview"}]}]'
+);
+
+-- 13.SwipeScreen
+INSERT INTO `action` (
+	`id`,
+	`name`,
+	`description`,
+	`class_name`,
+	`need_driver`,
+	`has_return_value`,
+	`params`
+)
+VALUES
+(
+	13,
+	'滑动屏幕',
+	'TouchAction.press.moveTo',
+	'com.daxiang.action.appium.SwipeScreen',
+	1,
+	0,
+	'[{"name":"startX","description":"X起点，范围0-1，如: 0.5，代表屏幕宽度一半的位置"},{"name":"startY","description":"Y起点，范围0-1，如：0.5，代表屏幕高度一半的位置"},{"name":"endX","description":"X终点，范围0-1，如: 0.5，代表屏幕宽度一半的位置"},{"name":"endY","description":"Y终点，范围0-1，如: 0.5，代表屏幕高度一半的位置"}]'
+);
+
+-- 14.SwipeInElement
+INSERT INTO `action` (
+	`id`,
+	`name`,
+	`description`,
+	`class_name`,
+	`need_driver`,
+	`has_return_value`,
+	`params`
+)
+VALUES
+(
+	14,
+	'元素容器内滑动',
+	'TouchAction.press.moveTo',
+	'com.daxiang.action.appium.SwipeInElement',
+	1,
+	0,
+	'[{"name":"webElement","description":"元素容器"},{"name":"startX","description":"X起点，范围0-1，如: 0.5，代表元素容器宽度一半的位置"},{"name":"startY","description":"Y起点，范围0-1，如：0.5，代表元素容器高度一半的位置"},{"name":"endX","description":"X终点，范围0-1，如: 0.5，代表元素容器宽度一半的位置"},{"name":"endY","description":"Y终点，范围0-1，如: 0.5，代表元素容器高度一半的位置"}]'
+);
+
+-- 15.SwipeScreenFindElement
+INSERT INTO `action` (
+	`id`,
+	`name`,
+	`description`,
+	`class_name`,
+	`need_driver`,
+	`has_return_value`,
+	`return_value_desc`,
+	`params`
+)
+VALUES
+(
+	15,
+	'滑动屏幕查找元素',
+	'1.AppiumDriver.findElement 2.TouchAction.press.moveTo',
+	'com.daxiang.action.appium.SwipeScreenFindElement',
+	1,
+	1,
+	'WebElement',
+	'[{"name":"findBy","description":"查找方式","possibleValues":[{"value":"id","description":"MobileBy.id"},{"value":"AccessibilityId","description":"MobileBy.AccessibilityId"},{"value":"xpath","description":"MobileBy.xpath"},{"value":"AndroidUIAutomator","description":"MobileBy.AndroidUIAutomator"},{"value":"iOSClassChain","description":"MobileBy.iOSClassChain"},{"value":"iOSNsPredicateString","description":"MobileBy.iOSNsPredicateString"},{"value":"image","description":"MobileBy.image"}]},{"name":"value","description":"查找值"},{"name":"startX","description":"X起点，范围0-1，如: 0.5，代表屏幕宽度一半的位置"},{"name":"startY","description":"Y起点，范围0-1，如：0.5，代表屏幕高度一半的位置"},{"name":"endX","description":"X终点，范围0-1，如: 0.5，代表屏幕宽度一半的位置"},{"name":"endY","description":"Y终点，范围0-1，如: 0.5，代表屏幕高度一半的位置"},{"name":"maxSwipeCount","description":"最大滑动次数"}]'
+);
+
+-- 16.SwipeInElementFindElement
+INSERT INTO `action` (
+	`id`,
+	`name`,
+	`description`,
+	`class_name`,
+	`need_driver`,
+	`has_return_value`,
+	`return_value_desc`,
+	`params`
+)
+VALUES
+(
+	16,
+	'元素容器内滑动查找元素',
+	'1.AppiumDriver.findElement 2.TouchAction.press.moveTo',
+	'com.daxiang.action.appium.SwipeInElementFindElement',
+	1,
+	1,
+	'WebElement',
+	'[{"name":"webElement","description":"容器元素"},{"name":"findBy","description":"查找方式","possibleValues":[{"value":"id","description":"MobileBy.id"},{"value":"AccessibilityId","description":"MobileBy.AccessibilityId"},{"value":"xpath","description":"MobileBy.xpath"},{"value":"AndroidUIAutomator","description":"MobileBy.AndroidUIAutomator"},{"value":"iOSClassChain","description":"MobileBy.iOSClassChain"},{"value":"iOSNsPredicateString","description":"MobileBy.iOSNsPredicateString"},{"value":"image","description":"MobileBy.image"}]},{"name":"value","description":"查找值"},{"name":"startX","description":"X起点，范围0-1，如: 0.5，代表容器元素宽度一半的位置"},{"name":"startY","description":"Y起点，范围0-1，如：0.5，代表容器元素高度一半的位置"},{"name":"endX","description":"X终点，范围0-1，如: 0.5，代表容器元素宽度一半的位置"},{"name":"endY","description":"Y终点，范围0-1，如: 0.5，代表容器元素高度一半的位置"},{"name":"maxSwipeCount","description":"最大滑动次数"}]'
 );
