@@ -11,6 +11,7 @@ import io.appium.java_client.remote.IOSMobileCapabilityType;
 import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.remote.MobilePlatform;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.springframework.util.StringUtils;
 
 /**
  * Created by jiangyitao.
@@ -36,6 +37,21 @@ public class IosDriverBuilder implements AppiumDriverBuilder {
         // http://appium.io/docs/en/advanced-concepts/settings/
         capabilities.setCapability("mjpegServerFramerate", Integer.parseInt(App.getProperty("mjpegServerFramerate")));
         capabilities.setCapability("webkitDebugProxyPort", PortProvider.getWebkitDebugProxyAvalilablePort());
+
+        // https://github.com/appium/appium-xcuitest-driver/blob/master/docs/real-device-config.md
+        String xcodeOrgId = App.getProperty("xcodeOrgId");
+        if (!StringUtils.isEmpty(xcodeOrgId)) {
+            capabilities.setCapability("xcodeOrgId", xcodeOrgId);
+        }
+        String xcodeSigningId = App.getProperty("xcodeSigningId");
+        if (!StringUtils.isEmpty(xcodeSigningId)) {
+            capabilities.setCapability("xcodeSigningId", xcodeSigningId);
+        }
+        String updatedWDABundleId = App.getProperty("updatedWDABundleId");
+        if (!StringUtils.isEmpty(updatedWDABundleId)) {
+            capabilities.setCapability("updatedWDABundleId", updatedWDABundleId);
+        }
+
         IOSDriver iosDriver = new IOSDriver(mobileDevice.getAppiumServer().getUrl(), capabilities);
         IosUtil.pressHome(iosDriver);
         return iosDriver;
