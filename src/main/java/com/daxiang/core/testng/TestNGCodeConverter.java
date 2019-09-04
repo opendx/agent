@@ -36,9 +36,8 @@ public class TestNGCodeConverter {
     /**
      * 转换为testng代码
      */
-    public String convert(String deviceId, String className, List<Action> testcases,
+    public String convert(String deviceId, String className, List<? extends Action> testcases,
                           String ftlBasePackagePath, String ftlFileName) throws IOException, TemplateException {
-
         List<Action> actionTreeList = new ArrayList<>();
         actionTreeList.addAll(testcases);
 

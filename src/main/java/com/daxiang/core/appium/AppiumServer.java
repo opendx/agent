@@ -21,7 +21,7 @@ public class AppiumServer {
 
     private static String version;
 
-    public static String getVersion() {
+    public synchronized static String getVersion() {
         if (version == null) {
             try {
                 String cmd = "appium -v";

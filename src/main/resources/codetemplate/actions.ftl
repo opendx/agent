@@ -23,7 +23,7 @@
                 </#if>
             </#list>
         </#if>
-        <#lt>) throws Exception {
+        <#lt>) throws Throwable {
         <#-- 方法体 -->
         <#-- 基础action -->
         <#if action.type==1>

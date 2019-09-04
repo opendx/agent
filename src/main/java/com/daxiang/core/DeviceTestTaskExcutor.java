@@ -84,11 +84,7 @@ public class DeviceTestTaskExcutor {
                     .setAfterClass(deviceTestTask.getAfterClass())
                     .setBeforeMethod(deviceTestTask.getBeforeMethod())
                     .setAfterMethod(deviceTestTask.getAfterMethod())
-                    .convert(deviceTestTask.getDeviceId(), className, deviceTestTask.getTestcases().stream().map(testcase -> {
-                        Action action = new Action();
-                        BeanUtils.copyProperties(testcase, action);
-                        return action;
-                    }).collect(Collectors.toList()), "/codetemplate", "mobile.ftl");
+                    .convert(deviceTestTask.getDeviceId(), className, deviceTestTask.getTestcases(), "/codetemplate", "mobile.ftl");
             log.info("[自动化测试][{}]转换代码: {}", deviceId, code);
             // todo 捕获到DynamicCompilerException即编译失败，通知master纠正用例，否则错误的用例会无限下发给agent执行
             Class clazz = JavaCompiler.compile(className, code);
