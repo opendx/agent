@@ -32,7 +32,7 @@ public class AdbKit {
         log.info("[adbkit][{}]node vendor/adbkit/bin/adbkit usb-device-to-tcp -p {} {}", deviceId, localPort, deviceId);
         // https://github.com/openstf/adbkit
         watchdog = Terminal
-                .executeAsyncAndGetWatchdog(null,"node", "vendor/adbkit/bin/adbkit", "usb-device-to-tcp", "-p", String.valueOf(localPort), deviceId);
+                .executeAsyncAndGetWatchdog(null, "node", "vendor/adbkit/bin/adbkit", "usb-device-to-tcp", "-p", String.valueOf(localPort), deviceId);
         return localPort;
     }
 
