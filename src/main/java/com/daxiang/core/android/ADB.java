@@ -63,7 +63,6 @@ public class ADB {
         log.info("[adb]adb start-server完成");
     }
 
-
     /**
      * 获取adb路径
      *
