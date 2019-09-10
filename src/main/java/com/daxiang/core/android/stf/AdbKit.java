@@ -6,17 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.*;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Created by jiangyitao.
  */
 @Slf4j
 public class AdbKit {
-
-    /**
-     * https://github.com/openstf/adbkit
-     */
-    private static final String START_ADBKIT_CMD = "node vendor/adbkit/bin/adbkit usb-device-to-tcp -p %d %s";
 
     private ExecuteWatchdog watchdog;
     private String deviceId;
@@ -34,10 +30,10 @@ public class AdbKit {
         stop();
 
         int localPort = PortProvider.getAdbKitAvailablePort();
-        String cmd = String.format(START_ADBKIT_CMD, localPort, deviceId);
-        log.info("[adbkit][{}]开启远程调试功能: {}", deviceId, cmd);
-
-        watchdog = ShellExecutor.excuteAsyncAndGetWatchdog(cmd, null);
+        log.info("[adbkit][{}]node vendor/adbkit/bin/adbkit usb-device-to-tcp -p {} {}", deviceId, localPort, deviceId);
+        // https://github.com/openstf/adbkit
+        watchdog = ShellExecutor
+                .executeAsyncAndGetWatchdog("node", Arrays.asList("vendor/adbkit/bin/adbkit", "usb-device-to-tcp", "-p", String.valueOf(localPort), deviceId), null);
         return localPort;
     }
 

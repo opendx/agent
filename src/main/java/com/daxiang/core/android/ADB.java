@@ -7,6 +7,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Created by jiangyitao.
@@ -15,28 +16,23 @@ import java.io.IOException;
 public class ADB {
 
     private static final String ADB_PLATFORM_TOOLS = "platform-tools";
-    private static AndroidDebugBridge adb;
 
     /**
-     * 初始化ADB
+     * 连接ADB
      */
-    public static synchronized void init() {
-        if (adb == null) {
-            log.info("[adb]开始初始化adb");
-            AndroidDebugBridge.init(false);
-            adb = AndroidDebugBridge.createBridge(getPath(), false);
-
-            log.info("[adb]等待adb连接");
-            long start = System.currentTimeMillis();
-            while (System.currentTimeMillis() - start <= 30000) {
-                if (adb.isConnected()) {
-                    log.info("[adb]adb已连接");
-                    log.info("[adb]adb初始化成功");
-                    return;
-                }
+    public static void connect() {
+        AndroidDebugBridge.init(false);
+        log.info("[adb]创建adb");
+        AndroidDebugBridge adb = AndroidDebugBridge.createBridge(getPath(), false);
+        log.info("[adb]等待adb连接");
+        long start = System.currentTimeMillis();
+        while (System.currentTimeMillis() - start <= 30000) {
+            if (adb.isConnected()) {
+                log.info("[adb]adb已连接");
+                return;
             }
-            throw new RuntimeException("[adb]adb初始化失败");
         }
+        throw new RuntimeException("[adb]adb连接失败");
     }
 
     /**
@@ -53,17 +49,18 @@ public class ADB {
      */
     public static void killServer() throws IOException {
         log.info("[adb]adb kill-server");
-        ShellExecutor.execute("adb kill-server");
+        ShellExecutor.execute("adb", Arrays.asList("kill-server"));
         log.info("[adb]adb kill-server完成");
     }
 
     /**
      * 启动adb服务
+     *
      * @throws IOException
      */
     public static void startServer() throws IOException {
         log.info("[adb]adb start-server");
-        ShellExecutor.execute("adb start-server");
+        ShellExecutor.execute("adb", Arrays.asList("start-server"));
         log.info("[adb]adb start-server完成");
     }
 

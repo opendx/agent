@@ -8,6 +8,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -178,8 +179,7 @@ public class AndroidUtil {
      * aapt dump badging
      */
     public static String aaptDumpBadging(String apkPath) throws IOException {
-        String cmd = "aapt dump badging " + apkPath;
-        return ShellExecutor.execute(cmd);
+        return ShellExecutor.execute("aapt", Arrays.asList("dump", "badging", apkPath));
     }
 
     /**
