@@ -23,7 +23,7 @@ import java.nio.charset.Charset;
  */
 @Slf4j
 @Component
-public class MobileInitializer implements ApplicationRunner {
+public class AgentStartRunner implements ApplicationRunner {
 
     /**
      * todo 补充文档
@@ -57,7 +57,7 @@ public class MobileInitializer implements ApplicationRunner {
             ADB.killServer();
             Thread.sleep(1000);
             ADB.startServer();
-            ADB.init();
+            ADB.connect();
             ADB.addDeviceChangeListener(androidDeviceChangeListener);
             log.info("[android]开始监听设备连接/断开");
         }

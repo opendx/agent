@@ -25,7 +25,7 @@ public class DeviceTestTaskExcutor {
     /**
      * 执行测试任务线程
      */
-    private Thread excuteTestTaskThread;
+    private Thread executeTestTaskThread;
 
     private MobileDevice mobileDevice;
     private String deviceId;
@@ -34,24 +34,24 @@ public class DeviceTestTaskExcutor {
         this.mobileDevice = mobileDevice;
         this.deviceId = mobileDevice.getId();
 
-        excuteTestTaskThread = new Thread(() -> {
+        executeTestTaskThread = new Thread(() -> {
             while (true) {
                 DeviceTestTask deviceTestTask;
                 try {
                     deviceTestTask = testTaskQueue.take(); // 没有测试任务，线程阻塞在此
                 } catch (InterruptedException e) {
-                    // 调用excuteTestTaskThread.interrupt()可以执行到这里
+                    // 调用executeTestTaskThread.interrupt()可以执行到这里
                     log.info("[自动化测试][{}]停止获取测试任务", deviceId);
                     break;
                 }
                 try {
-                    excuteTestTask(deviceTestTask);
+                    executeTestTask(deviceTestTask);
                 } catch (Exception e) {
                     log.error("[自动化测试][{}]执行测试任务出错: {}", deviceId, deviceTestTask.getTestTaskName(), e);
                 }
             }
         });
-        excuteTestTaskThread.start();
+        executeTestTaskThread.start();
     }
 
     /**
@@ -70,7 +70,7 @@ public class DeviceTestTaskExcutor {
      *
      * @param deviceTestTask
      */
-    private void excuteTestTask(DeviceTestTask deviceTestTask) throws Exception {
+    private void executeTestTask(DeviceTestTask deviceTestTask) throws Exception {
         log.info("[自动化测试][{}]开始执行测试任务: {}", deviceId, deviceTestTask.getTestTaskName());
 
         mobileDevice.saveUsingDeviceToMaster(deviceTestTask.getTestTaskName());

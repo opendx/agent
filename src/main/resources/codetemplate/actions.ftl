@@ -27,7 +27,7 @@
         <#-- 方法体 -->
         <#-- 基础action -->
         <#if action.type==1>
-            <#lt>        <#if action.hasReturnValue==1>return </#if>new ${action.className}(<#if action.needDriver==1>driver</#if>).excute(<#rt>
+            <#lt>        <#if action.hasReturnValue==1>return </#if>new ${action.className}(<#if action.needDriver==1>driver</#if>).execute(<#rt>
             <#if action.params?? && (action.params?size>0)>
                 <#list action.params as param>
                     <#lt>${param.name}<#rt>
