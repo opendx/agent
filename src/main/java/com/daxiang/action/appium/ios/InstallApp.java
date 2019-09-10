@@ -15,7 +15,7 @@ public class InstallApp {
         this.appiumDriver = appiumDriver;
     }
 
-    public void excute(Object appDownloadUrl) {
+    public void execute(Object appDownloadUrl) {
         Assert.notNull(appDownloadUrl, "appDownloadUrl不能为空");
         String _appDownloadUrl = (String) appDownloadUrl;
         IosUtil.installApp(appiumDriver, _appDownloadUrl);

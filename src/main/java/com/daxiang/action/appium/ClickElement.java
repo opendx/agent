@@ -8,7 +8,7 @@ import org.springframework.util.Assert;
  */
 public class ClickElement {
 
-    public WebElement excute(Object element) {
+    public WebElement execute(Object element) {
         Assert.notNull(element, "element不能为空");
         WebElement _element = (WebElement) element;
         _element.click();

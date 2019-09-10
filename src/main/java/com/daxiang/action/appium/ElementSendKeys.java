@@ -8,7 +8,7 @@ import org.springframework.util.Assert;
  */
 public class ElementSendKeys {
 
-    public WebElement excute(Object webElement, Object content) {
+    public WebElement execute(Object webElement, Object content) {
         Assert.notNull(webElement, "webElement不能为空");
         Assert.notNull(content, "content不能为空");
 

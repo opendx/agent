@@ -23,7 +23,7 @@ public class SwipeScreen {
         this.appiumDriver = appiumDriver;
     }
 
-    public void excute(Object startX, Object startY, Object endX, Object endY) {
+    public void execute(Object startX, Object startY, Object endX, Object endY) {
         Assert.notNull(startX, "X起点不能为空");
         Assert.notNull(startY, "Y起点不能为空");
         Assert.notNull(endX, "X终点不能为空");

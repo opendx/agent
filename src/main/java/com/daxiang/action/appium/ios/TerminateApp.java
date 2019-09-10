@@ -15,7 +15,7 @@ public class TerminateApp {
         this.appiumDriver = appiumDriver;
     }
 
-    public void excute(Object bundleId) {
+    public void execute(Object bundleId) {
         Assert.notNull(bundleId, "bundleId不能为空");
         String _bundleId = (String) bundleId;
         IosUtil.terminateApp(appiumDriver, _bundleId);

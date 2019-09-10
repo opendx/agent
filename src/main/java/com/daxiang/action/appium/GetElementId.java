@@ -10,7 +10,7 @@ import org.springframework.util.Assert;
 @Slf4j
 public class GetElementId {
 
-    public String excute(Object webElement) {
+    public String execute(Object webElement) {
         Assert.notNull(webElement, "元素不能为空");
 
         MobileElement mobileElement = (MobileElement) webElement;

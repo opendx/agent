@@ -16,7 +16,7 @@ public class SendKeys {
         this.driver = driver;
     }
 
-    public WebElement excute(Object findBy, Object value, Object content) {
+    public WebElement execute(Object findBy, Object value, Object content) {
         Assert.notNull(findBy, "findBy不能为空");
         Assert.notNull(value, "value不能为空");
         Assert.notNull(content, "content不能为空");

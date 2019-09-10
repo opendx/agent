@@ -21,7 +21,7 @@ VALUES
 	'[{"name": "packageName", "description": "包名"}]'
 );
 
--- 502.ExcuteAdbShellCommond
+-- 502.ExecuteAdbShellCommond
 INSERT INTO `action` (
 	`id`,
 	`name`,
@@ -38,7 +38,7 @@ VALUES
 	502,
 	'adb shell',
 	'adb shell {cmd}',
-	'com.daxiang.action.appium.android.ExcuteAdbShellCommond',
+	'com.daxiang.action.appium.android.ExecuteAdbShellCommond',
 	1,
 	1,
 	'执行命令返回的结果',

@@ -16,7 +16,7 @@ public class UnInstallApk {
         this.driver = driver;
     }
 
-    public void excute(Object packageName) throws Exception {
+    public void execute(Object packageName) throws Exception {
         Assert.notNull(packageName, "apk包名不能为空");
 
         String _packageName = (String) packageName;

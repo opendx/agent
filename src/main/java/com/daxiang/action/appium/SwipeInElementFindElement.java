@@ -28,7 +28,7 @@ public class SwipeInElementFindElement {
         this.appiumDriver = appiumDriver;
     }
 
-    public WebElement excute(Object webElement, Object findBy, Object value, Object startX, Object startY, Object endX, Object endY, Object maxSwipeCount) {
+    public WebElement execute(Object webElement, Object findBy, Object value, Object startX, Object startY, Object endX, Object endY, Object maxSwipeCount) {
         Assert.notNull(webElement, "元素不能为空");
         Assert.notNull(findBy, "findBy不能为空");
         Assert.notNull(value, "value不能为空");

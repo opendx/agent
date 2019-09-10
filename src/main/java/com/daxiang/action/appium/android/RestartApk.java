@@ -16,7 +16,7 @@ public class RestartApk {
         this.driver = driver;
     }
 
-    public void excute(Object packageName, Object launchActivity) throws Exception {
+    public void execute(Object packageName, Object launchActivity) throws Exception {
         Assert.notNull(packageName, "包名不能为空");
         Assert.notNull(launchActivity, "启动Activity不能为空");
 

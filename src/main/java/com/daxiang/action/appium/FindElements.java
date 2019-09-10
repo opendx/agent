@@ -18,7 +18,7 @@ public class FindElements {
         this.driver = driver;
     }
 
-    public List<WebElement> excute(Object findBy, Object value) {
+    public List<WebElement> execute(Object findBy, Object value) {
         Assert.notNull(findBy, "findBy不能为空");
         Assert.notNull(value, "value不能为空");
 

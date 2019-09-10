@@ -26,7 +26,7 @@ public class SwipeInElement {
         this.appiumDriver = appiumDriver;
     }
 
-    public void excute(Object webElement, Object startX, Object startY, Object endX, Object endY) {
+    public void execute(Object webElement, Object startX, Object startY, Object endX, Object endY) {
         Assert.notNull(webElement, "元素不能为空");
         Assert.notNull(startX, "X起点不能为空");
         Assert.notNull(startY, "Y起点不能为空");

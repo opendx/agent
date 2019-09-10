@@ -7,7 +7,7 @@ import org.junit.Assert;
  */
 public class AssertEquals {
 
-    public void excute(Object expected, Object actual) {
+    public void execute(Object expected, Object actual) {
         Assert.assertEquals(expected, actual);
     }
 }

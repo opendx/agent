@@ -16,7 +16,7 @@ public class ClearApkData {
         this.driver = driver;
     }
 
-    public void excute(Object packageName) throws Exception {
+    public void execute(Object packageName) throws Exception {
         Assert.notNull(packageName, "包名不能为空");
         String _packageName = (String) packageName;
         AndroidUtil.clearApkData(MobileDeviceHolder.getIDeviceByAppiumDriver(driver), _packageName);

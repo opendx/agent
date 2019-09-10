@@ -15,8 +15,8 @@ public class Click {
         this.driver = driver;
     }
 
-    public WebElement excute(Object findBy, Object value) {
-        WebElement element = new FindElement(driver).excute(findBy, value);
+    public WebElement execute(Object findBy, Object value) {
+        WebElement element = new FindElement(driver).execute(findBy, value);
         element.click();
         return element;
     }

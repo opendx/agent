@@ -15,7 +15,7 @@ public class LaunchApp {
         this.appiumDriver = appiumDriver;
     }
 
-    public void excute(Object bundleId) {
+    public void execute(Object bundleId) {
         Assert.notNull(bundleId, "bundleId不能为空");
         String _bundleId = (String) bundleId;
         IosUtil.launchApp(appiumDriver, _bundleId);

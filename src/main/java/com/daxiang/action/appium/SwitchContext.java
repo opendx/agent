@@ -19,7 +19,7 @@ public class SwitchContext {
         this.appiumDriver = appiumDriver;
     }
 
-    public void excute(Object context) {
+    public void execute(Object context) {
         Assert.notNull(context, "context不能为空");
         String _context = (String) context;
 

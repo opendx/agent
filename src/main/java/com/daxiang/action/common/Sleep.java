@@ -7,7 +7,7 @@ import org.springframework.util.Assert;
  */
 public class Sleep {
 
-    public void excute(Object sleepTimeInSeconds) throws InterruptedException {
+    public void execute(Object sleepTimeInSeconds) throws InterruptedException {
         Assert.notNull(sleepTimeInSeconds, "休眠时长不能为空");
         long sleepTime = (long)(Float.parseFloat((String) sleepTimeInSeconds) * 1000);
         Thread.sleep(sleepTime);

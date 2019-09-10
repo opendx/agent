@@ -19,7 +19,7 @@ public class ExecuteScript {
      * @param args
      * @return
      */
-    public Object excute(Object script, Object... args) {
+    public Object execute(Object script, Object... args) {
         Assert.notNull(script,"脚本不能为空");
         String _script = (String) script;
         return appiumDriver.executeScript(_script, args);

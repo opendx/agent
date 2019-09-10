@@ -18,7 +18,7 @@ public class PressKey {
     /**
      * @param androidKeyCode io.appium.java_client.android.nativekey.AndroidKey
      */
-    public void excute(Object androidKeyCode) {
+    public void execute(Object androidKeyCode) {
         Assert.notNull(androidKeyCode, "androidKeyCode不能为空");
         int _androidKeyCode = Integer.parseInt((String) androidKeyCode);
 

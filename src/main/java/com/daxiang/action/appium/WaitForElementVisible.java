@@ -18,7 +18,7 @@ public class WaitForElementVisible {
         this.driver = driver;
     }
 
-    public WebElement excute(Object findBy, Object value, Object maxWaitTimeInSeconds) {
+    public WebElement execute(Object findBy, Object value, Object maxWaitTimeInSeconds) {
         Assert.notNull(findBy, "findBy不能为空");
         Assert.notNull(value, "value不能为空");
         Assert.notNull(maxWaitTimeInSeconds, "最大等待时间不能为空");

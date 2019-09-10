@@ -8,7 +8,7 @@ import org.springframework.util.Assert;
  */
 public class GetAttribute {
 
-    public String excute(Object element, Object attributeName) {
+    public String execute(Object element, Object attributeName) {
         Assert.notNull(element, "element不能为空");
         Assert.notNull(attributeName, "attributeName不能为空");
 

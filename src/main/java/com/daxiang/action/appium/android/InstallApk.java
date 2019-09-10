@@ -22,7 +22,7 @@ public class InstallApk {
         this.driver = driver;
     }
 
-    public void excute(Object apkDownloadUrl) throws Exception {
+    public void execute(Object apkDownloadUrl) throws Exception {
         Assert.notNull(apkDownloadUrl, "apk下载地址不能为空");
         String _apkDownloadUrl = (String) apkDownloadUrl;
 

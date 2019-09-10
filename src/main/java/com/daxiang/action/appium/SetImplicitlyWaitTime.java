@@ -16,7 +16,7 @@ public class SetImplicitlyWaitTime {
         this.driver = driver;
     }
 
-    public void excute(Object implicitlyWaitTimeInSeconds) {
+    public void execute(Object implicitlyWaitTimeInSeconds) {
         Assert.notNull(implicitlyWaitTimeInSeconds, "隐士等待时间不能为空");
         long _implicitlyWaitTime = Long.parseLong((String) implicitlyWaitTimeInSeconds);
         driver.manage().timeouts().implicitlyWait(_implicitlyWaitTime, TimeUnit.SECONDS);

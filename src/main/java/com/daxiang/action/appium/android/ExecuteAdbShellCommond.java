@@ -8,15 +8,15 @@ import org.springframework.util.Assert;
 /**
  * Created by jiangyitao.
  */
-public class ExcuteAdbShellCommond {
+public class ExecuteAdbShellCommond {
 
     private AppiumDriver driver;
 
-    public ExcuteAdbShellCommond(AppiumDriver driver) {
+    public ExecuteAdbShellCommond(AppiumDriver driver) {
         this.driver = driver;
     }
 
-    public String excute(Object cmd) throws Exception {
+    public String execute(Object cmd) throws Exception {
         Assert.notNull(cmd, "命令不能为空");
         String _cmd = (String) cmd;
 

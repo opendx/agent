@@ -15,7 +15,7 @@ public class UninstallApp {
         this.appiumDriver = appiumDriver;
     }
 
-    public void excute(Object bundleId) {
+    public void execute(Object bundleId) {
         Assert.notNull(bundleId, "bundleId不能为空");
         String _bundleId = (String) bundleId;
         IosUtil.uninstallApp(appiumDriver, _bundleId);
