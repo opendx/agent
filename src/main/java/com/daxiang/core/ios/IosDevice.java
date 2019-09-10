@@ -15,6 +15,7 @@ import org.dom4j.DocumentException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Created by jiangyitao.
@@ -22,10 +23,6 @@ import java.io.IOException;
 @Slf4j
 public class IosDevice extends MobileDevice {
 
-    /**
-     * iproxy localPort remotePort deviceId
-     */
-    private static final String IPROXY = "iproxy %d %d %s";
     private ExecuteWatchdog mjpegServerIproxyWatchdog;
 
     public IosDevice(Device device, AppiumServer appiumServer) {
@@ -58,16 +55,17 @@ public class IosDevice extends MobileDevice {
     }
 
     public void startMjpegServerIproxy() throws IOException {
-        int mjpegServerPort = getMjpegServerPort();
-        String cmd = String.format(IPROXY, mjpegServerPort, mjpegServerPort, getId());
         PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(new LogOutputStream() {
             @Override
             protected void processLine(String line, int i) {
                 log.info("[ios][{}]iproxy -> {}", getId(), line);
             }
         });
-        mjpegServerIproxyWatchdog = ShellExecutor.excuteAsyncAndGetWatchdog(cmd, pumpStreamHandler);
-        log.info("[ios][{}]mjpegServer: {}", getId(), cmd);
+        int mjpegServerPort = getMjpegServerPort();
+        // iproxy localPort remotePort deviceId
+        mjpegServerIproxyWatchdog = ShellExecutor
+                .executeAsyncAndGetWatchdog("iproxy", Arrays.asList(String.valueOf(mjpegServerPort), String.valueOf(mjpegServerPort), getId()), pumpStreamHandler);
+        log.info("[ios][{}]mjpegServer: iproxy {} {} {}", getId(), mjpegServerPort, mjpegServerPort, getId());
     }
 
     public void stopMjpegServerIproxy() {
