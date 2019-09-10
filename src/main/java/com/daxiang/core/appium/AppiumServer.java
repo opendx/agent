@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
 
 /**
  * Created by jiangyitao.
@@ -18,15 +19,20 @@ import java.net.URL;
 @Slf4j
 public class AppiumServer {
 
+    private static final String APPIUM_JS = App.getProperty("appiumJs");
     private static String version;
 
     public synchronized static String getVersion() {
         if (version == null) {
             try {
-                version = ShellExecutor.execute("appium -v");
+                if (StringUtils.isEmpty(APPIUM_JS)) {
+                    version = ShellExecutor.execute("appium",Arrays.asList("-v"));
+                } else {
+                    version = ShellExecutor.execute("node", Arrays.asList(APPIUM_JS, "-v"));
+                }
             } catch (Exception e) {
                 log.error("获取appium版本失败", e);
-                return "控制台输入appium -v无法获取appium版本，请检查配置";
+                version = e.getMessage();
             }
         }
         return version;
@@ -37,10 +43,10 @@ public class AppiumServer {
     public void start() {
         AppiumServiceBuilder builder = new AppiumServiceBuilder();
         builder.usingPort(PortProvider.getAppiumServerAvailablePort()).withArgument(GeneralServerFlag.SESSION_OVERRIDE);
-        String appiumJs = App.getProperty("appiumJs");
-        if (!StringUtils.isEmpty(appiumJs)) {
-            log.info("[appium-server]appiumJs: {}", appiumJs);
-            builder.withAppiumJS(new File(appiumJs));
+
+        if (!StringUtils.isEmpty(APPIUM_JS)) {
+            log.info("[appium-server]appiumJs: {}", APPIUM_JS);
+            builder.withAppiumJS(new File(APPIUM_JS));
         }
         service = AppiumDriverLocalService.buildService(builder);
 //        service.enableDefaultSlf4jLoggingOfOutputData(); // 输出日志到slf4j

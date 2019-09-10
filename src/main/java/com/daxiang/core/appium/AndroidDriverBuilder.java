@@ -1,7 +1,7 @@
 package com.daxiang.core.appium;
 
 import com.daxiang.core.MobileDevice;
-import com.daxiang.core.MobileInitializer;
+import com.daxiang.core.AgentStartRunner;
 import com.daxiang.core.PortProvider;
 import com.daxiang.core.android.AndroidDevice;
 import io.appium.java_client.AppiumDriver;
@@ -36,7 +36,7 @@ public class AndroidDriverBuilder implements AppiumDriverBuilder {
         capabilities.setCapability(AndroidMobileCapabilityType.SYSTEM_PORT, PortProvider.getUiautomator2ServerAvailablePort());
         capabilities.setCapability("chromedriverPort", PortProvider.getChromeDriverAvailablePort());
 
-        String chromeDriverFilePath = MobileInitializer.getChromeDriverFilePath(mobileDevice.getId());
+        String chromeDriverFilePath = AgentStartRunner.getChromeDriverFilePath(mobileDevice.getId());
         if (!StringUtils.isEmpty(chromeDriverFilePath)) {
             capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, chromeDriverFilePath);
         }
