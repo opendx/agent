@@ -1,12 +1,11 @@
 package com.daxiang.core.android.stf;
 
 import com.daxiang.core.PortProvider;
-import com.daxiang.utils.ShellExecutor;
+import com.daxiang.utils.Terminal;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.*;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * Created by jiangyitao.
@@ -32,8 +31,8 @@ public class AdbKit {
         int localPort = PortProvider.getAdbKitAvailablePort();
         log.info("[adbkit][{}]node vendor/adbkit/bin/adbkit usb-device-to-tcp -p {} {}", deviceId, localPort, deviceId);
         // https://github.com/openstf/adbkit
-        watchdog = ShellExecutor
-                .executeAsyncAndGetWatchdog("node", Arrays.asList("vendor/adbkit/bin/adbkit", "usb-device-to-tcp", "-p", String.valueOf(localPort), deviceId), null);
+        watchdog = Terminal
+                .executeAsyncAndGetWatchdog(null,"node", "vendor/adbkit/bin/adbkit", "usb-device-to-tcp", "-p", String.valueOf(localPort), deviceId);
         return localPort;
     }
 

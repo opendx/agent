@@ -1,13 +1,12 @@
 package com.daxiang.core.android;
 
 import com.android.ddmlib.AndroidDebugBridge;
-import com.daxiang.utils.ShellExecutor;
+import com.daxiang.utils.Terminal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * Created by jiangyitao.
@@ -49,7 +48,7 @@ public class ADB {
      */
     public static void killServer() throws IOException {
         log.info("[adb]adb kill-server");
-        ShellExecutor.execute("adb", Arrays.asList("kill-server"));
+        Terminal.execute("adb", "kill-server");
         log.info("[adb]adb kill-server完成");
     }
 
@@ -60,7 +59,7 @@ public class ADB {
      */
     public static void startServer() throws IOException {
         log.info("[adb]adb start-server");
-        ShellExecutor.execute("adb", Arrays.asList("start-server"));
+        Terminal.execute("adb", "start-server");
         log.info("[adb]adb start-server完成");
     }
 
@@ -78,7 +77,12 @@ public class ADB {
             throw new RuntimeException("未获取到ANDROID_HOME，请配置ANDOIRD_HOME环境变量");
         }
 
-        String adbPath = androidHome + File.separator + ADB_PLATFORM_TOOLS + File.separator + "adb";
+        String adbPath = androidHome + File.separator + ADB_PLATFORM_TOOLS + File.separator;
+        if (Terminal.IS_WINDOWS) {
+            adbPath = adbPath + "adb.exe";
+        } else {
+            adbPath = adbPath + "adb";
+        }
         log.info("[adb]adb路径: {}", adbPath);
         return adbPath;
     }

@@ -1,14 +1,13 @@
 package com.daxiang.core.android;
 
 import com.android.ddmlib.*;
-import com.daxiang.utils.ShellExecutor;
+import com.daxiang.utils.Terminal;
 import com.daxiang.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -179,7 +178,7 @@ public class AndroidUtil {
      * aapt dump badging
      */
     public static String aaptDumpBadging(String apkPath) throws IOException {
-        return ShellExecutor.execute("aapt", Arrays.asList("dump", "badging", apkPath));
+        return Terminal.execute("aapt", "dump", "badging", apkPath);
     }
 
     /**

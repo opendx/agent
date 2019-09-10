@@ -1,6 +1,6 @@
 package com.daxiang.core.ios;
 
-import com.daxiang.utils.ShellExecutor;
+import com.daxiang.utils.Terminal;
 import com.google.common.collect.ImmutableMap;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ public class IosUtil {
 
     public static List<String> getDeviceList() {
         try {
-            String result = ShellExecutor.execute("idevice_id", Arrays.asList("-l"));
+            String result = Terminal.execute("idevice_id", "-l");
             if (StringUtils.isEmpty(result)) {
                 return Collections.emptyList();
             }
@@ -35,7 +35,7 @@ public class IosUtil {
      * @throws IOException
      */
     public static String getSystemVersion(String deviceId) throws IOException {
-        return ShellExecutor.execute("ideviceinfo", Arrays.asList("-k", "ProductVersion", "-u", deviceId));
+        return Terminal.execute("ideviceinfo", "-k", "ProductVersion", "-u", deviceId);
     }
 
     /**
@@ -44,16 +44,16 @@ public class IosUtil {
      * @throws IOException
      */
     public static String getProductType(String deviceId) throws IOException {
-        return ShellExecutor.execute("ideviceinfo", Arrays.asList("-k", "ProductType", "-u", deviceId));
+        return Terminal.execute("ideviceinfo", "-k", "ProductType", "-u", deviceId);
     }
 
     public static String getDeviceName(String deviceId) throws IOException {
-        return ShellExecutor.execute("ideviceinfo", Arrays.asList("-k", "DeviceName", "-u", deviceId));
+        return Terminal.execute("ideviceinfo", "-k", "DeviceName", "-u", deviceId);
     }
 
     public static File screenshotByIdeviceScreenshot(String deviceId) throws IOException {
         // Screenshot saved to screenshot-xxx.png
-        String result = ShellExecutor.execute("idevicescreenshot", Arrays.asList("-u", deviceId));
+        String result = Terminal.execute("idevicescreenshot", "-u", deviceId);
         if (StringUtils.isEmpty(result)) {
             throw new RuntimeException("截图失败，idevicescreenshot返回空");
         }
@@ -67,7 +67,7 @@ public class IosUtil {
     }
 
     public static void installIpa(String ipaPath, String deviceId) throws IOException {
-        ShellExecutor.execute("ideviceinstaller", Arrays.asList("-i", ipaPath, "-u", deviceId));
+        Terminal.execute("ideviceinstaller", "-i", ipaPath, "-u", deviceId);
     }
 
     // http://appium.io/docs/en/writing-running-appium/ios/ios-xctest-mobile-apps-management/index.html

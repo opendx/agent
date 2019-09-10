@@ -75,6 +75,8 @@ public class AgentStartRunner implements ApplicationRunner {
             log.info("{} => {}", DEVICE_CHROMEDRIVER_JSON_FILE, deviceChromeDriverJsonFileContent);
             deviceIdChromeDriverFilePath = JSON.parseObject(deviceChromeDriverJsonFileContent);
         }
+
+        //todo 检查aapt配置 通过springbootadmin传递给server 防止server调aapt选错agent
     }
 
     public static String getChromeDriverFilePath(String deviceId) {

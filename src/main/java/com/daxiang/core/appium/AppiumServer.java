@@ -2,7 +2,7 @@ package com.daxiang.core.appium;
 
 import com.daxiang.App;
 import com.daxiang.core.PortProvider;
-import com.daxiang.utils.ShellExecutor;
+import com.daxiang.utils.Terminal;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
 import io.appium.java_client.service.local.flags.GeneralServerFlag;
@@ -11,7 +11,6 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
 
 /**
  * Created by jiangyitao.
@@ -26,9 +25,9 @@ public class AppiumServer {
         if (version == null) {
             try {
                 if (StringUtils.isEmpty(APPIUM_JS)) {
-                    version = ShellExecutor.execute("appium",Arrays.asList("-v"));
+                    version = Terminal.execute("appium","-v");
                 } else {
-                    version = ShellExecutor.execute("node", Arrays.asList(APPIUM_JS, "-v"));
+                    version = Terminal.execute("node", APPIUM_JS, "-v");
                 }
             } catch (Exception e) {
                 log.error("获取appium版本失败", e);

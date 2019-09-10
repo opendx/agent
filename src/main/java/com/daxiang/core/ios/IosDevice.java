@@ -5,7 +5,7 @@ import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.core.appium.IosDriverBuilder;
 import com.daxiang.core.appium.IosPageSourceHandler;
 import com.daxiang.model.Device;
-import com.daxiang.utils.ShellExecutor;
+import com.daxiang.utils.Terminal;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ExecuteWatchdog;
@@ -15,7 +15,6 @@ import org.dom4j.DocumentException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * Created by jiangyitao.
@@ -63,8 +62,8 @@ public class IosDevice extends MobileDevice {
         });
         int mjpegServerPort = getMjpegServerPort();
         // iproxy localPort remotePort deviceId
-        mjpegServerIproxyWatchdog = ShellExecutor
-                .executeAsyncAndGetWatchdog("iproxy", Arrays.asList(String.valueOf(mjpegServerPort), String.valueOf(mjpegServerPort), getId()), pumpStreamHandler);
+        mjpegServerIproxyWatchdog = Terminal
+                .executeAsyncAndGetWatchdog(pumpStreamHandler, "iproxy", String.valueOf(mjpegServerPort), String.valueOf(mjpegServerPort), getId());
         log.info("[ios][{}]mjpegServer: iproxy {} {} {}", getId(), mjpegServerPort, mjpegServerPort, getId());
     }
 
