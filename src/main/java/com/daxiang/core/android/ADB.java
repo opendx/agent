@@ -20,18 +20,27 @@ public class ADB {
      * 连接ADB
      */
     public static void connect() {
+        log.info("[adb]初始化adb");
         AndroidDebugBridge.init(false);
         log.info("[adb]创建adb");
         AndroidDebugBridge adb = AndroidDebugBridge.createBridge(getPath(), false);
-        log.info("[adb]等待adb连接");
+
+        int timeoutInMs = 60 * 1000;
         long start = System.currentTimeMillis();
-        while (System.currentTimeMillis() - start <= 30000) {
-            if (adb.isConnected()) {
+        while (true) {
+            if (adb.hasInitialDeviceList()) {
                 log.info("[adb]adb已连接");
                 return;
             }
+            if (System.currentTimeMillis() - start > timeoutInMs) {
+                throw new RuntimeException("[adb]adb初始化失败，超时时间: " + timeoutInMs + "ms");
+            }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                // ignore
+            }
         }
-        throw new RuntimeException("[adb]adb连接失败");
     }
 
     /**
