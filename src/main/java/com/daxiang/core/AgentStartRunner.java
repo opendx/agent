@@ -4,10 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.daxiang.core.android.ADB;
 import com.daxiang.core.android.AndroidDeviceChangeListener;
+import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.core.ios.IosDeviceChangeListener;
 import com.daxiang.core.ios.IosDeviceMonitor;
+import com.daxiang.utils.Terminal;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -75,7 +78,17 @@ public class AgentStartRunner implements ApplicationRunner {
             deviceIdChromeDriverFilePath = JSON.parseObject(deviceChromeDriverJsonFileContent);
         }
 
-        //todo 检查aapt配置 通过springbootadmin传递给server 防止server调aapt选错agent
+        // appium版本
+        String appiumVersion = AppiumServer.getVersion();
+        System.setProperty("appiumVersion", appiumVersion);
+
+        // 是否配置了aapt
+        String aaptVersion = Terminal.execute("aapt v");
+        if (!StringUtils.isEmpty(aaptVersion) && aaptVersion.startsWith("Android")) {
+            System.setProperty("aapt", "true");
+        } else {
+            System.setProperty("aapt", "false");
+        }
     }
 
     public static String getChromeDriverFilePath(String deviceId) {
