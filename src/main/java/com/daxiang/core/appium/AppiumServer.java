@@ -25,9 +25,9 @@ public class AppiumServer {
         if (version == null) {
             try {
                 if (StringUtils.isEmpty(APPIUM_JS)) {
-                    version = Terminal.execute("appium","-v");
+                    version = Terminal.execute("appium -v");
                 } else {
-                    version = Terminal.execute("node", APPIUM_JS, "-v");
+                    version = Terminal.execute("node " + APPIUM_JS + " -v");
                 }
             } catch (Exception e) {
                 log.error("获取appium版本失败", e);

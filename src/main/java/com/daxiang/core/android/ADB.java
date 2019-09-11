@@ -57,7 +57,7 @@ public class ADB {
      */
     public static void killServer() throws IOException {
         log.info("[adb]adb kill-server");
-        Terminal.execute("adb", "kill-server");
+        Terminal.execute("adb kill-server");
         log.info("[adb]adb kill-server完成");
     }
 
@@ -68,7 +68,7 @@ public class ADB {
      */
     public static void startServer() throws IOException {
         log.info("[adb]adb start-server");
-        Terminal.execute("adb", "start-server");
+        Terminal.execute("adb start-server");
         log.info("[adb]adb start-server完成");
     }
 

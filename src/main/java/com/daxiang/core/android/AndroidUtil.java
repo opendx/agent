@@ -178,7 +178,7 @@ public class AndroidUtil {
      * aapt dump badging
      */
     public static String aaptDumpBadging(String apkPath) throws IOException {
-        return Terminal.execute("aapt", "dump", "badging", apkPath);
+        return Terminal.execute("aapt dump badging " + apkPath);
     }
 
     /**

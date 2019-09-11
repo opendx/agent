@@ -22,6 +22,10 @@ import java.io.IOException;
 @Slf4j
 public class IosDevice extends MobileDevice {
 
+    /**
+     * iproxy localPort remotePort deviceId
+     */
+    private static final String IPROXY = "iproxy %d %d %s";
     private ExecuteWatchdog mjpegServerIproxyWatchdog;
 
     public IosDevice(Device device, AppiumServer appiumServer) {
@@ -54,17 +58,16 @@ public class IosDevice extends MobileDevice {
     }
 
     public void startMjpegServerIproxy() throws IOException {
+        int mjpegServerPort = getMjpegServerPort();
+        String cmd = String.format(IPROXY, mjpegServerPort, mjpegServerPort, getId());
         PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(new LogOutputStream() {
             @Override
             protected void processLine(String line, int i) {
                 log.info("[ios][{}]iproxy -> {}", getId(), line);
             }
         });
-        int mjpegServerPort = getMjpegServerPort();
-        // iproxy localPort remotePort deviceId
-        mjpegServerIproxyWatchdog = Terminal
-                .executeAsyncAndGetWatchdog(pumpStreamHandler, "iproxy", String.valueOf(mjpegServerPort), String.valueOf(mjpegServerPort), getId());
-        log.info("[ios][{}]mjpegServer: iproxy {} {} {}", getId(), mjpegServerPort, mjpegServerPort, getId());
+        mjpegServerIproxyWatchdog = Terminal.executeAsyncAndGetWatchdog(cmd, pumpStreamHandler);
+        log.info("[ios][{}]mjpegServer: {}", getId(), cmd);
     }
 
     public void stopMjpegServerIproxy() {

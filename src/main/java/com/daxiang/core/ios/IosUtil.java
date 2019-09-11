@@ -18,7 +18,7 @@ public class IosUtil {
 
     public static List<String> getDeviceList() {
         try {
-            String result = Terminal.execute("idevice_id", "-l");
+            String result = Terminal.execute("idevice_id -l");
             if (StringUtils.isEmpty(result)) {
                 return Collections.emptyList();
             }
@@ -35,7 +35,7 @@ public class IosUtil {
      * @throws IOException
      */
     public static String getSystemVersion(String deviceId) throws IOException {
-        return Terminal.execute("ideviceinfo", "-k", "ProductVersion", "-u", deviceId);
+        return Terminal.execute("ideviceinfo -k ProductVersion -u " + deviceId);
     }
 
     /**
@@ -44,16 +44,16 @@ public class IosUtil {
      * @throws IOException
      */
     public static String getProductType(String deviceId) throws IOException {
-        return Terminal.execute("ideviceinfo", "-k", "ProductType", "-u", deviceId);
+        return Terminal.execute("ideviceinfo -k ProductType -u " + deviceId);
     }
 
     public static String getDeviceName(String deviceId) throws IOException {
-        return Terminal.execute("ideviceinfo", "-k", "DeviceName", "-u", deviceId);
+        return Terminal.execute("ideviceinfo -k DeviceName -u " + deviceId);
     }
 
     public static File screenshotByIdeviceScreenshot(String deviceId) throws IOException {
         // Screenshot saved to screenshot-xxx.png
-        String result = Terminal.execute("idevicescreenshot", "-u", deviceId);
+        String result = Terminal.execute("idevicescreenshot -u " + deviceId);
         if (StringUtils.isEmpty(result)) {
             throw new RuntimeException("截图失败，idevicescreenshot返回空");
         }
@@ -67,7 +67,7 @@ public class IosUtil {
     }
 
     public static void installIpa(String ipaPath, String deviceId) throws IOException {
-        Terminal.execute("ideviceinstaller", "-i", ipaPath, "-u", deviceId);
+        Terminal.execute("ideviceinstaller -i " + ipaPath + " -u " + deviceId);
     }
 
     // http://appium.io/docs/en/writing-running-appium/ios/ios-xctest-mobile-apps-management/index.html
