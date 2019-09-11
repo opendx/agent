@@ -9,8 +9,6 @@ import com.daxiang.utils.Terminal;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ExecuteWatchdog;
-import org.apache.commons.exec.LogOutputStream;
-import org.apache.commons.exec.PumpStreamHandler;
 import org.dom4j.DocumentException;
 
 import java.io.File;
@@ -60,20 +58,14 @@ public class IosDevice extends MobileDevice {
     public void startMjpegServerIproxy() throws IOException {
         int mjpegServerPort = getMjpegServerPort();
         String cmd = String.format(IPROXY, mjpegServerPort, mjpegServerPort, getId());
-        PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(new LogOutputStream() {
-            @Override
-            protected void processLine(String line, int i) {
-                log.info("[ios][{}]iproxy -> {}", getId(), line);
-            }
-        });
-        mjpegServerIproxyWatchdog = Terminal.executeAsyncAndGetWatchdog(cmd, pumpStreamHandler);
         log.info("[ios][{}]mjpegServer: {}", getId(), cmd);
+        mjpegServerIproxyWatchdog = Terminal.executeAsyncAndGetWatchdog(cmd);
     }
 
     public void stopMjpegServerIproxy() {
         if (mjpegServerIproxyWatchdog != null) {
-            mjpegServerIproxyWatchdog.destroyProcess();
             log.info("[ios][{}]mjpegServer iproxy stop", getId());
+            mjpegServerIproxyWatchdog.destroyProcess();
         }
     }
 }

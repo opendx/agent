@@ -36,7 +36,7 @@ public class AdbKit {
         int localPort = PortProvider.getAdbKitAvailablePort();
         String cmd = String.format(START_ADBKIT_CMD, localPort, deviceId);
         log.info("[adbkit][{}]开启远程调试功能: {}", deviceId, cmd);
-        watchdog = Terminal.executeAsyncAndGetWatchdog(cmd, null);
+        watchdog = Terminal.executeAsyncAndGetWatchdog(cmd);
         return localPort;
     }
 
@@ -45,9 +45,8 @@ public class AdbKit {
      */
     public void stop() {
         if (watchdog != null) {
-            log.info("[adbkit][{}]关闭adbkit...", deviceId);
+            log.info("[adbkit][{}]关闭adbkit", deviceId);
             watchdog.destroyProcess();
-            log.info("[adbkit][{}]关闭adbkit完成", deviceId);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.daxiang.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.*;
 
 import java.io.ByteArrayOutputStream;
@@ -8,6 +9,7 @@ import java.io.IOException;
 /**
  * Created by jiangyitao.
  */
+@Slf4j
 public class Terminal {
 
     public static final boolean IS_WINDOWS = OS.isFamilyWindows();
@@ -23,12 +25,17 @@ public class Terminal {
      */
     public static String execute(String command) throws IOException {
         DefaultExecutor executor = new DefaultExecutor();
+
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
              ByteArrayOutputStream errorStream = new ByteArrayOutputStream()) {
             PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(outputStream, errorStream);
             executor.setStreamHandler(pumpStreamHandler);
+
+            log.info("[==>]{}", command);
             executor.execute(createCommandLine(command));
-            return outputStream.toString() + errorStream.toString();
+            String result = outputStream.toString() + errorStream.toString();
+            log.info("[<==]{}", result);
+            return result;
         }
     }
 
@@ -39,13 +46,21 @@ public class Terminal {
      * @return watchdog，watchdog可杀掉正在执行的进程
      * @throws IOException
      */
-    public static ExecuteWatchdog executeAsyncAndGetWatchdog(String command, PumpStreamHandler pumpStreamHandler) throws IOException {
-        ExecuteWatchdog watchdog = new ExecuteWatchdog(Integer.MAX_VALUE);
+    public static ExecuteWatchdog executeAsyncAndGetWatchdog(String command) throws IOException {
         DefaultExecutor executor = new DefaultExecutor();
+
+        ExecuteWatchdog watchdog = new ExecuteWatchdog(Integer.MAX_VALUE);
         executor.setWatchdog(watchdog);
-        if (pumpStreamHandler != null) {
-            executor.setStreamHandler(pumpStreamHandler);
-        }
+
+        PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(new LogOutputStream() {
+            @Override
+            protected void processLine(String line, int i) {
+                log.info("[<=={}]{}", command, line);
+            }
+        });
+        executor.setStreamHandler(pumpStreamHandler);
+
+        log.info("[==>]{}", command);
         executor.execute(createCommandLine(command), new DefaultExecuteResultHandler());
         return watchdog;
     }
