@@ -17,38 +17,13 @@ public class ADB {
     private static final String ADB_PLATFORM_TOOLS = "platform-tools";
 
     /**
-     * 连接ADB
-     */
-    public static void connect() {
-        log.info("[adb]初始化adb");
-        AndroidDebugBridge.init(false);
-        log.info("[adb]创建adb");
-        AndroidDebugBridge adb = AndroidDebugBridge.createBridge(getPath(), false);
-
-        int timeoutInMs = 60 * 1000;
-        long start = System.currentTimeMillis();
-        while (true) {
-            if (adb.isConnected()) {
-                log.info("[adb]adb已连接");
-                return;
-            }
-            if (System.currentTimeMillis() - start > timeoutInMs) {
-                throw new RuntimeException("[adb]adb初始化失败，超时时间: " + timeoutInMs + "ms");
-            }
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                // ignore
-            }
-        }
-    }
-
-    /**
      * 添加Android设备监听器
      *
      * @param deviceChangeListener
      */
     public static void addDeviceChangeListener(AndroidDebugBridge.IDeviceChangeListener deviceChangeListener) {
+        AndroidDebugBridge.init(false);
+        AndroidDebugBridge.createBridge(getPath(), false);
         AndroidDebugBridge.addDeviceChangeListener(deviceChangeListener);
     }
 

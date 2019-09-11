@@ -57,7 +57,6 @@ public class AgentStartRunner implements ApplicationRunner {
             ADB.killServer();
             Thread.sleep(1000);
             ADB.startServer();
-            ADB.connect();
             ADB.addDeviceChangeListener(androidDeviceChangeListener);
             log.info("[android]开始监听设备连接/断开");
         }
