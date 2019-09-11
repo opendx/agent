@@ -28,7 +28,7 @@ public class ADB {
         int timeoutInMs = 60 * 1000;
         long start = System.currentTimeMillis();
         while (true) {
-            if (adb.hasInitialDeviceList()) {
+            if (adb.isConnected()) {
                 log.info("[adb]adb已连接");
                 return;
             }
@@ -56,20 +56,16 @@ public class ADB {
      * 杀掉adb服务
      */
     public static void killServer() throws IOException {
-        log.info("[adb]adb kill-server");
+        log.info("[adb]kill-server");
         Terminal.execute("adb kill-server");
-        log.info("[adb]adb kill-server完成");
     }
 
     /**
      * 启动adb服务
-     *
-     * @throws IOException
      */
     public static void startServer() throws IOException {
-        log.info("[adb]adb start-server");
+        log.info("[adb]start-server");
         Terminal.execute("adb start-server");
-        log.info("[adb]adb start-server完成");
     }
 
     /**

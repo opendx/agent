@@ -26,6 +26,9 @@ public class Terminal {
     public static String execute(String command) throws IOException {
         DefaultExecutor executor = new DefaultExecutor();
 
+        int[] exitValues = {0, 1};
+        executor.setExitValues(exitValues);
+
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
              ByteArrayOutputStream errorStream = new ByteArrayOutputStream()) {
             PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(outputStream, errorStream);
@@ -79,7 +82,7 @@ public class Terminal {
             commandLine.addArgument("-c");
         }
 
-        commandLine.addArgument("\"" + command + "\"", false);
+        commandLine.addArgument(command, false);
         return commandLine;
     }
 }
