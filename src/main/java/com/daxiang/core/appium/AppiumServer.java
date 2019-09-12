@@ -3,14 +3,13 @@ package com.daxiang.core.appium;
 import com.daxiang.App;
 import com.daxiang.core.PortProvider;
 import com.daxiang.utils.Terminal;
-import io.appium.java_client.service.local.AppiumDriverLocalService;
-import io.appium.java_client.service.local.AppiumServiceBuilder;
-import io.appium.java_client.service.local.flags.GeneralServerFlag;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.exec.ExecuteWatchdog;
+import org.openqa.selenium.net.UrlChecker;
 import org.springframework.util.StringUtils;
 
-import java.io.File;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by jiangyitao.
@@ -37,43 +36,50 @@ public class AppiumServer {
         return version;
     }
 
-    private AppiumDriverLocalService service;
+    private ExecuteWatchdog watchdog;
+    private boolean isRunning = false;
+    private int port;
+    private URL url;
 
-    public void start() {
-        AppiumServiceBuilder builder = new AppiumServiceBuilder();
-        builder.usingPort(PortProvider.getAppiumServerAvailablePort()).withArgument(GeneralServerFlag.SESSION_OVERRIDE);
-
-        if (!StringUtils.isEmpty(APPIUM_JS)) {
-            log.info("[appium-server]appiumJs: {}", APPIUM_JS);
-            builder.withAppiumJS(new File(APPIUM_JS));
+    public synchronized void start() {
+        if (isRunning) {
+            return;
         }
-        service = AppiumDriverLocalService.buildService(builder);
-//        service.enableDefaultSlf4jLoggingOfOutputData(); // 输出日志到slf4j
-        service.start();
+
+        port = PortProvider.getAppiumServerAvailablePort();
+        String cmd = " -p " + port + " --session-override";
+
+        if (StringUtils.isEmpty(APPIUM_JS)) {
+            cmd = "appium" + cmd;
+        } else {
+            cmd = "node " + APPIUM_JS + cmd;
+        }
+
+        try {
+            watchdog = Terminal.executeAsyncAndGetWatchdog(cmd);
+            String url = "http://127.0.0.1:" + port + "/wd/hub";
+            this.url = new URL(url);
+            new UrlChecker().waitUntilAvailable(10, TimeUnit.SECONDS, new URL(url + "/status"));
+            isRunning = true;
+        } catch (Exception e) {
+            throw new RuntimeException("启动appium失败", e);
+        }
+
     }
 
     public URL getUrl() {
-        if (service == null) {
-            throw new RuntimeException("appium服务未启动");
+        if (isRunning) {
+            return url;
+        } else {
+            throw new RuntimeException("appium未启动");
         }
-        // 从日志里看到很多人服务已经成功运行，但是这个方法检测不到isRunning，先注掉
-//        if (!service.isRunning()) {
-//            throw new RuntimeException("appium服务未运行");
-//        }
-        URL url = service.getUrl();
-        if (url == null) {
-            throw new RuntimeException("appium服务url为空");
-        }
-        return url;
     }
 
     public void stop() {
-//        if (service != null && service.isRunning()) {
-//            service.stop();
-//        }
-        // 很多人服务已经在运行但是service.isRunning()检测不到已运行，所有先这样处理
-        if (service != null) {
-            service.stop();
+        if (isRunning) {
+            watchdog.destroyProcess();
+        } else {
+            throw new RuntimeException("appium未启动");
         }
     }
 }

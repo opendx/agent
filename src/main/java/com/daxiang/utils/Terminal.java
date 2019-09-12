@@ -58,7 +58,7 @@ public class Terminal {
         PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(new LogOutputStream() {
             @Override
             protected void processLine(String line, int i) {
-                log.info("[<=={}]{}", command, line);
+                log.info("[<==]{}", command, line);
             }
         });
         executor.setStreamHandler(pumpStreamHandler);
