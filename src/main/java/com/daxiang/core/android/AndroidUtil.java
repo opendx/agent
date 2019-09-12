@@ -115,7 +115,7 @@ public class AndroidUtil {
      * @return
      */
     public static String getCpuAbi(IDevice iDevice) {
-        return iDevice.getAbis().stream().findFirst().orElseThrow(() -> new RuntimeException("获取CPU架构失败"));
+        return iDevice.getProperty("ro.product.cpu.abi");
     }
 
     /**
