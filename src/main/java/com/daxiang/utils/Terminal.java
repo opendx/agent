@@ -26,7 +26,7 @@ public class Terminal {
     public static String execute(String command) throws IOException {
         DefaultExecutor executor = new DefaultExecutor();
 
-        int[] exitValues = {0, 1};
+        int[] exitValues = {0, 1, 127};
         executor.setExitValues(exitValues);
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
