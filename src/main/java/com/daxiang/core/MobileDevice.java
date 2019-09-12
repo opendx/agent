@@ -31,7 +31,7 @@ public abstract class MobileDevice {
     public static final int IOS = 2;
 
     private Device device;
-    private DeviceTestTaskExcutor deviceTestTaskExcutor;
+    private DeviceTestTaskExecutor deviceTestTaskExecutor;
 
     private AppiumServer appiumServer;
     private AppiumDriver appiumDriver;
@@ -39,7 +39,7 @@ public abstract class MobileDevice {
     public MobileDevice(Device device, AppiumServer appiumServer) {
         this.device = device;
         this.appiumServer = appiumServer;
-        deviceTestTaskExcutor = new DeviceTestTaskExcutor(this);
+        deviceTestTaskExecutor = new DeviceTestTaskExecutor(this);
     }
 
     /**

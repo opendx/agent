@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  * Created by jiangyitao.
  */
 @Slf4j
-public class DeviceTestTaskExcutor {
+public class DeviceTestTaskExecutor {
     /**
      * 执行测试任务队列
      */
@@ -30,7 +30,7 @@ public class DeviceTestTaskExcutor {
     private MobileDevice mobileDevice;
     private String deviceId;
 
-    public DeviceTestTaskExcutor(MobileDevice mobileDevice) {
+    public DeviceTestTaskExecutor(MobileDevice mobileDevice) {
         this.mobileDevice = mobileDevice;
         this.deviceId = mobileDevice.getId();
 
