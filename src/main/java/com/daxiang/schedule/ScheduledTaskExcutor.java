@@ -40,7 +40,7 @@ public class ScheduledTaskExcutor {
             // 获取最早的一个未开始的设备测试任务
             DeviceTestTask unStartDeviceTestTask = masterApi.getFirstUnStartDeviceTestTask(idleMobileDevice.getId());
             if (unStartDeviceTestTask != null) {
-                idleMobileDevice.getDeviceTestTaskExcutor().commitTestTask(unStartDeviceTestTask);
+                idleMobileDevice.getDeviceTestTaskExecutor().commitTestTask(unStartDeviceTestTask);
                 log.info("[自动化测试][{}]提交测试任务: {}", idleMobileDevice.getId(), unStartDeviceTestTask.getTestTaskName());
             }
         });
