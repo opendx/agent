@@ -1,6 +1,7 @@
 import com.daxiang.core.MobileDeviceHolder;
 import io.appium.java_client.AppiumDriver;
 import org.testng.annotations.*;
+import org.testng.SkipException;
 import com.daxiang.core.testng.listener.TestCaseTestListener;
 
 public class ${className} {

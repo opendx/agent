@@ -19,6 +19,10 @@ public class Step {
     private Date endTime;
     private String name;
     private String evaluation;
+    /**
+     * 异常处理： null.中断执行 0.忽略，继续执行 1.抛出跳过异常
+     */
+    private Integer handleException;
     private Integer number;
     private List<ParamValue> paramValues;
 }

@@ -17,4 +17,9 @@ public class DebugActionTestListener extends TestListenerAdapter {
     public void onTestFailure(ITestResult tr) {
         failMsg.set(tr.getThrowable().getMessage());
     }
+
+    @Override
+    public void onTestSkipped(ITestResult tr) {
+        failMsg.set(tr.getThrowable().getMessage());
+    }
 }

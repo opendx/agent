@@ -51,6 +51,9 @@
                     <#lt>        // ${step.number?c}.<#if step.name?? && step.name!=''>${step.name}</#if>
                     <#-- (设备任务id && 测试用例)记录步骤的执行开始时间 -->
                     <#lt>        <#if deviceTestTaskId?? && action.type==3>TestCaseTestListener.recordTestCaseStepTime(${action.id?c}, "start", ${step.number});</#if>
+                    <#if step.handleException??>
+                        try{
+                    </#if>
                     <#-- 步骤赋值，方法调用 -->
                     <#lt>        <#if step.evaluation?? && step.evaluation!=''>${step.evaluation} = </#if>${methodPrefix}${step.actionId?c}(<#rt>
                     <#if step.paramValues?? && (step.paramValues?size>0)>
@@ -61,6 +64,14 @@
                             </#if>
                         </#list>
                     </#if><#lt>);
+                    <#if step.handleException??>
+                        } catch (Throwable t) {
+                            <#-- 0.忽略，继续执行 1.抛出跳过异常 -->
+                            <#if step.handleException==1>
+                                throw new SkipException(t.getMessage());
+                            </#if>
+                        }
+                    </#if>
                     <#-- (设备任务id && 测试用例)记录步骤的执行结束时间 -->
                     <#lt>        <#if deviceTestTaskId?? && action.type==3>TestCaseTestListener.recordTestCaseStepTime(${action.id?c}, "end", ${step.number?c});</#if>
                 </#list>
