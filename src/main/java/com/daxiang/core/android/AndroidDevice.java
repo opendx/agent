@@ -11,12 +11,15 @@ import com.daxiang.core.appium.AndroidPageSourceHandler;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.AndroidStartScreenRecordingOptions;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.dom4j.DocumentException;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 
 /**
  * Created by jiangyitao.
@@ -70,6 +73,20 @@ public class AndroidDevice extends MobileDevice {
     @Override
     public String dump() throws IOException, DocumentException {
         return new AndroidPageSourceHandler(getAppiumDriver()).getPageSource();
+    }
+
+    @Override
+    public void startRecordingScreen() {
+        AndroidStartScreenRecordingOptions androidOptions = new AndroidStartScreenRecordingOptions();
+        // Since Appium 1.8.2 the time limit can be up to 1800 seconds (30 minutes).
+        androidOptions.withTimeLimit(Duration.ofMinutes(30));
+        androidOptions.withBitRate(200000); // default 4000000
+        ((AndroidDriver) getAppiumDriver()).startRecordingScreen(androidOptions);
+    }
+
+    @Override
+    public String stopRecordingScreen() {
+        return ((AndroidDriver) getAppiumDriver()).stopRecordingScreen();
     }
 
 }

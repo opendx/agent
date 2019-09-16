@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.Date;
 
 /**
@@ -190,5 +191,23 @@ public abstract class MobileDevice {
             throw new RuntimeException("appiumDriver未初始化");
         }
         return NATIVE_CONTEXT.equals(appiumDriver.getContext());
+    }
+
+    public abstract void startRecordingScreen();
+
+    public abstract String stopRecordingScreen();
+
+    public String stopRecordingScreenAndUploadToMaster() throws IOException {
+        File videoFile = new File(UUIDUtil.getUUID() + ".mp4");
+        try {
+            String base64Video = stopRecordingScreen();
+            if (StringUtils.isEmpty(base64Video)) {
+                throw new RuntimeException("base64Video is empty");
+            }
+            FileUtils.writeByteArrayToFile(videoFile, Base64.getDecoder().decode(base64Video), false);
+            return MasterApi.getInstance().uploadFile(videoFile);
+        } finally {
+            FileUtils.deleteQuietly(videoFile);
+        }
     }
 }

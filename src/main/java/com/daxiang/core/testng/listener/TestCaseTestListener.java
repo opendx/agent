@@ -6,23 +6,12 @@ import com.daxiang.api.MasterApi;
 import com.daxiang.model.action.Step;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.model.devicetesttask.Testcase;
-import com.daxiang.utils.UUIDUtil;
-import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidStartScreenRecordingOptions;
-import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.ios.IOSStartScreenRecordingOptions;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.springframework.util.StringUtils;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
 
-import java.io.File;
-import java.time.Duration;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Date;
 
 /**
@@ -106,24 +95,9 @@ public class TestCaseTestListener extends TestListenerAdapter {
         MasterApi.getInstance().updateTestcase(deviceTestTaskId, testcase);
 
         if (needRecordVideo) {
-            AppiumDriver appiumDriver = mobileDevice.getAppiumDriver();
             try {
                 log.info("[自动化测试][{}]testcaseId: {}, 开始录制视频...", deviceId, testcaseId);
-                if (appiumDriver instanceof AndroidDriver) {
-                    AndroidStartScreenRecordingOptions androidOptions = new AndroidStartScreenRecordingOptions();
-                    // Since Appium 1.8.2 the time limit can be up to 1800 seconds (30 minutes).
-                    androidOptions.withTimeLimit(Duration.ofMinutes(30));
-                    androidOptions.withBitRate(200000); // default 4000000
-                    ((AndroidDriver) appiumDriver).startRecordingScreen(androidOptions);
-                } else {
-                    IOSStartScreenRecordingOptions iosOptions = new IOSStartScreenRecordingOptions();
-                    // The maximum value is 30 minutes.
-                    iosOptions.withTimeLimit(Duration.ofMinutes(30));
-                    iosOptions.withFps(10); // default 10
-                    iosOptions.withVideoQuality(IOSStartScreenRecordingOptions.VideoQuality.LOW);
-                    iosOptions.withVideoType("libx264");
-                    ((IOSDriver) appiumDriver).startRecordingScreen(iosOptions);
-                }
+                mobileDevice.startRecordingScreen();
             } catch (Exception e) {
                 log.error("[自动化测试][{}]testcaseId: {}, 启动录制视频失败", deviceId, testcaseId, e);
                 // todo 有的安卓手机无法用adb shell录屏 ，可以使用minicap录屏
@@ -207,37 +181,15 @@ public class TestCaseTestListener extends TestListenerAdapter {
         String deviceId = mobileDevice.getId();
         Integer testcaseId = TL_TEST_CASE_ID.get();
 
-        AppiumDriver appiumDriver = mobileDevice.getAppiumDriver();
-
-        String base64Video;
-        File videoFile = new File(UUIDUtil.getUUID() + ".mp4");
-
         try {
             log.info("[自动化测试][{}]testcaseId: {}, 停止录制视频...", deviceId, testcaseId);
-            long startStopRecordingScreenTime = System.currentTimeMillis();
-            if (appiumDriver instanceof AndroidDriver) {
-                base64Video = ((AndroidDriver) appiumDriver).stopRecordingScreen();
-            } else {
-                base64Video = ((IOSDriver) appiumDriver).stopRecordingScreen();
-            }
-            log.info("[自动化测试][{}]testcaseId: {}, base64视频已生成，耗时: {} ms", deviceId, testcaseId, System.currentTimeMillis() - startStopRecordingScreenTime);
-
-            if (StringUtils.isEmpty(base64Video)) {
-                return null;
-            }
-
-            log.info("[自动化测试][{}]testcaseId: {}, 开始将base64视频转换成mp4上传到master", deviceId, testcaseId);
-            long startGenerateMp4FileAndUploadToMasterTime = System.currentTimeMillis();
-            FileUtils.writeByteArrayToFile(videoFile, Base64.getDecoder().decode(base64Video), false);
-            String downloadUrl = MasterApi.getInstance().uploadFile(videoFile);
-            log.info("[自动化测试][{}]testcaseId: {}, base64视频转换成mp4上传到master完成，耗时: {} ms", deviceId, testcaseId, System.currentTimeMillis() - startGenerateMp4FileAndUploadToMasterTime);
-
+            long startTime = System.currentTimeMillis();
+            String downloadUrl = mobileDevice.stopRecordingScreenAndUploadToMaster();
+            log.info("[自动化测试][{}]testcaseId: {}, 停止录制视频并上传到master完成，耗时: {} ms", deviceId, testcaseId, System.currentTimeMillis() - startTime);
             return downloadUrl;
         } catch (Exception e) {
-            log.error("[自动化测试][{}]testcaseId: {}，getVideoDownloadUrl err", deviceId, testcaseId, e);
+            log.error("[自动化测试][{}]testcaseId: {}，stopRecordingScreenAndUploadToMaster err", deviceId, testcaseId, e);
             return null;
-        } finally {
-            FileUtils.deleteQuietly(videoFile);
         }
     }
 

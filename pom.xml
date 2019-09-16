@@ -76,54 +76,6 @@
             <artifactId>dom4j</artifactId>
             <version>1.6.1</version>
         </dependency>
-        <!--现在使用appium的录屏功能，不再自己实现，所以暂时不用这个库了-->
-        <!--<dependency>-->
-            <!--<groupId>org.bytedeco</groupId>-->
-            <!--<artifactId>javacv-platform</artifactId>-->
-            <!--<version>1.5</version>-->
-            <!--<exclusions>-->
-                <!--<exclusion>-->
-                    <!--<groupId>org.bytedeco</groupId>-->
-                    <!--<artifactId>flycapture-platform</artifactId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                    <!--<groupId>org.bytedeco</groupId>-->
-                    <!--<artifactId>libdc1394-platform</artifactId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                    <!--<groupId>org.bytedeco</groupId>-->
-                    <!--<artifactId>libfreenect-platform</artifactId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                    <!--<groupId>org.bytedeco</groupId>-->
-                    <!--<artifactId>libfreenect2-platform</artifactId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                    <!--<groupId>org.bytedeco</groupId>-->
-                    <!--<artifactId>librealsense-platform</artifactId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                    <!--<groupId>org.bytedeco</groupId>-->
-                    <!--<artifactId>videoinput-platform</artifactId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                    <!--<groupId>org.bytedeco</groupId>-->
-                    <!--<artifactId>artoolkitplus-platform</artifactId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                    <!--<groupId>org.bytedeco</groupId>-->
-                    <!--<artifactId>flandmark-platform</artifactId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                    <!--<groupId>org.bytedeco</groupId>-->
-                    <!--<artifactId>leptonica-platform</artifactId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                    <!--<groupId>org.bytedeco</groupId>-->
-                    <!--<artifactId>tesseract-platform</artifactId>-->
-                <!--</exclusion>-->
-            <!--</exclusions>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>

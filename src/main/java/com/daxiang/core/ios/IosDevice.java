@@ -7,12 +7,15 @@ import com.daxiang.core.appium.IosPageSourceHandler;
 import com.daxiang.model.Device;
 import com.daxiang.utils.Terminal;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.ios.IOSStartScreenRecordingOptions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.dom4j.DocumentException;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 
 /**
  * Created by jiangyitao.
@@ -48,6 +51,22 @@ public class IosDevice extends MobileDevice {
     @Override
     public String dump() throws IOException, DocumentException {
         return new IosPageSourceHandler(getAppiumDriver()).getPageSource();
+    }
+
+    @Override
+    public void startRecordingScreen() {
+        IOSStartScreenRecordingOptions iosOptions = new IOSStartScreenRecordingOptions();
+        // The maximum value is 30 minutes.
+        iosOptions.withTimeLimit(Duration.ofMinutes(30));
+        iosOptions.withFps(10); // default 10
+        iosOptions.withVideoQuality(IOSStartScreenRecordingOptions.VideoQuality.LOW);
+        iosOptions.withVideoType("libx264");
+        ((IOSDriver) getAppiumDriver()).startRecordingScreen(iosOptions);
+    }
+
+    @Override
+    public String stopRecordingScreen() {
+        return ((IOSDriver) getAppiumDriver()).stopRecordingScreen();
     }
 
     public int getMjpegServerPort() {
