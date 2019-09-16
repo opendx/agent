@@ -100,7 +100,6 @@ public class TestCaseTestListener extends TestListenerAdapter {
                 mobileDevice.startRecordingScreen();
             } catch (Exception e) {
                 log.error("[自动化测试][{}]testcaseId: {}, 启动录制视频失败", deviceId, testcaseId, e);
-                // todo 有的安卓手机无法用adb shell录屏 ，可以使用minicap录屏
                 TL_NEED_RECORD_VIDEO.set(false);
             }
         }

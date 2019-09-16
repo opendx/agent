@@ -36,6 +36,8 @@ public class AndroidDevice extends MobileDevice {
     private Minitouch minitouch;
     private AdbKit adbKit;
 
+    private boolean canUseAppiumRecordVideo = true;
+
     public AndroidDevice(Device device, IDevice iDevice, AppiumServer appiumServer) {
         super(device, appiumServer);
         this.iDevice = iDevice;
@@ -76,17 +78,31 @@ public class AndroidDevice extends MobileDevice {
     }
 
     @Override
-    public void startRecordingScreen() {
-        AndroidStartScreenRecordingOptions androidOptions = new AndroidStartScreenRecordingOptions();
-        // Since Appium 1.8.2 the time limit can be up to 1800 seconds (30 minutes).
-        androidOptions.withTimeLimit(Duration.ofMinutes(30));
-        androidOptions.withBitRate(200000); // default 4000000
-        ((AndroidDriver) getAppiumDriver()).startRecordingScreen(androidOptions);
+    public void startRecordingScreen() throws Exception {
+        try {
+            AndroidStartScreenRecordingOptions androidOptions = new AndroidStartScreenRecordingOptions();
+            // Since Appium 1.8.2 the time limit can be up to 1800 seconds (30 minutes).
+            androidOptions.withTimeLimit(Duration.ofMinutes(30));
+            androidOptions.withBitRate(200000); // default 4000000
+            ((AndroidDriver) getAppiumDriver()).startRecordingScreen(androidOptions);
+        } catch (Exception e) {
+            log.warn("[{}]无法使用appium录制视频，改用minicap录制视频", getId(), e);
+            canUseAppiumRecordVideo = false;
+            String resolution = getResolution();
+            minicap.start(25, resolution, getVirtualResolution(300), 0,
+                    minicapImgData -> {
+                        // todo
+                    }
+            );
+        }
     }
 
     @Override
     public String stopRecordingScreen() {
-        return ((AndroidDriver) getAppiumDriver()).stopRecordingScreen();
+        if (canUseAppiumRecordVideo) {
+            return ((AndroidDriver) getAppiumDriver()).stopRecordingScreen();
+        } else {
+            // todo
+        }
     }
-
 }

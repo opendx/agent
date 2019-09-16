@@ -193,7 +193,7 @@ public abstract class MobileDevice {
         return NATIVE_CONTEXT.equals(appiumDriver.getContext());
     }
 
-    public abstract void startRecordingScreen();
+    public abstract void startRecordingScreen() throws Exception;
 
     public abstract String stopRecordingScreen();
 
