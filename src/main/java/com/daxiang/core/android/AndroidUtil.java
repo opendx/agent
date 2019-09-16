@@ -194,4 +194,12 @@ public class AndroidUtil {
     public static void restartApk(IDevice iDevice, String packageName, String launchActivity) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         iDevice.executeShellCommand("am start -S -n " + packageName + "/" + launchActivity, new NullOutputReceiver());
     }
+
+    /**
+     * 获取屏幕分辨率
+     * @return eg.720x1280
+     */
+    public static String getResolution(IDevice iDevice) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+        return executeShellCommand(iDevice, "wm size").split(":")[1].trim();
+    }
 }

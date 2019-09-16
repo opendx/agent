@@ -160,9 +160,10 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         AppiumDriver appiumDriver = androidDevice.newAppiumDriver();
         log.info("[android][{}]初始化appium完成", deviceId);
 
-        Dimension window = appiumDriver.manage().window().getSize();
-        device.setScreenWidth(window.getWidth());
-        device.setScreenHeight(window.getHeight());
+        String resolution = AndroidUtil.getResolution(iDevice); // 720x1280
+        String[] res = resolution.split("x");
+        device.setScreenWidth(Integer.parseInt(res[0]));
+        device.setScreenHeight(Integer.parseInt(res[1]));
 
         // 截图并上传到服务器
         String imgDownloadUrl = androidDevice.screenshotAndUploadToMaster();
