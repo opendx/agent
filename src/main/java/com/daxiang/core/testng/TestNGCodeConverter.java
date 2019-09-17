@@ -45,29 +45,29 @@ public class TestNGCodeConverter {
 
         dataModel.put("testcases", testcases.stream().map(testcase -> {
             JSONObject tc = new JSONObject();
-            tc.put("testcase", parseActionToCallMethodString(testcase));
+            tc.put("testcase", convertToInvokeMethodStringWithParamNull(testcase));
             tc.put("id", testcase.getId());
             return tc;
         }).collect(Collectors.toList()));
 
         if (beforeClass != null) {
             actionTreeList.add(beforeClass);
-            String callBeforeClass = parseActionToCallMethodString(beforeClass);
+            String callBeforeClass = convertToInvokeMethodStringWithParamNull(beforeClass);
             dataModel.put("beforeClass", callBeforeClass);
         }
         if (afterClass != null) {
             actionTreeList.add(afterClass);
-            String callAfterClass = parseActionToCallMethodString(afterClass);
+            String callAfterClass = convertToInvokeMethodStringWithParamNull(afterClass);
             dataModel.put("afterClass", callAfterClass);
         }
         if (beforeMethod != null) {
             actionTreeList.add(beforeMethod);
-            String callBeforeMethod = parseActionToCallMethodString(beforeMethod);
+            String callBeforeMethod = convertToInvokeMethodStringWithParamNull(beforeMethod);
             dataModel.put("beforeMethod", callBeforeMethod);
         }
         if (afterMethod != null) {
             actionTreeList.add(afterMethod);
-            String callAfterMethod = parseActionToCallMethodString(afterMethod);
+            String callAfterMethod = convertToInvokeMethodStringWithParamNull(afterMethod);
             dataModel.put("afterMethod", callAfterMethod);
         }
 
@@ -88,12 +88,12 @@ public class TestNGCodeConverter {
     }
 
     /**
-     * 解析Action为方法调用的字符串
+     * 转换Action为方法调用的字符串，如果需要传递参数则传入null
      *
      * @param action
      * @return
      */
-    private String parseActionToCallMethodString(Action action) {
+    private String convertToInvokeMethodStringWithParamNull(Action action) {
         StringBuilder callMethodString = new StringBuilder(METHOD_PREFIX + action.getId() + "(");
         List<Param> actionParams = action.getParams();
         // 如果有参数 则都传入null
@@ -159,16 +159,7 @@ public class TestNGCodeConverter {
             }
             // 非基础Action有返回值时，可能是普通字符串 or 方法参数 or 局部变量 or 全局变量
             if (action.getType() != Action.TYPE_BASE && action.getHasReturnValue() == Action.HAS_RETURN_VALUE) {
-                String returnValue = action.getReturnValue();
-                if (returnValue.startsWith(Param.QUOTE_PREFIX) && returnValue.endsWith(Param.QUOTE_SUFFIX)) { // 方法参数
-                    action.setReturnValue(Param.NAME_PREFIX + returnValue.substring(2, returnValue.length() - 1));
-                } else if (returnValue.startsWith(LocalVar.QUOTE_PREFIX) && returnValue.endsWith(LocalVar.QUOTE_SUFFIX)) { // 局部变量
-                    action.setReturnValue(LocalVar.NAME_PREFIX + returnValue.substring(2, returnValue.length() - 1));
-                } else if (returnValue.startsWith(GlobalVar.QUOTE_PREFIX) && returnValue.endsWith(GlobalVar.QUOTE_SUFFIX)) { // 全局变量
-                    action.setReturnValue(GlobalVar.NAME_PREFIX + returnValue.substring(2, returnValue.length() - 1));
-                } else { // 普通字符串
-                    action.setReturnValue("\"" + returnValue + "\"");
-                }
+                action.setReturnValue(handleValue(action.getReturnValue()));
             }
             // 步骤
             List<Step> steps = action.getSteps();
@@ -183,24 +174,27 @@ public class TestNGCodeConverter {
                     List<ParamValue> paramValues = step.getParamValues();
                     if (!CollectionUtils.isEmpty(paramValues)) {
                         for (ParamValue paramValue : paramValues) {
-                            String value = paramValue.getParamValue();
-                            if (StringUtils.isEmpty(value)) {
-                                paramValue.setParamValue("null");
-                            } else {
-                                if (value.startsWith(Param.QUOTE_PREFIX) && value.endsWith(Param.QUOTE_SUFFIX)) { // 方法参数
-                                    paramValue.setParamValue(Param.NAME_PREFIX + value.substring(2, value.length() - 1));
-                                } else if (value.startsWith(LocalVar.QUOTE_PREFIX) && value.endsWith(LocalVar.QUOTE_SUFFIX)) { // 局部变量
-                                    paramValue.setParamValue(LocalVar.NAME_PREFIX + value.substring(2, value.length() - 1));
-                                } else if (value.startsWith(GlobalVar.QUOTE_PREFIX) && value.endsWith(GlobalVar.QUOTE_SUFFIX)) { // 全局变量
-                                    paramValue.setParamValue(GlobalVar.NAME_PREFIX + value.substring(2, value.length() - 1));
-                                } else { // 普通字符串
-                                    paramValue.setParamValue("\"" + value + "\"");
-                                }
-                            }
+                            paramValue.setParamValue(handleValue(paramValue.getParamValue()));
                         }
                     }
                 });
             }
+        }
+    }
+
+    private String handleValue(String value) {
+        if (StringUtils.isEmpty(value)) {
+            return "null";
+        }
+
+        if (value.startsWith(Param.QUOTE_PREFIX) && value.endsWith(Param.QUOTE_SUFFIX)) { // 方法参数
+            return Param.NAME_PREFIX + value.substring(2, value.length() - 1);
+        } else if (value.startsWith(LocalVar.QUOTE_PREFIX) && value.endsWith(LocalVar.QUOTE_SUFFIX)) { // 局部变量
+            return LocalVar.NAME_PREFIX + value.substring(2, value.length() - 1);
+        } else if (value.startsWith(GlobalVar.QUOTE_PREFIX) && value.endsWith(GlobalVar.QUOTE_SUFFIX)) { // 全局变量
+            return GlobalVar.NAME_PREFIX + value.substring(2, value.length() - 1);
+        } else { // 普通字符串
+            return "\"" + value + "\"";
         }
     }
 }
