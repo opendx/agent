@@ -35,7 +35,12 @@ public class IosDevice extends MobileDevice {
 
     @Override
     public AppiumDriver newAppiumDriver() {
-        return new IosDriverBuilder().build(this);
+        return new IosDriverBuilder().build(this, false);
+    }
+
+    @Override
+    public AppiumDriver initAppiumDriver() {
+        return new IosDriverBuilder().build(this, true);
     }
 
     @Override

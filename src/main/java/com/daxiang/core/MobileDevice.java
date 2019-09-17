@@ -67,6 +67,8 @@ public abstract class MobileDevice {
 
     public abstract AppiumDriver newAppiumDriver();
 
+    public abstract AppiumDriver initAppiumDriver();
+
     public String getId() {
         return device.getId();
     }

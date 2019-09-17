@@ -96,7 +96,7 @@ public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
         IosDevice iosDevice = new IosDevice(device, appiumServer);
 
         log.info("[ios][{}]开始初始化appium", deviceId);
-        AppiumDriver appiumDriver = iosDevice.newAppiumDriver();
+        AppiumDriver appiumDriver = iosDevice.initAppiumDriver();
         log.info("[ios][{}]初始化appium完成", deviceId);
 
         // 有时window获取的宽高可能为0

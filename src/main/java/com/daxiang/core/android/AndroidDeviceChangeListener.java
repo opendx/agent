@@ -155,7 +155,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         androidDevice.installApp(new File("vendor/apk/ApiDemos-debug.apk"));
 
         log.info("[android][{}]开始初始化appium", deviceId);
-        AppiumDriver appiumDriver = androidDevice.newAppiumDriver();
+        AppiumDriver appiumDriver = androidDevice.initAppiumDriver();
         log.info("[android][{}]初始化appium完成", deviceId);
 
         String resolution = AndroidUtil.getResolution(iDevice); // 720x1280

@@ -21,7 +21,7 @@ public class IosDriverBuilder implements AppiumDriverBuilder {
     private static final String BUNDLE_ID = "com.apple.mobilesafari";
 
     @Override
-    public AppiumDriver build(MobileDevice mobileDevice) {
+    public AppiumDriver build(MobileDevice mobileDevice, boolean isFirstBuild) {
         // https://github.com/appium/appium-xcuitest-driver
         DesiredCapabilities capabilities = createDesiredCapabilities(mobileDevice);
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.IOS);

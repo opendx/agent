@@ -14,7 +14,7 @@ public interface AppiumDriverBuilder {
      */
     int NEW_COMMAND_TIMEOUT = 60 * 60 * 12;
 
-    AppiumDriver build(MobileDevice mobileDevice);
+    AppiumDriver build(MobileDevice mobileDevice, boolean isFirstBuild);
 
     default DesiredCapabilities createDesiredCapabilities(MobileDevice mobileDevice) {
         // http://appium.io/docs/en/writing-running-appium/caps/
