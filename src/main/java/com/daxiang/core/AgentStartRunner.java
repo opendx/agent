@@ -89,6 +89,9 @@ public class AgentStartRunner implements ApplicationRunner {
         } else {
             System.setProperty("aapt", "false");
         }
+
+        // ffmpeg
+        Terminal.execute("ffmpeg");
     }
 
     public static String getChromeDriverFilePath(String deviceId) {
