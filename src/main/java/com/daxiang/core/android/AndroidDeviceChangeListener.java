@@ -74,9 +74,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
                     mobileDevice = initAndroidDevice(iDevice, appiumServer);
                     log.info("[android][{}]初始化设备完成", deviceId);
                 } catch (Exception e) {
-                    if (mobileDevice.getAppiumServer() != null) {
-                        mobileDevice.getAppiumServer().stop();
-                    }
+                    appiumServer.stop();
                     throw new RuntimeException("初始化设备" + deviceId + "出错", e);
                 }
             } else {

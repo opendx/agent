@@ -53,9 +53,7 @@ public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
                     mobileDevice = initIosDevice(deviceId, appiumServer);
                     log.info("[ios][{}]初始化设备完成", deviceId);
                 } catch (Exception e) {
-                    if (mobileDevice.getAppiumServer() != null) {
-                        mobileDevice.getAppiumServer().stop();
-                    }
+                    appiumServer.stop();
                     throw new RuntimeException("初始化设备" + deviceId + "出错", e);
                 }
             } else {
