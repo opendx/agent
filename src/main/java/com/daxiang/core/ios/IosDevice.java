@@ -6,16 +6,19 @@ import com.daxiang.core.appium.IosDriverBuilder;
 import com.daxiang.core.appium.IosPageSourceHandler;
 import com.daxiang.model.Device;
 import com.daxiang.utils.Terminal;
+import com.daxiang.utils.UUIDUtil;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.ios.IOSStartScreenRecordingOptions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ExecuteWatchdog;
+import org.apache.commons.io.FileUtils;
 import org.dom4j.DocumentException;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Base64;
 
 /**
  * Created by jiangyitao.
@@ -70,8 +73,11 @@ public class IosDevice extends MobileDevice {
     }
 
     @Override
-    public String stopRecordingScreen() {
-        return ((IOSDriver) getAppiumDriver()).stopRecordingScreen();
+    public File stopRecordingScreen() throws IOException {
+        File videoFile = new File(UUIDUtil.getUUID() + ".mp4");
+        String base64Video = ((IOSDriver) getAppiumDriver()).stopRecordingScreen();
+        FileUtils.writeByteArrayToFile(videoFile, Base64.getDecoder().decode(base64Video), false);
+        return videoFile;
     }
 
     public int getMjpegServerPort() {

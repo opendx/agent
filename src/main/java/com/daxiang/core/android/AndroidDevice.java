@@ -2,6 +2,7 @@ package com.daxiang.core.android;
 
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.InstallException;
+import com.daxiang.core.MinicapVideoRecorder;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.android.stf.AdbKit;
 import com.daxiang.core.android.stf.Minicap;
@@ -10,16 +11,19 @@ import com.daxiang.core.appium.AndroidDriverBuilder;
 import com.daxiang.core.appium.AndroidPageSourceHandler;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
+import com.daxiang.utils.UUIDUtil;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidStartScreenRecordingOptions;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.dom4j.DocumentException;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Base64;
 
 /**
  * Created by jiangyitao.
@@ -37,6 +41,7 @@ public class AndroidDevice extends MobileDevice {
     private AdbKit adbKit;
 
     private boolean canUseAppiumRecordVideo = true;
+    private MinicapVideoRecorder minicapVideoRecorder;
 
     public AndroidDevice(Device device, IDevice iDevice, AppiumServer appiumServer) {
         super(device, appiumServer);
@@ -84,31 +89,34 @@ public class AndroidDevice extends MobileDevice {
 
     @Override
     public void startRecordingScreen() throws Exception {
-        try {
-            AndroidStartScreenRecordingOptions androidOptions = new AndroidStartScreenRecordingOptions();
-            // Since Appium 1.8.2 the time limit can be up to 1800 seconds (30 minutes).
-            androidOptions.withTimeLimit(Duration.ofMinutes(30));
-            androidOptions.withBitRate(200000); // default 4000000
-            ((AndroidDriver) getAppiumDriver()).startRecordingScreen(androidOptions);
-        } catch (Exception e) {
-            log.warn("[{}]无法使用appium录制视频，改用minicap录制视频", getId(), e);
-            canUseAppiumRecordVideo = false;
-            String resolution = getResolution();
-            minicap.start(25, resolution, getVirtualResolution(300), 0,
-                    minicapImgData -> {
-                        // todo
-                    }
-            );
+        if (canUseAppiumRecordVideo) {
+            try {
+                AndroidStartScreenRecordingOptions androidOptions = new AndroidStartScreenRecordingOptions();
+                // Since Appium 1.8.2 the time limit can be up to 1800 seconds (30 minutes).
+                androidOptions.withTimeLimit(Duration.ofMinutes(30));
+                androidOptions.withBitRate(200000); // default 4000000
+                ((AndroidDriver) getAppiumDriver()).startRecordingScreen(androidOptions);
+                return;
+            } catch (Exception e) {
+                log.warn("[{}]无法使用appium录制视频，改用minicap录制视频", getId(), e);
+                canUseAppiumRecordVideo = false;
+            }
         }
+
+        // 使用minicap录屏
+        minicapVideoRecorder = new MinicapVideoRecorder(this);
+        minicapVideoRecorder.start();
     }
 
     @Override
-    public String stopRecordingScreen() {
+    public File stopRecordingScreen() throws IOException {
         if (canUseAppiumRecordVideo) {
-            return ((AndroidDriver) getAppiumDriver()).stopRecordingScreen();
+            File videoFile = new File(UUIDUtil.getUUID() + ".mp4");
+            String base64Video = ((AndroidDriver) getAppiumDriver()).stopRecordingScreen();
+            FileUtils.writeByteArrayToFile(videoFile, Base64.getDecoder().decode(base64Video), false);
+            return videoFile;
         } else {
-            // todo
-            return null;
+            return minicapVideoRecorder.stop();
         }
     }
 }

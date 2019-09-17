@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Base64;
 import java.util.Date;
 
 /**
@@ -197,19 +196,15 @@ public abstract class MobileDevice {
 
     public abstract void startRecordingScreen() throws Exception;
 
-    public abstract String stopRecordingScreen();
+    public abstract File stopRecordingScreen() throws Exception;
 
-    public String stopRecordingScreenAndUploadToMaster() throws IOException {
-        File videoFile = new File(UUIDUtil.getUUID() + ".mp4");
+    public String stopRecordingScreenAndUploadToMaster() throws Exception {
+        File video = null;
         try {
-            String base64Video = stopRecordingScreen();
-            if (StringUtils.isEmpty(base64Video)) {
-                throw new RuntimeException("base64Video is empty");
-            }
-            FileUtils.writeByteArrayToFile(videoFile, Base64.getDecoder().decode(base64Video), false);
-            return MasterApi.getInstance().uploadFile(videoFile);
+            video = stopRecordingScreen();
+            return MasterApi.getInstance().uploadFile(video);
         } finally {
-            FileUtils.deleteQuietly(videoFile);
+            FileUtils.deleteQuietly(video);
         }
     }
 }
