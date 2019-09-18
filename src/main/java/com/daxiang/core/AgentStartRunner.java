@@ -62,12 +62,16 @@ public class AgentStartRunner implements ApplicationRunner {
             ADB.startServer();
             ADB.addDeviceChangeListener(androidDeviceChangeListener);
             log.info("[android]开始监听设备连接/断开");
+        } else {
+            log.info("[android]未开启Android功能");
         }
 
         if (needIos) {
             IosDeviceMonitor iosDeviceMonitor = IosDeviceMonitor.getInstance();
             iosDeviceMonitor.start(iosDeviceChangeListener);
             log.info("[ios]开始监听设备连接/断开");
+        } else {
+            log.info("[ios]未开启ios功能");
         }
 
         File deviceChromeDriverJsonFile = new File(DEVICE_CHROMEDRIVER_JSON_FILE);
@@ -91,7 +95,7 @@ public class AgentStartRunner implements ApplicationRunner {
         }
 
         // ffmpeg
-        Terminal.execute("ffmpeg");
+        Terminal.execute("ffmpeg -version");
     }
 
     public static String getChromeDriverFilePath(String deviceId) {
