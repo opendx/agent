@@ -2,7 +2,6 @@ package com.daxiang.core.android;
 
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.InstallException;
-import com.daxiang.core.MinicapVideoRecorder;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.android.stf.AdbKit;
 import com.daxiang.core.android.stf.Minicap;

@@ -1,4 +1,4 @@
-package com.daxiang.core;
+package com.daxiang.core.android;
 
 import com.android.ddmlib.*;
 import com.daxiang.core.android.AndroidDevice;
