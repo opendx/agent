@@ -23,7 +23,6 @@ public interface AppiumDriverBuilder {
         capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, mobileDevice.getDevice().getName());
         capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, mobileDevice.getDevice().getSystemVersion());
         capabilities.setCapability(MobileCapabilityType.UDID, mobileDevice.getId());
-        capabilities.setCapability(MobileCapabilityType.NO_RESET, true); // http://appium.io/docs/en/writing-running-appium/other/reset-strategies/index.html
         return capabilities;
     }
 }

@@ -53,6 +53,7 @@ public class AndroidDriverBuilder implements AppiumDriverBuilder {
             capabilities.setCapability("skipUnlock", true);
         }
 
+        capabilities.setCapability(AndroidMobileCapabilityType.AUTO_GRANT_PERMISSIONS, true);
         capabilities.setCapability("autoLaunch", false);
         capabilities.setCapability("skipLogcatCapture", true);
         return new AndroidDriver(mobileDevice.getAppiumServer().getUrl(), capabilities);

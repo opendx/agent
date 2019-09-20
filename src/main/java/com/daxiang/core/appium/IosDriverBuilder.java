@@ -24,6 +24,7 @@ public class IosDriverBuilder implements AppiumDriverBuilder {
     public AppiumDriver build(MobileDevice mobileDevice, boolean isFirstBuild) {
         // https://github.com/appium/appium-xcuitest-driver
         DesiredCapabilities capabilities = createDesiredCapabilities(mobileDevice);
+        capabilities.setCapability(MobileCapabilityType.NO_RESET, true); // http://appium.io/docs/en/writing-running-appium/other/reset-strategies/index.html
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
         capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.IOS_XCUI_TEST);
         capabilities.setCapability(IOSMobileCapabilityType.WDA_LOCAL_PORT, PortProvider.getWdaLocalAvailablePort());
