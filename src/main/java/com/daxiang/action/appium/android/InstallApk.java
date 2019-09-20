@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 public class InstallApk {
 
     private AppiumDriver driver;
-    private ScheduledExecutorService service;
 
     public InstallApk(AppiumDriver driver) {
         this.driver = driver;
@@ -37,10 +36,12 @@ public class InstallApk {
         File apk = new File(UUIDUtil.getUUID() + ".apk");
         try {
             FileUtils.writeByteArrayToFile(apk, apkBytes, false);
-            handleInstallBtnAsync();
+            ScheduledExecutorService service = handleInstallBtnAsync();
             // install apk
             AndroidUtil.installApk(MobileDeviceHolder.getIDeviceByAppiumDriver(driver), apk.getAbsolutePath());
-            stopHandleInstallBtn();
+            if (!service.isShutdown()) {
+                service.shutdown();
+            }
         } finally {
             // delete apk
             FileUtils.deleteQuietly(apk);
@@ -50,8 +51,8 @@ public class InstallApk {
     /**
      * 处理安装app时弹窗
      */
-    private void handleInstallBtnAsync() {
-        service = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService handleInstallBtnAsync() {
+        final ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
         service.scheduleAtFixedRate(() -> {
             try {
                 driver.findElementByXPath("//android.widget.Button[contains(@text,'安装')]").click();
@@ -59,12 +60,6 @@ public class InstallApk {
             } catch (Exception ignore) {
             }
         }, 0, 1, TimeUnit.SECONDS);
-    }
-
-    /**
-     * 安装完成后停止处理安装弹窗
-     */
-    private void stopHandleInstallBtn() {
-        service.shutdown();
+        return service;
     }
 }
