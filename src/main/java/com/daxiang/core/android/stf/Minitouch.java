@@ -51,6 +51,10 @@ public class Minitouch {
         deviceId = iDevice.getSerialNumber();
     }
 
+    public void setIDevice(IDevice iDevice) {
+        this.iDevice = iDevice;
+    }
+
     /**
      * 开始运行minitouch
      *
@@ -125,14 +129,11 @@ public class Minitouch {
                 printWriter.close();
             }
 
-            // 手机未连接 adb forward会自己移除
-            if (iDevice.isOnline()) {
-                try {
-                    log.info("[minitouch][{}]移除adb forward: {} -> remote minitouch", deviceId, localPort);
-                    iDevice.removeForward(localPort, "minitouch", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
-                } catch (Exception e) {
-                    log.error("[minitouch][{}]移除adb forward出错", deviceId, e);
-                }
+            try {
+                log.info("[minitouch][{}]移除adb forward: {} -> remote minitouch", deviceId, localPort);
+                iDevice.removeForward(localPort, "minitouch", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
+            } catch (Exception e) {
+                log.error("[minitouch][{}]移除adb forward出错", deviceId, e);
             }
         }).start();
 
@@ -142,8 +143,7 @@ public class Minitouch {
      * 停止运行monitouch
      */
     public void stop() {
-        // 手机未连接，minitouch会自己退出
-        if (pid > 0 && iDevice.isOnline()) {
+        if (pid > 0) {
             log.info("[minitouch][{}]开始停止minitouch", deviceId);
             String cmd = "kill -9 " + pid;
             log.info("[minitouch][{}]kill minitouch: {}", deviceId, cmd);

@@ -33,6 +33,10 @@ public class Minicap {
         deviceId = iDevice.getSerialNumber();
     }
 
+    public void setIDevice(IDevice iDevice) {
+        this.iDevice = iDevice;
+    }
+
     /**
      * 启动minicap
      *
@@ -101,21 +105,18 @@ public class Minicap {
             }
             log.info("[minicap][{}]已停止消费minicap图片数据", deviceId);
 
-            // 手机未连接 adb forward会自己移除
-            if (iDevice.isOnline()) {
-                try {
-                    log.info("[minicap][{}]移除adb forward: {} -> remote minicap", deviceId, localPort);
-                    iDevice.removeForward(localPort, "minicap", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
-                } catch (Exception e) {
-                    log.error("[minicap][{}]移除adb forward出错", deviceId, e);
-                }
+            // 移除adb forward
+            try {
+                log.info("[minicap][{}]移除adb forward: {} -> remote minicap", deviceId, localPort);
+                iDevice.removeForward(localPort, "minicap", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
+            } catch (Exception e) {
+                log.error("[minicap][{}]移除adb forward出错", deviceId, e);
             }
         }).start();
     }
 
     public void stop() {
-        // 手机未连接，minicap会自己退出
-        if (pid > 0 && iDevice.isOnline()) {
+        if (pid > 0) {
             log.info("[minicap][{}]开始停止minicap", deviceId);
             String cmd = "kill -9 " + pid;
             log.info("[minicap][{}]kill minicap: {}", deviceId, cmd);

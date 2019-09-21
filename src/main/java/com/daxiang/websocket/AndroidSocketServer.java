@@ -18,8 +18,6 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by jiangyitao.
@@ -28,8 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 @ServerEndpoint(value = "/android/{deviceId}/{username}")
 public class AndroidSocketServer {
-
-    private static final Map<String, Session> SESSION_POOL = new ConcurrentHashMap<>();
 
     private AndroidDevice androidDevice;
     private AndroidDriver androidDriver;
@@ -50,14 +46,14 @@ public class AndroidSocketServer {
             return;
         }
 
-        Session otherSession = SESSION_POOL.get(deviceId);
-        if (otherSession != null && otherSession.isOpen()) {
-            remoteEndpoint.sendText(deviceId + "手机正在被" + otherSession.getId() + "连接占用，请稍后重试");
+        Session openedSession = MobileDeviceWebSocketSessionPool.getOpenedSession(deviceId);
+        if (openedSession != null) {
+            remoteEndpoint.sendText(deviceId + "手机正在被" + openedSession.getId() + "连接占用，请稍后重试");
             session.close();
             return;
         }
 
-        SESSION_POOL.put(deviceId, session);
+        MobileDeviceWebSocketSessionPool.put(deviceId, session);
         androidDevice = (AndroidDevice) mobileDevice;
 
         androidDevice.saveUsingDeviceToMaster(username);
@@ -90,10 +86,9 @@ public class AndroidSocketServer {
         log.info("[android-websocket][{}]onClose", deviceId);
 
         if (androidDevice != null) {
-            SESSION_POOL.remove(deviceId);
+            MobileDeviceWebSocketSessionPool.remove(deviceId);
             androidDevice.getMinitouch().stop();
             androidDevice.getMinicap().stop();
-            androidDevice.quitAppiumDriver();
             androidDevice.saveIdleDeviceToMaster();
         }
     }

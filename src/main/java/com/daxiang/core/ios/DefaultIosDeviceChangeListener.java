@@ -5,12 +5,15 @@ import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
+import com.daxiang.websocket.MobileDeviceWebSocketSessionPool;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.Dimension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.websocket.Session;
+import java.io.IOException;
 import java.util.Date;
 
 /**
@@ -76,7 +79,20 @@ public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
         if (mobileDevice == null) {
             return;
         }
+
         mobileDevice.saveOfflineDeviceToMaster();
+
+        // 有人正在使用，则断开连接
+        Session openedSession = MobileDeviceWebSocketSessionPool.getOpenedSession(deviceId);
+        if (openedSession != null) {
+            try {
+                log.info("[ios][{}]sessionId: {}正在使用，关闭连接", deviceId, openedSession.getId());
+                openedSession.close();
+            } catch (IOException e) {
+                log.error("close opened session err", e);
+            }
+        }
+
         log.info("[ios][{}]iosDeviceDisconnected处理完成", deviceId);
     }
 

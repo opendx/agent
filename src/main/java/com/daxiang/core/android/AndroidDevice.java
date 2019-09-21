@@ -47,6 +47,17 @@ public class AndroidDevice extends MobileDevice {
         this.iDevice = iDevice;
     }
 
+    public void setIDevice(IDevice iDevice) {
+        // 手机重新插拔后，IDevice需要更新，同时更新minicap/minitouch内的IDevice
+        this.iDevice = iDevice;
+        if (minicap != null) {
+            minicap.setIDevice(iDevice);
+        }
+        if (minitouch != null) {
+            minitouch.setIDevice(iDevice);
+        }
+    }
+
     public boolean canUseUiautomator2() {
         String androidVersion = getDevice().getSystemVersion();
         for (String sdkVersion : AndroidUtil.ANDROID_VERSION.keySet()) {

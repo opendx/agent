@@ -11,13 +11,15 @@ import com.daxiang.core.android.stf.Minitouch;
 import com.daxiang.core.android.stf.MinitouchInstaller;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
+import com.daxiang.websocket.MobileDeviceWebSocketSessionPool;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.Dimension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.websocket.Session;
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 
 /**
@@ -89,6 +91,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
 
             MobileDeviceHolder.add(deviceId, mobileDevice);
         } else {
+            ((AndroidDevice) mobileDevice).setIDevice(iDevice);
             log.info("[android][{}]非首次在agent上线", deviceId);
         }
 
@@ -108,7 +111,20 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         if (mobileDevice == null) {
             return;
         }
+
         mobileDevice.saveOfflineDeviceToMaster();
+
+        // 有人正在使用，则断开连接
+        Session openedSession = MobileDeviceWebSocketSessionPool.getOpenedSession(deviceId);
+        if (openedSession != null) {
+            try {
+                log.info("[android][{}]sessionId: {}正在使用，关闭连接", deviceId, openedSession.getId());
+                openedSession.close();
+            } catch (IOException e) {
+                log.error("close opened session err", e);
+            }
+        }
+
         log.info("[android][{}]androidDeviceDisconnected处理完成", deviceId);
     }
 

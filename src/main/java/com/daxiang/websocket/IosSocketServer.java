@@ -19,8 +19,6 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.time.Duration;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by jiangyitao.
@@ -29,8 +27,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 @ServerEndpoint(value = "/ios/{deviceId}/{username}")
 public class IosSocketServer {
-
-    private static final Map<String, Session> SESSION_POOL = new ConcurrentHashMap<>();
 
     private IosDevice iosDevice;
     private String deviceId;
@@ -55,14 +51,14 @@ public class IosSocketServer {
             return;
         }
 
-        Session otherSession = SESSION_POOL.get(deviceId);
-        if (otherSession != null && otherSession.isOpen()) {
-            basicRemote.sendText(deviceId + "手机正在被" + otherSession.getId() + "连接占用，请稍后重试");
+        Session openedSession = MobileDeviceWebSocketSessionPool.getOpenedSession(deviceId);
+        if (openedSession != null) {
+            basicRemote.sendText(deviceId + "手机正在被" + openedSession.getId() + "连接占用，请稍后重试");
             session.close();
             return;
         }
 
-        SESSION_POOL.put(deviceId, session);
+        MobileDeviceWebSocketSessionPool.put(deviceId, session);
         iosDevice = (IosDevice) mobileDevice;
 
         mobileDevice.saveUsingDeviceToMaster(username);
@@ -83,9 +79,8 @@ public class IosSocketServer {
         log.info("[ios-websocket][{}]onClose", deviceId);
 
         if (iosDevice != null) {
-            SESSION_POOL.remove(deviceId);
+            MobileDeviceWebSocketSessionPool.remove(deviceId);
             iosDevice.stopMjpegServerIproxy();
-            iosDevice.quitAppiumDriver();
             iosDevice.saveIdleDeviceToMaster();
         }
     }
