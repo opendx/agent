@@ -17,10 +17,7 @@
         <#-- 方法参数 -->
         <#if action.params?? && (action.params?size>0)>
             <#list action.params as param>
-                <#lt>Object ${param.name}<#rt>
-                <#if param_has_next>
-                    <#lt>, <#rt>
-                </#if>
+                <#lt>Object ${param.name}<#sep>, <#rt>
             </#list>
         </#if>
         <#lt>) throws Throwable {
@@ -30,10 +27,7 @@
             <#lt>        <#if action.hasReturnValue==1>return </#if>new ${action.className}(<#if action.needDriver==1>driver</#if>).execute(<#rt>
             <#if action.params?? && (action.params?size>0)>
                 <#list action.params as param>
-                    <#lt>${param.name}<#rt>
-                    <#if param_has_next>
-                        <#lt>, <#rt>
-                    </#if>
+                    <#lt>${param.name}<#sep>, <#rt>
                 </#list>
             </#if><#lt>);
         <#-- 非基础action -->
@@ -54,16 +48,18 @@
                     <#if step.handleException??>
                         try{
                     </#if>
+                    <#-- 直接嵌入java代码 -->
+                    <#if step.actionId==executeJavaCodeActionId>
+                        ${step.paramValues[0].paramValue}
+                    <#else>
                     <#-- 步骤赋值，方法调用 -->
-                    <#lt>        <#if step.evaluation?? && step.evaluation!=''>${step.evaluation} = </#if>${methodPrefix}${step.actionId?c}(<#rt>
-                    <#if step.paramValues?? && (step.paramValues?size>0)>
-                        <#list step.paramValues as paramValue>
-                            <#lt>${paramValue.paramValue}<#rt>
-                            <#if paramValue_has_next>
-                                <#lt>, <#rt>
-                            </#if>
-                        </#list>
-                    </#if><#lt>);
+                        <#lt>        <#if step.evaluation?? && step.evaluation!=''>${step.evaluation} = </#if>${methodPrefix}${step.actionId?c}(<#rt>
+                        <#if step.paramValues?? && (step.paramValues?size>0)>
+                            <#list step.paramValues as paramValue>
+                                <#lt>${paramValue.paramValue}<#sep>, <#rt>
+                            </#list>
+                        </#if><#lt>);
+                    </#if>
                     <#if step.handleException??>
                         } catch (Throwable t) {
                             <#-- 0.忽略，继续执行 1.抛出跳过异常 -->
