@@ -72,10 +72,6 @@
                     <#lt>        <#if deviceTestTaskId?? && action.type==3>TestCaseTestListener.recordTestCaseStepTime(${action.id?c}, "end", ${step.number?c});</#if>
                 </#list>
             </#if>
-            <#-- 方法返回值 -->
-            <#if action.hasReturnValue==1>
-                <#lt>        return ${action.returnValue};
-            </#if>
         </#if>
     }
     </#list>

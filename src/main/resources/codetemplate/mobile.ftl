@@ -11,7 +11,7 @@ public class ${className} {
     <#-- 全局变量 -->
     <#if globalVars?? && (globalVars?size>0)>
         <#list globalVars as globalVar>
-            <#lt>    public static final Object ${globalVar.name} = "${globalVar.value}";
+            <#lt>    public static final Object ${globalVar.name} = ${globalVar.value};
         </#list>
     </#if>
 

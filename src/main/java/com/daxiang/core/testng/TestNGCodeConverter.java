@@ -108,7 +108,7 @@ public class TestNGCodeConverter {
     }
 
     /**
-     * 递归把每个action放到cachedActions里
+     * 递归把每个action放到cachedActions里，排除掉内嵌代码ExecuteJavaCode
      */
     private void parseActions(List<Action> actions) {
         for (Action action : actions) {
@@ -132,59 +132,36 @@ public class TestNGCodeConverter {
     }
 
     /**
-     * 在每个全局变量前加上前缀，防止和方法参数、局部变量冲突
+     * 处理全局变量值
      */
     private void handleGlobalVars() {
         if (!CollectionUtils.isEmpty(globalVars)) {
-            globalVars.forEach(globalVar -> globalVar.setName(GlobalVar.NAME_PREFIX + globalVar.getName()));
+            globalVars.forEach(globalVar -> globalVar.setValue(handleValue(globalVar.getValue())));
         }
     }
 
     /**
-     * 处理actions，方法参数、局部变量、返回值、步骤: 赋值、传入的参数
+     * 处理actions
      */
     private void handleActions() {
         List<Action> actions = new ArrayList<>(cachedActions.values());
         for (Action action : actions) {
-            // 在每个方法参数前加上前缀，防止和全局变量、局部变量冲突
-            List<Param> params = action.getParams();
-            if (!CollectionUtils.isEmpty(params)) {
-                params.forEach(param -> param.setName(Param.NAME_PREFIX + param.getName()));
-            }
+            // 局部变量
             List<LocalVar> localVars = action.getLocalVars();
-            // 在每个局部变量前加上前缀，防止和全局变量、方法参数冲突
             if (!CollectionUtils.isEmpty(localVars)) {
-                localVars.forEach(localVar -> {
-                    localVar.setName(LocalVar.NAME_PREFIX + localVar.getName());
-                    if (StringUtils.isEmpty(localVar.getValue())) {
-                        localVar.setValue("null");
-                    } else {
-                        localVar.setValue("\"" + localVar.getValue() + "\"");
-                    }
-                });
-            }
-            // 非基础Action有返回值时，可能是普通字符串 or 方法参数 or 局部变量 or 全局变量
-            if (action.getType() != Action.TYPE_BASE && action.getHasReturnValue() == Action.HAS_RETURN_VALUE) {
-                action.setReturnValue(handleValue(action.getReturnValue()));
+                localVars.forEach(localVar -> localVar.setValue(handleValue(localVar.getValue())));
             }
             // 步骤
             List<Step> steps = action.getSteps();
             if (!CollectionUtils.isEmpty(steps)) {
                 steps.forEach(step -> {
-                    String evaluation = step.getEvaluation();
-                    // 处理赋值，只要赋值不为空一定是局部变量
-                    if (!StringUtils.isEmpty(evaluation)) {
-                        step.setEvaluation(LocalVar.NAME_PREFIX + evaluation.substring(2, evaluation.length() - 1));
-                    }
                     // 处理步骤传入的参数值
                     List<ParamValue> paramValues = step.getParamValues();
                     if (!CollectionUtils.isEmpty(paramValues)) {
                         for (ParamValue paramValue : paramValues) {
+                            // 2019-10-02 ExecuteJavaCode直接嵌入代码，无需做处理
                             if (step.getActionId() != ExecuteJavaCode.ID) {
                                 paramValue.setParamValue(handleValue(paramValue.getParamValue()));
-                            } else {
-                                // 2019-10-02 直接嵌入代码，无需做处理
-                                paramValue.setParamValue(paramValue.getParamValue());
                             }
                         }
                     }
@@ -198,12 +175,8 @@ public class TestNGCodeConverter {
             return "null";
         }
 
-        if (value.startsWith(Param.QUOTE_PREFIX) && value.endsWith(Param.QUOTE_SUFFIX)) { // 方法参数
-            return Param.NAME_PREFIX + value.substring(2, value.length() - 1);
-        } else if (value.startsWith(LocalVar.QUOTE_PREFIX) && value.endsWith(LocalVar.QUOTE_SUFFIX)) { // 局部变量
-            return LocalVar.NAME_PREFIX + value.substring(2, value.length() - 1);
-        } else if (value.startsWith(GlobalVar.QUOTE_PREFIX) && value.endsWith(GlobalVar.QUOTE_SUFFIX)) { // 全局变量
-            return GlobalVar.NAME_PREFIX + value.substring(2, value.length() - 1);
+        if (value.startsWith("${") && value.endsWith("}")) {
+            return value.substring(2, value.length() - 1);
         } else { // 普通字符串
             return "\"" + value + "\"";
         }
