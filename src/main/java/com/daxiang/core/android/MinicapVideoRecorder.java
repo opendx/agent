@@ -1,8 +1,6 @@
 package com.daxiang.core.android;
 
 import com.android.ddmlib.*;
-import com.daxiang.core.android.AndroidDevice;
-import com.daxiang.core.android.AndroidUtil;
 import com.daxiang.utils.Terminal;
 import com.daxiang.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
