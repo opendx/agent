@@ -1,7 +1,7 @@
 package com.daxiang.core.testng;
 
 import com.alibaba.fastjson.JSONObject;
-import com.daxiang.action.common.ExecuteJavaCode;
+import com.daxiang.action.appium.BasicAction;
 import com.daxiang.model.action.*;
 import freemarker.template.TemplateException;
 import lombok.Data;
@@ -85,7 +85,7 @@ public class TestNGCodeConverter {
         dataModel.put("deviceId", deviceId);
         dataModel.put("deviceTestTaskId", deviceTestTaskId);
 
-        dataModel.put("executeJavaCodeActionId", ExecuteJavaCode.ID);
+        dataModel.put("executeJavaCodeActionId", BasicAction.EXECUTE_JAVA_CODE_ID);
 
         return FreemarkerUtil.process(ftlBasePackagePath, ftlFileName, dataModel);
     }
@@ -128,7 +128,7 @@ public class TestNGCodeConverter {
         }
 
         // 2019-10-02 新增内嵌代码ExecuteJavaCode，ExecuteJavaCode.ID是不需要调用的
-        cachedActions.remove(ExecuteJavaCode.ID);
+        cachedActions.remove(BasicAction.EXECUTE_JAVA_CODE_ID);
     }
 
     /**
@@ -160,7 +160,7 @@ public class TestNGCodeConverter {
                     if (!CollectionUtils.isEmpty(paramValues)) {
                         for (ParamValue paramValue : paramValues) {
                             // 2019-10-02 ExecuteJavaCode直接嵌入代码，无需做处理
-                            if (step.getActionId() != ExecuteJavaCode.ID) {
+                            if (step.getActionId() != BasicAction.EXECUTE_JAVA_CODE_ID) {
                                 paramValue.setParamValue(handleValue(paramValue.getParamValue()));
                             }
                         }

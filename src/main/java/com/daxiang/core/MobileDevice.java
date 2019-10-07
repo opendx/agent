@@ -207,4 +207,6 @@ public abstract class MobileDevice {
             FileUtils.deleteQuietly(video);
         }
     }
+
+    public abstract void installApp(String appDownloadUrl) throws Exception;
 }

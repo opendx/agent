@@ -2,6 +2,7 @@ package com.daxiang.core.android;
 
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.InstallException;
+import com.daxiang.App;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.android.stf.AdbKit;
 import com.daxiang.core.android.stf.Minicap;
@@ -18,11 +19,16 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.dom4j.DocumentException;
+import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Base64;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by jiangyitao.
@@ -128,5 +134,45 @@ public class AndroidDevice extends MobileDevice {
         } else {
             return minicapVideoRecorder.stop();
         }
+    }
+
+    @Override
+    public void installApp(String appDownloadUrl) throws Exception {
+        if (StringUtils.isEmpty(appDownloadUrl)) {
+            throw new RuntimeException("appDownloadUrl connot be empty");
+        }
+
+        // download apk
+        RestTemplate restTemplate = App.getBean(RestTemplate.class);
+        byte[] apkBytes = restTemplate.getForObject(appDownloadUrl, byte[].class);
+
+        File apk = new File(UUIDUtil.getUUID() + ".apk");
+        try {
+            FileUtils.writeByteArrayToFile(apk, apkBytes, false);
+            ScheduledExecutorService service = handleInstallBtnAsync();
+            // install apk
+            AndroidUtil.installApk(iDevice, apk.getAbsolutePath());
+            if (!service.isShutdown()) {
+                service.shutdown();
+            }
+        } finally {
+            // delete apk
+            FileUtils.deleteQuietly(apk);
+        }
+    }
+
+    /**
+     * 处理安装app时弹窗
+     */
+    private ScheduledExecutorService handleInstallBtnAsync() {
+        final ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+        service.scheduleAtFixedRate(() -> {
+            try {
+                getAppiumDriver().findElementByXPath("//android.widget.Button[contains(@text,'安装')]").click();
+                service.shutdown();
+            } catch (Exception ignore) {
+            }
+        }, 0, 1, TimeUnit.SECONDS);
+        return service;
     }
 }

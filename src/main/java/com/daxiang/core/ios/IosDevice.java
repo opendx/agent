@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.io.FileUtils;
 import org.dom4j.DocumentException;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -78,6 +79,15 @@ public class IosDevice extends MobileDevice {
         String base64Video = ((IOSDriver) getAppiumDriver()).stopRecordingScreen();
         FileUtils.writeByteArrayToFile(videoFile, Base64.getDecoder().decode(base64Video), false);
         return videoFile;
+    }
+
+    @Override
+    public void installApp(String appDownloadUrl) throws Exception {
+        if (StringUtils.isEmpty(appDownloadUrl)) {
+            throw new RuntimeException("appDownloadUrl connot be empty");
+        }
+
+        IosUtil.installApp(getAppiumDriver(), appDownloadUrl);
     }
 
     public int getMjpegServerPort() {

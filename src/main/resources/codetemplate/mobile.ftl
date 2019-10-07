@@ -3,10 +3,13 @@ import io.appium.java_client.AppiumDriver;
 import org.testng.annotations.*;
 import org.testng.SkipException;
 import com.daxiang.core.testng.listener.TestCaseTestListener;
+import com.daxiang.action.appium.BasicAction;
+import org.openqa.selenium.*;
 
 public class ${className} {
 
     private AppiumDriver driver;
+    private BasicAction $;
 
     <#-- 全局变量 -->
     <#if globalVars?? && (globalVars?size>0)>
@@ -18,6 +21,7 @@ public class ${className} {
     @BeforeSuite
     public void beforeSuite() throws Throwable {
         driver = MobileDeviceHolder.get("${deviceId}").getAppiumDriver();
+        $ = new BasicAction(driver);
     }
 
     <#if beforeClass??>
