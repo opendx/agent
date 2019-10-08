@@ -5,6 +5,8 @@ import org.testng.SkipException;
 import com.daxiang.core.testng.listener.TestCaseTestListener;
 import com.daxiang.action.appium.BasicAction;
 import org.openqa.selenium.*;
+import java.util.*;
+import static org.assertj.core.api.Assertions.*;
 
 public class ${className} {
 
