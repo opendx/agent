@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by jiangyitao.
@@ -197,9 +199,16 @@ public class AndroidUtil {
 
     /**
      * 获取屏幕分辨率
+     *
      * @return eg.720x1280
      */
     public static String getResolution(IDevice iDevice) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
-        return executeShellCommand(iDevice, "wm size").split(":")[1].trim();
+        String wmSize = executeShellCommand(iDevice, "wm size");
+        Pattern pattern = Pattern.compile("Physical size: (\\d+x\\d+)");
+        Matcher matcher = pattern.matcher(wmSize);
+        while (matcher.find()) {
+            return matcher.group(1);
+        }
+        throw new RuntimeException("cannot find physical size, execute: wm size => " + wmSize);
     }
 }
