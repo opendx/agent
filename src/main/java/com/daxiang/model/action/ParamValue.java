@@ -8,5 +8,6 @@ import lombok.Data;
 @Data
 public class ParamValue {
     private String paramName;
+    private String paramType;
     private String paramValue;
 }

@@ -19,7 +19,7 @@
         <#-- 方法体 -->
         <#-- 基础action -->
         <#if action.type==1>
-            <#lt>        <#if action.hasReturnValue==1>return </#if>${action.invoke}(<#rt>
+            <#lt>        <#if action.returnValue!='void'>return </#if>${action.invoke}(<#rt>
             <#if action.params?? && (action.params?size>0)>
                 <#list action.params as param>
                     <#lt>${param.name}<#sep>, <#rt>
