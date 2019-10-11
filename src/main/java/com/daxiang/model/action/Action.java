@@ -18,9 +18,10 @@ public class Action {
     private Integer type;
     private Integer platform;
     private String invoke;
-    private Integer hasReturnValue;
+    private String returnValue;
     private String returnValueDesc;
     private List<Param> params;
     private List<LocalVar> localVars;
     private List<Step> steps;
+    private List<String> javaImports;
 }

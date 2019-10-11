@@ -26,6 +26,8 @@ public class TestNGCodeConverter {
      */
     private final Map<Integer, Action> cachedActions = new HashMap();
 
+    private final Set<String> javaImports = new HashSet<>();
+
     private Integer deviceTestTaskId;
     private List<GlobalVar> globalVars;
 
@@ -87,7 +89,29 @@ public class TestNGCodeConverter {
 
         dataModel.put("executeJavaCodeActionId", BasicAction.EXECUTE_JAVA_CODE_ID);
 
+        handleJavaImports();
+        dataModel.put("javaImports", javaImports);
+
         return FreemarkerUtil.process(ftlBasePackagePath, ftlFileName, dataModel);
+    }
+
+    private void handleJavaImports() {
+        javaImports.add("import com.daxiang.core.MobileDeviceHolder;");
+        javaImports.add("import io.appium.java_client.AppiumDriver;");
+        javaImports.add("import org.testng.annotations.*;");
+        javaImports.add("import org.testng.SkipException;");
+        javaImports.add("import com.daxiang.core.testng.listener.TestCaseTestListener;");
+        javaImports.add("import com.daxiang.action.appium.BasicAction;");
+        javaImports.add("import org.openqa.selenium.*;");
+        javaImports.add("import java.util.*;");
+        javaImports.add("import static org.assertj.core.api.Assertions.*;");
+
+        cachedActions.values().forEach(action -> {
+            List<String> javaImports = action.getJavaImports();
+            if (!CollectionUtils.isEmpty(javaImports)) {
+                this.javaImports.addAll(javaImports);
+            }
+        });
     }
 
     /**

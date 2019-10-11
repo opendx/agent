@@ -8,6 +8,7 @@ import lombok.Data;
  */
 @Data
 public class GlobalVar {
+    private String type;
     private String name;
     private String value;
 }

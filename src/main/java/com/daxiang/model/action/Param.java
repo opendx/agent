@@ -7,6 +7,7 @@ import lombok.Data;
  */
 @Data
 public class Param {
+    private String type;
     private String name;
 }
 
