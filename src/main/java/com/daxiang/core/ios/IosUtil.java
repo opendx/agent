@@ -70,12 +70,6 @@ public class IosUtil {
         Terminal.execute("ideviceinstaller -i " + ipaPath + " -u " + deviceId);
     }
 
-    // http://appium.io/docs/en/writing-running-appium/ios/ios-xctest-mobile-apps-management/index.html
-    // make sure that terminateApp has been called first, otherwise WebDriverAgent will detect the state as a potential crash of the application.
-    public static void installApp(AppiumDriver appiumDriver, String appDownloadUrl) {
-        appiumDriver.executeScript("mobile: installApp", ImmutableMap.of("app", appDownloadUrl));
-    }
-
     public static void uninstallApp(AppiumDriver appiumDriver, String bundleId) {
         appiumDriver.executeScript("mobile: removeApp", ImmutableMap.of("bundleId", bundleId));
     }

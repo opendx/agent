@@ -139,7 +139,7 @@ public class AndroidDevice extends MobileDevice {
     @Override
     public void installApp(String appDownloadUrl) throws Exception {
         if (StringUtils.isEmpty(appDownloadUrl)) {
-            throw new RuntimeException("appDownloadUrl connot be empty");
+            throw new RuntimeException("appDownloadUrl cannot be empty");
         }
 
         // download apk

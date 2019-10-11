@@ -1,5 +1,6 @@
 package com.daxiang.core.ios;
 
+import com.daxiang.App;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.core.appium.IosDriverBuilder;
@@ -15,6 +16,7 @@ import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.io.FileUtils;
 import org.dom4j.DocumentException;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.io.IOException;
@@ -84,10 +86,22 @@ public class IosDevice extends MobileDevice {
     @Override
     public void installApp(String appDownloadUrl) throws Exception {
         if (StringUtils.isEmpty(appDownloadUrl)) {
-            throw new RuntimeException("appDownloadUrl connot be empty");
+            throw new RuntimeException("appDownloadUrl cannot be empty");
         }
 
-        IosUtil.installApp(getAppiumDriver(), appDownloadUrl);
+        // download ipa
+        RestTemplate restTemplate = App.getBean(RestTemplate.class);
+        byte[] ipaBytes = restTemplate.getForObject(appDownloadUrl, byte[].class);
+
+        File ipa = new File(UUIDUtil.getUUID() + ".ipa");
+        try {
+            FileUtils.writeByteArrayToFile(ipa, ipaBytes, false);
+            // install
+            IosUtil.installIpa(ipa.getAbsolutePath(), getId());
+        } finally {
+            // delete ipa
+            FileUtils.deleteQuietly(ipa);
+        }
     }
 
     public int getMjpegServerPort() {
