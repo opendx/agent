@@ -1,6 +1,7 @@
 package com.daxiang.core.ios;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,28 +29,29 @@ public class IosDeviceMonitor {
         return INSTANCE;
     }
 
-    public void start(IosDeviceChangeListener iosDeviceChangeListener) {
+    public synchronized void start(IosDeviceChangeListener iosDeviceChangeListener) {
+        Assert.notNull(iosDeviceChangeListener, "iosDeviceChangeListener cannot be null");
+
         if (isMonitorDevice) {
             return;
         }
         isMonitorDevice = true;
+
         new Thread(() -> {
             log.info("[ios]开始检查设备连接状态");
             while (isMonitorDevice) {
-                if(iosDeviceChangeListener != null) {
-                    currentDeviceList = IosUtil.getDeviceList();
+                currentDeviceList = IosUtil.getDeviceList();
 
-                    // 新增的设备
-                    currentDeviceList.stream()
-                            .filter(deviceId -> !lastDeviceList.contains(deviceId))
-                            .forEach(deviceId -> iosDeviceChangeListener.onDeviceConnected(deviceId));
-                    // 减少的设备
-                    lastDeviceList.stream()
-                            .filter(deviceId -> !currentDeviceList.contains(deviceId))
-                            .forEach(deviceId -> iosDeviceChangeListener.onDeviceDisconnected(deviceId));
+                // 新增的设备
+                currentDeviceList.stream()
+                        .filter(deviceId -> !lastDeviceList.contains(deviceId))
+                        .forEach(deviceId -> iosDeviceChangeListener.onDeviceConnected(deviceId));
+                // 减少的设备
+                lastDeviceList.stream()
+                        .filter(deviceId -> !currentDeviceList.contains(deviceId))
+                        .forEach(deviceId -> iosDeviceChangeListener.onDeviceDisconnected(deviceId));
 
-                    lastDeviceList = currentDeviceList;
-                }
+                lastDeviceList = currentDeviceList;
 
                 try {
                     Thread.sleep(MONITOR_PERIOD);
