@@ -25,9 +25,7 @@ public class Terminal {
      */
     public static String execute(String command) throws IOException {
         DefaultExecutor executor = new DefaultExecutor();
-
-        int[] exitValues = {0, 1, 127};
-        executor.setExitValues(exitValues);
+        executor.setExitValues(null);
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
              ByteArrayOutputStream errorStream = new ByteArrayOutputStream()) {
@@ -51,6 +49,7 @@ public class Terminal {
      */
     public static ExecuteWatchdog executeAsyncAndGetWatchdog(String command) throws IOException {
         DefaultExecutor executor = new DefaultExecutor();
+        executor.setExitValues(null);
 
         ExecuteWatchdog watchdog = new ExecuteWatchdog(Integer.MAX_VALUE);
         executor.setWatchdog(watchdog);
