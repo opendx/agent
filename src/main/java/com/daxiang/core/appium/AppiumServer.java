@@ -59,7 +59,7 @@ public class AppiumServer {
             watchdog = Terminal.executeAsyncAndGetWatchdog(cmd);
             String url = "http://127.0.0.1:" + port + "/wd/hub";
             this.url = new URL(url);
-            new UrlChecker().waitUntilAvailable(10, TimeUnit.SECONDS, new URL(url + "/status"));
+            new UrlChecker().waitUntilAvailable(60, TimeUnit.SECONDS, new URL(url + "/status"));
             isRunning = true;
         } catch (Exception e) {
             throw new RuntimeException("启动appium失败", e);
