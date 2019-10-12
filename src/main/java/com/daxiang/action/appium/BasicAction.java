@@ -288,7 +288,7 @@ public class BasicAction {
 
         log.info("滑动屏幕: ({},{}) -> ({},{})", startX, startY, endX, endY);
         new TouchAction(driver)
-                .press(PointOption.point(startX, startY))
+                .longPress(PointOption.point(startX, startY))
                 .waitAction(WaitOptions.waitOptions(Duration.ZERO))
                 .moveTo(PointOption.point(endX, endY))
                 .release()
@@ -369,7 +369,7 @@ public class BasicAction {
 
         log.info("在containerElement内滑动: ({},{}) -> ({},{})", startX, startY, endX, endY);
         new TouchAction(driver)
-                .press(PointOption.point(startX, startY))
+                .longPress(PointOption.point(startX, startY))
                 .waitAction(WaitOptions.waitOptions(Duration.ZERO))
                 .moveTo(PointOption.point(endX, endY))
                 .release()
@@ -429,7 +429,7 @@ public class BasicAction {
         for (int i = 0; i < _maxSwipeCount; i++) {
             log.info("在containerElement内滑动第{}次: ({},{}) -> ({},{})", i + 1, startX, startY, endX, endY);
             new TouchAction(driver)
-                    .press(PointOption.point(startX, startY))
+                    .longPress(PointOption.point(startX, startY))
                     .waitAction(WaitOptions.waitOptions(Duration.ZERO))
                     .moveTo(PointOption.point(endX, endY))
                     .release()
