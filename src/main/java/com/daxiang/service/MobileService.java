@@ -49,7 +49,7 @@ public class MobileService {
             return Response.fail("设备未连接");
         }
         if (!mobileDevice.isNativeContext()) {
-            return Response.fail("当前不是原生context，无法获取原生布局");
+            return Response.success("ok", mobileDevice.getAppiumDriver().getPageSource());
         }
 
         try {
