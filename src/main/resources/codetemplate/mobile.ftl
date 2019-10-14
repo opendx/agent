@@ -6,6 +6,7 @@ public class ${className} {
 
     private AppiumDriver driver;
     private BasicAction $;
+    private Map<String, Object> vars;
 
     <#-- 全局变量 -->
     <#if globalVars?? && (globalVars?size>0)>
@@ -18,6 +19,7 @@ public class ${className} {
     public void beforeSuite() throws Throwable {
         driver = MobileDeviceHolder.get("${deviceId}").getAppiumDriver();
         $ = new BasicAction(driver);
+        vars = new HashMap();
     }
 
     <#if beforeClass??>
