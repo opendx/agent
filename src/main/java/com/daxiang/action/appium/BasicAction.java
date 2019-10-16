@@ -495,6 +495,24 @@ public class BasicAction {
             case "image":
                 by = MobileBy.image(value);
                 break;
+            case "className":
+                by = MobileBy.className(value);
+                break;
+            case "name":
+                by = MobileBy.name(value);
+                break;
+            case "cssSelector":
+                by = MobileBy.cssSelector(value);
+                break;
+            case "linkText":
+                by = MobileBy.linkText(value);
+                break;
+            case "partialLinkText":
+                by = MobileBy.partialLinkText(value);
+                break;
+            case "tagName":
+                by = MobileBy.tagName(value);
+                break;
             default:
                 throw new RuntimeException("暂不支持: " + findBy);
         }

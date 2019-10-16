@@ -1,3 +1,4 @@
+set @findbyAndValue = '{"name":"findBy","type":"String","description":"查找方式","possibleValues":[{"value":"id","description":"MobileBy.id"},{"value":"AccessibilityId","description":"MobileBy.AccessibilityId"},{"value":"xpath","description":"MobileBy.xpath"},{"value":"AndroidUIAutomator","description":"MobileBy.AndroidUIAutomator"},{"value":"iOSClassChain","description":"MobileBy.iOSClassChain"},{"value":"iOSNsPredicateString","description":"MobileBy.iOSNsPredicateString"},{"value":"image","description":"MobileBy.image"},{"value":"className","description":"MobileBy.className"},{"value":"name","description":"MobileBy.name"},{"value":"cssSelector","description":"MobileBy.cssSelector"},{"value":"linkText","description":"MobileBy.linkText"},{"value":"partialLinkText","description":"MobileBy.partialLinkText"},{"value":"tagName","description":"MobileBy.tagName"}]},{"name":"value","type":"String","description":"查找值"}';
 -- 1.executeJavaCode
 INSERT INTO `action` (
   `id`,
@@ -12,7 +13,7 @@ VALUES
   '执行java代码[executeJavaCode]',
   '$.executeJavaCode',
   'void',
-  '[{"name": "code", "type": "String", "description": "java代码"}]'
+  '[{"name":"code","type":"String","description":"java代码"}]'
 );
 
 -- 2.uninstallApp
@@ -29,7 +30,7 @@ VALUES
   '卸载App[uninstallApp]',
   '$.uninstallApp',
   'void',
-  '[{"name": "packageName", "type": "String", "description": "android: packageName, iOS: bundleId"}]'
+  '[{"name":"packageName","type":"String","description":"android: packageName, iOS: bundleId"}]'
 );
 
 -- 3.installApk
@@ -46,7 +47,7 @@ VALUES
   '安装App[installApp]',
   '$.installApp',
   'void',
-  '[{"name": "appDownloadUrl", "type": "String", "description": "app下载地址"}]'
+  '[{"name":"appDownloadUrl","type":"String","description":"app下载地址"}]'
 );
 
 -- 4.clearApkData
@@ -65,7 +66,7 @@ VALUES
   '$.clearApkData',
   'void',
   1,
-  '[{"name": "packageName", "type": "String", "description": "包名"}]'
+  '[{"name":"packageName","type":"String","description":"包名"}]'
 );
 
 -- 5.restartApk
@@ -84,7 +85,7 @@ VALUES
   '$.restartApk',
   'void',
   1,
-  '[{"name": "packageName", "type": "String", "description": "包名"},{"name": "launchActivity", "type": "String", "description": "启动Activity名"}]'
+  '[{"name":"packageName","type":"String","description":"包名"},{"name":"launchActivity","type":"String","description":"启动Activity名"}]'
 );
 
 -- 6.restartIosApp
@@ -103,7 +104,7 @@ VALUES
   '$.restartIosApp',
   'String',
   2,
-  '[{"name": "bundleId", "type": "String", "description": "app bundleId"}]'
+  '[{"name":"bundleId","type":"String","description": "app bundleId"}]'
 );
 
 -- 7.click
@@ -120,7 +121,7 @@ VALUES
   '点击[click]',
   '$.click',
   'WebElement',
-  '[{"name":"findBy", "type": "String", "description":"查找方式","possibleValues":[{"value":"id","description":"MobileBy.id"},{"value":"AccessibilityId","description":"MobileBy.AccessibilityId"},{"value":"xpath","description":"MobileBy.xpath"},{"value":"AndroidUIAutomator","description":"MobileBy.AndroidUIAutomator"},{"value":"iOSClassChain","description":"MobileBy.iOSClassChain"},{"value":"iOSNsPredicateString","description":"MobileBy.iOSNsPredicateString"},{"value":"image","description":"MobileBy.image"}]},{"name":"value", "type": "String", "description":"查找值"}]'
+  REPLACE('[#]','#',@findbyAndValue)
 );
 
 -- 8.findElement
@@ -137,7 +138,7 @@ VALUES
   '查找元素[findElement]',
   '$.findElement',
   'WebElement',
-  '[{"name":"findBy", "type": "String", "description":"查找方式","possibleValues":[{"value":"id","description":"MobileBy.id"},{"value":"AccessibilityId","description":"MobileBy.AccessibilityId"},{"value":"xpath","description":"MobileBy.xpath"},{"value":"AndroidUIAutomator","description":"MobileBy.AndroidUIAutomator"},{"value":"iOSClassChain","description":"MobileBy.iOSClassChain"},{"value":"iOSNsPredicateString","description":"MobileBy.iOSNsPredicateString"},{"value":"image","description":"MobileBy.image"}]},{"name":"value", "type": "String", "description":"查找值"}]'
+  REPLACE('[#]','#',@findbyAndValue)
 );
 
 -- 9.findElements
@@ -154,7 +155,7 @@ VALUES
   '查找元素[findElements]',
   '$.findElements',
   'List<WebElement>',
-  '[{"name":"findBy", "type": "String", "description":"查找方式","possibleValues":[{"value":"id","description":"MobileBy.id"},{"value":"AccessibilityId","description":"MobileBy.AccessibilityId"},{"value":"xpath","description":"MobileBy.xpath"},{"value":"AndroidUIAutomator","description":"MobileBy.AndroidUIAutomator"},{"value":"iOSClassChain","description":"MobileBy.iOSClassChain"},{"value":"iOSNsPredicateString","description":"MobileBy.iOSNsPredicateString"},{"value":"image","description":"MobileBy.image"}]},{"name":"value", "type": "String", "description":"查找值"}]'
+  REPLACE('[#]','#',@findbyAndValue)
 );
 
 -- 10.sendKeys
@@ -171,7 +172,7 @@ VALUES
   '输入[sendKeys]',
   '$.sendKeys',
   'WebElement',
-  '[{"name":"findBy", "type": "String", "description":"查找方式","possibleValues":[{"value":"id","description":"MobileBy.id"},{"value":"AccessibilityId","description":"MobileBy.AccessibilityId"},{"value":"xpath","description":"MobileBy.xpath"},{"value":"AndroidUIAutomator","description":"MobileBy.AndroidUIAutomator"},{"value":"iOSClassChain","description":"MobileBy.iOSClassChain"},{"value":"iOSNsPredicateString","description":"MobileBy.iOSNsPredicateString"},{"value":"image","description":"MobileBy.image"}]},{"name":"value", "type": "String", "description":"查找值"},{"name": "content", "type": "String",  "description": "输入内容"}]'
+  REPLACE('[#,{"name":"content","type":"String","description":"输入内容"}]','#',@findbyAndValue)
 );
 
 -- 11.setImplicitlyWaitTime
@@ -188,7 +189,7 @@ VALUES
   '设置隐式等待时间[setImplicitlyWaitTime]',
   '$.setImplicitlyWaitTime',
   'void',
-  '[{"name": "implicitlyWaitTimeInSeconds", "type": "String", "description": "隐式等待时间(秒)"}]'
+  '[{"name":"implicitlyWaitTimeInSeconds","type":"String","description":"隐式等待时间(秒)"}]'
 );
 
 -- 12.waitForElementVisible
@@ -205,7 +206,7 @@ VALUES
   '等待元素可见[waitForElementVisible]',
   '$.waitForElementVisible',
   'WebElement',
-  '[{"name":"findBy", "type": "String", "description":"查找方式","possibleValues":[{"value":"id","description":"MobileBy.id"},{"value":"AccessibilityId","description":"MobileBy.AccessibilityId"},{"value":"xpath","description":"MobileBy.xpath"},{"value":"AndroidUIAutomator","description":"MobileBy.AndroidUIAutomator"},{"value":"iOSClassChain","description":"MobileBy.iOSClassChain"},{"value":"iOSNsPredicateString","description":"MobileBy.iOSNsPredicateString"},{"value":"image","description":"MobileBy.image"}]},{"name":"value", "type": "String", "description":"查找值"},{"name": "maxWaitTimeInSeconds", "type": "String", "description": "最大等待时间(秒)"}]'
+  REPLACE('[#,{"name":"maxWaitTimeInSeconds","type":"String","description":"最大等待时间(秒)"}]','#',@findbyAndValue)
 );
 
 -- 13.switchContext
@@ -222,7 +223,7 @@ VALUES
   '切换context[switchContext]',
   '$.switchContext',
   'String',
-  '[{"name":"context", "type": "String", "description":"context","possibleValues":[{"value":"NATIVE_APP","description":"原生"},{"value":"WEBVIEW","description":"webview"}]}]'
+  '[{"name":"context","type":"String","description":"context","possibleValues":[{"value":"NATIVE_APP","description":"原生"},{"value":"WEBVIEW","description":"webview"}]}]'
 );
 
 -- 14.sleep
@@ -239,7 +240,7 @@ VALUES
   '休眠[sleep]',
   '$.sleep',
   'void',
-  '[{"name": "sleepTimeInSeconds", "type": "String", "description": "休眠时长(秒)，支持小数，如: 1.5"}]'
+  '[{"name":"sleepTimeInSeconds","type":"String","description": "休眠时长(秒)，支持小数，如: 1.5"}]'
 );
 
 -- 15.swipeInScreen
@@ -256,7 +257,7 @@ VALUES
   '滑动屏幕[swipeInScreen]',
   '$.swipeInScreen',
   'void',
-  '[{"name":"startPoint", "type": "String", "description":"起点，如: {x:0.5,y:0.5} => 屏幕中心点"},{"name":"endPoint", "type": "String", "description":"终点，如: {x:0.5,y:0.5} => 屏幕中心点"}]'
+  '[{"name":"startPoint","type":"String","description":"起点，如: {x:0.5,y:0.5} => 屏幕中心点"},{"name":"endPoint","type":"String","description":"终点，如: {x:0.5,y:0.5} => 屏幕中心点"}]'
 );
 
 -- 16.swipeInScreenAndFindElement
@@ -273,7 +274,7 @@ VALUES
   '滑动屏幕查找元素[swipeInScreenAndFindElement]',
   '$.swipeInScreenAndFindElement',
   'WebElement',
-  '[{"name":"findBy", "type": "String", "description":"查找方式","possibleValues":[{"value":"id","description":"MobileBy.id"},{"value":"AccessibilityId","description":"MobileBy.AccessibilityId"},{"value":"xpath","description":"MobileBy.xpath"},{"value":"AndroidUIAutomator","description":"MobileBy.AndroidUIAutomator"},{"value":"iOSClassChain","description":"MobileBy.iOSClassChain"},{"value":"iOSNsPredicateString","description":"MobileBy.iOSNsPredicateString"},{"value":"image","description":"MobileBy.image"}]},{"name":"value", "type": "String", "description":"查找值"},{"name":"startPoint", "type": "String", "description":"起点，如: {x:0.5,y:0.5} => 屏幕中心点"},{"name":"endPoint", "type": "String", "description":"终点，如: {x:0.5,y:0.5} => 屏幕中心点"},{"name":"maxSwipeCount", "type": "String", "description":"最大滑动次数"}]'
+  REPLACE('[#,{"name":"startPoint","type":"String","description":"起点，如: {x:0.5,y:0.5} => 屏幕中心点"},{"name":"endPoint","type":"String","description":"终点，如: {x:0.5,y:0.5} => 屏幕中心点"},{"name":"maxSwipeCount","type":"String","description":"最大滑动次数"}]','#',@findbyAndValue)
 );
 
 -- 17.swipeInContainerElement
@@ -290,7 +291,7 @@ VALUES
   '容器元素内滑动[swipeInContainerElement]',
   '$.swipeInContainerElement',
   'void',
-  '[{"name":"containerElement", "type": "WebElement", "description":"容器元素"},{"name":"startPoint", "type": "String", "description":"起点，如: {x:0.5,y:0.5} => 容器中心点"},{"name":"endPoint", "type": "String", "description":"终点，如: {x:0.5,y:0.5} => 容器中心点"}]'
+  '[{"name":"containerElement","type":"WebElement","description":"容器元素"},{"name":"startPoint","type":"String","description":"起点，如: {x:0.5,y:0.5} => 容器中心点"},{"name":"endPoint","type":"String","description":"终点，如: {x:0.5,y:0.5} => 容器中心点"}]'
 );
 
 -- 18.swipeInContainerElementAndFindElement
@@ -307,7 +308,7 @@ VALUES
   '容器元素内滑动查找元素[swipeInContainerElementAndFindElement]',
   '$.swipeInContainerElementAndFindElement',
   'WebElement',
-  '[{"name":"containerElement", "type": "WebElement", "description":"容器元素"},{"name":"findBy", "type": "String", "description":"查找方式","possibleValues":[{"value":"id","description":"MobileBy.id"},{"value":"AccessibilityId","description":"MobileBy.AccessibilityId"},{"value":"xpath","description":"MobileBy.xpath"},{"value":"AndroidUIAutomator","description":"MobileBy.AndroidUIAutomator"},{"value":"iOSClassChain","description":"MobileBy.iOSClassChain"},{"value":"iOSNsPredicateString","description":"MobileBy.iOSNsPredicateString"},{"value":"image","description":"MobileBy.image"}]},{"name":"value", "type": "String", "description":"查找值"},{"name":"startPoint", "type": "String", "description":"起点，如: {x:0.5,y:0.5} => 容器中心点"},{"name":"endPoint", "type": "String", "description":"终点，如: {x:0.5,y:0.5} => 容器中心点"},{"name":"maxSwipeCount", "type": "String", "description":"最大滑动次数"}]'
+  REPLACE('[{"name":"containerElement","type":"WebElement","description":"容器元素"},#,{"name":"startPoint","type":"String","description":"起点，如: {x:0.5,y:0.5} => 容器中心点"},{"name":"endPoint","type":"String","description":"终点，如: {x:0.5,y:0.5} => 容器中心点"},{"name":"maxSwipeCount","type":"String","description":"最大滑动次数"}]','#',@findbyAndValue)
 );
 
 -- 19.switchToLastWindow
@@ -341,5 +342,5 @@ VALUES
   '[web]切换窗口[switchWindow]',
   '$.switchWindow',
   'void',
-  '[{"name": "window", "type": "String", "description": "窗口"}]'
+  '[{"name":"window","type":"String","description":"窗口"}]'
 );
