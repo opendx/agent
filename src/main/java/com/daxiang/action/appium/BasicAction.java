@@ -429,6 +429,7 @@ public class BasicAction {
      * 19.切换窗口
      */
     public void switchWindow(String window) {
+        Assert.hasText(window, "window不能为空");
         driver.switchTo().window(window);
     }
 
