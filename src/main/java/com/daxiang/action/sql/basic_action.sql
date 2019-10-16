@@ -222,8 +222,8 @@ VALUES
   13,
   '切换context[switchContext]',
   '$.switchContext',
-  'String',
-  '[{"name":"context","type":"String","description":"context","possibleValues":[{"value":"NATIVE_APP","description":"原生"},{"value":"WEBVIEW","description":"webview"}]}]'
+  'void',
+  '[{"name":"context","type":"String","description":"context","possibleValues":[{"value":"NATIVE_APP","description":"原生"}]}]'
 );
 
 -- 14.sleep
@@ -311,7 +311,7 @@ VALUES
   REPLACE('[{"name":"containerElement","type":"WebElement","description":"容器元素"},#,{"name":"startPoint","type":"String","description":"起点，如: {x:0.5,y:0.5} => 容器中心点"},{"name":"endPoint","type":"String","description":"终点，如: {x:0.5,y:0.5} => 容器中心点"},{"name":"maxSwipeCount","type":"String","description":"最大滑动次数"}]','#',@findbyAndValue)
 );
 
--- 19.switchToLastWindow
+-- 19.switchWindow
 INSERT INTO `action` (
   `id`,
   `name`,
@@ -322,23 +322,6 @@ INSERT INTO `action` (
 VALUES
 (
   19,
-  '[web]切换到最新窗口[switchToLastWindow]',
-  '$.switchToLastWindow',
-  'void',
-  '[]'
-);
-
--- 20.switchWindow
-INSERT INTO `action` (
-  `id`,
-  `name`,
-  `invoke`,
-  `return_value`,
-  `params`
-)
-VALUES
-(
-  20,
   '[web]切换窗口[switchWindow]',
   '$.switchWindow',
   'void',
