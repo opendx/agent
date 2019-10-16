@@ -17,8 +17,10 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -220,38 +222,6 @@ public class BasicAction {
     }
 
     /**
-     * platform: Android / iOS
-     * 13.切换context
-     *
-     * @param context
-     * @return 切换后的context
-     */
-    public String switchContext(String context) {
-        Assert.hasText(context, "context不能为空");
-
-        if (MobileDevice.NATIVE_CONTEXT.equals(context)) {
-            // 切换到原生
-            driver.context(context);
-        } else {
-            Set<String> contexts = driver.getContextHandles();
-            log.info("contexts: {}", contexts);
-            for (String ctx : contexts) {
-                // webview 目前先这样处理，如果有多个webview可能会切换错
-                if (!MobileDevice.NATIVE_CONTEXT.equals(ctx)) {
-                    driver.context(ctx);
-                    break;
-                }
-            }
-            context = driver.getContext();
-            if (MobileDevice.NATIVE_CONTEXT.equals(context)) {
-                throw new RuntimeException("未检测到webview，无法切换。当前contexts: " + contexts.toString());
-            }
-        }
-
-        return context;
-    }
-
-    /**
      * 14.休眠
      * platform: Android / iOS
      *
@@ -443,6 +413,60 @@ public class BasicAction {
         return driver.findElement(by);
     }
 
+    /**
+     * platform: Android / iOS
+     * 13.切换context
+     *
+     * @param context
+     * @return 切换后的context
+     */
+    public String switchContext(String context) {
+        Assert.hasText(context, "context不能为空");
+
+        if (MobileDevice.NATIVE_CONTEXT.equals(context)) {
+            // 切换到原生
+            driver.context(context);
+        } else {
+            Set<String> contexts = driver.getContextHandles();
+            log.info("contexts: {}", contexts);
+            for (String ctx : contexts) {
+                // webview 目前先这样处理，如果有多个webview可能会切换错
+                if (!MobileDevice.NATIVE_CONTEXT.equals(ctx)) {
+                    driver.context(ctx);
+                    break;
+                }
+            }
+            context = driver.getContext();
+            if (MobileDevice.NATIVE_CONTEXT.equals(context)) {
+                throw new RuntimeException("未检测到webview，无法切换。当前contexts: " + contexts.toString());
+            }
+        }
+
+        return context;
+    }
+
+    /**
+     * platform: Android / iOS
+     * 切换到最新窗口
+     */
+    public void switchToLastWindow() {
+        Set<String> windowHandles = driver.getWindowHandles();
+        log.info("windowHandles: {}", windowHandles);
+        if (CollectionUtils.isEmpty(windowHandles)) {
+            throw new RuntimeException("当前无窗口句柄");
+        }
+
+        List<String> windows = new ArrayList(windowHandles);
+        driver.switchTo().window(windows.get(windows.size() - 1));
+    }
+
+    /**
+     * platform: Android / iOS
+     * 切换窗口
+     */
+    public void switchWindow(String window) {
+        driver.switchTo().window(window);
+    }
 
     private By getBy(String findBy, String value) {
         By by;

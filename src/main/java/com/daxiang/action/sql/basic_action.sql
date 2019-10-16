@@ -304,8 +304,42 @@ INSERT INTO `action` (
 VALUES
 (
   18,
-  '容器元素内滑动查找元素',
+  '容器元素内滑动查找元素[swipeInContainerElementAndFindElement]',
   '$.swipeInContainerElementAndFindElement',
   'WebElement',
   '[{"name":"containerElement", "type": "WebElement", "description":"容器元素"},{"name":"findBy", "type": "String", "description":"查找方式","possibleValues":[{"value":"id","description":"MobileBy.id"},{"value":"AccessibilityId","description":"MobileBy.AccessibilityId"},{"value":"xpath","description":"MobileBy.xpath"},{"value":"AndroidUIAutomator","description":"MobileBy.AndroidUIAutomator"},{"value":"iOSClassChain","description":"MobileBy.iOSClassChain"},{"value":"iOSNsPredicateString","description":"MobileBy.iOSNsPredicateString"},{"value":"image","description":"MobileBy.image"}]},{"name":"value", "type": "String", "description":"查找值"},{"name":"startPoint", "type": "String", "description":"起点，如: {x:0.5,y:0.5} => 容器中心点"},{"name":"endPoint", "type": "String", "description":"终点，如: {x:0.5,y:0.5} => 容器中心点"},{"name":"maxSwipeCount", "type": "String", "description":"最大滑动次数"}]'
+);
+
+-- 19.switchToLastWindow
+INSERT INTO `action` (
+  `id`,
+  `name`,
+  `invoke`,
+  `return_value`,
+  `params`
+)
+VALUES
+(
+  19,
+  '[web]切换到最新窗口[switchToLastWindow]',
+  '$.switchToLastWindow',
+  'void',
+  '[]'
+);
+
+-- 20.switchWindow
+INSERT INTO `action` (
+  `id`,
+  `name`,
+  `invoke`,
+  `return_value`,
+  `params`
+)
+VALUES
+(
+  20,
+  '[web]切换窗口[switchWindow]',
+  '$.switchWindow',
+  'void',
+  '[{"name": "window", "type": "String", "description": "窗口"}]'
 );
