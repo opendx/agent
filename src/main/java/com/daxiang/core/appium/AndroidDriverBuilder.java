@@ -36,6 +36,8 @@ public class AndroidDriverBuilder implements AppiumDriverBuilder {
 
         capabilities.setCapability(AndroidMobileCapabilityType.SYSTEM_PORT, PortProvider.getUiautomator2ServerAvailablePort());
         capabilities.setCapability("chromedriverPort", PortProvider.getChromeDriverAvailablePort());
+        capabilities.setCapability("showChromedriverLog", true);
+        capabilities.setCapability("extractChromeAndroidPackageFromContextName", true);
 
         String chromeDriverFilePath = AgentStartRunner.getChromeDriverFilePath(mobileDevice.getId());
         if (!StringUtils.isEmpty(chromeDriverFilePath)) {
