@@ -2,6 +2,8 @@ package com.daxiang.core.testng;
 
 import com.daxiang.core.testng.listener.DebugActionTestListener;
 import com.daxiang.core.testng.listener.TestCaseTestListener;
+import com.daxiang.model.Response;
+import org.springframework.util.StringUtils;
 import org.testng.TestNG;
 
 import java.util.Arrays;
@@ -22,15 +24,21 @@ public class TestNGRunner {
     /**
      * 调试action
      */
-    public static String debugAction(Class clazz) {
+    public static Response debugAction(Class clazz) {
         TestNG testNG = run(new Class[]{clazz}, Arrays.asList(DebugActionTestListener.class));
         if (testNG.getStatus() != 0) {
-            //运行有错误
+            // 运行有错误
             String failMsg = DebugActionTestListener.failMsg.get();
             DebugActionTestListener.failMsg.remove();
-            return failMsg;
+            return Response.fail(failMsg);
         } else {
-            return null;
+            // 运行成功
+            String printMsg = DebugActionTestListener.printMsg.get();
+            DebugActionTestListener.printMsg.remove();
+            if (StringUtils.isEmpty(printMsg)) {
+                printMsg = "执行成功";
+            }
+            return Response.success(printMsg);
         }
     }
 

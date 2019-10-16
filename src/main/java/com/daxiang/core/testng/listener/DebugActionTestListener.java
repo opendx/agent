@@ -13,6 +13,11 @@ public class DebugActionTestListener extends TestListenerAdapter {
      */
     public static ThreadLocal<String> failMsg = new ThreadLocal();
 
+    /**
+     * mobile.ftl print()
+     */
+    public static ThreadLocal<String> printMsg = new ThreadLocal<>();
+
     @Override
     public void onTestFailure(ITestResult tr) {
         failMsg.set(tr.getThrowable().getMessage());

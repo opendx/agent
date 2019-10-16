@@ -58,4 +58,8 @@ public class ${className} {
     </#list>
 
     <#include "actions.ftl"/>
+
+    private void print(Object o) {
+        DebugActionTestListener.printMsg.set(String.valueOf(o));
+    }
 }

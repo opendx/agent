@@ -63,11 +63,6 @@ public class ActionService {
      */
     private Response compileAndDebug(String className, String code) throws DynamicCompilerException {
         Class clazz = JavaCompiler.compile(className, code);
-        String failMsg = TestNGRunner.debugAction(clazz);
-        if (StringUtils.isEmpty(failMsg)) {
-            return Response.success("执行成功");
-        } else {
-            return Response.fail(failMsg);
-        }
+        return TestNGRunner.debugAction(clazz);
     }
 }
