@@ -433,6 +433,24 @@ public class BasicAction {
         driver.switchTo().window(window);
     }
 
+    /**
+     * platform: Android / iOS
+     * 20.等待元素在DOM里出现，不一定可见
+     * 可用于检查toast是否显示
+     * @param findBy
+     * @param value
+     * @param maxWaitTimeInSeconds
+     * @return
+     */
+    public WebElement waitForElementPresence(String findBy, String value, String maxWaitTimeInSeconds) {
+        Assert.hasText(findBy, "findBy不能为空");
+        Assert.hasText(value, "value不能为空");
+        Assert.hasText(maxWaitTimeInSeconds, "最大等待时间不能为空");
+
+        return new WebDriverWait(driver, Long.parseLong(maxWaitTimeInSeconds))
+                .until(ExpectedConditions.presenceOfElementLocated(getBy(findBy, value)));
+    }
+
     private By getBy(String findBy, String value) {
         By by;
         switch (findBy) {

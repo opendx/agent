@@ -327,3 +327,22 @@ VALUES
   'void',
   '[{"name":"window","type":"String","description":"窗口"}]'
 );
+
+-- 20.waitForElementPresence
+INSERT INTO `action` (
+  `id`,
+  `name`,
+  `description`,
+  `invoke`,
+  `return_value`,
+  `params`
+)
+VALUES
+(
+  20,
+  '等待元素呈现[waitForElementPresence]',
+  '等待元素在Page DOM里出现，移动端可用于检测toast',
+  '$.waitForElementPresence',
+  'WebElement',
+  REPLACE('[#,{"name":"maxWaitTimeInSeconds","type":"String","description":"最大等待时间(秒)"}]','#',@findbyAndValue)
+);
