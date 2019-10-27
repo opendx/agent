@@ -3,6 +3,7 @@ package com.daxiang.model.devicetesttask;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.daxiang.model.action.Action;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -16,9 +17,11 @@ public class Testcase extends Action {
     public static final Integer PASS_STATUS = 1;
     public static final Integer SKIP_STATUS = 2;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
     private Date startTime;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
     private Date endTime;
     /**
      * 失败截图
