@@ -102,7 +102,7 @@ VALUES
   6,
   '启动/重启app[restartIosApp]',
   '$.restartIosApp',
-  'String',
+  'void',
   2,
   '[{"name":"bundleId","type":"String","description": "app bundleId"}]'
 );
