@@ -1,7 +1,6 @@
 package com.daxiang.core.appium;
 
 import com.daxiang.core.MobileDevice;
-import com.daxiang.core.AgentStartRunner;
 import com.daxiang.core.PortProvider;
 import com.daxiang.core.android.AndroidDevice;
 import io.appium.java_client.AppiumDriver;
@@ -11,7 +10,8 @@ import io.appium.java_client.remote.AutomationName;
 import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.remote.MobilePlatform;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.springframework.util.StringUtils;
+
+import java.util.Optional;
 
 /**
  * Created by jiangyitao.
@@ -39,9 +39,9 @@ public class AndroidDriverBuilder implements AppiumDriverBuilder {
         // capabilities.setCapability("showChromedriverLog", true);
         capabilities.setCapability("extractChromeAndroidPackageFromContextName", true);
 
-        String chromeDriverFilePath = AgentStartRunner.getChromeDriverFilePath(mobileDevice.getId());
-        if (!StringUtils.isEmpty(chromeDriverFilePath)) {
-            capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, chromeDriverFilePath);
+        Optional<String> chromedriverFilePath = ((AndroidDevice) mobileDevice).getChromedriverFilePath();
+        if (chromedriverFilePath.isPresent()) {
+            capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, chromedriverFilePath.get());
         }
 
         capabilities.setCapability(AndroidMobileCapabilityType.APP_PACKAGE, APP_PACKAGE);

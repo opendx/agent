@@ -6,6 +6,7 @@ import com.daxiang.model.Response;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.model.devicetesttask.Testcase;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.exec.OS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -22,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by jiangyitao.
@@ -42,6 +45,9 @@ public class MasterApi {
     private String deviceListApi;
     @Value("${master}/device/save")
     private String deviceSaveApi;
+
+    @Value("${master}/driver/downloadUrl")
+    private String driverDownloadUrlApi;
 
     @Value("${master}/deviceTestTask/update")
     private String updateDeviceTestTaskApi;
@@ -74,6 +80,33 @@ public class MasterApi {
 
         if (response.isSuccess()) {
             return response.getData().stream().findFirst().orElse(null);
+        } else {
+            throw new RuntimeException(response.getMsg());
+        }
+    }
+
+    /**
+     * 获取chromedriver下载地址
+     * @param deviceId
+     * @return
+     */
+    public Optional<String> getChromedriverDownloadUrl(String deviceId) {
+        Assert.hasText(deviceId, "deviceId不能为空");
+
+        MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
+        params.add("deviceId", deviceId);
+        params.add("type", 1); // chromedriver
+        params.add("platform", OS.isFamilyWindows() ? 1 : OS.isFamilyMac() ? 3 : 2); // 1.windows 2.linux 3.macos
+
+        Response<Map<String, String>> response = restTemplate.exchange(driverDownloadUrlApi, HttpMethod.POST, new HttpEntity<>(params),
+                new ParameterizedTypeReference<Response<Map<String, String>>>() {}).getBody();
+
+        if (response.isSuccess()) {
+            if (response.getData() == null) {
+                return Optional.empty();
+            } else {
+                return Optional.of(response.getData().get("downloadUrl"));
+            }
         } else {
             throw new RuntimeException(response.getMsg());
         }

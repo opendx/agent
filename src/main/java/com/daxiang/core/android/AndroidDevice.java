@@ -3,6 +3,7 @@ package com.daxiang.core.android;
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.InstallException;
 import com.daxiang.App;
+import com.daxiang.api.MasterApi;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.android.stf.AdbKit;
 import com.daxiang.core.android.stf.Minicap;
@@ -26,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Base64;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -174,5 +176,35 @@ public class AndroidDevice extends MobileDevice {
             }
         }, 0, 1, TimeUnit.SECONDS);
         return service;
+    }
+
+    public synchronized Optional<String> getChromedriverFilePath() {
+        Optional<String> chromedriverDownloadUrl = MasterApi.getInstance().getChromedriverDownloadUrl(getId());
+        if (!chromedriverDownloadUrl.isPresent()) {
+            return Optional.empty();
+        }
+
+        String downloadUrl = chromedriverDownloadUrl.get();
+        if (StringUtils.isEmpty(downloadUrl)) {
+            return Optional.empty();
+        }
+
+        // 检查本地文件是否已存在
+        String fileName = downloadUrl.substring(downloadUrl.lastIndexOf("/") + 1);
+        File chromedriverFile = new File("vendor/driver/" + fileName);
+        if (!chromedriverFile.exists()) {
+            // 文件不存在 -> 下载
+            try {
+                log.info("[chromedriver][{}]download => {}", getId(), downloadUrl);
+                FileUtils.writeByteArrayToFile(chromedriverFile, App.getBean(RestTemplate.class).getForObject(downloadUrl, byte[].class), false);
+            } catch (IOException e) {
+                log.error("write chromedriver file err", e);
+                return Optional.empty();
+            }
+        } else {
+            log.info("[chromedriver][{}]file exist => {}", getId(), chromedriverFile.getAbsolutePath());
+        }
+
+        return Optional.of(chromedriverFile.getAbsolutePath());
     }
 }
