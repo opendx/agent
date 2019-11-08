@@ -3,15 +3,12 @@ package com.daxiang.core;
 import com.daxiang.core.javacompile.JavaCompiler;
 import com.daxiang.core.testng.TestNGCodeConverter;
 import com.daxiang.core.testng.TestNGRunner;
-import com.daxiang.model.action.Action;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.stream.Collectors;
 
 /**
  * Created by jiangyitao.
@@ -47,7 +44,7 @@ public class DeviceTestTaskExecutor {
                 try {
                     executeTestTask(deviceTestTask);
                 } catch (Exception e) {
-                    log.error("[自动化测试][{}]执行测试任务出错: {}", deviceId, deviceTestTask.getTestTaskName(), e);
+                    log.error("[自动化测试][{}]执行测试任务出错, testTaskId: {}", deviceId, deviceTestTask.getTestTaskId(), e);
                 }
             }
         });
@@ -61,7 +58,7 @@ public class DeviceTestTaskExecutor {
      */
     public void commitTestTask(DeviceTestTask deviceTestTask) {
         if (!testTaskQueue.offer(deviceTestTask)) {
-            throw new RuntimeException("提交测试任务失败: " + deviceTestTask.getTestTaskName());
+            throw new RuntimeException("提交测试任务失败, testTaskId: " + deviceTestTask.getTestTaskId());
         }
     }
 
@@ -71,10 +68,8 @@ public class DeviceTestTaskExecutor {
      * @param deviceTestTask
      */
     private void executeTestTask(DeviceTestTask deviceTestTask) throws Exception {
-        log.info("[自动化测试][{}]开始执行测试任务: {}", deviceId, deviceTestTask.getTestTaskName());
-
-        mobileDevice.saveUsingDeviceToMaster(deviceTestTask.getTestTaskName());
-
+        log.info("[自动化测试][{}]开始执行测试任务, testTaskId: {}", deviceId, deviceTestTask.getTestTaskId());
+        mobileDevice.saveUsingDeviceToMaster("TestTaskId: " + deviceTestTask.getTestTaskId() + "执行中");
         try {
             String className = "Test_" + UUIDUtil.getUUID();
             String code = new TestNGCodeConverter()

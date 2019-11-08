@@ -30,7 +30,6 @@ public class DeviceTestTask {
 
     private Integer id;
     private Integer testTaskId;
-    private String testTaskName;
     private String deviceId;
     private Integer status;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
