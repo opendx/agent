@@ -69,7 +69,7 @@ public class DeviceTestTaskExecutor {
      */
     private void executeTestTask(DeviceTestTask deviceTestTask) throws Exception {
         log.info("[自动化测试][{}]开始执行测试任务, testTaskId: {}", deviceId, deviceTestTask.getTestTaskId());
-        mobileDevice.saveUsingDeviceToMaster("TestTaskId: " + deviceTestTask.getTestTaskId() + "执行中");
+        mobileDevice.saveUsingDeviceToMaster("TestTaskId: " + deviceTestTask.getTestTaskId());
         try {
             String className = "Test_" + UUIDUtil.getUUID();
             String code = new TestNGCodeConverter()
