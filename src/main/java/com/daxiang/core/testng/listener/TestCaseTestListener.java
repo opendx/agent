@@ -7,6 +7,7 @@ import com.daxiang.model.action.Step;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.model.devicetesttask.Testcase;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
@@ -130,7 +131,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         testcase.setEndTime(new Date());
         testcase.setStatus(Testcase.FAIL_STATUS);
         testcase.setFailImgUrl(getScreenshotDownloadUrl());
-        testcase.setFailInfo(tr.getThrowable().getMessage());
+        testcase.setFailInfo(ExceptionUtils.getStackTrace(tr.getThrowable()));
         testcase.setVideoUrl(getVideoDownloadUrl());
         MasterApi.getInstance().updateTestcase(TL_DEVICE_TEST_TASK_ID.get(), testcase);
     }

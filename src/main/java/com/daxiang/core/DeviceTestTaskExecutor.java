@@ -1,11 +1,15 @@
 package com.daxiang.core;
 
+import com.daxiang.api.MasterApi;
 import com.daxiang.core.javacompile.JavaCompiler;
+import com.daxiang.core.testng.TestNGCodeConvertException;
 import com.daxiang.core.testng.TestNGCodeConverter;
 import com.daxiang.core.testng.TestNGRunner;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.dvare.dynamic.exceptions.DynamicCompilerException;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -43,7 +47,7 @@ public class DeviceTestTaskExecutor {
                 }
                 try {
                     executeTestTask(deviceTestTask);
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     log.error("[自动化测试][{}]执行测试任务出错, testTaskId: {}", deviceId, deviceTestTask.getTestTaskId(), e);
                 }
             }
@@ -67,7 +71,7 @@ public class DeviceTestTaskExecutor {
      *
      * @param deviceTestTask
      */
-    private void executeTestTask(DeviceTestTask deviceTestTask) throws Exception {
+    private void executeTestTask(DeviceTestTask deviceTestTask) {
         log.info("[自动化测试][{}]开始执行测试任务, testTaskId: {}", deviceId, deviceTestTask.getTestTaskId());
         mobileDevice.saveUsingDeviceToMaster("TestTaskId: " + deviceTestTask.getTestTaskId());
         try {
@@ -80,14 +84,33 @@ public class DeviceTestTaskExecutor {
                     .setBeforeMethod(deviceTestTask.getBeforeMethod())
                     .setAfterMethod(deviceTestTask.getAfterMethod())
                     .convert(deviceTestTask.getDeviceId(), className, deviceTestTask.getTestcases(), "/codetemplate", "mobile.ftl");
-            log.info("[自动化测试][{}]转换代码: {}", deviceId, code);
-            // todo 捕获到DynamicCompilerException即编译失败，通知master纠正用例，否则错误的用例会无限下发给agent执行
+            log.info("[自动化测试][{}]deviceTestTaskId: {}, 转换代码: {}", deviceId, deviceTestTask.getId(), code);
+            updateDeviceTestTaskCode(deviceTestTask.getId(), code);
+
             Class clazz = JavaCompiler.compile(className, code);
             mobileDevice.freshAppiumDriver();
             TestNGRunner.runTestCases(new Class[]{clazz});
+        } catch (TestNGCodeConvertException | DynamicCompilerException e) {
+            log.error("[自动化测试][{}]deviceTestTaskId: {}", deviceId, deviceTestTask.getId(), e);
+            updateDeviceTestTaskStatusAndErrMsg(deviceTestTask.getId(), DeviceTestTask.ERROR_STATUS, ExceptionUtils.getStackTrace(e));
         } finally {
             mobileDevice.quitAppiumDriver();
             mobileDevice.saveIdleDeviceToMaster();
         }
+    }
+
+    private void updateDeviceTestTaskCode(Integer deviceTestTaskId, String code) {
+        DeviceTestTask deviceTestTask = new DeviceTestTask();
+        deviceTestTask.setId(deviceTestTaskId);
+        deviceTestTask.setCode(code);
+        MasterApi.getInstance().updateDeviceTestTask(deviceTestTask);
+    }
+
+    private void updateDeviceTestTaskStatusAndErrMsg(Integer deviceTestTaskId, Integer status, String errMsg) {
+        DeviceTestTask deviceTestTask = new DeviceTestTask();
+        deviceTestTask.setId(deviceTestTaskId);
+        deviceTestTask.setStatus(status);
+        deviceTestTask.setErrMsg(errMsg);
+        MasterApi.getInstance().updateDeviceTestTask(deviceTestTask);
     }
 }

@@ -16,6 +16,10 @@ import java.util.List;
 public class DeviceTestTask {
 
     /**
+     * 出错，无法运行
+     */
+    public static final int ERROR_STATUS = -1;
+    /**
      * 未开始
      */
     public static final Integer UNSTART_STATUS = 0;
@@ -42,4 +46,6 @@ public class DeviceTestTask {
     private Action afterClass;
     private Action afterMethod;
     private List<Testcase> testcases;
+    private String code;
+    private String errMsg;
 }
