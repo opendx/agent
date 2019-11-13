@@ -33,7 +33,7 @@ public class AppiumServer {
                 version = e.getMessage();
             }
         }
-        return version;
+        return version.replace("\n", "");
     }
 
     private ExecuteWatchdog watchdog;

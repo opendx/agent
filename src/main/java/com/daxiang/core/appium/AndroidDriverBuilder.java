@@ -18,9 +18,6 @@ import java.util.Optional;
  */
 public class AndroidDriverBuilder implements AppiumDriverBuilder {
 
-    private static final String APP_PACKAGE = "io.appium.android.apis";
-    private static final String APP_ACTIVITY = "io.appium.android.apis.ApiDemos";
-
     @Override
     public AppiumDriver build(MobileDevice mobileDevice, boolean isFirstBuild) {
         // http://appium.io/docs/en/writing-running-appium/caps/
@@ -44,10 +41,6 @@ public class AndroidDriverBuilder implements AppiumDriverBuilder {
             capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, chromedriverFilePath.get());
         }
 
-        capabilities.setCapability(AndroidMobileCapabilityType.APP_PACKAGE, APP_PACKAGE);
-        capabilities.setCapability(AndroidMobileCapabilityType.APP_ACTIVITY, APP_ACTIVITY);
-        capabilities.setCapability(AndroidMobileCapabilityType.NO_SIGN, true);
-
         if (!isFirstBuild) {
             // 不是第一次初始化appium，skip掉一些操作，可以提升初始化driver的速度
             capabilities.setCapability("skipServerInstallation", true);
@@ -55,8 +48,6 @@ public class AndroidDriverBuilder implements AppiumDriverBuilder {
             capabilities.setCapability("skipUnlock", true);
         }
 
-        capabilities.setCapability(AndroidMobileCapabilityType.AUTO_GRANT_PERMISSIONS, true);
-        capabilities.setCapability("autoLaunch", false);
         capabilities.setCapability("skipLogcatCapture", true);
         return new AndroidDriver(mobileDevice.getAppiumServer().getUrl(), capabilities);
     }

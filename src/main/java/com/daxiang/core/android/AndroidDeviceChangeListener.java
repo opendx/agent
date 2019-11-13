@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.Session;
-import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
@@ -166,9 +165,6 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         }
 
         AndroidDevice androidDevice = new AndroidDevice(device, iDevice, appiumServer);
-
-        // 安装一个测试apk，用于初始化appium driver
-        androidDevice.installApp(new File("vendor/apk/ApiDemos-debug.apk"));
 
         log.info("[android][{}]开始初始化appium", deviceId);
         AppiumDriver appiumDriver = androidDevice.initAppiumDriver();
