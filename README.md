@@ -1,6 +1,6 @@
 ## 环境
-* java （必须，不低于java8）
-* appium （必须，建议不低于1.14.0）
+* java （必须，java8）
+* appium （必须，不能低于1.15.0）
 * aapt （非必须。若要dump apk信息获取packageName、启动activity等信息，需要将aapt(sdk/build-tools/{version})添加到环境变量）
 
 ## ide运行
