@@ -72,4 +72,32 @@ public class AndroidService {
         }
     }
 
+    public Response getImeList(String deviceId) {
+        MobileDevice device = MobileDeviceHolder.getConnectedDevice(deviceId);
+        if (device == null) {
+            return Response.fail("设备未连接");
+        }
+
+        try {
+            return Response.success(AndroidUtil.getImeList(((AndroidDevice) device).getIDevice()));
+        } catch (Exception e) {
+            log.error("[{}]获取输入法列表异常", device.getId(), e);
+            return Response.fail(e.getMessage());
+        }
+    }
+
+    public Response setIme(String deviceId, String ime) {
+        MobileDevice device = MobileDeviceHolder.getConnectedDevice(deviceId);
+        if (device == null) {
+            return Response.fail("设备未连接");
+        }
+
+        try {
+            AndroidUtil.setIme(((AndroidDevice) device).getIDevice(), ime);
+            return Response.success("设置成功");
+        } catch (Exception e) {
+            log.error("[{}]设置输入法异常", device.getId(), e);
+            return Response.fail(e.getMessage());
+        }
+    }
 }

@@ -29,4 +29,14 @@ public class AndroidController {
     public Response aaptDumpBadging(@RequestBody String apkDownloadUrl) {
         return androidService.aaptDumpBadging(apkDownloadUrl);
     }
+
+    @GetMapping("{deviceId}/imeList")
+    public Response getImeList(@PathVariable String deviceId) {
+        return androidService.getImeList(deviceId);
+    }
+
+    @PostMapping("{deviceId}/ime")
+    public Response setIme(@PathVariable String deviceId, String ime) {
+        return androidService.setIme(deviceId, ime);
+    }
 }

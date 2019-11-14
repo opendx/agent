@@ -4,12 +4,12 @@ import com.android.ddmlib.*;
 import com.daxiang.utils.Terminal;
 import com.daxiang.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -210,5 +210,18 @@ public class AndroidUtil {
             return matcher.group(1);
         }
         throw new RuntimeException("cannot find physical size, execute: wm size => " + wmSize);
+    }
+
+    public static List<String> getImeList(IDevice iDevice) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+        String imeListString = executeShellCommand(iDevice, "ime list -s");
+        if (StringUtils.isEmpty(imeListString)) {
+            return Collections.EMPTY_LIST;
+        }
+        return Arrays.asList(imeListString.split("\r\n"));
+    }
+
+    public static void setIme(IDevice iDevice, String ime) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+        Assert.hasText(ime, "ime不能为空");
+        executeShellCommand(iDevice, "ime set " + ime);
     }
 }
