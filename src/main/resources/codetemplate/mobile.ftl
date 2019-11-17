@@ -60,6 +60,6 @@ public class ${className} {
     <#include "actions.ftl"/>
 
     private void print(Object o) {
-        DebugActionTestListener.printMsg.set(String.valueOf(o));
+        DebugActionTestListener.addPrintMsg(String.valueOf(o));
     }
 }
