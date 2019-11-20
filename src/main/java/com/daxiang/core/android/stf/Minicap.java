@@ -15,7 +15,7 @@ import java.util.concurrent.*;
 @Slf4j
 public class Minicap {
 
-    private static final String START_MINICAP_CMD = "LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/minicap -Q %d -P %s@%s/%d";
+    private static final String START_MINICAP_CMD = "LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/minicap -S -Q %d -P %s@%s/%d";
 
     private IDevice iDevice;
     private String deviceId;
