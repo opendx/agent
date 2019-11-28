@@ -51,7 +51,7 @@ public class ${className} {
     </#if>
 
     <#list testcases as testcase>
-        <#lt>    @Test<#if deviceTestTaskId??>(description = "${deviceId}_${deviceTestTaskId?c}_${testcase.id?c}")</#if>
+        <#lt>    @Test<#if deviceTestTaskId??>(description = "${deviceId}_${deviceTestTaskId?c}_${testcase.id?c}_${enableRecordVideo}")</#if>
         <#lt>    public void testcase_${testcase.id?c}() throws Throwable {
         <#lt>        ${testcase.testcase}
         <#lt>    }

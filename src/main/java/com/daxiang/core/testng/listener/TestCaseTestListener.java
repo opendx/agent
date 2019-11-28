@@ -33,14 +33,15 @@ public class TestCaseTestListener extends TestListenerAdapter {
      */
     @Override
     public void onStart(ITestContext testContext) {
-        // deviceId_deviceTestTaskId_testcaseId
+        // deviceId_deviceTestTaskId_testcaseId_enableRecordVideo
         String[] testDesc = testContext.getAllTestMethods()[0].getDescription().split("_");
         String deviceId = testDesc[0];
         Integer deviceTestTaskId = Integer.parseInt(testDesc[1]);
-        Boolean needRecordVideo = true; // 这个版本先设置为需要录制视频，以后可能改成从前端传过来
+        Integer enableRecordVideo = Integer.parseInt(testDesc[3]);
+        Boolean needRecordVideo = enableRecordVideo == DeviceTestTask.ENABLE_RECORD_VIDEO;
 
         MobileDevice mobileDevice = MobileDeviceHolder.get(deviceId);
-        log.info("[自动化测试][{}]onStart, deviceTestTaskId：{}", deviceId, deviceTestTaskId);
+        log.info("[自动化测试][{}]onStart, deviceTestTaskId：{}, needRecordVideo: {}", deviceId, deviceTestTaskId, needRecordVideo);
 
         TL_MOBILE_DEVICE.set(mobileDevice);
         TL_DEVICE_TEST_TASK_ID.set(deviceTestTaskId);
@@ -84,7 +85,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         Boolean needRecordVideo = TL_NEED_RECORD_VIDEO.get();
         MobileDevice mobileDevice = TL_MOBILE_DEVICE.get();
         String deviceId = mobileDevice.getId();
-        // deviceId_deviceTestTaskId_testcaseId
+        // deviceId_deviceTestTaskId_testcaseId_enableRecordVideo
         Integer testcaseId = Integer.parseInt(tr.getMethod().getDescription().split("_")[2]);
         TL_TEST_CASE_ID.set(testcaseId);
 

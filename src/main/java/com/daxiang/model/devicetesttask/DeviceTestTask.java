@@ -32,6 +32,8 @@ public class DeviceTestTask {
      */
     public static final Integer FINISHED_STATUS = 2;
 
+    public static final Integer ENABLE_RECORD_VIDEO = 1;
+
     private Integer id;
     private Integer testTaskId;
     private String deviceId;
@@ -48,4 +50,5 @@ public class DeviceTestTask {
     private List<Testcase> testcases;
     private String code;
     private String errMsg;
+    private Integer enableRecordVideo;
 }

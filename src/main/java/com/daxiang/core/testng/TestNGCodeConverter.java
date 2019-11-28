@@ -36,6 +36,8 @@ public class TestNGCodeConverter {
     private Action beforeMethod;
     private Action afterMethod;
 
+    private Integer enableRecordVideo;
+
     /**
      * 转换为testng代码
      */
@@ -91,6 +93,8 @@ public class TestNGCodeConverter {
 
         handleJavaImports();
         dataModel.put("javaImports", javaImports);
+
+        dataModel.put("enableRecordVideo", enableRecordVideo);
 
         try {
             return FreemarkerUtil.process(ftlBasePackagePath, ftlFileName, dataModel);
