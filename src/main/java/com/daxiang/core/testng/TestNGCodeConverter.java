@@ -3,6 +3,8 @@ package com.daxiang.core.testng;
 import com.alibaba.fastjson.JSONObject;
 import com.daxiang.action.appium.BasicAction;
 import com.daxiang.model.action.*;
+import com.daxiang.model.devicetesttask.DeviceTestTask;
+import com.daxiang.model.devicetesttask.Testcase;
 import freemarker.template.TemplateException;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -28,25 +30,16 @@ public class TestNGCodeConverter {
 
     private final Set<String> javaImports = new HashSet<>();
 
-    private Integer deviceTestTaskId;
-    private List<GlobalVar> globalVars;
-
-    private Action beforeClass;
-    private Action afterClass;
-    private Action beforeMethod;
-    private Action afterMethod;
-
-    private Integer enableRecordVideo;
-
     /**
      * 转换为testng代码
      */
-    public String convert(String deviceId, String className, List<? extends Action> testcases,
-                          String ftlBasePackagePath, String ftlFileName) throws TestNGCodeConvertException {
-        List<Action> actionTreeList = new ArrayList<>();
-        actionTreeList.addAll(testcases);
-
+    public String convert(DeviceTestTask deviceTestTask, String className, String ftlBasePackagePath, String ftlFileName) throws TestNGCodeConvertException {
         Map<String, Object> dataModel = new HashMap();
+
+        List<Action> actionTreeList = new ArrayList<>();
+
+        List<Testcase> testcases = deviceTestTask.getTestcases();
+        actionTreeList.addAll(testcases);
 
         dataModel.put("testcases", testcases.stream().map(testcase -> {
             JSONObject tc = new JSONObject();
@@ -55,21 +48,28 @@ public class TestNGCodeConverter {
             return tc;
         }).collect(Collectors.toList()));
 
+        Action beforeClass = deviceTestTask.getBeforeClass();
         if (beforeClass != null) {
             actionTreeList.add(beforeClass);
             String callBeforeClass = convertToInvokeMethodStringWithParamNull(beforeClass);
             dataModel.put("beforeClass", callBeforeClass);
         }
+
+        Action afterClass = deviceTestTask.getAfterClass();
         if (afterClass != null) {
             actionTreeList.add(afterClass);
             String callAfterClass = convertToInvokeMethodStringWithParamNull(afterClass);
             dataModel.put("afterClass", callAfterClass);
         }
+
+        Action beforeMethod = deviceTestTask.getBeforeMethod();
         if (beforeMethod != null) {
             actionTreeList.add(beforeMethod);
             String callBeforeMethod = convertToInvokeMethodStringWithParamNull(beforeMethod);
             dataModel.put("beforeMethod", callBeforeMethod);
         }
+
+        Action afterMethod = deviceTestTask.getAfterMethod();
         if (afterMethod != null) {
             actionTreeList.add(afterMethod);
             String callAfterMethod = convertToInvokeMethodStringWithParamNull(afterMethod);
@@ -81,20 +81,16 @@ public class TestNGCodeConverter {
         handleActions();
         dataModel.put("actions", cachedActions.values());
 
-        handleGlobalVars();
-        dataModel.put("globalVars", globalVars);
+        handleGlobalVars(deviceTestTask.getGlobalVars());
 
         dataModel.put("className", className);
         dataModel.put("methodPrefix", METHOD_PREFIX);
-        dataModel.put("deviceId", deviceId);
-        dataModel.put("deviceTestTaskId", deviceTestTaskId);
-
         dataModel.put("executeJavaCodeActionId", BasicAction.EXECUTE_JAVA_CODE_ID);
 
         handleJavaImports();
         dataModel.put("javaImports", javaImports);
 
-        dataModel.put("enableRecordVideo", enableRecordVideo);
+        dataModel.put("deviceTestTask", deviceTestTask);
 
         try {
             return FreemarkerUtil.process(ftlBasePackagePath, ftlFileName, dataModel);
@@ -167,7 +163,7 @@ public class TestNGCodeConverter {
     /**
      * 处理全局变量值
      */
-    private void handleGlobalVars() {
+    private void handleGlobalVars(List<GlobalVar> globalVars) {
         if (!CollectionUtils.isEmpty(globalVars)) {
             globalVars.forEach(globalVar -> globalVar.setValue(handleValue(globalVar.getValue())));
         }

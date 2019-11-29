@@ -76,15 +76,7 @@ public class DeviceTestTaskExecutor {
         mobileDevice.saveUsingDeviceToMaster("TestTaskId: " + deviceTestTask.getTestTaskId());
         try {
             String className = "Test_" + UUIDUtil.getUUID();
-            String code = new TestNGCodeConverter()
-                    .setDeviceTestTaskId(deviceTestTask.getId())
-                    .setGlobalVars(deviceTestTask.getGlobalVars())
-                    .setBeforeClass(deviceTestTask.getBeforeClass())
-                    .setAfterClass(deviceTestTask.getAfterClass())
-                    .setBeforeMethod(deviceTestTask.getBeforeMethod())
-                    .setAfterMethod(deviceTestTask.getAfterMethod())
-                    .setEnableRecordVideo(deviceTestTask.getTestPlan().getEnableRecordVideo())
-                    .convert(deviceTestTask.getDeviceId(), className, deviceTestTask.getTestcases(), "/codetemplate", "mobile.ftl");
+            String code = new TestNGCodeConverter().convert(deviceTestTask, className, "/codetemplate", "mobile.ftl");
             log.info("[自动化测试][{}]deviceTestTaskId: {}, 转换代码: {}", deviceId, deviceTestTask.getId(), code);
             updateDeviceTestTaskCode(deviceTestTask.getId(), code);
 

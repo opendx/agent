@@ -3,15 +3,19 @@ package com.daxiang.service;
 import com.daxiang.core.javacompile.JavaCompiler;
 import com.daxiang.core.testng.TestNGRunner;
 import com.daxiang.model.Response;
+import com.daxiang.model.devicetesttask.DeviceTestTask;
+import com.daxiang.model.devicetesttask.Testcase;
 import com.daxiang.model.request.ActionDebugRequest;
 import com.daxiang.core.testng.TestNGCodeConverter;
 import com.daxiang.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dvare.dynamic.exceptions.DynamicCompilerException;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * Created by jiangyitao.
@@ -29,8 +33,18 @@ public class ActionService {
     public Response debug(ActionDebugRequest request) {
         try {
             String className = "Debug_" + UUIDUtil.getUUID();
-            String code = new TestNGCodeConverter().setGlobalVars(request.getGlobalVars())
-                    .convert(request.getDeviceId(), className, Arrays.asList(request.getAction()), "/codetemplate", "mobile.ftl");
+
+            DeviceTestTask deviceTestTask = new DeviceTestTask();
+            deviceTestTask.setGlobalVars(request.getGlobalVars());
+            deviceTestTask.setDeviceId(request.getDeviceId());
+            deviceTestTask.setTestcases(Arrays.asList(request.getAction()).stream().map(a -> {
+                Testcase testcase = new Testcase();
+                BeanUtils.copyProperties(a, testcase);
+                return testcase;
+            }).collect(Collectors.toList()));
+
+            String code = new TestNGCodeConverter()
+                    .convert(deviceTestTask, className, "/codetemplate", "mobile.ftl");
             log.info("[调试action][{}]code: {}", request.getDeviceId(), code);
             if (StringUtils.isEmpty(code)) {
                 return Response.fail("转换后的代码为空，无法调试");
