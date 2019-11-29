@@ -5,6 +5,7 @@ import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.api.MasterApi;
 import com.daxiang.model.action.Step;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
+import com.daxiang.model.devicetesttask.TestPlan;
 import com.daxiang.model.devicetesttask.Testcase;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -38,7 +39,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         String deviceId = testDesc[0];
         Integer deviceTestTaskId = Integer.parseInt(testDesc[1]);
         Integer enableRecordVideo = Integer.parseInt(testDesc[3]);
-        Boolean needRecordVideo = enableRecordVideo == DeviceTestTask.ENABLE_RECORD_VIDEO;
+        Boolean needRecordVideo = enableRecordVideo == TestPlan.ENABLE_RECORD_VIDEO;
 
         MobileDevice mobileDevice = MobileDeviceHolder.get(deviceId);
         log.info("[自动化测试][{}]onStart, deviceTestTaskId：{}, needRecordVideo: {}", deviceId, deviceTestTaskId, needRecordVideo);

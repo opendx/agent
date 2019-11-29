@@ -83,7 +83,7 @@ public class DeviceTestTaskExecutor {
                     .setAfterClass(deviceTestTask.getAfterClass())
                     .setBeforeMethod(deviceTestTask.getBeforeMethod())
                     .setAfterMethod(deviceTestTask.getAfterMethod())
-                    .setEnableRecordVideo(deviceTestTask.getEnableRecordVideo())
+                    .setEnableRecordVideo(deviceTestTask.getTestPlan().getEnableRecordVideo())
                     .convert(deviceTestTask.getDeviceId(), className, deviceTestTask.getTestcases(), "/codetemplate", "mobile.ftl");
             log.info("[自动化测试][{}]deviceTestTaskId: {}, 转换代码: {}", deviceId, deviceTestTask.getId(), code);
             updateDeviceTestTaskCode(deviceTestTask.getId(), code);
