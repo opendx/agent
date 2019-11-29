@@ -48,7 +48,7 @@ public class DeviceTestTaskExecutor {
                 try {
                     executeTestTask(deviceTestTask);
                 } catch (Throwable e) {
-                    log.error("[自动化测试][{}]执行测试任务出错, testTaskId: {}", deviceId, deviceTestTask.getTestTaskId(), e);
+                    log.error("[自动化测试][{}]执行测试任务出错, deviceTestTaskId: {}", deviceId, deviceTestTask.getId(), e);
                 }
             }
         });
@@ -62,7 +62,7 @@ public class DeviceTestTaskExecutor {
      */
     public void commitTestTask(DeviceTestTask deviceTestTask) {
         if (!testTaskQueue.offer(deviceTestTask)) {
-            throw new RuntimeException("提交测试任务失败, testTaskId: " + deviceTestTask.getTestTaskId());
+            throw new RuntimeException("提交测试任务失败, deviceTestTaskId: " + deviceTestTask.getId());
         }
     }
 
@@ -72,8 +72,8 @@ public class DeviceTestTaskExecutor {
      * @param deviceTestTask
      */
     private void executeTestTask(DeviceTestTask deviceTestTask) {
-        log.info("[自动化测试][{}]开始执行测试任务, testTaskId: {}", deviceId, deviceTestTask.getTestTaskId());
-        mobileDevice.saveUsingDeviceToMaster("TestTaskId: " + deviceTestTask.getTestTaskId());
+        log.info("[自动化测试][{}]开始执行测试任务, deviceTestTaskId: {}", deviceId, deviceTestTask.getId());
+        mobileDevice.saveUsingDeviceToMaster(deviceTestTask.getTestPlan().getName());
         try {
             String className = "Test_" + UUIDUtil.getUUID();
             String code = new TestNGCodeConverter().convert(deviceTestTask, className, "/codetemplate", "mobile.ftl");
