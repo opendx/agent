@@ -63,10 +63,9 @@ public class TestCaseTestListener extends TestListenerAdapter {
     @Override
     public void onFinish(ITestContext testContext) {
         MobileDevice mobileDevice = TL_MOBILE_DEVICE.get();
-        String deviceId = mobileDevice.getId();
         Integer deviceTestTaskId = TL_DEVICE_TEST_TASK_ID.get();
 
-        log.info("[自动化测试][{}]onFinish, deviceTestTaskId: {}", deviceId, deviceTestTaskId);
+        log.info("[自动化测试][{}]onFinish, deviceTestTaskId: {}", mobileDevice.getId(), deviceTestTaskId);
         DeviceTestTask deviceTestTask = new DeviceTestTask();
         deviceTestTask.setId(deviceTestTaskId);
         deviceTestTask.setEndTime(new Date());
@@ -76,7 +75,6 @@ public class TestCaseTestListener extends TestListenerAdapter {
 
     /**
      * 每个设备执行每条测试用例前调用的方法，这里可能有多个线程同时调用
-     * 目前设计的：每条用例单独录制视频
      *
      * @param tr
      */
@@ -139,8 +137,10 @@ public class TestCaseTestListener extends TestListenerAdapter {
     }
 
     /**
-     * 当@BeforeClass或@BeforeMethod抛出异常时，所有@Test都不会执行，且所有Test都会先调用onTestStart然后直接调用onTestSkipped，且onTestSkipped tr.getThrowable为null
-     * Test抛出的SkipException，tr.getThrowable不为空，能获取到跳过的原因
+     * 当@BeforeClass抛出异常后，所有@Test都不会执行，且所有@Test都会先调用onTestStart然后直接调用onTestSkipped
+     * 当@BeforeMethod抛出异常后，当前将要执行的@Test不会执行，且会先调用onTestStart然后直接调用onTestSkipped
+     * BeforeClass/BeforeMethod抛出异常后，onTestSkipped tr.getThrowable为null
+     * 由Test抛出的SkipException，tr.getThrowable不为空，能获取到跳过的原因
      *
      * @param tr
      */
