@@ -1,11 +1,9 @@
 package com.daxiang.core.testng.listener;
 
-import com.daxiang.core.MobileDevice;
-import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.api.MasterApi;
+import com.daxiang.core.testng.TestDescription;
 import com.daxiang.model.action.Step;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
-import com.daxiang.model.devicetesttask.TestPlan;
 import com.daxiang.model.devicetesttask.Testcase;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -22,10 +20,9 @@ import java.util.Date;
 @Slf4j
 public class TestCaseTestListener extends TestListenerAdapter {
 
-    private static final ThreadLocal<MobileDevice> TL_MOBILE_DEVICE = new ThreadLocal<>();
-    private static final ThreadLocal<Integer> TL_DEVICE_TEST_TASK_ID = new ThreadLocal<>();
-    private static final ThreadLocal<Integer> TL_TEST_CASE_ID = new ThreadLocal<>();
-    private static final ThreadLocal<Boolean> TL_NEED_RECORD_VIDEO = new ThreadLocal<>();
+    private static final String TEST_DESCRIPTION = "test_desc";
+    private static final MasterApi MASTER_API = MasterApi.getInstance();
+    private static final ThreadLocal<Integer> CURRENT_TEST_CASE_ID = new ThreadLocal<>();
 
     /**
      * 每个设备开始测试调用的方法，这里可能有多个线程同时调用
@@ -34,25 +31,15 @@ public class TestCaseTestListener extends TestListenerAdapter {
      */
     @Override
     public void onStart(ITestContext testContext) {
-        // deviceId_deviceTestTaskId_testcaseId_enableRecordVideo
-        String[] testDesc = testContext.getAllTestMethods()[0].getDescription().split("_");
-        String deviceId = testDesc[0];
-        Integer deviceTestTaskId = Integer.parseInt(testDesc[1]);
-        Integer enableRecordVideo = Integer.parseInt(testDesc[3]);
-        Boolean needRecordVideo = enableRecordVideo == TestPlan.ENABLE_RECORD_VIDEO;
-
-        MobileDevice mobileDevice = MobileDeviceHolder.get(deviceId);
-        log.info("[自动化测试][{}]onStart, deviceTestTaskId：{}, needRecordVideo: {}", deviceId, deviceTestTaskId, needRecordVideo);
-
-        TL_MOBILE_DEVICE.set(mobileDevice);
-        TL_DEVICE_TEST_TASK_ID.set(deviceTestTaskId);
-        TL_NEED_RECORD_VIDEO.set(needRecordVideo);
+        TestDescription testDesc = new TestDescription(testContext.getAllTestMethods()[0].getDescription());
+        log.info("[自动化测试][{}]onStart, deviceTestTaskId：{}, recordVideo: {}", testDesc.getDeviceId(), testDesc.getDeviceTestTaskId(), testDesc.getRecordVideo());
+        testContext.setAttribute(TEST_DESCRIPTION, testDesc);
 
         DeviceTestTask deviceTestTask = new DeviceTestTask();
-        deviceTestTask.setId(deviceTestTaskId);
+        deviceTestTask.setId(testDesc.getDeviceTestTaskId());
         deviceTestTask.setStartTime(new Date());
         deviceTestTask.setStatus(DeviceTestTask.RUNNING_STATUS);
-        MasterApi.getInstance().updateDeviceTestTask(deviceTestTask);
+        MASTER_API.updateDeviceTestTask(deviceTestTask);
     }
 
     /**
@@ -62,15 +49,14 @@ public class TestCaseTestListener extends TestListenerAdapter {
      */
     @Override
     public void onFinish(ITestContext testContext) {
-        MobileDevice mobileDevice = TL_MOBILE_DEVICE.get();
-        Integer deviceTestTaskId = TL_DEVICE_TEST_TASK_ID.get();
+        TestDescription testDesc = (TestDescription) testContext.getAttribute(TEST_DESCRIPTION);
+        log.info("[自动化测试][{}]onFinish, deviceTestTaskId: {}", testDesc.getDeviceId(), testDesc.getDeviceTestTaskId());
 
-        log.info("[自动化测试][{}]onFinish, deviceTestTaskId: {}", mobileDevice.getId(), deviceTestTaskId);
         DeviceTestTask deviceTestTask = new DeviceTestTask();
-        deviceTestTask.setId(deviceTestTaskId);
+        deviceTestTask.setId(testDesc.getDeviceTestTaskId());
         deviceTestTask.setEndTime(new Date());
         deviceTestTask.setStatus(DeviceTestTask.FINISHED_STATUS);
-        MasterApi.getInstance().updateDeviceTestTask(deviceTestTask);
+        MASTER_API.updateDeviceTestTask(deviceTestTask);
     }
 
     /**
@@ -80,60 +66,54 @@ public class TestCaseTestListener extends TestListenerAdapter {
      */
     @Override
     public void onTestStart(ITestResult tr) {
-        Integer deviceTestTaskId = TL_DEVICE_TEST_TASK_ID.get();
-        Boolean needRecordVideo = TL_NEED_RECORD_VIDEO.get();
-        MobileDevice mobileDevice = TL_MOBILE_DEVICE.get();
-        String deviceId = mobileDevice.getId();
-        // deviceId_deviceTestTaskId_testcaseId_enableRecordVideo
-        Integer testcaseId = Integer.parseInt(tr.getMethod().getDescription().split("_")[2]);
-        TL_TEST_CASE_ID.set(testcaseId);
-
-        log.info("[自动化测试][{}]onTestStart, testcaseId: {}", deviceId, testcaseId);
+        TestDescription testDesc = (TestDescription) tr.getTestContext().getAttribute(TEST_DESCRIPTION);
+        Integer testcaseId = TestDescription.parseTestcaseId(tr.getMethod().getDescription());
+        testDesc.setTestcaseId(testcaseId);
+        CURRENT_TEST_CASE_ID.set(testcaseId);
+        log.info("[自动化测试][{}]onTestStart, testcaseId: {}", testDesc.getDeviceId(), testcaseId);
 
         Testcase testcase = new Testcase();
         testcase.setId(testcaseId);
         testcase.setStartTime(new Date());
-        MasterApi.getInstance().updateTestcase(deviceTestTaskId, testcase);
+        MASTER_API.updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
 
-        if (needRecordVideo) {
+        if (testDesc.getRecordVideo()) {
             try {
-                log.info("[自动化测试][{}]testcaseId: {}, 开始录制视频...", deviceId, testcaseId);
-                mobileDevice.startRecordingScreen();
+                log.info("[自动化测试][{}]testcaseId: {}, 开始录制视频...", testDesc.getDeviceId(), testcaseId);
+                testDesc.getMobileDevice().startRecordingScreen();
             } catch (Exception e) {
-                log.error("[自动化测试][{}]testcaseId: {}, 启动录制视频失败", deviceId, testcaseId, e);
-                TL_NEED_RECORD_VIDEO.set(false);
+                log.error("[自动化测试][{}]testcaseId: {}, 启动录制视频失败", testDesc.getDeviceId(), testcaseId, e);
+                testDesc.setRecordVideo(false);
             }
         }
     }
 
     @Override
     public void onTestSuccess(ITestResult tr) {
-        MobileDevice mobileDevice = TL_MOBILE_DEVICE.get();
-        Integer testcaseId = TL_TEST_CASE_ID.get();
-        log.info("[自动化测试][{}]onTestSuccess, testcaseId: {}", mobileDevice.getId(), testcaseId);
+        TestDescription testDesc = (TestDescription) tr.getTestContext().getAttribute(TEST_DESCRIPTION);
+        log.info("[自动化测试][{}]onTestSuccess, testcaseId: {}", testDesc.getDeviceId(), testDesc.getTestcaseId());
 
         Testcase testcase = new Testcase();
-        testcase.setId(testcaseId);
+        testcase.setId(testDesc.getTestcaseId());
         testcase.setEndTime(new Date());
         testcase.setStatus(Testcase.PASS_STATUS);
-        testcase.setVideoUrl(getVideoDownloadUrl());
-        MasterApi.getInstance().updateTestcase(TL_DEVICE_TEST_TASK_ID.get(), testcase);
+        testcase.setVideoUrl(getVideoDownloadUrl(testDesc));
+        MASTER_API.updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
     }
 
     @Override
     public void onTestFailure(ITestResult tr) {
-        MobileDevice mobileDevice = TL_MOBILE_DEVICE.get();
-        Integer testcaseId = TL_TEST_CASE_ID.get();
-        log.error("[自动化测试][{}]onTestFailure, testcaseId: {}", mobileDevice.getId(), testcaseId, tr.getThrowable());
+        TestDescription testDesc = (TestDescription) tr.getTestContext().getAttribute(TEST_DESCRIPTION);
+        log.error("[自动化测试][{}]onTestFailure, testcaseId: {}", testDesc.getDeviceId(), testDesc.getTestcaseId());
 
         Testcase testcase = new Testcase();
-        testcase.setId(testcaseId);
+        testcase.setId(testDesc.getTestcaseId());
         testcase.setEndTime(new Date());
         testcase.setStatus(Testcase.FAIL_STATUS);
-        testcase.setFailImgUrl(getScreenshotDownloadUrl());
+        testcase.setFailImgUrl(getScreenshotDownloadUrl(testDesc));
         testcase.setFailInfo(ExceptionUtils.getStackTrace(tr.getThrowable()));
-        testcase.setVideoUrl(getVideoDownloadUrl());
-        MasterApi.getInstance().updateTestcase(TL_DEVICE_TEST_TASK_ID.get(), testcase);
+        testcase.setVideoUrl(getVideoDownloadUrl(testDesc));
+        MASTER_API.updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
     }
 
     /**
@@ -146,51 +126,45 @@ public class TestCaseTestListener extends TestListenerAdapter {
      */
     @Override
     public void onTestSkipped(ITestResult tr) {
-        MobileDevice mobileDevice = TL_MOBILE_DEVICE.get();
-        Integer testcaseId = TL_TEST_CASE_ID.get();
-        log.warn("[自动化测试][{}]onTestSkipped, testcaseId: {}", mobileDevice.getId(), testcaseId, tr.getThrowable());
+        TestDescription testDesc = (TestDescription) tr.getTestContext().getAttribute(TEST_DESCRIPTION);
+        log.warn("[自动化测试][{}]onTestSkipped, testcaseId: {}", testDesc.getDeviceId(), testDesc.getTestcaseId());
 
         Testcase testcase = new Testcase();
-        testcase.setId(testcaseId);
+        testcase.setId(testDesc.getTestcaseId());
         testcase.setEndTime(new Date());
         testcase.setStatus(Testcase.SKIP_STATUS);
-        testcase.setFailImgUrl(getScreenshotDownloadUrl());
+        testcase.setFailImgUrl(getScreenshotDownloadUrl(testDesc));
         if (tr.getThrowable() == null) { // @BeforeClass或@BeforeMethod抛出异常导致的case跳过
             testcase.setFailInfo("前置任务执行失败");
         } else {
             testcase.setFailInfo(tr.getThrowable().getMessage());
         }
-        testcase.setVideoUrl(getVideoDownloadUrl());
-        MasterApi.getInstance().updateTestcase(TL_DEVICE_TEST_TASK_ID.get(), testcase);
+        testcase.setVideoUrl(getVideoDownloadUrl(testDesc));
+        MASTER_API.updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
     }
 
-    private String getScreenshotDownloadUrl() {
-        MobileDevice mobileDevice = TL_MOBILE_DEVICE.get();
+    private String getScreenshotDownloadUrl(TestDescription testDesc) {
         try {
-            return mobileDevice.screenshotAndUploadToMaster();
+            return testDesc.getMobileDevice().screenshotAndUploadToMaster();
         } catch (Exception e) {
-            log.error("[自动化测试][{}]testcaseId: {}，截图并上传到master失败", mobileDevice.getId(), TL_TEST_CASE_ID.get(), e);
+            log.error("[自动化测试][{}]testcaseId: {}，截图并上传到master失败", testDesc.getDeviceId(), testDesc.getTestcaseId(), e);
             return null;
         }
     }
 
-    private String getVideoDownloadUrl() {
-        if (!TL_NEED_RECORD_VIDEO.get()) {
+    private String getVideoDownloadUrl(TestDescription testDesc) {
+        if (!testDesc.getRecordVideo()) {
             return null;
         }
 
-        MobileDevice mobileDevice = TL_MOBILE_DEVICE.get();
-        String deviceId = mobileDevice.getId();
-        Integer testcaseId = TL_TEST_CASE_ID.get();
-
         try {
-            log.info("[自动化测试][{}]testcaseId: {}, 停止录制视频...", deviceId, testcaseId);
+            log.info("[自动化测试][{}]testcaseId: {}, 停止录制视频...", testDesc.getDeviceId(), testDesc.getTestcaseId());
             long startTime = System.currentTimeMillis();
-            String downloadUrl = mobileDevice.stopRecordingScreenAndUploadToMaster();
-            log.info("[自动化测试][{}]testcaseId: {}, 停止录制视频并上传到master完成，耗时: {} ms", deviceId, testcaseId, System.currentTimeMillis() - startTime);
+            String downloadUrl = testDesc.getMobileDevice().stopRecordingScreenAndUploadToMaster();
+            log.info("[自动化测试][{}]testcaseId: {}, 停止录制视频并上传到master完成，耗时: {} ms", testDesc.getDeviceId(), testDesc.getTestcaseId(), System.currentTimeMillis() - startTime);
             return downloadUrl;
         } catch (Exception e) {
-            log.error("[自动化测试][{}]testcaseId: {}，stopRecordingScreenAndUploadToMaster err", deviceId, testcaseId, e);
+            log.error("[自动化测试][{}]testcaseId: {}，stopRecordingScreenAndUploadToMaster err", testDesc.getDeviceId(), testDesc.getTestcaseId(), e);
             return null;
         }
     }
@@ -198,24 +172,24 @@ public class TestCaseTestListener extends TestListenerAdapter {
     /**
      * 提供给actions.ftl调用，记录用例步骤的执行开始/结束时间
      */
-    public static void recordTestCaseStepTime(Integer actionId, String startOrEnd, Integer stepNumber) {
-        Integer testcaseId = TL_TEST_CASE_ID.get();
+    public static void recordTestCaseStepTime(Integer deviceTestTaskId, Integer actionId, boolean isStart, Integer stepNumber) {
+        Integer currentTestcaseId = CURRENT_TEST_CASE_ID.get();
         // 只记录当前正在执行的测试用例里的步骤
-        if (!actionId.equals(testcaseId)) {
+        if (!actionId.equals(currentTestcaseId)) {
             return;
         }
 
         Step step = new Step();
-        if ("start".equals(startOrEnd)) {
+        if (isStart) {
             step.setStartTime(new Date());
-        } else if ("end".equals(startOrEnd)) {
+        } else {
             step.setEndTime(new Date());
         }
         step.setNumber(stepNumber);
 
         Testcase testcase = new Testcase();
-        testcase.setId(testcaseId);
+        testcase.setId(currentTestcaseId);
         testcase.setSteps(Arrays.asList(step));
-        MasterApi.getInstance().updateTestcase(TL_DEVICE_TEST_TASK_ID.get(), testcase);
+        MASTER_API.updateTestcase(deviceTestTaskId, testcase);
     }
 }

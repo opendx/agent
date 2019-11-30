@@ -39,7 +39,7 @@
                     <#-- 步骤注释 -->
                     <#lt>        // ${step.number?c}.<#if step.name?? && step.name!=''>${step.name}</#if>
                     <#-- (设备任务id && 测试用例)记录步骤的执行开始时间 -->
-                    <#lt>        <#if deviceTestTask.id?? && action.type==3>TestCaseTestListener.recordTestCaseStepTime(${action.id?c}, "start", ${step.number});</#if>
+                    <#lt>        <#if deviceTestTask.id?? && action.type==3>TestCaseTestListener.recordTestCaseStepTime(${deviceTestTask.id?c}, ${action.id?c}, true, ${step.number});</#if>
                     <#if step.handleException??>
                         try{
                     </#if>
@@ -64,7 +64,7 @@
                         }
                     </#if>
                     <#-- (设备任务id && 测试用例)记录步骤的执行结束时间 -->
-                    <#lt>        <#if deviceTestTask.id?? && action.type==3>TestCaseTestListener.recordTestCaseStepTime(${action.id?c}, "end", ${step.number?c});</#if>
+                    <#lt>        <#if deviceTestTask.id?? && action.type==3>TestCaseTestListener.recordTestCaseStepTime(${deviceTestTask.id?c}, ${action.id?c}, false, ${step.number?c});</#if>
                 </#list>
             </#if>
         </#if>

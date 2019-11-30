@@ -1,7 +1,9 @@
 package com.daxiang.core.testng;
 
+import com.daxiang.core.MobileDevice;
+import com.daxiang.core.MobileDeviceHolder;
+import com.daxiang.model.devicetesttask.TestPlan;
 import lombok.Data;
-import org.springframework.util.StringUtils;
 
 /**
  * Created by jiangyitao.
@@ -14,16 +16,14 @@ public class TestDescription {
     private Integer enableRecordVideo;
     private Integer failRetryCount;
 
+    private Boolean recordVideo;
+    private MobileDevice mobileDevice;
+
     /**
-     *
      * @param testDesc deviceId_deviceTestTaskId_testcaseId_enableRecordVideo_failRetryCount
      * @return
      */
     public TestDescription(String testDesc) {
-        if (StringUtils.isEmpty(testDesc)) {
-            throw new IllegalArgumentException("testDesc cannot be empty!");
-        }
-
         String[] testDescArr = testDesc.split("_");
 
         this.deviceId = testDescArr[0];
@@ -31,5 +31,12 @@ public class TestDescription {
         this.testcaseId = Integer.valueOf(testDescArr[2]);
         this.enableRecordVideo = Integer.valueOf(testDescArr[3]);
         this.failRetryCount = Integer.valueOf(testDescArr[4]);
+
+        this.mobileDevice = MobileDeviceHolder.get(deviceId);
+        this.recordVideo = (enableRecordVideo == TestPlan.ENABLE_RECORD_VIDEO);
+    }
+
+    public static Integer parseTestcaseId(String testDesc) {
+        return Integer.valueOf(testDesc.split("_")[2]);
     }
 }
