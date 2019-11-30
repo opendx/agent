@@ -82,7 +82,7 @@ public class DeviceTestTaskExecutor {
 
             Class clazz = JavaCompiler.compile(className, code);
             mobileDevice.freshAppiumDriver();
-            TestNGRunner.runTestCases(new Class[]{clazz});
+            TestNGRunner.runTestCases(new Class[]{clazz}, deviceTestTask.getTestPlan().getFailRetryCount());
         } catch (TestNGCodeConvertException | DynamicCompilerException e) {
             log.error("[自动化测试][{}]deviceTestTaskId: {}", deviceId, deviceTestTask.getId(), e);
             updateDeviceTestTaskStatusAndErrMsg(deviceTestTask.getId(), DeviceTestTask.ERROR_STATUS, ExceptionUtils.getStackTrace(e));

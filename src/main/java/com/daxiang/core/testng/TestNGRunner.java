@@ -1,7 +1,5 @@
 package com.daxiang.core.testng;
 
-import com.daxiang.core.testng.listener.DebugActionTestListener;
-import com.daxiang.core.testng.listener.TestCaseTestListener;
 import com.daxiang.model.Response;
 import org.springframework.util.CollectionUtils;
 import org.testng.TestNG;
@@ -17,8 +15,12 @@ public class TestNGRunner {
     /**
      * 运行测试用例
      */
-    public static void runTestCases(Class[] classes) {
-        run(classes, Arrays.asList(TestCaseTestListener.class));
+    public static void runTestCases(Class[] classes, Integer failRetryCount) {
+        if (failRetryCount != null && failRetryCount > 0) {
+            run(classes, Arrays.asList(TestCaseTestListener.class, AnnotationTransformer.class));
+        } else {
+            run(classes, Arrays.asList(TestCaseTestListener.class));
+        }
     }
 
     /**

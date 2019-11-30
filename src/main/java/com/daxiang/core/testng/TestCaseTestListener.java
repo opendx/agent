@@ -1,7 +1,6 @@
-package com.daxiang.core.testng.listener;
+package com.daxiang.core.testng;
 
 import com.daxiang.api.MasterApi;
-import com.daxiang.core.testng.TestDescription;
 import com.daxiang.model.action.Step;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.model.devicetesttask.Testcase;
@@ -20,7 +19,7 @@ import java.util.Date;
 @Slf4j
 public class TestCaseTestListener extends TestListenerAdapter {
 
-    private static final String TEST_DESCRIPTION = "test_desc";
+    public static final String TEST_DESCRIPTION = "test_desc";
     private static final MasterApi MASTER_API = MasterApi.getInstance();
     private static final ThreadLocal<Integer> CURRENT_TEST_CASE_ID = new ThreadLocal<>();
 

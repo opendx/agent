@@ -1,4 +1,4 @@
-package com.daxiang.core.testng.listener;
+package com.daxiang.core.testng;
 
 import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
