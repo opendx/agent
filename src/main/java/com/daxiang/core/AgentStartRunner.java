@@ -35,24 +35,6 @@ public class AgentStartRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws IOException, InterruptedException {
-        if (needAndroid) {
-            ADB.killServer();
-            Thread.sleep(1000);
-            ADB.startServer();
-            ADB.addDeviceChangeListener(androidDeviceChangeListener);
-            log.info("[android]开始监听设备连接/断开");
-        } else {
-            log.info("[android]未开启Android功能");
-        }
-
-        if (needIos) {
-            IosDeviceMonitor iosDeviceMonitor = IosDeviceMonitor.getInstance();
-            iosDeviceMonitor.start(iosDeviceChangeListener);
-            log.info("[ios]开始监听设备连接/断开");
-        } else {
-            log.info("[ios]未开启ios功能");
-        }
-
         // appium版本
         String appiumVersion = AppiumServer.getVersion();
         System.setProperty("appiumVersion", appiumVersion);
@@ -80,6 +62,24 @@ public class AgentStartRunner implements ApplicationRunner {
 
         // ffmpeg
         Terminal.execute("ffmpeg -version");
+
+        if (needAndroid) {
+            ADB.killServer();
+            Thread.sleep(1000);
+            ADB.startServer();
+            ADB.addDeviceChangeListener(androidDeviceChangeListener);
+            log.info("[android]开始监听设备连接/断开");
+        } else {
+            log.info("[android]未开启Android功能");
+        }
+
+        if (needIos) {
+            IosDeviceMonitor iosDeviceMonitor = IosDeviceMonitor.getInstance();
+            iosDeviceMonitor.start(iosDeviceChangeListener);
+            log.info("[ios]开始监听设备连接/断开");
+        } else {
+            log.info("[ios]未开启ios功能");
+        }
     }
 
 }
