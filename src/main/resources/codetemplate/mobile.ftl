@@ -22,31 +22,31 @@ public class ${className} {
         vars = new HashMap();
     }
 
-    <#if deviceTestTask.beforeClass??>
+    <#if beforeClass??>
         <#lt>    @BeforeClass
         <#lt>    public void beforeClass() throws Throwable {
-        <#lt>        ${deviceTestTask.beforeClass}
+        <#lt>        ${beforeClass}
         <#lt>    }
     </#if>
 
-    <#if deviceTestTask.afterClass??>
+    <#if afterClass??>
         <#lt>    @AfterClass
         <#lt>    public void afterClass() throws Throwable {
-        <#lt>        ${deviceTestTask.afterClass}
+        <#lt>        ${afterClass}
         <#lt>    }
     </#if>
 
-    <#if deviceTestTask.beforeMethod??>
+    <#if beforeMethod??>
         <#lt>    @BeforeMethod
         <#lt>    public void beforeMethod() throws Throwable {
-        <#lt>        ${deviceTestTask.beforeMethod}
+        <#lt>        ${beforeMethod}
         <#lt>    }
     </#if>
 
-    <#if deviceTestTask.afterMethod??>
+    <#if afterMethod??>
         <#lt>    @AfterMethod
         <#lt>    public void afterMethod() throws Throwable {
-        <#lt>        ${deviceTestTask.afterMethod}
+        <#lt>        ${afterMethod}
         <#lt>    }
     </#if>
 
