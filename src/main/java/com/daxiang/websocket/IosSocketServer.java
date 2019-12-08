@@ -63,7 +63,9 @@ public class IosSocketServer {
 
         mobileDevice.saveUsingDeviceToMaster(username);
 
+        basicRemote.sendText("初始化appium driver...");
         Response response = App.getBean(MobileService.class).freshDriver(deviceId);
+        basicRemote.sendText("初始化appium driver完成");
         basicRemote.sendText(JSON.toJSONString(response));
 
         // 转发本地端口到wdaMjpegServer,这样可以通过localhost访问到wdaMjpegServer获取屏幕数据

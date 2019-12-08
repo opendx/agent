@@ -102,12 +102,14 @@ public class TestNGCodeConverter {
     private void handleJavaImports() {
         javaImports.add("import com.daxiang.core.MobileDeviceHolder;");
         javaImports.add("import io.appium.java_client.AppiumDriver;");
+        javaImports.add("import io.appium.java_client.pagefactory.*;");
         javaImports.add("import org.testng.annotations.*;");
         javaImports.add("import org.testng.SkipException;");
         javaImports.add("import com.daxiang.core.testng.TestCaseTestListener;");
         javaImports.add("import com.daxiang.core.testng.DebugActionTestListener;");
         javaImports.add("import com.daxiang.action.appium.BasicAction;");
         javaImports.add("import org.openqa.selenium.*;");
+        javaImports.add("import org.openqa.selenium.support.*;");
         javaImports.add("import java.util.*;");
         javaImports.add("import static org.assertj.core.api.Assertions.*;");
 

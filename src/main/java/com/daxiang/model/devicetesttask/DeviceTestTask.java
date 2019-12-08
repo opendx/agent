@@ -1,6 +1,7 @@
 package com.daxiang.model.devicetesttask;
 
 
+import com.daxiang.model.page.Page;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.daxiang.model.action.Action;
 import com.daxiang.model.action.GlobalVar;
@@ -42,6 +43,7 @@ public class DeviceTestTask {
     private Date endTime;
     private TestPlan testPlan;
     private List<GlobalVar> globalVars;
+    private List<Page> pages;
     private Action beforeClass;
     private Action beforeMethod;
     private Action afterClass;

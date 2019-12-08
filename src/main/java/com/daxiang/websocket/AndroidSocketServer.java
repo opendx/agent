@@ -76,8 +76,11 @@ public class AndroidSocketServer {
         androidDevice.getMinitouch().start();
         remoteEndpoint.sendText("启动minitouch完成");
 
+        remoteEndpoint.sendText("初始化appium driver...");
         Response response = App.getBean(MobileService.class).freshDriver(deviceId);
+        remoteEndpoint.sendText("初始化appium driver完成");
         remoteEndpoint.sendText(JSON.toJSONString(response));
+
         androidDriver = (AndroidDriver) androidDevice.getAppiumDriver();
     }
 

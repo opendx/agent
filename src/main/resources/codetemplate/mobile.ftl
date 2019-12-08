@@ -8,6 +8,18 @@ public class ${className} {
     private BasicAction $;
     private Map<String, Object> vars;
 
+    <#-- pages -->
+    <#if deviceTestTask.pages?? && (deviceTestTask.pages?size>0)>
+        <#list deviceTestTask.pages as page>
+            <#if page.elements?? && (page.elements?size>0)>
+                <#list page.elements as element>
+                    <#lt>    ${(element.findBy)[0]}(${(element.findBy)[1]} = "${element.value}")
+                    <#lt>    private WebElement ${page.name}_${element.name};
+                </#list>
+            </#if>
+        </#list>
+    </#if>
+
     <#-- 全局变量 -->
     <#if deviceTestTask.globalVars?? && (deviceTestTask.globalVars?size>0)>
         <#list deviceTestTask.globalVars as globalVar>
@@ -20,6 +32,7 @@ public class ${className} {
         driver = MobileDeviceHolder.get("${deviceTestTask.deviceId}").getAppiumDriver();
         $ = new BasicAction(driver);
         vars = new HashMap();
+        PageFactory.initElements(new AppiumFieldDecorator(driver), this);
     }
 
     <#if beforeClass??>

@@ -35,8 +35,8 @@ public class ActionService {
             String className = "Debug_" + UUIDUtil.getUUID();
 
             DeviceTestTask deviceTestTask = new DeviceTestTask();
-            deviceTestTask.setGlobalVars(request.getGlobalVars());
-            deviceTestTask.setDeviceId(request.getDeviceId());
+            BeanUtils.copyProperties(request, deviceTestTask);
+
             deviceTestTask.setTestcases(Arrays.asList(request.getAction()).stream().map(a -> {
                 Testcase testcase = new Testcase();
                 BeanUtils.copyProperties(a, testcase);
