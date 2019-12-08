@@ -96,11 +96,11 @@ public class AndroidUtil {
      * @param iDevice
      * @param resolution 手机分辨率 eg. 1080x1920
      */
-    public static File screenshotByMinicap(IDevice iDevice, String resolution) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException, SyncException {
+    public static File screenshotByMinicap(IDevice iDevice, String resolution, int orientation) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException, SyncException {
         String localScreenshotFilePath = UUIDUtil.getUUID() + ".jpg";
         String remoteScreenshotFilePath = AndroidDevice.TMP_FOLDER + "minicap.jpg";
 
-        String screenshotCmd = String.format("LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/minicap -P %s@%s/0 -s >%s", resolution, resolution, remoteScreenshotFilePath);
+        String screenshotCmd = String.format("LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/minicap -P %s@%s/%d -s >%s", resolution, resolution, orientation, remoteScreenshotFilePath);
         String minicapOutput = executeShellCommand(iDevice, screenshotCmd);
 
         if (StringUtils.isEmpty(minicapOutput) || !minicapOutput.contains("bytes for JPG encoder")) {

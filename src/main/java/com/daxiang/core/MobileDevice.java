@@ -30,6 +30,9 @@ public abstract class MobileDevice {
     public static final int ANDROID = 1;
     public static final int IOS = 2;
 
+    /* 0: 竖直 */
+    private Integer orientation = 0;
+
     private Device device;
     private DeviceTestTaskExecutor deviceTestTaskExecutor;
 
@@ -96,7 +99,7 @@ public abstract class MobileDevice {
      * @return eg.1080x1920
      */
     public String getResolution() {
-        return String.valueOf(device.getScreenWidth()) + "x" + String.valueOf(device.getScreenHeight());
+        return device.getScreenWidth() + "x" + device.getScreenHeight();
     }
 
     public String getVirtualResolution(Integer width) {

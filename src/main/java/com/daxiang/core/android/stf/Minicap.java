@@ -45,7 +45,7 @@ public class Minicap {
      * @param virtualResolution minicap输出的图片分辨率 eg.1080x1920
      * @param orientation       屏幕的旋转角度
      */
-    public void start(Integer quality, String realResolution, String virtualResolution, Integer orientation, MinicapImgDataConsumer minicapImgDataConsumer) throws Exception {
+    public void start(int quality, String realResolution, String virtualResolution, int orientation, MinicapImgDataConsumer minicapImgDataConsumer) throws Exception {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         // 启动minicap会阻塞线程，启一个线程运行minicap
         new Thread(() -> {

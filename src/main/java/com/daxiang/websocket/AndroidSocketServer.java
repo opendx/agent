@@ -62,7 +62,7 @@ public class AndroidSocketServer {
         androidDevice.getMinicap().start(Integer.parseInt(App.getProperty("minicap-quality")),
                 androidDevice.getResolution(),
                 androidDevice.getVirtualResolution(Integer.parseInt(App.getProperty("displayWidth"))),
-                0,
+                androidDevice.getOrientation(),
                 minicapImgData -> {
                     try {
                         remoteEndpoint.sendBinary(minicapImgData);

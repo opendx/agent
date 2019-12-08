@@ -92,7 +92,7 @@ public class AndroidDevice extends MobileDevice {
 
     @Override
     public File screenshot() throws Exception {
-        return AndroidUtil.screenshotByMinicap(iDevice, getResolution());
+        return AndroidUtil.screenshotByMinicap(iDevice, getResolution(), getOrientation());
     }
 
     @Override

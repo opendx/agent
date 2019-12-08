@@ -1,6 +1,5 @@
 package com.daxiang.core.android;
 
-import com.android.ddmlib.*;
 import com.daxiang.utils.Terminal;
 import com.daxiang.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -30,14 +29,11 @@ public class MinicapVideoRecorder {
     }
 
     public void start() {
-        IDevice iDevice = androidDevice.getIDevice();
-        String resolution = androidDevice.getResolution();
-
         service.scheduleAtFixedRate(() -> {
             try {
-                imgFileList.add(AndroidUtil.screenshotByMinicap(iDevice, resolution));
+                imgFileList.add(androidDevice.screenshot());
             } catch (Exception e) {
-                log.error("[{}]screenshot by minicap err", iDevice.getSerialNumber(), e);
+                log.error("[{}]screenshot by minicap err", androidDevice.getId(), e);
             }
         }, 0, SCREENSHOT_PERIOD_MS, TimeUnit.MILLISECONDS);
     }
