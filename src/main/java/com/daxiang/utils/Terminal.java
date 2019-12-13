@@ -24,6 +24,10 @@ public class Terminal {
      * @throws IOException
      */
     public static String execute(String command) throws IOException {
+        return execute(command, true);
+    }
+
+    public static String execute(String command, boolean showLog) throws IOException {
         DefaultExecutor executor = new DefaultExecutor();
         executor.setExitValues(null);
 
@@ -32,10 +36,14 @@ public class Terminal {
             PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(outputStream, errorStream);
             executor.setStreamHandler(pumpStreamHandler);
 
-            log.info("[==>]{}", command);
+            if (showLog) {
+                log.info("[==>]{}", command);
+            }
             executor.execute(createCommandLine(command));
             String result = outputStream.toString() + errorStream.toString();
-            log.info("[<==]{}", result);
+            if (showLog) {
+                log.info("[<==]{}", result);
+            }
             return result;
         }
     }
@@ -48,21 +56,27 @@ public class Terminal {
      * @throws IOException
      */
     public static ExecuteWatchdog executeAsyncAndGetWatchdog(String command) throws IOException {
+        return executeAsyncAndGetWatchdog(command, true);
+    }
+
+    public static ExecuteWatchdog executeAsyncAndGetWatchdog(String command, boolean showLog) throws IOException {
         DefaultExecutor executor = new DefaultExecutor();
         executor.setExitValues(null);
 
         ExecuteWatchdog watchdog = new ExecuteWatchdog(Integer.MAX_VALUE);
         executor.setWatchdog(watchdog);
 
-        PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(new LogOutputStream() {
-            @Override
-            protected void processLine(String line, int i) {
-                log.info("[<==]{}", line);
-            }
-        });
-        executor.setStreamHandler(pumpStreamHandler);
+        if (showLog) {
+            log.info("[==>]{}", command);
+            PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(new LogOutputStream() {
+                @Override
+                protected void processLine(String line, int i) {
+                    log.info("[<==]{}", line);
+                }
+            });
+            executor.setStreamHandler(pumpStreamHandler);
+        }
 
-        log.info("[==>]{}", command);
         executor.execute(createCommandLine(command), new DefaultExecuteResultHandler());
         return watchdog;
     }

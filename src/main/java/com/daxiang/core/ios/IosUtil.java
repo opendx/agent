@@ -16,9 +16,9 @@ import java.util.*;
 @Slf4j
 public class IosUtil {
 
-    public static List<String> getDeviceList() {
+    public static List<String> getDeviceList(boolean showLog) {
         try {
-            String result = Terminal.execute("idevice_id -l");
+            String result = Terminal.execute("idevice_id -l", showLog);
             if (StringUtils.isEmpty(result)) {
                 return Collections.emptyList();
             }

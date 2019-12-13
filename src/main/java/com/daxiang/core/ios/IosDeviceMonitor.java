@@ -40,7 +40,7 @@ public class IosDeviceMonitor {
         new Thread(() -> {
             log.info("[ios]开始检查设备连接状态");
             while (isMonitorDevice) {
-                currentDeviceList = IosUtil.getDeviceList();
+                currentDeviceList = IosUtil.getDeviceList(false);
 
                 // 新增的设备
                 currentDeviceList.stream()
