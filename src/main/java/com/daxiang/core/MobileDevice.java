@@ -32,6 +32,8 @@ public abstract class MobileDevice {
 
     /* 0: 竖直 */
     private Integer orientation = 0;
+    /* 分辨率 eg.1080x1920 */
+    private String resolution;
 
     private Device device;
     private DeviceTestTaskExecutor deviceTestTaskExecutor;
@@ -41,6 +43,7 @@ public abstract class MobileDevice {
 
     public MobileDevice(Device device, AppiumServer appiumServer) {
         this.device = device;
+        this.resolution = device.getScreenWidth() + "x" + device.getScreenHeight();
         this.appiumServer = appiumServer;
         deviceTestTaskExecutor = new DeviceTestTaskExecutor(this);
     }
@@ -93,16 +96,7 @@ public abstract class MobileDevice {
         return device.getStatus() == Device.IDLE_STATUS;
     }
 
-    /**
-     * 获取设备屏幕分辨率
-     *
-     * @return eg.1080x1920
-     */
-    public String getResolution() {
-        return device.getScreenWidth() + "x" + device.getScreenHeight();
-    }
-
-    public String getVirtualResolution(Integer width) {
+    public String getVirtualResolution(int width) {
         int height = getScreenScaledHeight(width);
         return width + "x" + height;
     }
@@ -197,11 +191,11 @@ public abstract class MobileDevice {
         return NATIVE_CONTEXT.equals(appiumDriver.getContext());
     }
 
-    public abstract void startRecordingScreen() throws Exception;
+    public abstract void startRecordingScreen();
 
-    public abstract File stopRecordingScreen() throws Exception;
+    public abstract File stopRecordingScreen() throws IOException;
 
-    public String stopRecordingScreenAndUploadToMaster() throws Exception {
+    public String stopRecordingScreenAndUploadToMaster() throws IOException {
         File video = null;
         try {
             video = stopRecordingScreen();

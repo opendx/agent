@@ -19,8 +19,6 @@ import java.util.regex.Pattern;
 @Slf4j
 public class AndroidUtil {
 
-    private static final String CPU_INFO_SHELL = "cat /proc/cpuinfo |grep Hardware";
-    private static final String MEM_SIZE_SHELL = "cat /proc/meminfo |grep MemTotal";
 
     public static final Map<String, String> ANDROID_VERSION = new HashMap();
 
@@ -42,50 +40,28 @@ public class AndroidUtil {
         ANDROID_VERSION.put("29", "10");
     }
 
-    /**
-     * 获取CPU信息
-     *
-     * @return
-     */
-    public static String getCpuInfo(IDevice iDevice) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
-        String output = executeShellCommand(iDevice, CPU_INFO_SHELL);
-        if (StringUtils.isEmpty(output)) {
+    public static String getCpuInfo(IDevice iDevice) throws IDeviceExecuteShellCommandException {
+        String cpuInfo = executeShellCommand(iDevice, "cat /proc/cpuinfo |grep Hardware"); // Hardware	: Qualcomm Technologies, Inc MSM8909
+        if (StringUtils.isEmpty(cpuInfo) || !cpuInfo.startsWith("Hardware")) {
             throw new RuntimeException("获取CPU信息失败");
         }
-        return output.split(":")[1].trim();
+        return cpuInfo.split(":")[1].trim();
     }
 
-    /**
-     * 获取内存信息
-     *
-     * @return
-     */
-    public static String getMemSize(IDevice iDevice) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
-        String output = executeShellCommand(iDevice, MEM_SIZE_SHELL);
-        if (StringUtils.isEmpty(output)) {
+    public static String getMemSize(IDevice iDevice) throws IDeviceExecuteShellCommandException {
+        String memInfo = executeShellCommand(iDevice, "cat /proc/meminfo |grep MemTotal"); // MemTotal:        1959700 kB
+        if (StringUtils.isEmpty(memInfo) || !memInfo.startsWith("MemTotal")) {
             throw new RuntimeException("获取内存信息失败");
         }
-        String memKB = (output.replaceAll(" ", "")).replaceAll("\n", "").replaceAll("\r", "").split(":")[1];
-        memKB = memKB.substring(0, memKB.length() - 2);
-        // 向上取整
-        double memGB = Math.ceil(Long.parseLong(memKB) / (1024.0 * 1024));
-        return memGB + " GB";
+
+        String memKB = Pattern.compile("[^0-9]").matcher(memInfo).replaceAll("").trim();
+        return Math.ceil(Long.parseLong(memKB) / (1024.0 * 1024)) + " GB";
     }
 
-    /**
-     * 设备名
-     *
-     * @return
-     */
     public static String getDeviceName(IDevice iDevice) {
         return "[" + iDevice.getProperty("ro.product.brand") + "] " + iDevice.getProperty("ro.product.model");
     }
 
-    /**
-     * 安卓版本
-     *
-     * @return
-     */
     public static String getAndroidVersion(IDevice iDevice) {
         return ANDROID_VERSION.get(getSdkVersion(iDevice));
     }
@@ -96,19 +72,20 @@ public class AndroidUtil {
      * @param iDevice
      * @param resolution 手机分辨率 eg. 1080x1920
      */
-    public static File screenshotByMinicap(IDevice iDevice, String resolution, int orientation) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException, SyncException {
-        String localScreenshotFilePath = UUIDUtil.getUUID() + ".jpg";
-        String remoteScreenshotFilePath = AndroidDevice.TMP_FOLDER + "minicap.jpg";
+    public static File screenshotByMinicap(IDevice iDevice, String resolution, int orientation) throws Exception {
+        String localFilePath = UUIDUtil.getUUID() + ".jpg";
+        String remoteFilePath = AndroidDevice.TMP_FOLDER + "minicap.jpg";
 
-        String screenshotCmd = String.format("LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/minicap -P %s@%s/%d -s >%s", resolution, resolution, orientation, remoteScreenshotFilePath);
+        String screenshotCmd = String.format("LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/minicap -P %s@%s/%d -s >%s", resolution, resolution, orientation, remoteFilePath);
         String minicapOutput = executeShellCommand(iDevice, screenshotCmd);
 
         if (StringUtils.isEmpty(minicapOutput) || !minicapOutput.contains("bytes for JPG encoder")) {
             throw new RuntimeException("minicap截图失败, cmd: " + screenshotCmd + ", minicapOutput: " + minicapOutput);
         }
+
         // pull到本地
-        iDevice.pullFile(remoteScreenshotFilePath, localScreenshotFilePath);
-        return new File(localScreenshotFilePath);
+        iDevice.pullFile(remoteFilePath, localFilePath);
+        return new File(localFilePath);
     }
 
     /**
@@ -120,11 +97,6 @@ public class AndroidUtil {
         return iDevice.getProperty("ro.product.cpu.abi");
     }
 
-    /**
-     * 获取手机sdk版本
-     *
-     * @return
-     */
     public static String getSdkVersion(IDevice iDevice) {
         return iDevice.getProperty("ro.build.version.sdk");
     }
@@ -149,13 +121,6 @@ public class AndroidUtil {
         }
     }
 
-    /**
-     * 安装APK
-     *
-     * @param iDevice
-     * @param apkPath
-     * @throws InstallException
-     */
     public static void installApk(IDevice iDevice, String apkPath) throws InstallException {
         iDevice.installPackage(apkPath, true);
     }
@@ -170,10 +135,20 @@ public class AndroidUtil {
      * @param cmd
      * @return
      */
-    public static String executeShellCommand(IDevice iDevice, String cmd) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+    public static String executeShellCommand(IDevice iDevice, String cmd) throws IDeviceExecuteShellCommandException {
+        Assert.notNull(iDevice, "iDevice can not be null");
+        Assert.hasText(cmd, "cmd can not be empty");
+
+        log.info("[{}==>]", cmd);
         CollectingOutputReceiver collectingOutputReceiver = new CollectingOutputReceiver();
-        iDevice.executeShellCommand(cmd, collectingOutputReceiver);
-        return collectingOutputReceiver.getOutput();
+        try {
+            iDevice.executeShellCommand(cmd, collectingOutputReceiver);
+        } catch (TimeoutException | AdbCommandRejectedException | ShellCommandUnresponsiveException | IOException e) {
+            throw new IDeviceExecuteShellCommandException(e);
+        }
+        String response = collectingOutputReceiver.getOutput();
+        log.info("[{}<==]{}", cmd, response);
+        return response;
     }
 
     /**
@@ -183,18 +158,12 @@ public class AndroidUtil {
         return Terminal.execute("aapt dump badging " + apkPath);
     }
 
-    /**
-     * 清除apk数据
-     */
-    public static void clearApkData(IDevice iDevice, String packageName) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
-        iDevice.executeShellCommand("pm clear " + packageName, new NullOutputReceiver());
+    public static void clearApkData(IDevice iDevice, String packageName) throws IDeviceExecuteShellCommandException {
+        executeShellCommand(iDevice, "pm clear " + packageName);
     }
 
-    /**
-     * 重启apk
-     */
-    public static void restartApk(IDevice iDevice, String packageName, String launchActivity) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
-        iDevice.executeShellCommand("am start -S -n " + packageName + "/" + launchActivity, new NullOutputReceiver());
+    public static void restartApk(IDevice iDevice, String packageName, String launchActivity) throws IDeviceExecuteShellCommandException {
+        executeShellCommand(iDevice, "am start -S -n " + packageName + "/" + launchActivity);
     }
 
     /**
@@ -202,7 +171,7 @@ public class AndroidUtil {
      *
      * @return eg.720x1280
      */
-    public static String getResolution(IDevice iDevice) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+    public static String getResolution(IDevice iDevice) throws IDeviceExecuteShellCommandException {
         String wmSize = executeShellCommand(iDevice, "wm size");
         Pattern pattern = Pattern.compile("Physical size: (\\d+x\\d+)");
         Matcher matcher = pattern.matcher(wmSize);
@@ -212,16 +181,15 @@ public class AndroidUtil {
         throw new RuntimeException("cannot find physical size, execute: wm size => " + wmSize);
     }
 
-    public static List<String> getImeList(IDevice iDevice) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+    public static List<String> getImeList(IDevice iDevice) throws IDeviceExecuteShellCommandException {
         String imeListString = executeShellCommand(iDevice, "ime list -s");
         if (StringUtils.isEmpty(imeListString)) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         return Arrays.asList(imeListString.split("\r\n"));
     }
 
-    public static void setIme(IDevice iDevice, String ime) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
-        Assert.hasText(ime, "ime不能为空");
+    public static void setIme(IDevice iDevice, String ime) throws IDeviceExecuteShellCommandException {
         executeShellCommand(iDevice, "ime set " + ime);
     }
 }

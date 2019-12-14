@@ -106,7 +106,7 @@ public class AndroidDevice extends MobileDevice {
     }
 
     @Override
-    public void startRecordingScreen() throws Exception {
+    public void startRecordingScreen() {
         if (canUseAppiumRecordVideo) {
             try {
                 AndroidStartScreenRecordingOptions androidOptions = new AndroidStartScreenRecordingOptions();

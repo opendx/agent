@@ -33,7 +33,7 @@ import java.util.Optional;
 @Slf4j
 public class MasterApi {
 
-    private static MasterApi masterApi;
+    private static MasterApi INSTANCE;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -56,11 +56,11 @@ public class MasterApi {
     @Value("${master}/deviceTestTask/%d/updateTestcase")
     private String updateTestcaseApi;
 
-    public synchronized static MasterApi getInstance() {
-        if (masterApi == null) {
-            masterApi = App.getBean(MasterApi.class);
+    public static MasterApi getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = App.getBean(MasterApi.class);
         }
-        return masterApi;
+        return INSTANCE;
     }
 
     /**
@@ -76,7 +76,8 @@ public class MasterApi {
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity(params, headers);
 
         Response<List<Device>> response = restTemplate.exchange(deviceListApi, HttpMethod.POST, requestEntity,
-                new ParameterizedTypeReference<Response<List<Device>>>() {}).getBody();
+                new ParameterizedTypeReference<Response<List<Device>>>() {
+                }).getBody();
 
         if (response.isSuccess()) {
             return response.getData().stream().findFirst().orElse(null);
@@ -87,6 +88,7 @@ public class MasterApi {
 
     /**
      * 获取chromedriver下载地址
+     *
      * @param deviceId
      * @return
      */
@@ -99,7 +101,8 @@ public class MasterApi {
         params.add("platform", OS.isFamilyWindows() ? 1 : OS.isFamilyMac() ? 3 : 2); // 1.windows 2.linux 3.macos
 
         Response<Map<String, String>> response = restTemplate.exchange(driverDownloadUrlApi, HttpMethod.POST, new HttpEntity<>(params),
-                new ParameterizedTypeReference<Response<Map<String, String>>>() {}).getBody();
+                new ParameterizedTypeReference<Response<Map<String, String>>>() {
+                }).getBody();
 
         if (response.isSuccess()) {
             if (response.getData() == null) {
@@ -136,7 +139,8 @@ public class MasterApi {
         HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(multiValueMap);
 
         Response<Map<String, String>> response = restTemplate.exchange(uploadFileApi, HttpMethod.POST, httpEntity,
-                new ParameterizedTypeReference<Response<Map<String, String>>>() {}).getBody();
+                new ParameterizedTypeReference<Response<Map<String, String>>>() {
+                }).getBody();
 
         if (response.isSuccess()) {
             return response.getData().get("downloadURL");
@@ -161,7 +165,8 @@ public class MasterApi {
     public DeviceTestTask getFirstUnStartDeviceTestTask(String deviceId) {
         String url = String.format(findFirstUnStartDeviceTestTaskApi, deviceId);
         Response<DeviceTestTask> response = restTemplate.exchange(url, HttpMethod.GET, null,
-                new ParameterizedTypeReference<Response<DeviceTestTask>>() {}).getBody();
+                new ParameterizedTypeReference<Response<DeviceTestTask>>() {
+                }).getBody();
 
         if (response.isSuccess()) {
             return response.getData();

@@ -50,7 +50,7 @@ public class IosDevice extends MobileDevice {
     }
 
     @Override
-    public File screenshot() throws Exception {
+    public File screenshot() throws IOException {
         return IosUtil.screenshotByIdeviceScreenshot(getId());
     }
 
