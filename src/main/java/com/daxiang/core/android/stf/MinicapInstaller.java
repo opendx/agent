@@ -5,8 +5,6 @@ import com.daxiang.core.android.AndroidDevice;
 import com.daxiang.core.android.AndroidUtil;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
-
 /**
  * Created by jiangyitao.
  */
@@ -15,8 +13,8 @@ public class MinicapInstaller {
 
     private static final String MINICAP_CHMOD_SHELL = "chmod 777 %s %s";
 
-    private static final String MINICAP_PATH = "vendor/minicap/bin/%s/minicap";
-    private static final String MINICAP_SO_PATH = "vendor/minicap/shared/android-%s/%s/minicap.so";
+    private static final String LOCAL_MINICAP_PATH = "vendor/minicap/bin/%s/minicap";
+    private static final String LOCAL_MINICAP_SO_PATH = "vendor/minicap/shared/android-%s/%s/minicap.so";
 
     private IDevice iDevice;
 
@@ -27,28 +25,32 @@ public class MinicapInstaller {
     /**
      * 安装minicap
      */
-    public void install() throws TimeoutException, AdbCommandRejectedException, SyncException, IOException, ShellCommandUnresponsiveException {
-        String deviceId = iDevice.getSerialNumber();
+    public void install() throws StfComponentInstallException {
+        try {
+            String deviceId = iDevice.getSerialNumber();
 
-        String cpuAbi = AndroidUtil.getCpuAbi(iDevice);
-        String sdkVersion = AndroidUtil.getSdkVersion(iDevice);
+            String cpuAbi = AndroidUtil.getCpuAbi(iDevice);
+            String sdkVersion = AndroidUtil.getSdkVersion(iDevice);
 
-        String minicapFilePath = String.format(MINICAP_PATH, cpuAbi);
-        String minicapSoFilePath = String.format(MINICAP_SO_PATH, sdkVersion, cpuAbi);
+            String localMinicapFilePath = String.format(LOCAL_MINICAP_PATH, cpuAbi);
+            String localMinicapSoFilePath = String.format(LOCAL_MINICAP_SO_PATH, sdkVersion, cpuAbi);
 
-        // push minicap 到手机
-        String androidDeviceMinicapPath = AndroidDevice.TMP_FOLDER + "minicap";
-        log.info("[minicap][{}]push minicap到手机, {} -> {}", deviceId, minicapFilePath, androidDeviceMinicapPath);
-        iDevice.pushFile(minicapFilePath, androidDeviceMinicapPath);
+            // push minicap 到手机
+            String remoteMinicapPath = AndroidDevice.TMP_FOLDER + "minicap";
+            log.info("[minicap][{}]push minicap到手机, {} -> {}", deviceId, localMinicapFilePath, remoteMinicapPath);
+            iDevice.pushFile(localMinicapFilePath, remoteMinicapPath);
 
-        // push minicap.so 到手机
-        String androidDeviceMinicapSoPath = AndroidDevice.TMP_FOLDER + "minicap.so";
-        log.info("[minicap][{}]push minicap.so到手机, {} -> {}", deviceId, minicapSoFilePath, androidDeviceMinicapSoPath);
-        iDevice.pushFile(minicapSoFilePath, androidDeviceMinicapSoPath);
+            // push minicap.so 到手机
+            String remoteMinicapSoPath = AndroidDevice.TMP_FOLDER + "minicap.so";
+            log.info("[minicap][{}]push minicap.so到手机, {} -> {}", deviceId, localMinicapSoFilePath, remoteMinicapSoPath);
+            iDevice.pushFile(localMinicapSoFilePath, remoteMinicapSoPath);
 
-        // 给手机里的minicap/minicap.so 赋予777权限
-        String chmodShellCmd = String.format(MINICAP_CHMOD_SHELL, androidDeviceMinicapPath, androidDeviceMinicapSoPath);
-        log.info("[minicap][{}]{} ", deviceId, chmodShellCmd);
-        iDevice.executeShellCommand(chmodShellCmd, new NullOutputReceiver());
+            // 给手机里的minicap/minicap.so 赋予777权限
+            String chmodShellCmd = String.format(MINICAP_CHMOD_SHELL, remoteMinicapPath, remoteMinicapSoPath);
+            log.info("[minicap][{}]{} ", deviceId, chmodShellCmd);
+            iDevice.executeShellCommand(chmodShellCmd, new NullOutputReceiver());
+        } catch (Exception e) {
+            throw new StfComponentInstallException(e);
+        }
     }
 }

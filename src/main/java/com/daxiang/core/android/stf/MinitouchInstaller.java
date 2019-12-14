@@ -5,15 +5,13 @@ import com.daxiang.core.android.AndroidDevice;
 import com.daxiang.core.android.AndroidUtil;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
-
 /**
  * Created by jiangyitao.
  */
 @Slf4j
 public class MinitouchInstaller {
 
-    private static final String MINITOUCH_PATH = "vendor/minitouch/%s/minitouch";
+    private static final String LOCAL_MINITOUCH_PATH = "vendor/minitouch/%s/minitouch";
     private static final String MINITOUCH_CHMOD_SHELL = "chmod 777 %s";
 
     private IDevice iDevice;
@@ -25,18 +23,22 @@ public class MinitouchInstaller {
     /**
      * 安装minitouch
      */
-    public void install() throws TimeoutException, AdbCommandRejectedException, SyncException, IOException, ShellCommandUnresponsiveException {
-        String deviceId = iDevice.getSerialNumber();
+    public void install() throws StfComponentInstallException {
+        try {
+            String deviceId = iDevice.getSerialNumber();
 
-        String cpuAbi = AndroidUtil.getCpuAbi(iDevice);
-        String minitouchFilePath = String.format(MINITOUCH_PATH, cpuAbi);
+            String cpuAbi = AndroidUtil.getCpuAbi(iDevice);
+            String localMinitouchFilePath = String.format(LOCAL_MINITOUCH_PATH, cpuAbi);
 
-        String androidDeviceMinitouchPath = AndroidDevice.TMP_FOLDER + "minitouch";
-        log.info("[minitouch][{}]push minitouch到手机, {}->{}", deviceId, minitouchFilePath, androidDeviceMinitouchPath);
-        iDevice.pushFile(minitouchFilePath, androidDeviceMinitouchPath);
+            String remoteMinitouchPath = AndroidDevice.TMP_FOLDER + "minitouch";
+            log.info("[minitouch][{}]push minitouch到手机, {} -> {}", deviceId, localMinitouchFilePath, remoteMinitouchPath);
+            iDevice.pushFile(localMinitouchFilePath, remoteMinitouchPath);
 
-        String chmodShellCmd = String.format(MINITOUCH_CHMOD_SHELL, androidDeviceMinitouchPath);
-        log.info("[minitouch][{}]{} ", deviceId, chmodShellCmd);
-        iDevice.executeShellCommand(chmodShellCmd, new NullOutputReceiver());
+            String chmodShellCmd = String.format(MINITOUCH_CHMOD_SHELL, remoteMinitouchPath);
+            log.info("[minitouch][{}]{} ", deviceId, chmodShellCmd);
+            iDevice.executeShellCommand(chmodShellCmd, new NullOutputReceiver());
+        } catch (Exception e) {
+            throw new StfComponentInstallException(e);
+        }
     }
 }

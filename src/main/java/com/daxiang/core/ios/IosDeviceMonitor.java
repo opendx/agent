@@ -5,6 +5,9 @@ import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by jiangyitao.
@@ -16,11 +19,12 @@ public class IosDeviceMonitor {
 
     private List<String> lastDeviceList = new ArrayList<>();
     private List<String> currentDeviceList = new ArrayList<>();
+
+    private final ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
     /**
      * 每5秒检查一次
      */
-    private static final int MONITOR_PERIOD = 5 * 1000;
-    private boolean isMonitorDevice = false;
+    private static final int MONITOR_PERIOD_SECONDS = 5;
 
     private IosDeviceMonitor() {
     }
@@ -29,41 +33,26 @@ public class IosDeviceMonitor {
         return INSTANCE;
     }
 
-    public synchronized void start(IosDeviceChangeListener iosDeviceChangeListener) {
+    public void start(IosDeviceChangeListener iosDeviceChangeListener) {
         Assert.notNull(iosDeviceChangeListener, "iosDeviceChangeListener cannot be null");
 
-        if (isMonitorDevice) {
-            return;
-        }
-        isMonitorDevice = true;
+        service.scheduleAtFixedRate(() -> {
+            currentDeviceList = IosUtil.getDeviceList(false);
 
-        new Thread(() -> {
-            log.info("[ios]开始检查设备连接状态");
-            while (isMonitorDevice) {
-                currentDeviceList = IosUtil.getDeviceList(false);
+            // 新增的设备
+            currentDeviceList.stream()
+                    .filter(deviceId -> !lastDeviceList.contains(deviceId))
+                    .forEach(deviceId -> iosDeviceChangeListener.onDeviceConnected(deviceId));
+            // 减少的设备
+            lastDeviceList.stream()
+                    .filter(deviceId -> !currentDeviceList.contains(deviceId))
+                    .forEach(deviceId -> iosDeviceChangeListener.onDeviceDisconnected(deviceId));
 
-                // 新增的设备
-                currentDeviceList.stream()
-                        .filter(deviceId -> !lastDeviceList.contains(deviceId))
-                        .forEach(deviceId -> iosDeviceChangeListener.onDeviceConnected(deviceId));
-                // 减少的设备
-                lastDeviceList.stream()
-                        .filter(deviceId -> !currentDeviceList.contains(deviceId))
-                        .forEach(deviceId -> iosDeviceChangeListener.onDeviceDisconnected(deviceId));
-
-                lastDeviceList = currentDeviceList;
-
-                try {
-                    Thread.sleep(MONITOR_PERIOD);
-                } catch (InterruptedException e) {
-                    log.error("sleep err", e);
-                }
-            }
-            log.info("[ios]已停止检查设备连接状态");
-        }).start();
+            lastDeviceList = currentDeviceList;
+        }, 0, MONITOR_PERIOD_SECONDS, TimeUnit.SECONDS);
     }
 
     public void stop() {
-        isMonitorDevice = false;
+        service.shutdown();
     }
 }

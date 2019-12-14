@@ -14,7 +14,6 @@ import java.io.IOException;
 @Slf4j
 public class ADB {
 
-    private static final String ADB_PLATFORM_TOOLS = "platform-tools";
 
     /**
      * 添加Android设备监听器
@@ -31,7 +30,6 @@ public class ADB {
      * 杀掉adb服务
      */
     public static void killServer() throws IOException {
-        log.info("[adb]kill-server");
         Terminal.execute("adb kill-server");
     }
 
@@ -39,7 +37,6 @@ public class ADB {
      * 启动adb服务
      */
     public static void startServer() throws IOException {
-        log.info("[adb]start-server");
         Terminal.execute("adb start-server");
     }
 
@@ -56,7 +53,7 @@ public class ADB {
             throw new RuntimeException("未获取到ANDROID_HOME，请配置ANDOIRD_HOME环境变量");
         }
 
-        String adbPath = androidHome + File.separator + ADB_PLATFORM_TOOLS + File.separator;
+        String adbPath = androidHome + File.separator + "platform-tools" + File.separator;
         if (Terminal.IS_WINDOWS) {
             adbPath = adbPath + "adb.exe";
         } else {
