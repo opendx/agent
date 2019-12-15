@@ -33,7 +33,7 @@ VALUES
   '[{"name":"packageName","type":"String","description":"android: packageName, iOS: bundleId"}]'
 );
 
--- 3.installApk
+-- 3.installApp
 INSERT INTO `action` (
   `id`,
   `name`,
@@ -56,7 +56,7 @@ INSERT INTO `action` (
   `name`,
   `invoke`,
   `return_value`,
-  `platform`,
+  `platforms`,
   `params`
 )
 VALUES
@@ -65,7 +65,7 @@ VALUES
   '清除APK数据[clearApkData]',
   '$.clearApkData',
   'void',
-  1,
+  '[1,3,4]',
   '[{"name":"packageName","type":"String","description":"包名"}]'
 );
 
@@ -75,7 +75,7 @@ INSERT INTO `action` (
   `name`,
   `invoke`,
   `return_value`,
-  `platform`,
+  `platforms`,
   `params`
 )
 VALUES
@@ -84,7 +84,7 @@ VALUES
   '启动/重启Apk[restartApk]',
   '$.restartApk',
   'void',
-  1,
+  '[1,3,4]',
   '[{"name":"packageName","type":"String","description":"包名"},{"name":"launchActivity","type":"String","description":"启动Activity名"}]'
 );
 
@@ -94,7 +94,7 @@ INSERT INTO `action` (
   `name`,
   `invoke`,
   `return_value`,
-  `platform`,
+  `platforms`,
   `params`
 )
 VALUES
@@ -103,7 +103,7 @@ VALUES
   '启动/重启app[restartIosApp]',
   '$.restartIosApp',
   'void',
-  2,
+  '[2]',
   '[{"name":"bundleId","type":"String","description": "app bundleId"}]'
 );
 
