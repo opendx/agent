@@ -8,21 +8,15 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 /**
  * Created by jiangyitao.
  */
-public class AndroidDriverBuilder implements AppiumDriverBuilder {
+public class WxToolsDriverBuilder implements AppiumDriverBuilder {
 
     @Override
     public AppiumDriver build(MobileDevice mobileDevice) {
         DesiredCapabilities capabilities = new DesiredCapabilitiesBuilder(mobileDevice)
                 .androidBasic()
                 .androidSkip()
-                .extractChromeAndroidPackageFromContextName()
-                .build();
-        return new AndroidDriver(mobileDevice.getAppiumServer().getUrl(), capabilities);
-    }
-
-    public AppiumDriver init(MobileDevice mobileDevice) {
-        DesiredCapabilities capabilities = new DesiredCapabilitiesBuilder(mobileDevice)
-                .androidBasic()
+                .androidWX()
+                .androidWxTools()
                 .build();
         return new AndroidDriver(mobileDevice.getAppiumServer().getUrl(), capabilities);
     }

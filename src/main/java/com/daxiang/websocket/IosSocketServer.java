@@ -25,7 +25,7 @@ import java.time.Duration;
  */
 @Slf4j
 @Component
-@ServerEndpoint(value = "/ios/{deviceId}/{username}")
+@ServerEndpoint(value = "/ios/{deviceId}/user/{username}/platform/{platform}")
 public class IosSocketServer {
 
     private IosDevice iosDevice;
@@ -37,7 +37,7 @@ public class IosSocketServer {
     long pressStartTime;
 
     @OnOpen
-    public void onOpen(@PathParam("deviceId") String deviceId, @PathParam("username") String username, Session session) throws Exception {
+    public void onOpen(@PathParam("deviceId") String deviceId, @PathParam("username") String username, @PathParam("platform") Integer platform, Session session) throws Exception {
         log.info("[ios-websocket][{}]onOpen: username -> {}", deviceId, username);
         this.deviceId = deviceId;
 
@@ -64,7 +64,7 @@ public class IosSocketServer {
         mobileDevice.saveUsingDeviceToMaster(username);
 
         basicRemote.sendText("初始化appium driver...");
-        Response response = App.getBean(MobileService.class).freshDriver(deviceId);
+        Response response = App.getBean(MobileService.class).freshDriver(deviceId, platform);
         basicRemote.sendText("初始化appium driver完成");
         basicRemote.sendText(JSON.toJSONString(response));
 

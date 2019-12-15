@@ -24,7 +24,7 @@ import java.io.IOException;
  */
 @Slf4j
 @Component
-@ServerEndpoint(value = "/android/{deviceId}/{username}")
+@ServerEndpoint(value = "/android/{deviceId}/user/{username}/platform/{platform}")
 public class AndroidSocketServer {
 
     private AndroidDevice androidDevice;
@@ -32,7 +32,7 @@ public class AndroidSocketServer {
     private String deviceId;
 
     @OnOpen
-    public void onOpen(@PathParam("deviceId") String deviceId, @PathParam("username") String username, Session session) throws Exception {
+    public void onOpen(@PathParam("deviceId") String deviceId, @PathParam("username") String username, @PathParam("platform") Integer platform, Session session) throws Exception {
         log.info("[android-websocket][{}]onOpen: username -> {}", deviceId, username);
         this.deviceId = deviceId;
 
@@ -77,7 +77,7 @@ public class AndroidSocketServer {
         remoteEndpoint.sendText("启动minitouch完成");
 
         remoteEndpoint.sendText("初始化appium driver...");
-        Response response = App.getBean(MobileService.class).freshDriver(deviceId);
+        Response response = App.getBean(MobileService.class).freshDriver(deviceId, platform);
         remoteEndpoint.sendText("初始化appium driver完成");
         remoteEndpoint.sendText(JSON.toJSONString(response));
 

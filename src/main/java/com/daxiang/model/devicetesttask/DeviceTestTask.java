@@ -34,6 +34,7 @@ public class DeviceTestTask {
     public static final Integer FINISHED_STATUS = 2;
 
     private Integer id;
+    private Integer platform;
     private Integer testTaskId;
     private String deviceId;
     private Integer status;

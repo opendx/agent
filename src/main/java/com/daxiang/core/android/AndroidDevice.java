@@ -81,13 +81,8 @@ public class AndroidDevice extends MobileDevice {
     }
 
     @Override
-    public AppiumDriver newAppiumDriver() {
-        return new AndroidDriverBuilder().build(this, false);
-    }
-
-    @Override
     public AppiumDriver initAppiumDriver() {
-        return new AndroidDriverBuilder().build(this, true);
+        return new AndroidDriverBuilder().init(this);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.daxiang.core;
 
 import com.daxiang.App;
 import com.daxiang.api.MasterApi;
+import com.daxiang.core.appium.AppiumDriverFactory;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
 import com.daxiang.utils.UUIDUtil;
@@ -53,9 +54,9 @@ public abstract class MobileDevice {
      *
      * @return
      */
-    public AppiumDriver freshAppiumDriver() {
+    public AppiumDriver freshAppiumDriver(Integer platform) {
         quitAppiumDriver();
-        appiumDriver = newAppiumDriver();
+        appiumDriver = AppiumDriverFactory.create(this, platform);
         return appiumDriver;
     }
 
@@ -69,8 +70,6 @@ public abstract class MobileDevice {
             }
         }
     }
-
-    public abstract AppiumDriver newAppiumDriver();
 
     public abstract AppiumDriver initAppiumDriver();
 

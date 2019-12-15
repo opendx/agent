@@ -64,13 +64,13 @@ public class MobileService {
         }
     }
 
-    public Response freshDriver(String deviceId) {
+    public Response freshDriver(String deviceId, Integer platform) {
         MobileDevice mobileDevice = MobileDeviceHolder.getConnectedDevice(deviceId);
         if (mobileDevice == null) {
             return Response.fail("设备未连接");
         }
 
-        AppiumDriver appiumDriver = mobileDevice.freshAppiumDriver();
+        AppiumDriver appiumDriver = mobileDevice.freshAppiumDriver(platform);
 
         JSONObject data = new JSONObject();
         data.put("appiumSessionId", appiumDriver.getSessionId().toString());
