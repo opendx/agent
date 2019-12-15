@@ -11,9 +11,9 @@ import java.util.List;
 /**
  * Created by jiangyitao.
  */
-public class IosPageSourceHandler extends AppiumPageSourceHandler {
+public class IosNativePageSourceHandler extends AppiumNativePageSourceHandler {
 
-    public IosPageSourceHandler(AppiumDriver appiumDriver) {
+    public IosNativePageSourceHandler(AppiumDriver appiumDriver) {
         super(appiumDriver);
     }
 

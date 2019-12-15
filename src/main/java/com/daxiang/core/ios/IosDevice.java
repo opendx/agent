@@ -4,7 +4,7 @@ import com.daxiang.App;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.core.appium.IosDriverBuilder;
-import com.daxiang.core.appium.IosPageSourceHandler;
+import com.daxiang.core.appium.IosNativePageSourceHandler;
 import com.daxiang.model.Device;
 import com.daxiang.utils.Terminal;
 import com.daxiang.utils.UUIDUtil;
@@ -61,7 +61,7 @@ public class IosDevice extends MobileDevice {
 
     @Override
     public String dump() throws IOException, DocumentException {
-        return new IosPageSourceHandler(getAppiumDriver()).getPageSource();
+        return new IosNativePageSourceHandler(getAppiumDriver()).getPageSource();
     }
 
     @Override

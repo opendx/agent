@@ -10,9 +10,9 @@ import java.util.List;
 /**
  * Created by jiangyitao.
  */
-public class AndroidPageSourceHandler extends AppiumPageSourceHandler {
+public class AndroidNativePageSourceHandler extends AppiumNativePageSourceHandler {
 
-    public AndroidPageSourceHandler(AppiumDriver appiumDriver) {
+    public AndroidNativePageSourceHandler(AppiumDriver appiumDriver) {
         super(appiumDriver);
     }
 

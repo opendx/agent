@@ -16,11 +16,11 @@ import java.nio.charset.Charset;
 /**
  * Created by jiangyitao.
  */
-public abstract class AppiumPageSourceHandler {
+public abstract class AppiumNativePageSourceHandler {
 
     private AppiumDriver appiumDriver;
 
-    public AppiumPageSourceHandler(AppiumDriver appiumDriver) {
+    public AppiumNativePageSourceHandler(AppiumDriver appiumDriver) {
         this.appiumDriver = appiumDriver;
     }
 

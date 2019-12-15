@@ -9,7 +9,7 @@ import com.daxiang.core.android.stf.AdbKit;
 import com.daxiang.core.android.stf.Minicap;
 import com.daxiang.core.android.stf.Minitouch;
 import com.daxiang.core.appium.AndroidDriverBuilder;
-import com.daxiang.core.appium.AndroidPageSourceHandler;
+import com.daxiang.core.appium.AndroidNativePageSourceHandler;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
 import com.daxiang.utils.UUIDUtil;
@@ -102,7 +102,7 @@ public class AndroidDevice extends MobileDevice {
 
     @Override
     public String dump() throws IOException, DocumentException {
-        return new AndroidPageSourceHandler(getAppiumDriver()).getPageSource();
+        return new AndroidNativePageSourceHandler(getAppiumDriver()).getPageSource();
     }
 
     @Override
@@ -112,7 +112,7 @@ public class AndroidDevice extends MobileDevice {
                 AndroidStartScreenRecordingOptions androidOptions = new AndroidStartScreenRecordingOptions();
                 // Since Appium 1.8.2 the time limit can be up to 1800 seconds (30 minutes).
                 androidOptions.withTimeLimit(Duration.ofMinutes(30));
-                androidOptions.withBitRate(200000); // default 4000000
+                androidOptions.withBitRate(1000000); // default 4000000
                 ((AndroidDriver) getAppiumDriver()).startRecordingScreen(androidOptions);
                 return;
             } catch (Exception e) {
