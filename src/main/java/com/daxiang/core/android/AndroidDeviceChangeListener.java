@@ -157,6 +157,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
             log.error("获取cpu信息失败", e);
             device.setCpuInfo("获取cpu信息失败");
         }
+
         try {
             device.setMemSize(AndroidUtil.getMemSize(iDevice));
         } catch (Exception e) {
@@ -164,16 +165,16 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
             device.setMemSize("获取内存大小失败");
         }
 
+        String resolution = AndroidUtil.getResolution(iDevice); // 720x1280
+        String[] res = resolution.split("x");
+        device.setScreenWidth(Integer.parseInt(res[0]));
+        device.setScreenHeight(Integer.parseInt(res[1]));
+
         AndroidDevice androidDevice = new AndroidDevice(device, iDevice, appiumServer);
 
         log.info("[android][{}]开始初始化appium", deviceId);
         AppiumDriver appiumDriver = androidDevice.initAppiumDriver();
         log.info("[android][{}]初始化appium完成", deviceId);
-
-        String resolution = AndroidUtil.getResolution(iDevice); // 720x1280
-        String[] res = resolution.split("x");
-        device.setScreenWidth(Integer.parseInt(res[0]));
-        device.setScreenHeight(Integer.parseInt(res[1]));
 
         // 截图并上传到服务器
         String imgDownloadUrl = androidDevice.screenshotAndUploadToMaster();
