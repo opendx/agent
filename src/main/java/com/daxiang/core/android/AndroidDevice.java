@@ -165,8 +165,7 @@ public class AndroidDevice extends MobileDevice {
         final ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
         service.scheduleAtFixedRate(() -> {
             try {
-                getAppiumDriver().findElementByXPath("//android.widget.Button[contains(@text,'安装')]").click();
-                service.shutdown();
+                getAppiumDriver().executeScript("mobile:acceptAlert");
             } catch (Exception ignore) {
             }
         }, 0, 1, TimeUnit.SECONDS);
