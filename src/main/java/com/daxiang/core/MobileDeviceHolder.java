@@ -1,7 +1,5 @@
 package com.daxiang.core;
 
-import com.android.ddmlib.IDevice;
-import com.daxiang.core.android.AndroidDevice;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.remote.MobileCapabilityType;
 import org.springframework.util.StringUtils;
@@ -33,14 +31,6 @@ public class MobileDeviceHolder {
     public static MobileDevice getMobileDeviceByAppiumDriver(AppiumDriver appiumDriver) {
         String deviceId = (String) appiumDriver.getCapabilities().getCapability(MobileCapabilityType.UDID);
         return get(deviceId);
-    }
-
-    public static IDevice getIDeviceByAppiumDriver(AppiumDriver appiumDriver) {
-        MobileDevice mobileDevice = getMobileDeviceByAppiumDriver(appiumDriver);
-        if (!(mobileDevice instanceof AndroidDevice)) {
-            throw new RuntimeException("非androidDevice无法获取IDevice");
-        }
-        return ((AndroidDevice) mobileDevice).getIDevice();
     }
 
     public static MobileDevice getConnectedDevice(String deviceId) {

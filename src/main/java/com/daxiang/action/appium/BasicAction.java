@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
+import com.daxiang.core.android.AndroidDevice;
 import com.daxiang.core.android.AndroidUtil;
 import com.daxiang.core.ios.IosUtil;
 import io.appium.java_client.AppiumDriver;
@@ -30,13 +31,14 @@ public class BasicAction {
 
     public static final int EXECUTE_JAVA_CODE_ID = 1;
 
+    private MobileDevice mobileDevice;
     private AppiumDriver driver;
     private int screenHeight;
     private int screenWidth;
 
     public BasicAction(AppiumDriver driver) {
         this.driver = driver;
-        MobileDevice mobileDevice = MobileDeviceHolder.getMobileDeviceByAppiumDriver(driver);
+        this.mobileDevice = MobileDeviceHolder.getMobileDeviceByAppiumDriver(driver);
         if (mobileDevice == null) {
             throw new RuntimeException("手机不存在");
         }
@@ -65,7 +67,7 @@ public class BasicAction {
         Assert.hasText(packageName, "apk包名或ios bundleId不能为空");
 
         if (driver instanceof AndroidDriver) {
-            AndroidUtil.uninstallApk(MobileDeviceHolder.getIDeviceByAppiumDriver(driver), packageName);
+            AndroidUtil.uninstallApk(((AndroidDevice) mobileDevice).getIDevice(), packageName);
         } else {
             IosUtil.uninstallApp(driver, packageName);
         }
@@ -81,7 +83,7 @@ public class BasicAction {
     public void installApp(String appDownloadUrl) throws Exception {
         Assert.hasText(appDownloadUrl, "appDownloadUrl不能为空");
 
-        MobileDeviceHolder.getMobileDeviceByAppiumDriver(driver).installApp(appDownloadUrl);
+        mobileDevice.installApp(appDownloadUrl);
     }
 
     /**
@@ -94,7 +96,7 @@ public class BasicAction {
     public void clearApkData(String packageName) throws Exception {
         Assert.hasText(packageName, "包名不能为空");
 
-        AndroidUtil.clearApkData(MobileDeviceHolder.getIDeviceByAppiumDriver(driver), packageName);
+        AndroidUtil.clearApkData(((AndroidDevice) mobileDevice).getIDevice(), packageName);
     }
 
     /**
@@ -109,7 +111,7 @@ public class BasicAction {
         Assert.hasText(packageName, "包名不能为空");
         Assert.hasText(launchActivity, "启动Activity不能为空");
 
-        AndroidUtil.restartApk(MobileDeviceHolder.getIDeviceByAppiumDriver(driver), packageName, launchActivity);
+        AndroidUtil.restartApk(((AndroidDevice) mobileDevice).getIDevice(), packageName, launchActivity);
     }
 
     /**
@@ -148,9 +150,6 @@ public class BasicAction {
      * @return
      */
     public WebElement findElement(String findBy, String value) {
-        Assert.hasText(findBy, "findBy不能为空");
-        Assert.hasText(value, "value不能为空");
-
         return driver.findElement(getBy(findBy, value));
     }
 
@@ -163,9 +162,6 @@ public class BasicAction {
      * @return 返回所有匹配的元素
      */
     public List<WebElement> findElements(String findBy, String value) {
-        Assert.hasText(findBy, "findBy不能为空");
-        Assert.hasText(value, "value不能为空");
-
         return driver.findElements(getBy(findBy, value));
     }
 
@@ -179,8 +175,6 @@ public class BasicAction {
      * @return
      */
     public WebElement sendKeys(String findBy, String value, String content) {
-        Assert.hasText(findBy, "findBy不能为空");
-        Assert.hasText(value, "value不能为空");
         Assert.hasText(content, "content不能为空");
 
         WebElement element = driver.findElement(getBy(findBy, value));
@@ -210,8 +204,6 @@ public class BasicAction {
      * @return
      */
     public WebElement waitForElementVisible(String findBy, String value, String maxWaitTimeInSeconds) {
-        Assert.hasText(findBy, "findBy不能为空");
-        Assert.hasText(value, "value不能为空");
         Assert.hasText(maxWaitTimeInSeconds, "最大等待时间不能为空");
 
         return new WebDriverWait(driver, Long.parseLong(maxWaitTimeInSeconds))
@@ -285,8 +277,6 @@ public class BasicAction {
      * @return
      */
     public WebElement swipeInScreenAndFindElement(String findBy, String value, String startPoint, String endPoint, String maxSwipeCount) {
-        Assert.hasText(findBy, "findBy不能为空");
-        Assert.hasText(value, "value不能为空");
         Assert.hasText(maxSwipeCount, "最大滑动次数不能为空");
 
         By by = getBy(findBy, value);
@@ -368,8 +358,6 @@ public class BasicAction {
      */
     public WebElement swipeInContainerElementAndFindElement(WebElement container, String findBy, String value, String startPoint, String endPoint, String maxSwipeCount) {
         Assert.notNull(container, "容器元素不能为空");
-        Assert.hasText(findBy, "findBy不能为空");
-        Assert.hasText(value, "value不能为空");
         Assert.hasText(maxSwipeCount, "最大滑动次数不能为空");
 
         By by = getBy(findBy, value);
@@ -434,21 +422,47 @@ public class BasicAction {
      * platform: Android / iOS
      * 20.等待元素在DOM里出现，不一定可见
      * 可用于检查toast是否显示
+     *
      * @param findBy
      * @param value
      * @param maxWaitTimeInSeconds
      * @return
      */
     public WebElement waitForElementPresence(String findBy, String value, String maxWaitTimeInSeconds) {
-        Assert.hasText(findBy, "findBy不能为空");
-        Assert.hasText(value, "value不能为空");
         Assert.hasText(maxWaitTimeInSeconds, "最大等待时间不能为空");
 
         return new WebDriverWait(driver, Long.parseLong(maxWaitTimeInSeconds))
                 .until(ExpectedConditions.presenceOfElementLocated(getBy(findBy, value)));
     }
 
+    /**
+     * platform: Android
+     * 21.弹窗 允许/接受/...
+     */
+    public void androidAcceptAlert() {
+        try {
+            driver.executeScript("mobile:acceptAlert");
+        } catch (Exception ign) {
+
+        }
+    }
+
+    /**
+     * platform: Android
+     * 22.弹窗 拒绝/取消/...
+     */
+    public void androidDismissAlert() {
+        try {
+            driver.executeScript("mobile:dismissAlert");
+        } catch (Exception ign) {
+
+        }
+    }
+
     private By getBy(String findBy, String value) {
+        Assert.hasText(findBy, "findBy不能为空");
+        Assert.hasText(value, "value不能为空");
+
         By by;
         switch (findBy) {
             case "id":

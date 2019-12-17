@@ -340,9 +340,47 @@ INSERT INTO `action` (
 VALUES
 (
   20,
-  '等待元素呈现[waitForElementPresence]',
+  '等待元素出现(不一定可见)[waitForElementPresence]',
   '等待元素在Page DOM里出现，移动端可用于检测toast',
   '$.waitForElementPresence',
   'WebElement',
   REPLACE('[#,{"name":"maxWaitTimeInSeconds","type":"String","description":"最大等待时间(秒)"}]','#',@findbyAndValue)
+);
+
+-- 21.androidAcceptAlert
+INSERT INTO `action` (
+  `id`,
+  `name`,
+  `description`,
+  `invoke`,
+  `return_value`,
+  `platforms`
+)
+VALUES
+(
+  21,
+  '对话框-接受/允许/确定/是...[acceptAlert]',
+  'driver.executeScript("mobile:acceptAlert")',
+  '$.androidAcceptAlert',
+  'void',
+  '[1,3,4]'
+);
+
+-- 22.androidDismissAlert
+INSERT INTO `action` (
+  `id`,
+  `name`,
+  `description`,
+  `invoke`,
+  `return_value`,
+  `platforms`
+)
+VALUES
+(
+  22,
+  '对话框-拒绝/取消/否...[dismissAlert]',
+  'driver.executeScript("mobile:dismissAlert")',
+  '$.androidDismissAlert',
+  'void',
+  '[1,3,4]'
 );
