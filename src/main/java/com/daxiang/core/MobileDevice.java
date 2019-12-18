@@ -5,6 +5,7 @@ import com.daxiang.api.MasterApi;
 import com.daxiang.core.appium.AppiumDriverFactory;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
+import com.daxiang.model.FileType;
 import com.daxiang.utils.UUIDUtil;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.touch.offset.PointOption;
@@ -125,7 +126,7 @@ public abstract class MobileDevice {
         File screenshotFile = null;
         try {
             screenshotFile = screenshot();
-            return MasterApi.getInstance().uploadFile(screenshotFile);
+            return MasterApi.getInstance().uploadFile(screenshotFile, FileType.IMG);
         } finally {
             FileUtils.deleteQuietly(screenshotFile);
         }
@@ -198,7 +199,7 @@ public abstract class MobileDevice {
         File video = null;
         try {
             video = stopRecordingScreen();
-            return MasterApi.getInstance().uploadFile(video);
+            return MasterApi.getInstance().uploadFile(video, FileType.VIDEO);
         } finally {
             FileUtils.deleteQuietly(video);
         }

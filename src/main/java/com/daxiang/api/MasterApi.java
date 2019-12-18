@@ -132,13 +132,13 @@ public class MasterApi {
      *
      * @return 下载地址
      */
-    public String uploadFile(File file) {
+    public String uploadFile(File file, Integer fileType) {
         FileSystemResource resource = new FileSystemResource(file);
         MultiValueMap<String, Object> multiValueMap = new LinkedMultiValueMap<>();
         multiValueMap.add("file", resource);
         HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(multiValueMap);
 
-        Response<Map<String, String>> response = restTemplate.exchange(uploadFileApi, HttpMethod.POST, httpEntity,
+        Response<Map<String, String>> response = restTemplate.exchange(uploadFileApi + "?fileType=" + fileType, HttpMethod.POST, httpEntity,
                 new ParameterizedTypeReference<Response<Map<String, String>>>() {
                 }).getBody();
 
