@@ -22,7 +22,8 @@ import java.util.stream.Collectors;
 @Accessors(chain = true)
 public class TestNGCodeConverter {
 
-    private static final String METHOD_PREFIX = "action_";
+    private static final String ACTION_PREFIX = "action_";
+    private static final String TESTCASE_PREFIX = "testcase_";
     /**
      * actionId: Action
      */
@@ -86,7 +87,8 @@ public class TestNGCodeConverter {
         handleGlobalVars(deviceTestTask.getGlobalVars());
 
         dataModel.put("className", className);
-        dataModel.put("methodPrefix", METHOD_PREFIX);
+        dataModel.put("actionPrefix", ACTION_PREFIX);
+        dataModel.put("testcasePrefix", TESTCASE_PREFIX);
         dataModel.put("executeJavaCodeActionId", BasicAction.EXECUTE_JAVA_CODE_ID);
 
         handleJavaImports();
@@ -122,7 +124,7 @@ public class TestNGCodeConverter {
         }
 
         // {"action_2","action_1"}
-        return "{" +  depends.stream().map(id -> "\"" + METHOD_PREFIX + id + "\"").collect(Collectors.joining(",")) + "}";
+        return "{" + depends.stream().map(id -> "\"" + TESTCASE_PREFIX + id + "\"").collect(Collectors.joining(",")) + "}";
     }
 
     private void handleJavaImports() {
@@ -154,7 +156,7 @@ public class TestNGCodeConverter {
      * @return
      */
     private String convertToInvokeMethodStringWithParamNull(Action action) {
-        StringBuilder invokeMethod = new StringBuilder(METHOD_PREFIX + action.getId() + "(");
+        StringBuilder invokeMethod = new StringBuilder(ACTION_PREFIX + action.getId() + "(");
         List<Param> actionParams = action.getParams();
         // 如果有参数 则都传入null
         if (!CollectionUtils.isEmpty(actionParams)) {

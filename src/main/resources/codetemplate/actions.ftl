@@ -7,7 +7,7 @@
         <#-- 返回值 -->
         <#lt>    public ${action.returnValue} <#rt>
         <#-- 方法名 -->
-        <#lt>${methodPrefix}${action.id?c}<#rt>
+        <#lt>${actionPrefix}${action.id?c}<#rt>
         <#lt>(<#rt>
         <#-- 方法参数 -->
         <#if action.params?? && (action.params?size>0)>
@@ -48,7 +48,7 @@
                         ${step.paramValues[0].paramValue}
                     <#else>
                     <#-- 步骤赋值，方法调用 -->
-                        <#lt>        <#if step.evaluation?? && step.evaluation!=''>${step.evaluation} = </#if>${methodPrefix}${step.actionId?c}(<#rt>
+                        <#lt>        <#if step.evaluation?? && step.evaluation!=''>${step.evaluation} = </#if>${actionPrefix}${step.actionId?c}(<#rt>
                         <#if step.paramValues?? && (step.paramValues?size>0)>
                             <#list step.paramValues as paramValue>
                                 <#lt>${paramValue.paramValue}<#sep>, <#rt>
