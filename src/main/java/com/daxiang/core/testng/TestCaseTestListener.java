@@ -77,7 +77,8 @@ public class TestCaseTestListener extends TestListenerAdapter {
         testcase.setStartTime(new Date());
         MASTER_API.updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
 
-        if (CONFIG_FAIL_ERR_INFO.get() == null && testDesc.getRecordVideo()) {
+        // 当前置任务执行失败，或依赖的用例执行失败，tr.getThrowable() != null，此时不需要开启视频录制，因为testng会马上调用onTestSkip
+        if (tr.getThrowable() == null && testDesc.getRecordVideo()) {
             try {
                 log.info("[自动化测试][{}]testcaseId: {}, 开始录制视频...", testDesc.getDeviceId(), testcaseId);
                 testDesc.getMobileDevice().startRecordingScreen();
@@ -126,19 +127,21 @@ public class TestCaseTestListener extends TestListenerAdapter {
         testcase.setEndTime(new Date());
         testcase.setStatus(Testcase.SKIP_STATUS);
 
-        if (CONFIG_FAIL_ERR_INFO.get() == null) { // 正常执行的跳过，并非前置任务执行失败
+        if (CONFIG_FAIL_ERR_INFO.get() != null) { // 前置任务执行失败
+            testcase.setFailInfo(CONFIG_FAIL_ERR_INFO.get());
+        } else if (tr.getThrowable() != null) { // dependsOnMethods执行失败。实际前置任务执行失败，也是!=null，但为了获取更加详细的信息，已经在上面的if作了处理
+            testcase.setFailInfo(tr.getThrowable().getMessage());
+        } else { // 正常情况下的跳过，throw SkipException导致
             testcase.setFailInfo(tr.getThrowable().getMessage());
             testcase.setFailImgUrl(getScreenshotDownloadUrl(testDesc));
             testcase.setVideoUrl(getVideoDownloadUrl(testDesc));
-        } else {
-            testcase.setFailInfo(CONFIG_FAIL_ERR_INFO.get());
         }
 
         MASTER_API.updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
     }
 
     /**
-     * BeforeClass或BeforeMethod出错时，将进入该方法
+     * 前置任务执行出错时，将进入该方法
      * 进入该方法后，后续的testcase都将跳过。将直接调用onTestStart -> onTestSkipped，不会调用@Test
      *
      * @param tr
@@ -148,7 +151,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         TestDescription testDesc = (TestDescription) tr.getTestContext().getAttribute(TEST_DESCRIPTION);
         log.error("[自动化测试][{}]{}执行失败", testDesc.getDeviceId(), tr.getName(), tr.getThrowable());
 
-        CONFIG_FAIL_ERR_INFO.set(tr.getName() + "执行失败\n" + ExceptionUtils.getStackTrace(tr.getThrowable()));
+        CONFIG_FAIL_ERR_INFO.set(tr.getName() + "执行失败!\n\n" + ExceptionUtils.getStackTrace(tr.getThrowable()));
     }
 
     private String getScreenshotDownloadUrl(TestDescription testDesc) {
