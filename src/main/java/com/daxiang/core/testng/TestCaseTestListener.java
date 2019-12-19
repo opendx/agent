@@ -22,6 +22,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
     public static final String TEST_DESCRIPTION = "test_desc";
     private static final MasterApi MASTER_API = MasterApi.getInstance();
     private static final ThreadLocal<Integer> CURRENT_TEST_CASE_ID = new ThreadLocal<>();
+    private static final ThreadLocal<String> CONFIG_FAIL_ERR_INFO = new ThreadLocal<>();
 
     /**
      * 每个设备开始测试调用的方法，这里可能有多个线程同时调用
@@ -76,7 +77,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         testcase.setStartTime(new Date());
         MASTER_API.updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
 
-        if (testDesc.getRecordVideo()) {
+        if (CONFIG_FAIL_ERR_INFO.get() == null && testDesc.getRecordVideo()) {
             try {
                 log.info("[自动化测试][{}]testcaseId: {}, 开始录制视频...", testDesc.getDeviceId(), testcaseId);
                 testDesc.getMobileDevice().startRecordingScreen();
@@ -115,14 +116,6 @@ public class TestCaseTestListener extends TestListenerAdapter {
         MASTER_API.updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
     }
 
-    /**
-     * 当@BeforeClass抛出异常后，所有@Test都不会执行，且所有@Test都会先调用onTestStart然后直接调用onTestSkipped
-     * 当@BeforeMethod抛出异常后，当前将要执行的@Test不会执行，且会先调用onTestStart然后直接调用onTestSkipped
-     * BeforeClass/BeforeMethod抛出异常后，onTestSkipped tr.getThrowable为null
-     * 由Test抛出的SkipException，tr.getThrowable不为空，能获取到跳过的原因
-     *
-     * @param tr
-     */
     @Override
     public void onTestSkipped(ITestResult tr) {
         TestDescription testDesc = (TestDescription) tr.getTestContext().getAttribute(TEST_DESCRIPTION);
@@ -132,14 +125,30 @@ public class TestCaseTestListener extends TestListenerAdapter {
         testcase.setId(testDesc.getTestcaseId());
         testcase.setEndTime(new Date());
         testcase.setStatus(Testcase.SKIP_STATUS);
-        testcase.setFailImgUrl(getScreenshotDownloadUrl(testDesc));
-        if (tr.getThrowable() == null) { // @BeforeClass或@BeforeMethod抛出异常导致的case跳过
-            testcase.setFailInfo("前置任务执行失败");
-        } else {
+
+        if (CONFIG_FAIL_ERR_INFO.get() == null) { // 正常执行的跳过，并非前置任务执行失败
             testcase.setFailInfo(tr.getThrowable().getMessage());
+            testcase.setFailImgUrl(getScreenshotDownloadUrl(testDesc));
+            testcase.setVideoUrl(getVideoDownloadUrl(testDesc));
+        } else {
+            testcase.setFailInfo(CONFIG_FAIL_ERR_INFO.get());
         }
-        testcase.setVideoUrl(getVideoDownloadUrl(testDesc));
+
         MASTER_API.updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
+    }
+
+    /**
+     * BeforeClass或BeforeMethod出错时，将进入该方法
+     * 进入该方法后，后续的testcase都将跳过。将直接调用onTestStart -> onTestSkipped，不会调用@Test
+     *
+     * @param tr
+     */
+    @Override
+    public void onConfigurationFailure(ITestResult tr) {
+        TestDescription testDesc = (TestDescription) tr.getTestContext().getAttribute(TEST_DESCRIPTION);
+        log.error("[自动化测试][{}]{}执行失败", testDesc.getDeviceId(), tr.getName(), tr.getThrowable());
+
+        CONFIG_FAIL_ERR_INFO.set(tr.getName() + "执行失败\n" + ExceptionUtils.getStackTrace(tr.getThrowable()));
     }
 
     private String getScreenshotDownloadUrl(TestDescription testDesc) {
