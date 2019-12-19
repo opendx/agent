@@ -64,9 +64,9 @@ public class ${className} {
     </#if>
 
     <#list testcases as testcase>
-        <#lt>    @Test<#if deviceTestTask.id??>(description = "${deviceTestTask.deviceId}_${deviceTestTask.id?c}_${testcase.id?c}_${deviceTestTask.testPlan.enableRecordVideo}_${deviceTestTask.testPlan.failRetryCount}")</#if>
+        <#lt>    @Test<#if deviceTestTask.id??>(description = "${testcase.description}"<#if testcase.dependsOnMethods??>, dependsOnMethods=${testcase.dependsOnMethods}</#if>)</#if>
         <#lt>    public void testcase_${testcase.id?c}() throws Throwable {
-        <#lt>        ${testcase.testcase}
+        <#lt>        ${testcase.invoke}
         <#lt>    }
     </#list>
 

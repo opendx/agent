@@ -2,6 +2,7 @@ package com.daxiang.core.testng;
 
 import com.daxiang.model.Response;
 import org.springframework.util.CollectionUtils;
+import org.testng.ITestNGListener;
 import org.testng.TestNG;
 
 import java.util.Arrays;
@@ -44,7 +45,7 @@ public class TestNGRunner {
         }
     }
 
-    private static TestNG run(Class[] testClasses, List<Class> listenerClasses) {
+    private static TestNG run(Class[] testClasses, List<Class<? extends ITestNGListener>> listenerClasses) {
         TestNG testNG = new TestNG();
         testNG.setTestClasses(testClasses);
         testNG.setListenerClasses(listenerClasses);

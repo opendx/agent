@@ -43,7 +43,9 @@ public class TestNGCodeConverter {
 
         dataModel.put("testcases", testcases.stream().map(testcase -> {
             JSONObject tc = new JSONObject();
-            tc.put("testcase", convertToInvokeMethodStringWithParamNull(testcase));
+            tc.put("invoke", convertToInvokeMethodStringWithParamNull(testcase));
+            tc.put("description", getDesc(deviceTestTask, testcase));
+            tc.put("dependsOnMethods", getDependsOnMethods(testcase.getDepends()));
             tc.put("id", testcase.getId());
             return tc;
         }).collect(Collectors.toList()));
@@ -99,6 +101,30 @@ public class TestNGCodeConverter {
         }
     }
 
+    private String getDesc(DeviceTestTask deviceTestTask, Testcase testcase) {
+        if (deviceTestTask.getId() == null) { // 调试
+            return null;
+        }
+        return deviceTestTask.getDeviceId()
+                + "_"
+                + deviceTestTask.getId()
+                + "_"
+                + testcase.getId()
+                + "_"
+                + deviceTestTask.getTestPlan().getEnableRecordVideo()
+                + "_"
+                + deviceTestTask.getTestPlan().getFailRetryCount();
+    }
+
+    private String getDependsOnMethods(List<Integer> depends) {
+        if (CollectionUtils.isEmpty(depends)) {
+            return null;
+        }
+
+        // {"action_2","action_1"}
+        return "{" +  depends.stream().map(id -> "\"" + METHOD_PREFIX + id + "\"").collect(Collectors.joining(",")) + "}";
+    }
+
     private void handleJavaImports() {
         javaImports.add("import com.daxiang.core.MobileDeviceHolder;");
         javaImports.add("import io.appium.java_client.AppiumDriver;");
@@ -128,14 +154,14 @@ public class TestNGCodeConverter {
      * @return
      */
     private String convertToInvokeMethodStringWithParamNull(Action action) {
-        StringBuilder callMethodString = new StringBuilder(METHOD_PREFIX + action.getId() + "(");
+        StringBuilder invokeMethod = new StringBuilder(METHOD_PREFIX + action.getId() + "(");
         List<Param> actionParams = action.getParams();
         // 如果有参数 则都传入null
         if (!CollectionUtils.isEmpty(actionParams)) {
-            callMethodString.append(actionParams.stream().map(i -> "null").collect(Collectors.joining(",")));
+            invokeMethod.append(actionParams.stream().map(i -> "null").collect(Collectors.joining(",")));
         }
-        callMethodString.append(");");
-        return callMethodString.toString();
+        invokeMethod.append(");");
+        return invokeMethod.toString();
     }
 
     /**

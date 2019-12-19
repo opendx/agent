@@ -24,4 +24,5 @@ public class Action {
     private List<LocalVar> localVars;
     private List<Step> steps;
     private List<String> javaImports;
+    private List<Integer> depends;
 }

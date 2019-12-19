@@ -6,7 +6,7 @@
 
     <groupId>com.daxiang</groupId>
     <artifactId>agent</artifactId>
-    <version>0.3.0-beta</version>
+    <version>0.3.1-beta</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -84,7 +84,7 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.8</version>
+            <version>7.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.dvare</groupId>
