@@ -52,6 +52,9 @@ public class TestCaseTestListener extends TestListenerAdapter {
         TestDescription testDesc = (TestDescription) testContext.getAttribute(TEST_DESCRIPTION);
         log.info("[自动化测试][{}]onFinish, deviceTestTaskId: {}", testDesc.getDeviceId(), testDesc.getDeviceTestTaskId());
 
+        CURRENT_TEST_CASE_ID.remove();
+        CONFIG_FAIL_ERR_INFO.remove();
+
         DeviceTestTask deviceTestTask = new DeviceTestTask();
         deviceTestTask.setId(testDesc.getDeviceTestTaskId());
         deviceTestTask.setEndTime(new Date());
