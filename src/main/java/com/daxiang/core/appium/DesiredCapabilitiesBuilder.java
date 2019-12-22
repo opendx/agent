@@ -102,9 +102,9 @@ public class DesiredCapabilitiesBuilder {
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
         capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.IOS_XCUI_TEST);
         capabilities.setCapability(IOSMobileCapabilityType.WDA_LOCAL_PORT, PortProvider.getWdaLocalAvailablePort());
-        capabilities.setCapability(IOSMobileCapabilityType.WDA_STARTUP_RETRY_INTERVAL, 60000);
         capabilities.setCapability("mjpegServerPort", PortProvider.getWdaMjpegServerAvailablePort());
         capabilities.setCapability(IOSMobileCapabilityType.BUNDLE_ID, IOS_BUNDLE_ID);
+        capabilities.setCapability(IOSMobileCapabilityType.WDA_STARTUP_RETRIES, 0);
         capabilities.setCapability("waitForQuiescence", false);
         capabilities.setCapability("skipLogCapture", true);
         // Get JSON source from WDA and parse into XML on Appium server. This can be much faster, especially on large devices.

@@ -257,7 +257,7 @@ VALUES
   '滑动屏幕[swipeInScreen]',
   '$.swipeInScreen',
   'void',
-  '[{"name":"startPoint","type":"String","description":"起点，如: {x:0.5,y:0.5} => 屏幕中心点"},{"name":"endPoint","type":"String","description":"终点，如: {x:0.5,y:0.5} => 屏幕中心点"}]'
+  '[{"name":"startPoint","type":"String","description":"起点，如: {x:0.5,y:0.5} => 屏幕中心点"},{"name":"endPoint","type":"String","description":"终点，如: {x:0.5,y:0.5} => 屏幕中心点"},{"name":"durationInMsOfSwipeOneTime","type":"String","description":"滑动一次的时间，单位: ms。时间越短，滑的距离越长"}]'
 );
 
 -- 16.swipeInScreenAndFindElement
@@ -274,7 +274,7 @@ VALUES
   '滑动屏幕查找元素[swipeInScreenAndFindElement]',
   '$.swipeInScreenAndFindElement',
   'WebElement',
-  REPLACE('[#,{"name":"startPoint","type":"String","description":"起点，如: {x:0.5,y:0.5} => 屏幕中心点"},{"name":"endPoint","type":"String","description":"终点，如: {x:0.5,y:0.5} => 屏幕中心点"},{"name":"maxSwipeCount","type":"String","description":"最大滑动次数"}]','#',@findbyAndValue)
+  REPLACE('[#,{"name":"startPoint","type":"String","description":"起点，如: {x:0.5,y:0.5} => 屏幕中心点"},{"name":"endPoint","type":"String","description":"终点，如: {x:0.5,y:0.5} => 屏幕中心点"},{"name":"maxSwipeCount","type":"String","description":"最大滑动次数"},{"name":"durationInMsOfSwipeOneTime","type":"String","description":"滑动一次的时间，单位: ms。时间越短，滑的距离越长"}]','#',@findbyAndValue)
 );
 
 -- 17.swipeInContainerElement
@@ -291,7 +291,7 @@ VALUES
   '容器元素内滑动[swipeInContainerElement]',
   '$.swipeInContainerElement',
   'void',
-  '[{"name":"containerElement","type":"WebElement","description":"容器元素"},{"name":"startPoint","type":"String","description":"起点，如: {x:0.5,y:0.5} => 容器中心点"},{"name":"endPoint","type":"String","description":"终点，如: {x:0.5,y:0.5} => 容器中心点"}]'
+  '[{"name":"containerElement","type":"WebElement","description":"容器元素"},{"name":"startPoint","type":"String","description":"起点，如: {x:0.5,y:0.5} => 容器中心点"},{"name":"endPoint","type":"String","description":"终点，如: {x:0.5,y:0.5} => 容器中心点"},{"name":"durationInMsOfSwipeOneTime","type":"String","description":"滑动一次的时间，单位: ms。时间越短，滑的距离越长"}]'
 );
 
 -- 18.swipeInContainerElementAndFindElement
@@ -308,7 +308,7 @@ VALUES
   '容器元素内滑动查找元素[swipeInContainerElementAndFindElement]',
   '$.swipeInContainerElementAndFindElement',
   'WebElement',
-  REPLACE('[{"name":"containerElement","type":"WebElement","description":"容器元素"},#,{"name":"startPoint","type":"String","description":"起点，如: {x:0.5,y:0.5} => 容器中心点"},{"name":"endPoint","type":"String","description":"终点，如: {x:0.5,y:0.5} => 容器中心点"},{"name":"maxSwipeCount","type":"String","description":"最大滑动次数"}]','#',@findbyAndValue)
+  REPLACE('[{"name":"containerElement","type":"WebElement","description":"容器元素"},#,{"name":"startPoint","type":"String","description":"起点，如: {x:0.5,y:0.5} => 容器中心点"},{"name":"endPoint","type":"String","description":"终点，如: {x:0.5,y:0.5} => 容器中心点"},{"name":"maxSwipeCount","type":"String","description":"最大滑动次数"},{"name":"durationInMsOfSwipeOneTime","type":"String","description":"滑动一次的时间，单位: ms。时间越短，滑的距离越长"}]','#',@findbyAndValue)
 );
 
 -- 19.switchWindow
@@ -347,40 +347,49 @@ VALUES
   REPLACE('[#,{"name":"maxWaitTimeInSeconds","type":"String","description":"最大等待时间(秒)"}]','#',@findbyAndValue)
 );
 
--- 21.androidAcceptAlert
+-- 21.acceptAlert
 INSERT INTO `action` (
   `id`,
   `name`,
-  `description`,
   `invoke`,
   `return_value`,
-  `platforms`
 )
 VALUES
 (
   21,
   '对话框-接受/允许/确定/是...[acceptAlert]',
-  'driver.executeScript("mobile:acceptAlert")',
-  '$.androidAcceptAlert',
-  'void',
-  '[1,3,4]'
+  '$.acceptAlert',
+  'void'
 );
 
--- 22.androidDismissAlert
+-- 22.dismissAlert
 INSERT INTO `action` (
   `id`,
   `name`,
-  `description`,
   `invoke`,
-  `return_value`,
-  `platforms`
+  `return_value`
 )
 VALUES
 (
   22,
   '对话框-拒绝/取消/否...[dismissAlert]',
-  'driver.executeScript("mobile:dismissAlert")',
-  '$.androidDismissAlert',
+  '$.dismissAlert',
+  'void'
+);
+
+-- 23.clearInput
+INSERT INTO `action` (
+  `id`,
+  `name`,
+  `invoke`,
+  `return_value`,
+  `params`
+)
+VALUES
+(
+  23,
+  '清除输入框[clearInput]',
+  '$.clearInput',
   'void',
-  '[1,3,4]'
+  REPLACE('[#]','#',@findbyAndValue)
 );

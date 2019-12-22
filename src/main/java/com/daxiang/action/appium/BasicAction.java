@@ -7,6 +7,7 @@ import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.AndroidDevice;
 import com.daxiang.core.android.AndroidUtil;
 import com.daxiang.core.ios.IosUtil;
+import com.google.common.collect.ImmutableMap;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.TouchAction;
@@ -18,6 +19,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import java.time.Duration;
 import java.util.List;
@@ -30,6 +32,8 @@ import java.util.concurrent.TimeUnit;
 public class BasicAction {
 
     public static final int EXECUTE_JAVA_CODE_ID = 1;
+
+    private static final long DEFAULT_SWIPE_DURATION_MS = 100L;
 
     private MobileDevice mobileDevice;
     private AppiumDriver driver;
@@ -241,28 +245,38 @@ public class BasicAction {
      * @param startPoint {"x": 0.5, "y": 0.5} => 屏幕宽/高 1/2的位置
      * @param endPoint
      */
-    public void swipeInScreen(String startPoint, String endPoint) {
-        JSONObject _startPoint;
-        JSONObject _endPoint;
-        try {
-            _startPoint = JSON.parseObject(startPoint);
-            _endPoint = JSON.parseObject(endPoint);
-        } catch (Exception e) {
-            throw new RuntimeException("startPoint,endPoint格式错误，正确格式: {x:0.5,y:0.5}");
-        }
+    public void swipeInScreen(String startPoint, String endPoint, String durationInMsOfSwipeOneTime) {
+        swipeInScreen(getPoint(startPoint), getPoint(endPoint), getdurationInMsOfSwipeOneTime(durationInMsOfSwipeOneTime));
+    }
 
-        int startX = (int) (_startPoint.getFloat("x") * screenWidth);
-        int startY = (int) (_startPoint.getFloat("y") * screenHeight);
-        int endX = (int) (_endPoint.getFloat("x") * screenWidth);
-        int endY = (int) (_endPoint.getFloat("y") * screenHeight);
-
-        log.info("滑动屏幕: ({},{}) -> ({},{})", startX, startY, endX, endY);
+    private void swipeInScreen(Point start, Point end, Long durationInMsOfSwipeOneTime) {
+        log.info("[{}]滑动: {} -> {}, duration: {} ms", mobileDevice.getId(), start, end, durationInMsOfSwipeOneTime);
         new TouchAction(driver)
-                .press(PointOption.point(startX, startY))
-                .waitAction(WaitOptions.waitOptions(Duration.ZERO))
-                .moveTo(PointOption.point(endX, endY))
+                .press(PointOption.point(start))
+                .waitAction(WaitOptions.waitOptions(Duration.ofMillis(durationInMsOfSwipeOneTime)))
+                .moveTo(PointOption.point(end))
                 .release()
                 .perform();
+    }
+
+    private Point getPoint(String point) {
+        JSONObject _point;
+        try {
+            _point = JSON.parseObject(point.trim());
+        } catch (Exception e) {
+            throw new RuntimeException("格式错误, 正确格式: {x:0.5,y:0.5}");
+        }
+        int x = (int) (_point.getFloat("x") * screenWidth);
+        int y = (int) (_point.getFloat("y") * screenHeight);
+        return new Point(x, y);
+    }
+
+    private long getdurationInMsOfSwipeOneTime(String durationInMsOfSwipeOneTime) {
+        long swipeDuration = DEFAULT_SWIPE_DURATION_MS;
+        if (!StringUtils.isEmpty(durationInMsOfSwipeOneTime)) {
+            swipeDuration = Long.parseLong(durationInMsOfSwipeOneTime);
+        }
+        return swipeDuration;
     }
 
     /**
@@ -276,7 +290,7 @@ public class BasicAction {
      * @param maxSwipeCount
      * @return
      */
-    public WebElement swipeInScreenAndFindElement(String findBy, String value, String startPoint, String endPoint, String maxSwipeCount) {
+    public WebElement swipeInScreenAndFindElement(String findBy, String value, String startPoint, String endPoint, String maxSwipeCount, String durationInMsOfSwipeOneTime) {
         Assert.hasText(maxSwipeCount, "最大滑动次数不能为空");
 
         By by = getBy(findBy, value);
@@ -286,11 +300,13 @@ public class BasicAction {
         } catch (Exception e) {
         }
 
-        int _maxSwipeCount = Integer.parseInt(maxSwipeCount);
+        Point start = getPoint(startPoint);
+        Point end = getPoint(endPoint);
+        long swipeDuration = getdurationInMsOfSwipeOneTime(durationInMsOfSwipeOneTime);
 
-        for (int i = 0; i < _maxSwipeCount; i++) {
-            log.info("开始滑动第{}次屏幕", i + 1);
-            swipeInScreen(startPoint, endPoint);
+        for (int i = 0; i < Integer.parseInt(maxSwipeCount); i++) {
+            log.info("[{}]滑动第{}次", mobileDevice.getId(), i + 1);
+            swipeInScreen(start, end, swipeDuration);
             try {
                 return driver.findElement(by);
             } catch (Exception e) {
@@ -308,14 +324,20 @@ public class BasicAction {
      * @param startPoint {"x": 0.5, "y": 0.5} => 容器元素宽/高 1/2的位置
      * @param endPoint
      */
-    public void swipeInContainerElement(WebElement container, String startPoint, String endPoint) {
+    public void swipeInContainerElement(WebElement container, String startPoint, String endPoint, String durationInMsOfSwipeOneTime) {
+        ImmutableMap<String, Point> points = getStartPointAndEndPointInContainer(container, startPoint, endPoint);
+
+        swipeInScreen(points.get("start"), points.get("end"), getdurationInMsOfSwipeOneTime(durationInMsOfSwipeOneTime));
+    }
+
+    private ImmutableMap<String, Point> getStartPointAndEndPointInContainer(WebElement container, String startPoint, String endPoint) {
         Assert.notNull(container, "容器元素不能为空");
 
         JSONObject _startPoint;
         JSONObject _endPoint;
         try {
-            _startPoint = JSON.parseObject(startPoint);
-            _endPoint = JSON.parseObject(endPoint);
+            _startPoint = JSON.parseObject(startPoint.trim());
+            _endPoint = JSON.parseObject(endPoint.trim());
         } catch (Exception e) {
             throw new RuntimeException("startPoint,endPoint格式错误，正确格式: {x:0.5,y:0.5}");
         }
@@ -323,9 +345,8 @@ public class BasicAction {
         Rectangle containerRect = container.getRect();
         int containerHeight = containerRect.getHeight();
         int containerWidth = containerRect.getWidth();
-        log.info("containerElement rect: {}", JSON.toJSONString(containerRect));
 
-        // 左上角坐标
+        // 容器左上角坐标
         Point containerRectPoint = containerRect.getPoint();
         int containerLeftTopX = containerRectPoint.getX();
         int containerLeftTopY = containerRectPoint.getY();
@@ -335,13 +356,7 @@ public class BasicAction {
         int endX = containerLeftTopX + (int) (_endPoint.getFloat("x") * containerWidth);
         int endY = containerLeftTopY + (int) (_endPoint.getFloat("y") * containerHeight);
 
-        log.info("在containerElement内滑动: ({},{}) -> ({},{})", startX, startY, endX, endY);
-        new TouchAction(driver)
-                .press(PointOption.point(startX, startY))
-                .waitAction(WaitOptions.waitOptions(Duration.ZERO))
-                .moveTo(PointOption.point(endX, endY))
-                .release()
-                .perform();
+        return ImmutableMap.of("start", new Point(startX, startY), "end", new Point(endX, endY));
     }
 
     /**
@@ -356,8 +371,7 @@ public class BasicAction {
      * @param maxSwipeCount
      * @return
      */
-    public WebElement swipeInContainerElementAndFindElement(WebElement container, String findBy, String value, String startPoint, String endPoint, String maxSwipeCount) {
-        Assert.notNull(container, "容器元素不能为空");
+    public WebElement swipeInContainerElementAndFindElement(WebElement container, String findBy, String value, String startPoint, String endPoint, String maxSwipeCount, String durationInMsOfSwipeOneTime) {
         Assert.hasText(maxSwipeCount, "最大滑动次数不能为空");
 
         By by = getBy(findBy, value);
@@ -366,40 +380,12 @@ public class BasicAction {
         } catch (Exception e) {
         }
 
-        Rectangle containerRect = container.getRect();
-        int containerHeight = containerRect.getHeight();
-        int containerWidth = containerRect.getWidth();
-        log.info("containerElement rect: {}", JSON.toJSONString(containerRect));
+        ImmutableMap<String, Point> points = getStartPointAndEndPointInContainer(container, startPoint, endPoint);
+        long swipeDuration = getdurationInMsOfSwipeOneTime(durationInMsOfSwipeOneTime);
 
-        // 左上角坐标
-        Point containerRectPoint = containerRect.getPoint();
-        int containerLeftTopX = containerRectPoint.getX();
-        int containerLeftTopY = containerRectPoint.getY();
-
-        JSONObject _startPoint;
-        JSONObject _endPoint;
-        try {
-            _startPoint = JSON.parseObject(startPoint);
-            _endPoint = JSON.parseObject(endPoint);
-        } catch (Exception e) {
-            throw new RuntimeException("startPoint,endPoint格式错误，正确格式: {x:0.5,y:0.5}");
-        }
-
-        int startX = containerLeftTopX + (int) (_startPoint.getFloat("x") * containerWidth);
-        int startY = containerLeftTopY + (int) (_startPoint.getFloat("y") * containerHeight);
-        int endX = containerLeftTopX + (int) (_endPoint.getFloat("x") * containerWidth);
-        int endY = containerLeftTopY + (int) (_endPoint.getFloat("y") * containerHeight);
-
-        int _maxSwipeCount = Integer.parseInt(maxSwipeCount);
-
-        for (int i = 0; i < _maxSwipeCount; i++) {
-            log.info("在containerElement内滑动第{}次: ({},{}) -> ({},{})", i + 1, startX, startY, endX, endY);
-            new TouchAction(driver)
-                    .press(PointOption.point(startX, startY))
-                    .waitAction(WaitOptions.waitOptions(Duration.ZERO))
-                    .moveTo(PointOption.point(endX, endY))
-                    .release()
-                    .perform();
+        for (int i = 0; i < Integer.parseInt(maxSwipeCount); i++) {
+            log.info("[{}]容器内滑动第{}次", mobileDevice.getId(), i + 1);
+            swipeInScreen(points.get("start"), points.get("end"), swipeDuration);
             try {
                 return driver.findElement(by);
             } catch (Exception e) {
@@ -436,27 +422,42 @@ public class BasicAction {
     }
 
     /**
-     * platform: Android
      * 21.弹窗 允许/接受/...
      */
-    public void androidAcceptAlert() {
+    public void acceptAlert() {
         try {
-            driver.executeScript("mobile:acceptAlert");
+            if (driver instanceof AndroidDriver) {
+                driver.executeScript("mobile:acceptAlert");
+            } else {
+                driver.switchTo().alert().accept();
+            }
+        } catch (Exception ign) {
+        }
+    }
+
+    /**
+     * 22.弹窗 拒绝/取消/...
+     */
+    public void dismissAlert() {
+        try {
+            if (driver instanceof AndroidDriver) {
+                driver.executeScript("mobile:dismissAlert");
+            } else {
+                driver.switchTo().alert().dismiss();
+            }
         } catch (Exception ign) {
 
         }
     }
 
     /**
-     * platform: Android
-     * 22.弹窗 拒绝/取消/...
+     * 23. 清除输入框
+     *
+     * @param findBy
+     * @param value
      */
-    public void androidDismissAlert() {
-        try {
-            driver.executeScript("mobile:dismissAlert");
-        } catch (Exception ign) {
-
-        }
+    public void clearInput(String findBy, String value) {
+        findElement(findBy, value).clear();
     }
 
     private By getBy(String findBy, String value) {
