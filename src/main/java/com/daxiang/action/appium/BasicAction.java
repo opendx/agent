@@ -246,7 +246,7 @@ public class BasicAction {
      * @param endPoint
      */
     public void swipeInScreen(String startPoint, String endPoint, String durationInMsOfSwipeOneTime) {
-        swipeInScreen(getPoint(startPoint), getPoint(endPoint), getdurationInMsOfSwipeOneTime(durationInMsOfSwipeOneTime));
+        swipeInScreen(getPoint(startPoint), getPoint(endPoint), getDurationInMsOfSwipeOneTime(durationInMsOfSwipeOneTime));
     }
 
     private void swipeInScreen(Point start, Point end, Long durationInMsOfSwipeOneTime) {
@@ -271,7 +271,7 @@ public class BasicAction {
         return new Point(x, y);
     }
 
-    private long getdurationInMsOfSwipeOneTime(String durationInMsOfSwipeOneTime) {
+    private long getDurationInMsOfSwipeOneTime(String durationInMsOfSwipeOneTime) {
         long swipeDuration = DEFAULT_SWIPE_DURATION_MS;
         if (!StringUtils.isEmpty(durationInMsOfSwipeOneTime)) {
             swipeDuration = Long.parseLong(durationInMsOfSwipeOneTime);
@@ -302,7 +302,7 @@ public class BasicAction {
 
         Point start = getPoint(startPoint);
         Point end = getPoint(endPoint);
-        long swipeDuration = getdurationInMsOfSwipeOneTime(durationInMsOfSwipeOneTime);
+        long swipeDuration = getDurationInMsOfSwipeOneTime(durationInMsOfSwipeOneTime);
 
         for (int i = 0; i < Integer.parseInt(maxSwipeCount); i++) {
             log.info("[{}]滑动第{}次", mobileDevice.getId(), i + 1);
@@ -327,7 +327,7 @@ public class BasicAction {
     public void swipeInContainerElement(WebElement container, String startPoint, String endPoint, String durationInMsOfSwipeOneTime) {
         ImmutableMap<String, Point> points = getStartPointAndEndPointInContainer(container, startPoint, endPoint);
 
-        swipeInScreen(points.get("start"), points.get("end"), getdurationInMsOfSwipeOneTime(durationInMsOfSwipeOneTime));
+        swipeInScreen(points.get("start"), points.get("end"), getDurationInMsOfSwipeOneTime(durationInMsOfSwipeOneTime));
     }
 
     private ImmutableMap<String, Point> getStartPointAndEndPointInContainer(WebElement container, String startPoint, String endPoint) {
@@ -381,7 +381,7 @@ public class BasicAction {
         }
 
         ImmutableMap<String, Point> points = getStartPointAndEndPointInContainer(container, startPoint, endPoint);
-        long swipeDuration = getdurationInMsOfSwipeOneTime(durationInMsOfSwipeOneTime);
+        long swipeDuration = getDurationInMsOfSwipeOneTime(durationInMsOfSwipeOneTime);
 
         for (int i = 0; i < Integer.parseInt(maxSwipeCount); i++) {
             log.info("[{}]容器内滑动第{}次", mobileDevice.getId(), i + 1);
