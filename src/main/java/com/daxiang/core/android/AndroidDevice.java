@@ -78,7 +78,9 @@ public class AndroidDevice extends MobileDevice {
 
     @Override
     public AppiumDriver initAppiumDriver() {
-        return new AndroidDriverBuilder().init(this);
+        AppiumDriver driver = new AndroidDriverBuilder().init(this);
+        setAppiumDriver(driver);
+        return driver;
     }
 
     @Override
