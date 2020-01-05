@@ -38,10 +38,10 @@ public class ScheduledTaskExcutor {
 
         idleMobileDevices.stream().parallel().forEach(idleMobileDevice -> {
             // 获取最早的一个未开始的设备测试任务
-            DeviceTestTask unStartDeviceTestTask = masterApi.getFirstUnStartDeviceTestTask(idleMobileDevice.getId());
-            if (unStartDeviceTestTask != null) {
-                idleMobileDevice.getDeviceTestTaskExecutor().commitTestTask(unStartDeviceTestTask);
-                log.info("[自动化测试][{}]提交测试任务，deviceTestTaskId: {}", idleMobileDevice.getId(), unStartDeviceTestTask.getId());
+            DeviceTestTask deviceTestTask = masterApi.getFirstUnStartDeviceTestTask(idleMobileDevice.getId());
+            if (deviceTestTask != null) {
+                idleMobileDevice.getDeviceTestTaskExecutor().commitTestTask(deviceTestTask);
+                log.info("[自动化测试][{}]提交测试任务，deviceTestTaskId: {}", idleMobileDevice.getId(), deviceTestTask.getId());
             }
         });
     }

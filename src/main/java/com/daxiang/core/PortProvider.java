@@ -44,6 +44,10 @@ public class PortProvider {
     private static final int WEBKIT_DEBUG_PROXY_PORT_END = 28999;
     private static int webkitDebugProxyPort = WEBKIT_DEBUG_PROXY_PORT_START;
 
+    private static final int SCRCPY_PORT_START = 29000;
+    private static final int SCRCPY_PORT_END = 29999;
+    private static int scrcpyPort = SCRCPY_PORT_START;
+
     public static synchronized int getChromeDriverAvailablePort() {
         int availablePort = getAvailablePort(CHROME_DRIVER_PORT_START, CHROME_DRIVER_PORT_END, chromeDriverPort);
         chromeDriverPort = availablePort + 1;
@@ -95,6 +99,12 @@ public class PortProvider {
     public static synchronized int getWdaMjpegServerAvailablePort() {
         int availablePort = getAvailablePort(WDA_MJPEG_SERVER_PORT_START, WDA_MJPEG_SERVER_PORT_END, wdaMjpegServerPort);
         wdaMjpegServerPort = availablePort + 1;
+        return availablePort;
+    }
+
+    public static synchronized int getScrcpyAvailablePort() {
+        int availablePort = getAvailablePort(SCRCPY_PORT_START, SCRCPY_PORT_END, scrcpyPort);
+        scrcpyPort = availablePort + 1;
         return availablePort;
     }
 

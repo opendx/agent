@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.dom4j.DocumentException;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -120,12 +121,11 @@ public abstract class MobileDevice {
         return PointOption.point((int) (percentOfX * screenWidth), (int) (percentOfY * screenHeight));
     }
 
-    public abstract File screenshot() throws Exception;
+    public abstract File screenshot() throws IOException;
 
-    public String screenshotAndUploadToMaster() throws Exception {
-        File screenshotFile = null;
+    public String screenshotAndUploadToMaster() throws IOException {
+        File screenshotFile = screenshot();
         try {
-            screenshotFile = screenshot();
             return MasterApi.getInstance().uploadFile(screenshotFile, FileType.IMG);
         } finally {
             FileUtils.deleteQuietly(screenshotFile);
@@ -206,4 +206,18 @@ public abstract class MobileDevice {
     }
 
     public abstract void installApp(String appDownloadUrl) throws Exception;
+
+    public File downloadApp(String appDownloadUrl) throws IOException {
+        if (StringUtils.isEmpty(appDownloadUrl)) {
+            throw new IllegalArgumentException("appDownloadUrl cannot be empty");
+        }
+
+        // download app
+        RestTemplate restTemplate = App.getBean(RestTemplate.class);
+        byte[] appBytes = restTemplate.getForObject(appDownloadUrl, byte[].class);
+
+        File app = new File(UUIDUtil.getUUID() + "." + StringUtils.unqualify(appDownloadUrl));
+        FileUtils.writeByteArrayToFile(app, appBytes, false);
+        return app;
+    }
 }

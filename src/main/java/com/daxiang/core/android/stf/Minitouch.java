@@ -19,7 +19,8 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class Minitouch {
 
-    public static final String START_MINITOUCH_CMD = AndroidDevice.TMP_FOLDER + "minitouch";
+    public static final String LOCAL_MINITOUCH_PATH = "vendor/minitouch/%s/minitouch";
+    public static final String REMOTE_MINITOUCH_PATH = AndroidDevice.TMP_FOLDER + "/minitouch";
 
     private int localPort;
 
@@ -65,12 +66,12 @@ public class Minitouch {
         // 启动minitouch会阻塞线程，启一个线程运行minitouch
         new Thread(() -> {
             try {
-                log.info("[minitouch][{}]启动: {}", deviceId, START_MINITOUCH_CMD);
-                iDevice.executeShellCommand(START_MINITOUCH_CMD, new MultiLineReceiver() {
+                log.info("[minitouch][{}]启动: {}", deviceId, REMOTE_MINITOUCH_PATH);
+                iDevice.executeShellCommand(REMOTE_MINITOUCH_PATH, new MultiLineReceiver() {
                     @Override
                     public void processNewLines(String[] lines) {
                         for (String line : lines) {
-                            log.info("[minitouch][{}]手机控制台输出: {}", deviceId, line);
+                            log.info("[minitouch][{}]{}", deviceId, line);
                             if (!StringUtils.isEmpty(line) && line.startsWith("Type")) {
                                 // minitouch启动完成
                                 countDownLatch.countDown();
@@ -94,7 +95,7 @@ public class Minitouch {
         log.info("[minitouch][{}]adb forward: {} -> remote minitouch", deviceId, localPort);
         iDevice.createForward(localPort, "minitouch", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
 
-        countDownLatch.await();
+        countDownLatch.await(30, TimeUnit.SECONDS);
         log.info("[minitouch][{}]minitouch启动完成", deviceId);
 
         new Thread(() -> {
@@ -144,7 +145,6 @@ public class Minitouch {
      */
     public void stop() {
         if (pid > 0) {
-            log.info("[minitouch][{}]开始停止minitouch", deviceId);
             String cmd = "kill -9 " + pid;
             log.info("[minitouch][{}]kill minitouch: {}", deviceId, cmd);
             try {

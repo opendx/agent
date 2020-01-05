@@ -2,6 +2,8 @@ package com.daxiang.core.android.stf;
 
 import com.android.ddmlib.*;
 import com.daxiang.core.PortProvider;
+import com.daxiang.core.android.AndroidDevice;
+import com.daxiang.core.android.AndroidImgDataConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
@@ -15,7 +17,11 @@ import java.util.concurrent.*;
 @Slf4j
 public class Minicap {
 
-    private static final String START_MINICAP_CMD = "LD_LIBRARY_PATH=/data/local/tmp /data/local/tmp/minicap -S -Q %d -P %s@%s/%d";
+    public static final String LOCAL_MINICAP_PATH = "vendor/minicap/bin/%s/minicap";
+    public static final String LOCAL_MINICAP_SO_PATH = "vendor/minicap/shared/android-%s/%s/minicap.so";
+
+    public static final String REMOTE_MINICAP_PATH = AndroidDevice.TMP_FOLDER + "/minicap";
+    public static final String REMOTE_MINICAP_SO_PATH = AndroidDevice.TMP_FOLDER + "/minicap.so";
 
     private IDevice iDevice;
     private String deviceId;
@@ -45,18 +51,22 @@ public class Minicap {
      * @param virtualResolution minicap输出的图片分辨率 eg.1080x1920
      * @param orientation       屏幕的旋转角度
      */
-    public void start(int quality, String realResolution, String virtualResolution, int orientation, MinicapImgDataConsumer minicapImgDataConsumer) throws Exception {
+    public void start(int quality, String realResolution, String virtualResolution, int orientation, AndroidImgDataConsumer androidImgDataConsumer) throws Exception {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         // 启动minicap会阻塞线程，启一个线程运行minicap
         new Thread(() -> {
             try {
-                String startMinicapCmd = String.format(START_MINICAP_CMD, quality, realResolution, virtualResolution, orientation);
+                String startMinicapCmd = String.format("LD_LIBRARY_PATH=" + AndroidDevice.TMP_FOLDER + " " + REMOTE_MINICAP_PATH + " -S -Q %d -P %s@%s/%d",
+                        quality,
+                        realResolution,
+                        virtualResolution,
+                        orientation);
                 log.info("[minicap][{}]启动: {}", deviceId, startMinicapCmd);
                 iDevice.executeShellCommand(startMinicapCmd, new MultiLineReceiver() {
                     @Override
                     public void processNewLines(String[] lines) {
                         for (String line : lines) {
-                            log.info("[minicap][{}]手机控制台输出: {}", deviceId, line);
+                            log.info("[minicap][{}]{}", deviceId, line);
                             if (!StringUtils.isEmpty(line) && line.startsWith("INFO: (jni/minicap/JpgEncoder.cpp")) {
                                 // minicap启动完成
                                 countDownLatch.countDown();
@@ -80,7 +90,7 @@ public class Minicap {
         log.info("[minicap][{}]adb forward: {} -> remote minicap", deviceId, localPort);
         iDevice.createForward(localPort, "minicap", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
 
-        countDownLatch.await();
+        countDownLatch.await(30, TimeUnit.SECONDS);
         log.info("[minicap][{}]minicap启动完成", deviceId);
 
         new Thread(() -> {
@@ -96,7 +106,7 @@ public class Minicap {
                 MinicapFrameParser minicapFrameParser = new MinicapFrameParser();
                 log.info("[minicap][{}]开始消费minicap图片数据", deviceId);
                 while (true) { // 获取不到minicap输出的数据时，将会抛出MinicapFrameSizeException，循环退出
-                    minicapImgDataConsumer.consume(minicapFrameParser.parse(inputStream));
+                    androidImgDataConsumer.consume(minicapFrameParser.parse(inputStream));
                 }
             } catch (MinicapFrameSizeException e) {
                 log.info("[minicap][{}]无法获取minicap输出数据", deviceId);
@@ -117,7 +127,6 @@ public class Minicap {
 
     public void stop() {
         if (pid > 0) {
-            log.info("[minicap][{}]开始停止minicap", deviceId);
             String cmd = "kill -9 " + pid;
             log.info("[minicap][{}]kill minicap: {}", deviceId, cmd);
             try {

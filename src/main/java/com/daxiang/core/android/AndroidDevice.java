@@ -5,6 +5,7 @@ import com.android.ddmlib.InstallException;
 import com.daxiang.App;
 import com.daxiang.api.MasterApi;
 import com.daxiang.core.MobileDevice;
+import com.daxiang.core.android.scrcpy.Scrcpy;
 import com.daxiang.core.android.stf.AdbKit;
 import com.daxiang.core.android.stf.Minicap;
 import com.daxiang.core.android.stf.Minitouch;
@@ -20,6 +21,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.dom4j.DocumentException;
+import org.openqa.selenium.OutputType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
@@ -39,16 +41,16 @@ import java.util.concurrent.TimeUnit;
 @Data
 public class AndroidDevice extends MobileDevice {
 
-    public final static String TMP_FOLDER = "/data/local/tmp/";
+    public final static String TMP_FOLDER = "/data/local/tmp";
 
     private IDevice iDevice;
 
+    private Scrcpy scrcpy;
     private Minicap minicap;
     private Minitouch minitouch;
     private AdbKit adbKit;
 
     private boolean canUseAppiumRecordVideo = true;
-    private MinicapVideoRecorder minicapVideoRecorder;
 
     public AndroidDevice(Device device, IDevice iDevice, AppiumServer appiumServer) {
         super(device, appiumServer);
@@ -56,7 +58,7 @@ public class AndroidDevice extends MobileDevice {
     }
 
     public void setIDevice(IDevice iDevice) {
-        // 手机重新插拔后，IDevice需要更新，同时更新minicap/minitouch内的IDevice
+        // 手机重新插拔后，IDevice需要更新
         this.iDevice = iDevice;
         if (minicap != null) {
             minicap.setIDevice(iDevice);
@@ -64,20 +66,14 @@ public class AndroidDevice extends MobileDevice {
         if (minitouch != null) {
             minitouch.setIDevice(iDevice);
         }
+        if (scrcpy != null) {
+            scrcpy.setIDevice(iDevice);
+        }
     }
 
-    public boolean canUseUiautomator2() {
-        String androidVersion = getDevice().getSystemVersion();
-        for (String sdkVersion : AndroidUtil.ANDROID_VERSION.keySet()) {
-            if (androidVersion.equals(AndroidUtil.ANDROID_VERSION.get(sdkVersion))) {
-                if (Integer.parseInt(sdkVersion) > 20) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }
-        throw new RuntimeException("无法判断是否能用Uiautomator2，请更新AndroidUtil.ANDROID_VERSION");
+    public boolean greaterOrEqualsToAndroid5() {
+        Integer sdkVersion = Integer.parseInt(AndroidUtil.getSdkVersion(iDevice)); // 21 android5.0
+        return sdkVersion >= 21;
     }
 
     @Override
@@ -86,8 +82,8 @@ public class AndroidDevice extends MobileDevice {
     }
 
     @Override
-    public File screenshot() throws Exception {
-        return AndroidUtil.screenshotByMinicap(iDevice, getResolution(), getOrientation());
+    public File screenshot() {
+        return getAppiumDriver().getScreenshotAs(OutputType.FILE);
     }
 
     @Override
@@ -107,7 +103,7 @@ public class AndroidDevice extends MobileDevice {
                 AndroidStartScreenRecordingOptions androidOptions = new AndroidStartScreenRecordingOptions();
                 // Since Appium 1.8.2 the time limit can be up to 1800 seconds (30 minutes).
                 androidOptions.withTimeLimit(Duration.ofMinutes(30));
-                androidOptions.withBitRate(1000000); // default 4000000
+                androidOptions.withBitRate(2000000); // default 4000000
                 ((AndroidDriver) getAppiumDriver()).startRecordingScreen(androidOptions);
                 return;
             } catch (Exception e) {
@@ -116,9 +112,7 @@ public class AndroidDevice extends MobileDevice {
             }
         }
 
-        // 使用minicap录屏
-        minicapVideoRecorder = new MinicapVideoRecorder(this);
-        minicapVideoRecorder.start();
+        // todo 使用scrcpy录屏
     }
 
     @Override
@@ -129,32 +123,22 @@ public class AndroidDevice extends MobileDevice {
             FileUtils.writeByteArrayToFile(videoFile, Base64.getDecoder().decode(base64Video), false);
             return videoFile;
         } else {
-            return minicapVideoRecorder.stop();
+            // todo 使用scrcpy录屏
+            return null;
         }
     }
 
     @Override
     public void installApp(String appDownloadUrl) throws Exception {
-        if (StringUtils.isEmpty(appDownloadUrl)) {
-            throw new RuntimeException("appDownloadUrl cannot be empty");
-        }
-
-        // download apk
-        RestTemplate restTemplate = App.getBean(RestTemplate.class);
-        byte[] apkBytes = restTemplate.getForObject(appDownloadUrl, byte[].class);
-
-        File apk = new File(UUIDUtil.getUUID() + ".apk");
+        File apk = downloadApp(appDownloadUrl);
+        ScheduledExecutorService service = handleInstallBtnAsync();
         try {
-            FileUtils.writeByteArrayToFile(apk, apkBytes, false);
-            ScheduledExecutorService service = handleInstallBtnAsync();
-            // install apk
             AndroidUtil.installApk(iDevice, apk.getAbsolutePath());
+        } finally {
+            FileUtils.deleteQuietly(apk);
             if (!service.isShutdown()) {
                 service.shutdown();
             }
-        } finally {
-            // delete apk
-            FileUtils.deleteQuietly(apk);
         }
     }
 

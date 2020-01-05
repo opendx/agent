@@ -1,7 +1,6 @@
 package com.daxiang.core.android.stf;
 
 import com.android.ddmlib.*;
-import com.daxiang.core.android.AndroidDevice;
 import com.daxiang.core.android.AndroidUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -11,8 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MinitouchInstaller {
 
-    private static final String LOCAL_MINITOUCH_PATH = "vendor/minitouch/%s/minitouch";
-    private static final String MINITOUCH_CHMOD_SHELL = "chmod 777 %s";
 
     private IDevice iDevice;
 
@@ -28,15 +25,14 @@ public class MinitouchInstaller {
             String deviceId = iDevice.getSerialNumber();
 
             String cpuAbi = AndroidUtil.getCpuAbi(iDevice);
-            String localMinitouchFilePath = String.format(LOCAL_MINITOUCH_PATH, cpuAbi);
+            String localMinitouchPath = String.format(Minitouch.LOCAL_MINITOUCH_PATH, cpuAbi);
 
-            String remoteMinitouchPath = AndroidDevice.TMP_FOLDER + "minitouch";
-            log.info("[minitouch][{}]push minitouch到手机, {} -> {}", deviceId, localMinitouchFilePath, remoteMinitouchPath);
-            iDevice.pushFile(localMinitouchFilePath, remoteMinitouchPath);
+            log.info("[minitouch][{}]push minitouch to device, {} -> {}", deviceId, localMinitouchPath, Minitouch.REMOTE_MINITOUCH_PATH);
+            iDevice.pushFile(localMinitouchPath, Minitouch.REMOTE_MINITOUCH_PATH);
 
-            String chmodShellCmd = String.format(MINITOUCH_CHMOD_SHELL, remoteMinitouchPath);
-            log.info("[minitouch][{}]{} ", deviceId, chmodShellCmd);
-            iDevice.executeShellCommand(chmodShellCmd, new NullOutputReceiver());
+            String chmodCmd = "chmod 777 " + Minitouch.REMOTE_MINITOUCH_PATH;
+            log.info("[minitouch][{}]{} ", deviceId, chmodCmd);
+            iDevice.executeShellCommand(chmodCmd, new NullOutputReceiver());
         } catch (Exception e) {
             throw new StfComponentInstallException(e);
         }

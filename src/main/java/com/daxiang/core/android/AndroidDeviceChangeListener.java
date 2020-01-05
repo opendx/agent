@@ -4,6 +4,7 @@ import com.android.ddmlib.*;
 import com.daxiang.api.MasterApi;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.MobileDevice;
+import com.daxiang.core.android.scrcpy.Scrcpy;
 import com.daxiang.core.android.stf.AdbKit;
 import com.daxiang.core.android.stf.Minicap;
 import com.daxiang.core.android.stf.MinicapInstaller;
@@ -87,6 +88,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
             androidDevice.setMinicap(new Minicap(iDevice));
             androidDevice.setMinitouch(new Minitouch(iDevice));
             androidDevice.setAdbKit(new AdbKit(deviceId));
+            androidDevice.setScrcpy(new Scrcpy(iDevice));
 
             MobileDeviceHolder.add(deviceId, mobileDevice);
         } else {
@@ -133,16 +135,6 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
     private MobileDevice initAndroidDevice(IDevice iDevice, AppiumServer appiumServer) throws Exception {
         String deviceId = iDevice.getSerialNumber();
 
-        log.info("[android][{}]开始安装minicap", deviceId);
-        MinicapInstaller minicapInstaller = new MinicapInstaller(iDevice);
-        minicapInstaller.install();
-        log.info("[android][{}]安装minicap成功", deviceId);
-
-        log.info("[android][{}]开始安装minitouch", deviceId);
-        MinitouchInstaller minitouchInstaller = new MinitouchInstaller(iDevice);
-        minitouchInstaller.install();
-        log.info("[android][{}]安装minitouch成功", deviceId);
-
         Device device = new Device();
 
         device.setPlatform(MobileDevice.ANDROID);
@@ -150,20 +142,8 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         device.setId(deviceId);
         device.setSystemVersion(AndroidUtil.getAndroidVersion(iDevice));
         device.setName(AndroidUtil.getDeviceName(iDevice));
-
-        try {
-            device.setCpuInfo(AndroidUtil.getCpuInfo(iDevice));
-        } catch (Exception e) {
-            log.error("获取cpu信息失败", e);
-            device.setCpuInfo("获取cpu信息失败");
-        }
-
-        try {
-            device.setMemSize(AndroidUtil.getMemSize(iDevice));
-        } catch (Exception e) {
-            log.error("获取内存大小失败", e);
-            device.setMemSize("获取内存大小失败");
-        }
+        device.setCpuInfo(AndroidUtil.getCpuInfo(iDevice));
+        device.setMemSize(AndroidUtil.getMemSize(iDevice));
 
         String resolution = AndroidUtil.getResolution(iDevice); // 720x1280
         String[] res = resolution.split("x");
@@ -181,6 +161,20 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         device.setImgUrl(imgDownloadUrl);
 
         appiumDriver.quit();
+
+        // 小于android5.0使用stf远程真机方案，否则使用scrcpy方案
+        if (!androidDevice.greaterOrEqualsToAndroid5()) {
+            log.info("[android][{}]开始安装minicap", deviceId);
+            MinicapInstaller minicapInstaller = new MinicapInstaller(iDevice);
+            minicapInstaller.install();
+            log.info("[android][{}]安装minicap成功", deviceId);
+
+            log.info("[android][{}]开始安装minitouch", deviceId);
+            MinitouchInstaller minitouchInstaller = new MinitouchInstaller(iDevice);
+            minitouchInstaller.install();
+            log.info("[android][{}]安装minitouch成功", deviceId);
+        }
+
         return androidDevice;
     }
 }

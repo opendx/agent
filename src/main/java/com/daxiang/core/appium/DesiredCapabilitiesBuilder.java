@@ -45,7 +45,7 @@ public class DesiredCapabilitiesBuilder {
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
         capabilities.setCapability(AndroidMobileCapabilityType.UNICODE_KEYBOARD, true); // 切换到appium输入法
 
-        if (((AndroidDevice) mobileDevice).canUseUiautomator2()) {
+        if (((AndroidDevice) mobileDevice).greaterOrEqualsToAndroid5()) {
             capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.ANDROID_UIAUTOMATOR2); // UIAutomation2 is only supported since Android 5.0 (Lollipop)
         } else {
             capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, "UIAutomator1");
