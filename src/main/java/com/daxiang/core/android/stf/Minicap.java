@@ -25,14 +25,13 @@ public class Minicap {
 
     private IDevice iDevice;
     private String deviceId;
-    /**
-     * 本地端口，adb forward 本地端口到手机端口
-     */
-    private int localPort;
+
     /**
      * 运行在手机里的进程id
      */
     private int pid;
+
+    private boolean isRun = false;
 
     public Minicap(IDevice iDevice) {
         this.iDevice = iDevice;
@@ -51,9 +50,12 @@ public class Minicap {
      * @param virtualResolution minicap输出的图片分辨率 eg.1080x1920
      * @param orientation       屏幕的旋转角度
      */
-    public void start(int quality, String realResolution, String virtualResolution, int orientation, AndroidImgDataConsumer androidImgDataConsumer) throws Exception {
+    public synchronized void start(int quality, String realResolution, String virtualResolution, int orientation, AndroidImgDataConsumer androidImgDataConsumer) throws Exception {
+        if (isRun) {
+            return;
+        }
+
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        // 启动minicap会阻塞线程，启一个线程运行minicap
         new Thread(() -> {
             try {
                 String startMinicapCmd = String.format("LD_LIBRARY_PATH=" + AndroidDevice.TMP_FOLDER + " " + REMOTE_MINICAP_PATH + " -S -Q %d -P %s@%s/%d",
@@ -80,18 +82,20 @@ public class Minicap {
                     }
                 }, 0, TimeUnit.SECONDS);
                 log.info("[minicap][{}]已停止运行", deviceId);
+                isRun = false;
             } catch (Exception e) {
-                log.error("[minicap][{}]启动出错", deviceId, e);
+                throw new RuntimeException("minicap启动失败", e);
             }
         }).start();
 
-        this.localPort = PortProvider.getMinicapAvailablePort();
+        int localPort = PortProvider.getMinicapAvailablePort();
 
         log.info("[minicap][{}]adb forward: {} -> remote minicap", deviceId, localPort);
         iDevice.createForward(localPort, "minicap", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
 
         countDownLatch.await(30, TimeUnit.SECONDS);
         log.info("[minicap][{}]minicap启动完成", deviceId);
+        isRun = true;
 
         new Thread(() -> {
             try (Socket socket = new Socket("127.0.0.1", localPort);
@@ -125,11 +129,11 @@ public class Minicap {
         }).start();
     }
 
-    public void stop() {
-        if (pid > 0) {
+    public synchronized void stop() {
+        if (isRun) {
             String cmd = "kill -9 " + pid;
-            log.info("[minicap][{}]kill minicap: {}", deviceId, cmd);
             try {
+                log.info("[minicap][{}]kill minicap: {}", deviceId, cmd);
                 iDevice.executeShellCommand(cmd, new NullOutputReceiver());
             } catch (Exception e) {
                 log.error("[minicap][{}]{}执行出错", deviceId, cmd, e);

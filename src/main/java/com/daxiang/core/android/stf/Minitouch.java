@@ -22,8 +22,6 @@ public class Minitouch {
     public static final String LOCAL_MINITOUCH_PATH = "vendor/minitouch/%s/minitouch";
     public static final String REMOTE_MINITOUCH_PATH = AndroidDevice.TMP_FOLDER + "/minitouch";
 
-    private int localPort;
-
     private IDevice iDevice;
     private String deviceId;
 
@@ -46,6 +44,8 @@ public class Minitouch {
      */
     private PrintWriter printWriter;
 
+    private boolean isRun = false;
+
 
     public Minitouch(IDevice iDevice) {
         this.iDevice = iDevice;
@@ -61,9 +61,12 @@ public class Minitouch {
      *
      * @throws Exception
      */
-    public void start() throws Exception {
+    public synchronized void start() throws Exception {
+        if (isRun) {
+            return;
+        }
+
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        // 启动minitouch会阻塞线程，启一个线程运行minitouch
         new Thread(() -> {
             try {
                 log.info("[minitouch][{}]启动: {}", deviceId, REMOTE_MINITOUCH_PATH);
@@ -85,18 +88,20 @@ public class Minitouch {
                     }
                 }, 0, TimeUnit.SECONDS);
                 log.info("[minitouch][{}]已停止运行", deviceId);
+                isRun = false;
             } catch (Exception e) {
-                log.error("[minitouch][{}]启动出错", deviceId, e);
+                throw new RuntimeException("启动minitouch失败", e);
             }
         }).start();
 
-        this.localPort = PortProvider.getMinitouchAvailablePort();
+        int localPort = PortProvider.getMinitouchAvailablePort();
 
         log.info("[minitouch][{}]adb forward: {} -> remote minitouch", deviceId, localPort);
         iDevice.createForward(localPort, "minitouch", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
 
         countDownLatch.await(30, TimeUnit.SECONDS);
         log.info("[minitouch][{}]minitouch启动完成", deviceId);
+        isRun = true;
 
         new Thread(() -> {
             try (Socket socket = new Socket("127.0.0.1", localPort);
@@ -143,11 +148,11 @@ public class Minitouch {
     /**
      * 停止运行monitouch
      */
-    public void stop() {
-        if (pid > 0) {
+    public synchronized void stop() {
+        if (isRun) {
             String cmd = "kill -9 " + pid;
-            log.info("[minitouch][{}]kill minitouch: {}", deviceId, cmd);
             try {
+                log.info("[minitouch][{}]kill minitouch: {}", deviceId, cmd);
                 iDevice.executeShellCommand(cmd, new NullOutputReceiver());
             } catch (Exception e) {
                 log.error("[minitouch][{}]{}执行出错", deviceId, cmd, e);
