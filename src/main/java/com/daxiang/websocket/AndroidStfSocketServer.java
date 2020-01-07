@@ -66,7 +66,7 @@ public class AndroidStfSocketServer {
                     try {
                         remoteEndpoint.sendBinary(minicapImgData);
                     } catch (IOException e) {
-                        log.error("[android-stf-ebsocket][{}]发送minicap数据异常", deviceId, e);
+                        log.error("[android-stf-websocket][{}]发送minicap数据异常", deviceId, e);
                     }
                 });
         remoteEndpoint.sendText("启动minicap完成");
