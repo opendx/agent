@@ -7,8 +7,6 @@ import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.ios.IosDevice;
 import com.daxiang.core.ios.IosUtil;
-import com.daxiang.model.Response;
-import com.daxiang.service.MobileService;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.PointOption;
@@ -64,7 +62,13 @@ public class IosSocketServer {
         mobileDevice.saveUsingDeviceToMaster(username);
 
         basicRemote.sendText("初始化appium driver...");
-        Response response = App.getBean(MobileService.class).freshDriver(deviceId, platform);
+        JSONObject response = new JSONObject();
+        response.put("appiumSessionId", mobileDevice.freshAppiumDriver(platform).getSessionId().toString());
+        response.put("mjpegServerPort", ((IosDevice) mobileDevice).getMjpegServerPort());
+        int displayWidth = Integer.parseInt(App.getProperty("displayWidth"));
+        int displayHeight = mobileDevice.getScreenScaledHeight(displayWidth);
+        response.put("displayWidth", displayWidth);
+        response.put("displayHeight", displayHeight);
         basicRemote.sendText("初始化appium driver完成");
         basicRemote.sendText(JSON.toJSONString(response));
 
@@ -103,14 +107,14 @@ public class IosSocketServer {
      * @param msg
      */
     private synchronized void handleMessage(String msg) {
-        JSONObject jsonObject = JSON.parseObject(msg);
-        String operation = jsonObject.getString("operation");
+        JSONObject message = JSON.parseObject(msg);
+        String operation = message.getString("operation");
         switch (operation) {
             case "m":
-                moveToPointOption = iosDevice.getPointOption(jsonObject.getFloat("percentOfX"), jsonObject.getFloat("percentOfY"));
+                moveToPointOption = iosDevice.getPointOption(message.getFloat("percentOfX"), message.getFloat("percentOfY"));
                 break;
             case "d":
-                downPointOption = iosDevice.getPointOption(jsonObject.getFloat("percentOfX"), jsonObject.getFloat("percentOfY"));
+                downPointOption = iosDevice.getPointOption(message.getFloat("percentOfX"), message.getFloat("percentOfY"));
                 moveToPointOption = null;
                 pressStartTime = System.currentTimeMillis();
                 break;

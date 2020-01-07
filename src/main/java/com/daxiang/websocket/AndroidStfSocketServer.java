@@ -6,8 +6,7 @@ import com.daxiang.App;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.AndroidDevice;
-import com.daxiang.model.Response;
-import com.daxiang.service.MobileService;
+import com.google.common.collect.ImmutableMap;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
@@ -24,8 +23,8 @@ import java.io.IOException;
  */
 @Slf4j
 @Component
-@ServerEndpoint(value = "/android/{deviceId}/user/{username}/platform/{platform}")
-public class AndroidSocketServer {
+@ServerEndpoint(value = "/stf/android/{deviceId}/user/{username}/platform/{platform}")
+public class AndroidStfSocketServer {
 
     private AndroidDevice androidDevice;
     private AndroidDriver androidDriver;
@@ -33,11 +32,11 @@ public class AndroidSocketServer {
 
     @OnOpen
     public void onOpen(@PathParam("deviceId") String deviceId, @PathParam("username") String username, @PathParam("platform") Integer platform, Session session) throws Exception {
-        log.info("[android-websocket][{}]onOpen: username -> {}", deviceId, username);
+        log.info("[android-stf-websocket][{}]onOpen: username -> {}", deviceId, username);
         this.deviceId = deviceId;
 
         RemoteEndpoint.Basic remoteEndpoint = session.getBasicRemote();
-        remoteEndpoint.sendText("android websocket连接成功");
+        remoteEndpoint.sendText("android stf websocket连接成功");
 
         MobileDevice mobileDevice = MobileDeviceHolder.getIdleDevice(deviceId);
         if (mobileDevice == null) {
@@ -67,7 +66,7 @@ public class AndroidSocketServer {
                     try {
                         remoteEndpoint.sendBinary(minicapImgData);
                     } catch (IOException e) {
-                        log.error("[android-websocket][minicap][{}]通过websocket发送minicap数据异常", deviceId, e);
+                        log.error("[android-stf-ebsocket][{}]发送minicap数据异常", deviceId, e);
                     }
                 });
         remoteEndpoint.sendText("启动minicap完成");
@@ -77,16 +76,14 @@ public class AndroidSocketServer {
         remoteEndpoint.sendText("启动minitouch完成");
 
         remoteEndpoint.sendText("初始化appium driver...");
-        Response response = App.getBean(MobileService.class).freshDriver(deviceId, platform);
+        androidDriver = (AndroidDriver)androidDevice.freshAppiumDriver(platform);
         remoteEndpoint.sendText("初始化appium driver完成");
-        remoteEndpoint.sendText(JSON.toJSONString(response));
-
-        androidDriver = (AndroidDriver) androidDevice.getAppiumDriver();
+        remoteEndpoint.sendText(JSON.toJSONString(ImmutableMap.of("appiumSessionId", androidDriver.getSessionId().toString())));
     }
 
     @OnClose
     public void onClose() {
-        log.info("[android-websocket][{}]onClose", deviceId);
+        log.info("[android-stf-websocket][{}]onClose", deviceId);
 
         if (androidDevice != null) {
             MobileDeviceWebSocketSessionPool.remove(deviceId);
@@ -98,7 +95,7 @@ public class AndroidSocketServer {
 
     @OnError
     public void onError(Throwable t) {
-        log.error("[android-websocket][{}]onError", deviceId, t);
+        log.error("[android-stf-websocket][{}]onError", deviceId, t);
     }
 
 
@@ -113,14 +110,14 @@ public class AndroidSocketServer {
      * @param msg
      */
     private void handleMessage(String msg) {
-        JSONObject jsonObject = JSON.parseObject(msg);
-        String operation = jsonObject.getString("operation");
+        JSONObject message = JSON.parseObject(msg);
+        String operation = message.getString("operation");
         switch (operation) {
             case "m":
-                androidDevice.getMinitouch().moveTo(jsonObject.getFloat("percentOfX"), jsonObject.getFloat("percentOfY"));
+                androidDevice.getMinitouch().moveTo(message.getFloat("percentOfX"), message.getFloat("percentOfY"));
                 break;
             case "d":
-                androidDevice.getMinitouch().touchDown(jsonObject.getFloat("percentOfX"), jsonObject.getFloat("percentOfY"));
+                androidDevice.getMinitouch().touchDown(message.getFloat("percentOfX"), message.getFloat("percentOfY"));
                 break;
             case "u":
                 androidDevice.getMinitouch().touchUp();

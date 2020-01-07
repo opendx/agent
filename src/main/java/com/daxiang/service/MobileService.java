@@ -1,12 +1,9 @@
 package com.daxiang.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.daxiang.App;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
-import com.daxiang.core.ios.IosDevice;
 import com.daxiang.model.Response;
-import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.dom4j.DocumentException;
 import org.springframework.stereotype.Service;
@@ -62,30 +59,6 @@ public class MobileService {
             log.error("io err", e);
             return Response.fail(e.getMessage());
         }
-    }
-
-    public Response freshDriver(String deviceId, Integer platform) {
-        MobileDevice mobileDevice = MobileDeviceHolder.getConnectedDevice(deviceId);
-        if (mobileDevice == null) {
-            return Response.fail("设备未连接");
-        }
-
-        AppiumDriver appiumDriver = mobileDevice.freshAppiumDriver(platform);
-
-        JSONObject data = new JSONObject();
-        data.put("appiumSessionId", appiumDriver.getSessionId().toString());
-
-        if (mobileDevice instanceof IosDevice) {
-            data.put("mjpegServerPort", ((IosDevice) mobileDevice).getMjpegServerPort());
-
-            int displayWidth = Integer.parseInt(App.getProperty("displayWidth"));
-            int displayHeight = mobileDevice.getScreenScaledHeight(displayWidth);
-
-            data.put("displayWidth", displayWidth);
-            data.put("displayHeight", displayHeight);
-        }
-
-        return Response.success(data);
     }
 
     public Response installApp(MultipartFile app, String deviceId) {
