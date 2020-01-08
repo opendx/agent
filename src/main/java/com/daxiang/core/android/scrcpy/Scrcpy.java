@@ -243,7 +243,7 @@ public class Scrcpy {
     public static final int ACTION_UP = 1;
     public static final int ACTION_MOVE = 2;
 
-    private ByteBuffer touchEventBuffer = ByteBuffer.allocate(32);
+    private ByteBuffer touchEventBuffer = ByteBuffer.allocate(28);
 
     // Scrcpy.server ControlMessageReader
     private void commitTouchEvent(int actionType, int x, int y, int screenWidth, int screenHeight) {
@@ -253,8 +253,8 @@ public class Scrcpy {
         touchEventBuffer.putLong(-1L); // pointerId
         touchEventBuffer.putInt(x);
         touchEventBuffer.putInt(y);
-        touchEventBuffer.putInt(screenWidth);
-        touchEventBuffer.putInt(screenHeight);
+        touchEventBuffer.putShort((short) screenWidth);
+        touchEventBuffer.putShort((short) screenHeight);
         touchEventBuffer.putShort(Short.MAX_VALUE); // pressure
         touchEventBuffer.putInt(1); // buttons
         try {
