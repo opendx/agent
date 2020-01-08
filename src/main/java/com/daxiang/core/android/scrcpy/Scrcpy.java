@@ -63,14 +63,14 @@ public class Scrcpy {
         new Thread(() -> {
             try {
                 String startCmd = "CLASSPATH=" + REMOTE_SCRCPY_PATH + " app_process / com.genymobile.scrcpy.Server " +
-                        App.getProperty("scrcpyVersion") +      // clientVersion
-                        " 0 " +                                 // maxSize
-                        "4000000 " +                            // bitRate
-                        "30 " +                                 // maxFps >=android10才生效
-                        "true " +                               // tunnelForward
-                        "- " +                                  // crop
-                        "true " +                               // sendFrameMeta
-                        "true";                                 // control
+                        App.getProperty("scrcpyVersion") + " " +    // clientVersion
+                        "0 " +                                      // maxSize
+                        App.getProperty("scrcpyBitRate") + " " +    // bitRate
+                        "60 " +                                     // maxFps >=android10才生效
+                        "true " +                                   // tunnelForward
+                        "- " +                                      // crop
+                        "true " +                                   // sendFrameMeta
+                        "true";                                     // control
 
                 log.info("[scrcpy][{}]start: {}", deviceId, startCmd);
                 iDevice.executeShellCommand(startCmd, new MultiLineReceiver() {
