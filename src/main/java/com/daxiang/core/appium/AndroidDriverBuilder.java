@@ -14,6 +14,7 @@ public class AndroidDriverBuilder implements AppiumDriverBuilder {
     public AppiumDriver build(MobileDevice mobileDevice) {
         DesiredCapabilities capabilities = new DesiredCapabilitiesBuilder(mobileDevice)
                 .androidBasic()
+                .androidApiDemos()
                 .androidSkip()
                 .extractChromeAndroidPackageFromContextName()
                 .build();
@@ -23,6 +24,7 @@ public class AndroidDriverBuilder implements AppiumDriverBuilder {
     public AppiumDriver init(MobileDevice mobileDevice) {
         DesiredCapabilities capabilities = new DesiredCapabilitiesBuilder(mobileDevice)
                 .androidBasic()
+                .androidApiDemos()
                 .build();
         return new AndroidDriver(mobileDevice.getAppiumServer().getUrl(), capabilities);
     }

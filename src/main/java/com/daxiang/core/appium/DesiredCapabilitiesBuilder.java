@@ -62,6 +62,13 @@ public class DesiredCapabilitiesBuilder {
         return this;
     }
 
+    public DesiredCapabilitiesBuilder androidApiDemos() {
+        capabilities.setCapability("appPackage", "io.appium.android.apis");
+        capabilities.setCapability("appActivity", "io.appium.android.apis.ApiDemos");
+        capabilities.setCapability("autoLaunch", false);
+        return this;
+    }
+
     public DesiredCapabilitiesBuilder extractChromeAndroidPackageFromContextName() {
         capabilities.setCapability("extractChromeAndroidPackageFromContextName", true);
         return this;

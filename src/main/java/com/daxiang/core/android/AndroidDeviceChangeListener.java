@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.Session;
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
@@ -28,6 +29,9 @@ import java.util.Date;
 @Component
 @Slf4j
 public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceChangeListener {
+
+    // http://appium.github.io/appium/assets/ApiDemos-debug.apk
+    private static final String APIDEMOS_APK = "vendor/apk/ApiDemos-debug.apk";
 
     @Autowired
     private MasterApi masterApi;
@@ -151,6 +155,9 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         device.setScreenHeight(Integer.parseInt(res[1]));
 
         AndroidDevice androidDevice = new AndroidDevice(device, iDevice, appiumServer);
+
+        // 安装一个测试apk，用于初始化appium driver
+        androidDevice.installApp(new File(APIDEMOS_APK));
 
         log.info("[android][{}]开始初始化appium", deviceId);
         AppiumDriver appiumDriver = androidDevice.initAppiumDriver();
