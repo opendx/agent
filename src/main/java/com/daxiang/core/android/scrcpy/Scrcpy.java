@@ -174,6 +174,7 @@ public class Scrcpy {
 
                     androidImgDataConsumer.consume(ByteBuffer.wrap(packet, 0, packetSize));
                 }
+            } catch (IndexOutOfBoundsException ign) {
             } catch (Exception e) {
                 log.warn("[scrcpy][{}]处理scrcpy数据失败", deviceId, e);
             } finally {

@@ -109,7 +109,7 @@ public class AndroidDevice extends MobileDevice {
                 ((AndroidDriver) getAppiumDriver()).startRecordingScreen(androidOptions);
                 return;
             } catch (Exception e) {
-                log.warn("[{}]无法使用appium录制视频，改用minicap录制视频", getId(), e);
+                log.warn("[{}]无法使用appium录制视频，改用scrcpy录制视频", getId(), e);
                 canUseAppiumRecordVideo = false;
             }
         }
