@@ -1,11 +1,12 @@
 package com.daxiang.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.model.Response;
-import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.dom4j.DocumentException;
+import org.openqa.selenium.Dimension;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,7 +33,14 @@ public class MobileService {
             return Response.fail(e.getMessage());
         }
 
-        return Response.success(ImmutableMap.of("downloadURL", downloadURL));
+        JSONObject response = new JSONObject();
+        response.put("downloadURL", downloadURL);
+
+        Dimension window = mobileDevice.getAppiumDriver().manage().window().getSize();
+        response.put("imgHeight", window.getHeight());
+        response.put("imgWidth", window.getWidth());
+
+        return Response.success(response);
     }
 
     public Response dump(String deviceId) {
