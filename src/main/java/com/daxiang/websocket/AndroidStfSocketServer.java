@@ -114,10 +114,12 @@ public class AndroidStfSocketServer {
         String operation = message.getString("operation");
         switch (operation) {
             case "m":
-                androidDevice.getMinitouch().moveTo(message.getFloat("percentOfX"), message.getFloat("percentOfY"));
+                androidDevice.getMinitouch()
+                        .moveTo(message.getInteger("x"), message.getInteger("y"), message.getInteger("width"), message.getInteger("height"));
                 break;
             case "d":
-                androidDevice.getMinitouch().touchDown(message.getFloat("percentOfX"), message.getFloat("percentOfY"));
+                androidDevice.getMinitouch()
+                        .touchDown(message.getInteger("x"), message.getInteger("y"), message.getInteger("width"), message.getInteger("height"));
                 break;
             case "u":
                 androidDevice.getMinitouch().touchUp();

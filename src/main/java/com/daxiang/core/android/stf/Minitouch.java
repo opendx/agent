@@ -161,33 +161,15 @@ public class Minitouch {
     }
 
     /**
-     * 按下
-     *
-     * @param percentX 屏幕X百分比
-     * @param percentY 屏幕Y百分比
-     */
-    public void touchDown(float percentX, float percentY) {
-        touchDown((int) (percentX * width), (int) (percentY * height));
-    }
-
-    /**
-     * 滑动
-     *
-     * @param percentX 屏幕X百分比
-     * @param percentY 屏幕Y百分比
-     */
-    public void moveTo(float percentX, float percentY) {
-        moveTo((int) (percentX * width), (int) (percentY * height));
-    }
-
-    /**
      * 按下 https://github.com/openstf/minitouch#d-contact-x-y-pressure
      *
      * @param x
      * @param y
      */
-    public void touchDown(int x, int y) {
-        commit(String.format("d 0 %s %s 50", x, y));
+    public void touchDown(int x, int y, int screenWidth, int screenHeight) {
+        int minitouchX = (int) (((float) x) / screenWidth * width);
+        int minitouchY = (int) (((float) y) / screenHeight * height);
+        commit(String.format("d 0 %d %d 50", minitouchX, minitouchY));
     }
 
     /**
@@ -200,8 +182,10 @@ public class Minitouch {
     /**
      * 滑动 https://github.com/openstf/minitouch#m-contact-x-y-pressure
      */
-    public void moveTo(int x, int y) {
-        commit(String.format("m 0 %d %d 50", x, y));
+    public void moveTo(int x, int y, int screenWidth, int screenHeight) {
+        int minitouchX = (int) (((float) x) / screenWidth * width);
+        int minitouchY = (int) (((float) y) / screenHeight * height);
+        commit(String.format("m 0 %d %d 50", minitouchX, minitouchY));
     }
 
     /**
