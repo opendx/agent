@@ -64,7 +64,7 @@ public class Scrcpy {
             try {
                 String startCmd = "CLASSPATH=" + REMOTE_SCRCPY_PATH + " app_process / com.genymobile.scrcpy.Server " +
                         App.getProperty("scrcpyVersion") + " " +    // clientVersion
-                        "0 " +                                      // maxSize
+                        "800 " +                                    // maxSize
                         App.getProperty("scrcpyBitRate") + " " +    // bitRate
                         "60 " +                                     // maxFps >=android10才生效
                         "true " +                                   // tunnelForward
