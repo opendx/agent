@@ -21,8 +21,6 @@ public class DesiredCapabilitiesBuilder {
      */
     private static final int NEW_COMMAND_TIMEOUT = 60 * 60 * 12;
 
-    private static final String IOS_BUNDLE_ID = "com.apple.mobilesafari";
-
     private DesiredCapabilities capabilities;
     private MobileDevice mobileDevice;
 
@@ -110,7 +108,6 @@ public class DesiredCapabilitiesBuilder {
         capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.IOS_XCUI_TEST);
         capabilities.setCapability(IOSMobileCapabilityType.WDA_LOCAL_PORT, PortProvider.getWdaLocalAvailablePort());
         capabilities.setCapability("mjpegServerPort", PortProvider.getWdaMjpegServerAvailablePort());
-        capabilities.setCapability(IOSMobileCapabilityType.BUNDLE_ID, IOS_BUNDLE_ID);
         capabilities.setCapability(IOSMobileCapabilityType.WDA_STARTUP_RETRIES, 0);
         capabilities.setCapability("waitForQuiescence", false);
         capabilities.setCapability("skipLogCapture", true);

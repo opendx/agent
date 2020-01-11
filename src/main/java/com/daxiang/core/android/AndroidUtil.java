@@ -18,24 +18,24 @@ import java.util.regex.Pattern;
 public class AndroidUtil {
 
 
-    public static final Map<String, String> ANDROID_VERSION = new HashMap();
+    public static final Map<Integer, String> ANDROID_VERSION = new HashMap();
 
     static {
         // https://source.android.com/setup/start/build-numbers
         // uiautomator需要 >= 4.2
-        ANDROID_VERSION.put("17", "4.2");
-        ANDROID_VERSION.put("18", "4.3");
-        ANDROID_VERSION.put("19", "4.4");
-        ANDROID_VERSION.put("20", "4.4W");
-        ANDROID_VERSION.put("21", "5.0");
-        ANDROID_VERSION.put("22", "5.1");
-        ANDROID_VERSION.put("23", "6.0");
-        ANDROID_VERSION.put("24", "7.0");
-        ANDROID_VERSION.put("25", "7.1");
-        ANDROID_VERSION.put("26", "8.0");
-        ANDROID_VERSION.put("27", "8.1");
-        ANDROID_VERSION.put("28", "9");
-        ANDROID_VERSION.put("29", "10");
+        ANDROID_VERSION.put(17, "4.2");
+        ANDROID_VERSION.put(18, "4.3");
+        ANDROID_VERSION.put(19, "4.4");
+        ANDROID_VERSION.put(20, "4.4W");
+        ANDROID_VERSION.put(21, "5.0");
+        ANDROID_VERSION.put(22, "5.1");
+        ANDROID_VERSION.put(23, "6.0");
+        ANDROID_VERSION.put(24, "7.0");
+        ANDROID_VERSION.put(25, "7.1");
+        ANDROID_VERSION.put(26, "8.0");
+        ANDROID_VERSION.put(27, "8.1");
+        ANDROID_VERSION.put(28, "9");
+        ANDROID_VERSION.put(29, "10");
     }
 
     public static String getCpuInfo(IDevice iDevice) throws IDeviceExecuteShellCommandException {
@@ -60,8 +60,8 @@ public class AndroidUtil {
         return "[" + iDevice.getProperty("ro.product.brand") + "] " + iDevice.getProperty("ro.product.model");
     }
 
-    public static String getAndroidVersion(IDevice iDevice) {
-        return ANDROID_VERSION.get(getSdkVersion(iDevice));
+    public static String getAndroidVersion(Integer sdkVerison) {
+        return ANDROID_VERSION.get(sdkVerison);
     }
 
 
@@ -74,8 +74,8 @@ public class AndroidUtil {
         return iDevice.getProperty("ro.product.cpu.abi");
     }
 
-    public static String getSdkVersion(IDevice iDevice) {
-        return iDevice.getProperty("ro.build.version.sdk");
+    public static int getSdkVersion(IDevice iDevice) {
+        return Integer.parseInt(iDevice.getProperty("ro.build.version.sdk"));
     }
 
     /**

@@ -50,6 +50,8 @@ public class AndroidDevice extends MobileDevice {
     private Minitouch minitouch;
     private AdbKit adbKit;
 
+    private Integer sdkVersion;
+
     private boolean canUseAppiumRecordVideo = true;
 
     public AndroidDevice(Device device, IDevice iDevice, AppiumServer appiumServer) {
@@ -72,7 +74,9 @@ public class AndroidDevice extends MobileDevice {
     }
 
     public boolean greaterOrEqualsToAndroid5() {
-        Integer sdkVersion = Integer.parseInt(AndroidUtil.getSdkVersion(iDevice)); // 21 android5.0
+        if (sdkVersion == null) {
+            sdkVersion = AndroidUtil.getSdkVersion(iDevice); // 21 android5.0
+        }
         return sdkVersion >= 21;
     }
 

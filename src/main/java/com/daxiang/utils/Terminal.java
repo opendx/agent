@@ -2,6 +2,7 @@ package com.daxiang.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.*;
+import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -43,6 +44,13 @@ public class Terminal {
             String result = outputStream.toString() + errorStream.toString();
             if (showLog) {
                 log.info("[<==]{}", result);
+            }
+            if (!StringUtils.isEmpty(result)) {
+                if (result.endsWith("\r\n")) {
+                    result = result.substring(0, result.length() - 2);
+                } else if (result.endsWith("\n")) {
+                    result = result.substring(0, result.length() - 1);
+                }
             }
             return result;
         }

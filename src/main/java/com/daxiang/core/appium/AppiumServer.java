@@ -8,6 +8,7 @@ import org.apache.commons.exec.ExecuteWatchdog;
 import org.openqa.selenium.net.UrlChecker;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
@@ -20,20 +21,15 @@ public class AppiumServer {
     private static final String APPIUM_JS = App.getProperty("appiumJs");
     private static String version;
 
-    public synchronized static String getVersion() {
+    public static String getVersion() throws IOException {
         if (version == null) {
-            try {
-                if (StringUtils.isEmpty(APPIUM_JS)) {
-                    version = Terminal.execute("appium -v");
-                } else {
-                    version = Terminal.execute("node " + APPIUM_JS + " -v");
-                }
-            } catch (Exception e) {
-                log.error("获取appium版本失败", e);
-                version = e.getMessage();
+            if (StringUtils.isEmpty(APPIUM_JS)) {
+                version = Terminal.execute("appium -v");
+            } else {
+                version = Terminal.execute("node " + APPIUM_JS + " -v");
             }
         }
-        return version.replace("\n", "");
+        return version;
     }
 
     private ExecuteWatchdog watchdog;

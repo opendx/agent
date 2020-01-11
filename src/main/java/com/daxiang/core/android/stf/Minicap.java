@@ -18,7 +18,7 @@ import java.util.concurrent.*;
 public class Minicap {
 
     public static final String LOCAL_MINICAP_PATH = "vendor/minicap/bin/%s/minicap";
-    public static final String LOCAL_MINICAP_SO_PATH = "vendor/minicap/shared/android-%s/%s/minicap.so";
+    public static final String LOCAL_MINICAP_SO_PATH = "vendor/minicap/shared/android-%d/%s/minicap.so";
 
     public static final String REMOTE_MINICAP_PATH = AndroidDevice.TMP_FOLDER + "/minicap";
     public static final String REMOTE_MINICAP_SO_PATH = AndroidDevice.TMP_FOLDER + "/minicap.so";

@@ -8,7 +8,6 @@ import com.daxiang.model.Device;
 import com.daxiang.model.FileType;
 import com.daxiang.utils.UUIDUtil;
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.touch.offset.PointOption;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -113,12 +112,6 @@ public abstract class MobileDevice {
         int screenWidth = getDevice().getScreenWidth();
         float scale = screenHeight / (float) screenWidth;
         return (int) (scale * width);
-    }
-
-    public PointOption getPointOption(float percentOfX, float percentOfY) {
-        int screenWidth = getDevice().getScreenWidth();
-        int screenHeight = getDevice().getScreenHeight();
-        return PointOption.point((int) (percentOfX * screenWidth), (int) (percentOfY * screenHeight));
     }
 
     public abstract File screenshot() throws IOException;

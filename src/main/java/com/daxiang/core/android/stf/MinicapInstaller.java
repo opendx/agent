@@ -24,7 +24,7 @@ public class MinicapInstaller {
             String deviceId = iDevice.getSerialNumber();
 
             String cpuAbi = AndroidUtil.getCpuAbi(iDevice);
-            String sdkVersion = AndroidUtil.getSdkVersion(iDevice);
+            int sdkVersion = AndroidUtil.getSdkVersion(iDevice);
 
             String localMinicapPath = String.format(Minicap.LOCAL_MINICAP_PATH, cpuAbi);
             String localMinicapSoPath = String.format(Minicap.LOCAL_MINICAP_SO_PATH, sdkVersion, cpuAbi);

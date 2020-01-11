@@ -39,7 +39,6 @@ public class AgentStartRunner implements ApplicationRunner {
         String appiumVersion = AppiumServer.getVersion();
         System.setProperty("appiumVersion", appiumVersion);
 
-        // 适配appium 1.15.0，appium版本必须>=1.15.0
         if (!appiumVersion.matches("\\d+.\\d+.\\d+")) {
             throw new Error("appium版本错误: " + appiumVersion);
         }
@@ -48,8 +47,8 @@ public class AgentStartRunner implements ApplicationRunner {
         int first = Integer.parseInt(appiumVersionArr[0]);
         int middle = Integer.parseInt(appiumVersionArr[1]);
 
-        if (first < 1 || (first == 1 && middle < 15)) {
-            throw new Error("appium版本必须>=1.15.0");
+        if (first < 1 || (first == 1 && middle < 16)) {
+            throw new Error("appium版本必须>=1.16.0");
         }
 
         // 是否配置了aapt

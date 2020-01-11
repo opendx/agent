@@ -58,7 +58,7 @@ public class IosUtil {
             throw new RuntimeException("截图失败，idevicescreenshot返回空");
         }
         String[] resultArr = result.split(" ");
-        return new File(resultArr[resultArr.length - 1].replaceAll("\n", ""));
+        return new File(resultArr[resultArr.length - 1]);
     }
 
     // http://appium.io/docs/en/commands/mobile-command/

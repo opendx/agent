@@ -144,7 +144,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         device.setPlatform(MobileDevice.ANDROID);
         device.setCreateTime(new Date());
         device.setId(deviceId);
-        device.setSystemVersion(AndroidUtil.getAndroidVersion(iDevice));
+        device.setSystemVersion(AndroidUtil.getAndroidVersion(AndroidUtil.getSdkVersion(iDevice)));
         device.setName(AndroidUtil.getDeviceName(iDevice));
         device.setCpuInfo(AndroidUtil.getCpuInfo(iDevice));
         device.setMemSize(AndroidUtil.getMemSize(iDevice));
@@ -156,20 +156,8 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
 
         AndroidDevice androidDevice = new AndroidDevice(device, iDevice, appiumServer);
 
-        // 安装一个测试apk，用于初始化appium driver
-        androidDevice.installApp(new File(APIDEMOS_APK));
-
-        log.info("[android][{}]开始初始化appium", deviceId);
-        AppiumDriver appiumDriver = androidDevice.initAppiumDriver();
-        log.info("[android][{}]初始化appium完成", deviceId);
-
-        // 截图并上传到服务器
-        String imgDownloadUrl = androidDevice.screenshotAndUploadToMaster();
-        device.setImgUrl(imgDownloadUrl);
-
-        appiumDriver.quit();
-
         // 小于android5.0使用stf远程真机方案，否则使用scrcpy方案
+        // 小于android5.0初始化driver需要指定app
         if (!androidDevice.greaterOrEqualsToAndroid5()) {
             log.info("[android][{}]开始安装minicap", deviceId);
             MinicapInstaller minicapInstaller = new MinicapInstaller(iDevice);
@@ -180,7 +168,22 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
             MinitouchInstaller minitouchInstaller = new MinitouchInstaller(iDevice);
             minitouchInstaller.install();
             log.info("[android][{}]安装minitouch成功", deviceId);
+
+            // 安装一个测试apk，用于初始化appium driver
+            log.info("[android][{}]开始安装{}", deviceId, APIDEMOS_APK);
+            androidDevice.installApp(new File(APIDEMOS_APK));
+            log.info("[android][{}]安装{}完成", deviceId, APIDEMOS_APK);
         }
+
+        log.info("[android][{}]开始初始化appium", deviceId);
+        AppiumDriver appiumDriver = androidDevice.initAppiumDriver();
+        log.info("[android][{}]初始化appium完成", deviceId);
+
+        // 截图并上传到服务器
+        String imgDownloadUrl = androidDevice.screenshotAndUploadToMaster();
+        device.setImgUrl(imgDownloadUrl);
+
+        appiumDriver.quit();
 
         return androidDevice;
     }

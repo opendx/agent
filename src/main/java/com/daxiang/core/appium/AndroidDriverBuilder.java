@@ -1,9 +1,9 @@
 package com.daxiang.core.appium;
 
 import com.daxiang.core.MobileDevice;
+import com.daxiang.core.android.AndroidDevice;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
 /**
  * Created by jiangyitao.
@@ -12,20 +12,24 @@ public class AndroidDriverBuilder implements AppiumDriverBuilder {
 
     @Override
     public AppiumDriver build(MobileDevice mobileDevice) {
-        DesiredCapabilities capabilities = new DesiredCapabilitiesBuilder(mobileDevice)
+        DesiredCapabilitiesBuilder builder = new DesiredCapabilitiesBuilder(mobileDevice)
                 .androidBasic()
-                .androidApiDemos()
                 .androidSkip()
-                .extractChromeAndroidPackageFromContextName()
-                .build();
-        return new AndroidDriver(mobileDevice.getAppiumServer().getUrl(), capabilities);
+                .extractChromeAndroidPackageFromContextName();
+        handleApiDemos(mobileDevice, builder);
+        return new AndroidDriver(mobileDevice.getAppiumServer().getUrl(), builder.build());
     }
 
     public AppiumDriver init(MobileDevice mobileDevice) {
-        DesiredCapabilities capabilities = new DesiredCapabilitiesBuilder(mobileDevice)
-                .androidBasic()
-                .androidApiDemos()
-                .build();
-        return new AndroidDriver(mobileDevice.getAppiumServer().getUrl(), capabilities);
+        DesiredCapabilitiesBuilder builder = new DesiredCapabilitiesBuilder(mobileDevice)
+                .androidBasic();
+        handleApiDemos(mobileDevice, builder);
+        return new AndroidDriver(mobileDevice.getAppiumServer().getUrl(), builder.build());
+    }
+
+    public void handleApiDemos(MobileDevice mobileDevice, DesiredCapabilitiesBuilder builder) {
+        if (!((AndroidDevice) mobileDevice).greaterOrEqualsToAndroid5()) {
+            builder.androidApiDemos(); // uiautomator1仍然需要指定app
+        }
     }
 }
