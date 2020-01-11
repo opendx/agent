@@ -88,11 +88,6 @@ public class AndroidDevice extends MobileDevice {
     }
 
     @Override
-    public File screenshot() {
-        return getAppiumDriver().getScreenshotAs(OutputType.FILE);
-    }
-
-    @Override
     public void installApp(File appFile) throws InstallException {
         AndroidUtil.installApk(iDevice, appFile.getAbsolutePath());
     }

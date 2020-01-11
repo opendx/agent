@@ -44,11 +44,6 @@ public class IosDevice extends MobileDevice {
     }
 
     @Override
-    public File screenshot() throws IOException {
-        return IosUtil.screenshotByIdeviceScreenshot(getId());
-    }
-
-    @Override
     public void installApp(File app) throws IOException {
         IosUtil.installIpa(app.getAbsolutePath(), getId());
     }

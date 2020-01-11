@@ -6,7 +6,6 @@ import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -49,16 +48,6 @@ public class IosUtil {
 
     public static String getDeviceName(String deviceId) throws IOException {
         return Terminal.execute("ideviceinfo -k DeviceName -u " + deviceId);
-    }
-
-    public static File screenshotByIdeviceScreenshot(String deviceId) throws IOException {
-        // Screenshot saved to screenshot-xxx.png
-        String result = Terminal.execute("idevicescreenshot -u " + deviceId);
-        if (StringUtils.isEmpty(result)) {
-            throw new RuntimeException("截图失败，idevicescreenshot返回空");
-        }
-        String[] resultArr = result.split(" ");
-        return new File(resultArr[resultArr.length - 1]);
     }
 
     // http://appium.io/docs/en/commands/mobile-command/

@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.dom4j.DocumentException;
+import org.openqa.selenium.OutputType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -114,10 +115,8 @@ public abstract class MobileDevice {
         return (int) (scale * width);
     }
 
-    public abstract File screenshot() throws IOException;
-
-    public String screenshotAndUploadToMaster() throws IOException {
-        File screenshotFile = screenshot();
+    public String screenshotAndUploadToMaster() {
+        File screenshotFile = appiumDriver.getScreenshotAs(OutputType.FILE);
         try {
             return MasterApi.getInstance().uploadFile(screenshotFile, FileType.IMG);
         } finally {

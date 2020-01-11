@@ -36,9 +36,12 @@ public class MobileService {
         JSONObject response = new JSONObject();
         response.put("downloadURL", downloadURL);
 
+        // 由于ios截图分辨率与dump的windowHierarchy bounds不一致，需要把当前屏幕信息传给前端处理
+        // 在竖/横屏时，若android截图有虚拟按键，这里window的高度/宽度不包含虚拟按键
         Dimension window = mobileDevice.getAppiumDriver().manage().window().getSize();
-        response.put("imgHeight", window.getHeight());
-        response.put("imgWidth", window.getWidth());
+        response.put("windowHeight", window.getHeight());
+        response.put("windowWidth", window.getWidth());
+        response.put("windowOrientation", mobileDevice.getAppiumDriver().getOrientation().value());
 
         return Response.success(response);
     }
