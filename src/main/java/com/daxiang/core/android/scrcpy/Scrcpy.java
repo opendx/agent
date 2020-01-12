@@ -237,16 +237,34 @@ public class Scrcpy {
         commitTouchEvent(ACTION_MOVE, x, y, screenWidth, screenHeight);
     }
 
+    public void home() {
+        commitKeyCode(KEYCODE_HOME);
+    }
+
+    public void back() {
+        commitKeyCode(KEYCODE_BACK);
+    }
+
+    public void menu() {
+        commitKeyCode(KEYCODE_MENU);
+    }
+
+    public void power() {
+        commitKeyCode(KEYCODE_POWER);
+    }
+
     // Scrcpy.server ControlMessage
     private static final int TYPE_INJECT_TOUCH_EVENT = 2;
+    private static final int TYPE_INJECT_KEYCODE = 0;
+
     // android.view.MotionEvent
-    public static final int ACTION_DOWN = 0;
-    public static final int ACTION_UP = 1;
-    public static final int ACTION_MOVE = 2;
+    private static final int ACTION_DOWN = 0;
+    private static final int ACTION_UP = 1;
+    private static final int ACTION_MOVE = 2;
 
     private ByteBuffer touchEventBuffer = ByteBuffer.allocate(28);
 
-    // Scrcpy.server ControlMessageReader
+    // Scrcpy.server ControlMessageReader.parseInjectTouchEvent
     private void commitTouchEvent(int actionType, int x, int y, int screenWidth, int screenHeight) {
         touchEventBuffer.rewind();
         touchEventBuffer.put((byte) TYPE_INJECT_TOUCH_EVENT);
@@ -258,12 +276,41 @@ public class Scrcpy {
         touchEventBuffer.putShort((short) screenHeight);
         touchEventBuffer.putShort(Short.MAX_VALUE); // pressure
         touchEventBuffer.putInt(1); // buttons
-        try {
-            controlOutputStream.write(touchEventBuffer.array());
-            controlOutputStream.flush();
-        } catch (IOException e) {
-            log.error("[scrcpy][{}]commitTouchEvent err", deviceId, e);
-        }
+        commit(touchEventBuffer.array());
     }
 
+    // android.view.KeyEvent
+    private static final int KEYCODE_HOME = 3;
+    private static final int KEYCODE_BACK = 4;
+    private static final int KEYCODE_MENU = 82;
+    private static final int KEYCODE_POWER = 26;
+    private static final int KEY_EVENT_ACTION_DOWN = 0;
+    private static final int KEY_EVENT_ACTION_UP = 1;
+
+    private ByteBuffer keycodeBuffer = ByteBuffer.allocate(20);
+
+    // Scrcpy.server ControlMessageReader.parseInjectKeycode
+    private void commitKeyCode(int keycode) {
+        keycodeBuffer.rewind();
+        keycodeBuffer.put((byte) TYPE_INJECT_KEYCODE);
+        keycodeBuffer.put((byte) KEY_EVENT_ACTION_DOWN); // 按下
+        keycodeBuffer.putInt(keycode); // keycode
+        keycodeBuffer.putInt(0); // metaState
+
+        keycodeBuffer.put((byte) TYPE_INJECT_KEYCODE);
+        keycodeBuffer.put((byte) KEY_EVENT_ACTION_UP); // 抬起
+        keycodeBuffer.putInt(keycode); // keycode
+        keycodeBuffer.putInt(0); // metaState
+
+        commit(keycodeBuffer.array());
+    }
+
+    private void commit(byte[] msg) {
+        try {
+            controlOutputStream.write(msg);
+            controlOutputStream.flush();
+        } catch (IOException e) {
+            log.error("[scrcpy][{}]commit msg err", deviceId, e);
+        }
+    }
 }

@@ -2,7 +2,6 @@ package com.daxiang.websocket;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.daxiang.App;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.ios.IosDevice;
@@ -11,6 +10,7 @@ import io.appium.java_client.TouchAction;
 import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.PointOption;
 import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.Dimension;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
@@ -31,6 +31,9 @@ public class IosSocketServer {
 
     PointOption downPointOption;
     PointOption moveToPointOption;
+
+    private int width;
+    private int height;
 
     long pressStartTime;
 
@@ -65,19 +68,16 @@ public class IosSocketServer {
         JSONObject response = new JSONObject();
         response.put("appiumSessionId", mobileDevice.freshAppiumDriver(platform).getSessionId().toString());
         response.put("mjpegServerPort", ((IosDevice) mobileDevice).getMjpegServerPort());
-        int displayWidth = Integer.parseInt(App.getProperty("displayWidth"));
-        int displayHeight = mobileDevice.getScreenScaledHeight(displayWidth);
-        response.put("displayWidth", displayWidth);
-        response.put("displayHeight", displayHeight);
         basicRemote.sendText("初始化appium driver完成");
-        basicRemote.sendText(JSON.toJSONString(response));
 
         // 转发本地端口到wdaMjpegServer,这样可以通过localhost访问到wdaMjpegServer获取屏幕数据
         iosDevice.startMjpegServerIproxy();
 
-        Thread.sleep(1000);
-        // 前端拿到ok，可以渲染出<img src="xx">显示屏幕数据
-        basicRemote.sendText("ok");
+        Dimension window = mobileDevice.getAppiumDriver().manage().window().getSize();
+        height = window.getHeight();
+        width = window.getWidth();
+
+        basicRemote.sendText(JSON.toJSONString(response));
     }
 
     @OnClose
@@ -87,6 +87,7 @@ public class IosSocketServer {
         if (iosDevice != null) {
             MobileDeviceWebSocketSessionPool.remove(deviceId);
             iosDevice.stopMjpegServerIproxy();
+            iosDevice.quitAppiumDriver();
             iosDevice.saveIdleDeviceToMaster();
         }
     }
@@ -106,15 +107,15 @@ public class IosSocketServer {
      *
      * @param msg
      */
-    private synchronized void handleMessage(String msg) {
+    private void handleMessage(String msg) {
         JSONObject message = JSON.parseObject(msg);
         String operation = message.getString("operation");
         switch (operation) {
             case "m":
-                moveToPointOption = iosDevice.getPointOption(message.getFloat("percentOfX"), message.getFloat("percentOfY"));
+                moveToPointOption = getPointOption(message.getInteger("x"), message.getInteger("y"), message.getInteger("width"), message.getInteger("height"));
                 break;
             case "d":
-                downPointOption = iosDevice.getPointOption(message.getFloat("percentOfX"), message.getFloat("percentOfY"));
+                downPointOption = getPointOption(message.getInteger("x"), message.getInteger("y"), message.getInteger("width"), message.getInteger("height"));
                 moveToPointOption = null;
                 pressStartTime = System.currentTimeMillis();
                 break;
@@ -133,5 +134,11 @@ public class IosSocketServer {
                 IosUtil.pressHome(iosDevice.getAppiumDriver());
                 break;
         }
+    }
+
+    private PointOption getPointOption(int x, int y, int screenWidth, int screenHeight) {
+        x = (int) (((float) x) / screenWidth * width);
+        y = (int) (((float) y) / screenHeight * height);
+        return PointOption.point(x, y);
     }
 }

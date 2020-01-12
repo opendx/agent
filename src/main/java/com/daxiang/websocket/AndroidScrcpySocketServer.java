@@ -5,10 +5,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.AndroidDevice;
+import com.daxiang.core.android.scrcpy.Scrcpy;
 import com.google.common.collect.ImmutableMap;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.nativekey.AndroidKey;
-import io.appium.java_client.android.nativekey.KeyEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +27,7 @@ public class AndroidScrcpySocketServer {
     private AndroidDevice androidDevice;
     private AndroidDriver androidDriver;
     private String deviceId;
+    private Scrcpy scrcpy;
 
     @OnOpen
     public void onOpen(@PathParam("deviceId") String deviceId, @PathParam("username") String username, @PathParam("platform") Integer platform, Session session) throws Exception {
@@ -68,6 +68,8 @@ public class AndroidScrcpySocketServer {
         androidDriver = (AndroidDriver)androidDevice.freshAppiumDriver(platform);
         remoteEndpoint.sendText("初始化appium driver完成");
         remoteEndpoint.sendText(JSON.toJSONString(ImmutableMap.of("appiumSessionId", androidDriver.getSessionId().toString())));
+
+        scrcpy = androidDevice.getScrcpy();
     }
 
     @OnClose
@@ -77,6 +79,7 @@ public class AndroidScrcpySocketServer {
         if (androidDevice != null) {
             MobileDeviceWebSocketSessionPool.remove(deviceId);
             androidDevice.getScrcpy().stop();
+            androidDevice.quitAppiumDriver();
             androidDevice.saveIdleDeviceToMaster();
         }
     }
@@ -102,28 +105,25 @@ public class AndroidScrcpySocketServer {
         String operation = message.getString("operation");
         switch (operation) {
             case "m":
-                androidDevice.getScrcpy()
-                        .moveTo(message.getInteger("x"), message.getInteger("y"), message.getInteger("width"), message.getInteger("height"));
+                scrcpy.moveTo(message.getInteger("x"), message.getInteger("y"), message.getInteger("width"), message.getInteger("height"));
                 break;
             case "d":
-                androidDevice.getScrcpy()
-                        .touchDown(message.getInteger("x"), message.getInteger("y"), message.getInteger("width"), message.getInteger("height"));
+                scrcpy.touchDown(message.getInteger("x"), message.getInteger("y"), message.getInteger("width"), message.getInteger("height"));
                 break;
             case "u":
-                androidDevice.getScrcpy()
-                        .touchUp(message.getInteger("x"), message.getInteger("y"), message.getInteger("width"), message.getInteger("height"));
+                scrcpy.touchUp(message.getInteger("x"), message.getInteger("y"), message.getInteger("width"), message.getInteger("height"));
                 break;
             case "home":
-                androidDriver.pressKey(new KeyEvent(AndroidKey.HOME));
+                scrcpy.home();
                 break;
             case "back":
-                androidDriver.pressKey(new KeyEvent(AndroidKey.BACK));
+                scrcpy.back();
                 break;
             case "power":
-                androidDriver.pressKey(new KeyEvent(AndroidKey.POWER));
+                scrcpy.power();
                 break;
             case "menu":
-                androidDriver.pressKey(new KeyEvent(AndroidKey.MENU));
+                scrcpy.menu();
                 break;
         }
     }

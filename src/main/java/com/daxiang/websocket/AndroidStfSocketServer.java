@@ -89,6 +89,7 @@ public class AndroidStfSocketServer {
             MobileDeviceWebSocketSessionPool.remove(deviceId);
             androidDevice.getMinitouch().stop();
             androidDevice.getMinicap().stop();
+            androidDevice.quitAppiumDriver();
             androidDevice.saveIdleDeviceToMaster();
         }
     }
