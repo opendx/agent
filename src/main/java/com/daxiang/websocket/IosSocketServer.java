@@ -10,7 +10,6 @@ import io.appium.java_client.TouchAction;
 import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.PointOption;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.Dimension;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
@@ -73,9 +72,8 @@ public class IosSocketServer {
         // 转发本地端口到wdaMjpegServer,这样可以通过localhost访问到wdaMjpegServer获取屏幕数据
         iosDevice.startMjpegServerIproxy();
 
-        Dimension window = mobileDevice.getAppiumDriver().manage().window().getSize();
-        height = window.getHeight();
-        width = window.getWidth();
+        width = mobileDevice.getDevice().getScreenWidth();
+        height = mobileDevice.getDevice().getScreenHeight();
 
         basicRemote.sendText(JSON.toJSONString(response));
     }

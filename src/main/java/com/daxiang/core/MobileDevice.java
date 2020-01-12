@@ -33,11 +33,6 @@ public abstract class MobileDevice {
     public static final int ANDROID = 1;
     public static final int IOS = 2;
 
-    /* 0: 竖直 */
-    private Integer orientation = 0;
-    /* 分辨率 eg.1080x1920 */
-    private String resolution;
-
     private Device device;
     private DeviceTestTaskExecutor deviceTestTaskExecutor;
 
@@ -46,7 +41,6 @@ public abstract class MobileDevice {
 
     public MobileDevice(Device device, AppiumServer appiumServer) {
         this.device = device;
-        this.resolution = device.getScreenWidth() + "x" + device.getScreenHeight();
         this.appiumServer = appiumServer;
         deviceTestTaskExecutor = new DeviceTestTaskExecutor(this);
     }
@@ -95,24 +89,6 @@ public abstract class MobileDevice {
      */
     public boolean isIdle() {
         return device.getStatus() == Device.IDLE_STATUS;
-    }
-
-    public String getVirtualResolution(int width) {
-        int height = getScreenScaledHeight(width);
-        return width + "x" + height;
-    }
-
-    /**
-     * 按照比例计算高度
-     *
-     * @param width
-     * @return
-     */
-    public int getScreenScaledHeight(int width) {
-        int screenHeight = getDevice().getScreenHeight();
-        int screenWidth = getDevice().getScreenWidth();
-        float scale = screenHeight / (float) screenWidth;
-        return (int) (scale * width);
     }
 
     public String screenshotAndUploadToMaster() {

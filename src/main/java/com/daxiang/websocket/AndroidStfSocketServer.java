@@ -57,11 +57,17 @@ public class AndroidStfSocketServer {
 
         androidDevice.saveUsingDeviceToMaster(username);
 
+        int width = mobileDevice.getDevice().getScreenWidth();
+        int height = mobileDevice.getDevice().getScreenHeight();
+        String realResolution = width + "x" + height;
+        String virtualResolution = width / 2 + "x" + height / 2;
+
+        // android5以下的手机不多，暂不处理横竖屏切换
         remoteEndpoint.sendText("启动minicap...");
         androidDevice.getMinicap().start(Integer.parseInt(App.getProperty("minicap-quality")),
-                androidDevice.getResolution(),
-                androidDevice.getVirtualResolution(Integer.parseInt(App.getProperty("displayWidth"))),
-                androidDevice.getOrientation(),
+                realResolution,
+                virtualResolution,
+                0,
                 minicapImgData -> {
                     try {
                         remoteEndpoint.sendBinary(minicapImgData);

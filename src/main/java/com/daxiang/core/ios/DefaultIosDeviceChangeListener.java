@@ -124,7 +124,6 @@ public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
             if (width > 0 && height > 0) {
                 device.setScreenWidth(width);
                 device.setScreenHeight(height);
-                iosDevice.setResolution(width + "x" + height);
                 break;
             } else {
                 log.warn("[ios][{}]未获取到正确的屏幕宽高: {}", deviceId, window);
