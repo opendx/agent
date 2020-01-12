@@ -7,6 +7,7 @@ import com.daxiang.App;
 import com.daxiang.core.PortProvider;
 import com.daxiang.core.android.AndroidDevice;
 import com.daxiang.core.android.AndroidImgDataConsumer;
+import com.daxiang.utils.IOUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -14,7 +15,6 @@ import org.springframework.util.StringUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.math.BigInteger;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.concurrent.CountDownLatch;
@@ -131,23 +131,10 @@ public class Scrcpy {
                 // deviceName 64
                 // width 2
                 // height 2
-                byte[] widthBytes = new byte[2];
-                byte[] heightBytes = new byte[2];
-
-                for (int i = 0; i < 64; i++) {
+                for (int i = 0; i < 68; i++) {
                     screenStream.read();
                 }
 
-                widthBytes[0] = (byte) screenStream.read();
-                widthBytes[1] = (byte) screenStream.read();
-                heightBytes[0] = (byte) screenStream.read();
-                heightBytes[1] = (byte) screenStream.read();
-
-                int width = new BigInteger(widthBytes).intValue();
-                int height = new BigInteger(heightBytes).intValue();
-                log.info("[scrcpy][{}]width: {}, height: {}", deviceId, width, height);
-
-                byte[] packetSizeBytes = new byte[4];
                 byte[] packet = new byte[1024 * 1024];
 
                 while (isRun) {
@@ -159,11 +146,7 @@ public class Scrcpy {
                         screenStream.read();
                     }
 
-                    for (int i = 0; i < 4; i++) {
-                        packetSizeBytes[i] = (byte) screenStream.read();
-                    }
-
-                    int packetSize = new BigInteger(packetSizeBytes).intValue();
+                    int packetSize = IOUtil.readInt(screenStream);
                     if (packetSize > packet.length) {
                         packet = new byte[packetSize];
                     }
