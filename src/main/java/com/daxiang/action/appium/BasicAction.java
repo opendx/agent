@@ -37,8 +37,6 @@ public class BasicAction {
 
     private MobileDevice mobileDevice;
     private AppiumDriver driver;
-    private int screenHeight;
-    private int screenWidth;
 
     public BasicAction(AppiumDriver driver) {
         this.driver = driver;
@@ -46,8 +44,6 @@ public class BasicAction {
         if (mobileDevice == null) {
             throw new RuntimeException("手机不存在");
         }
-        screenHeight = mobileDevice.getDevice().getScreenHeight();
-        screenWidth = mobileDevice.getDevice().getScreenWidth();
     }
 
     /**
@@ -246,7 +242,12 @@ public class BasicAction {
      * @param endPoint
      */
     public void swipeInScreen(String startPoint, String endPoint, String durationInMsOfSwipeOneTime) {
-        swipeInScreen(getPoint(startPoint), getPoint(endPoint), getDurationInMsOfSwipeOneTime(durationInMsOfSwipeOneTime));
+        Dimension window = driver.manage().window().getSize();
+        int width = window.width;
+        int height = window.height;
+        swipeInScreen(getPoint(startPoint, width, height),
+                getPoint(endPoint, width, height),
+                getDurationInMsOfSwipeOneTime(durationInMsOfSwipeOneTime));
     }
 
     private void swipeInScreen(Point start, Point end, Long durationInMsOfSwipeOneTime) {
@@ -259,7 +260,7 @@ public class BasicAction {
                 .perform();
     }
 
-    private Point getPoint(String point) {
+    private Point getPoint(String point, int screenWidth, int screenHeight) {
         JSONObject _point;
         try {
             _point = JSON.parseObject(point.trim());
@@ -300,8 +301,12 @@ public class BasicAction {
         } catch (Exception e) {
         }
 
-        Point start = getPoint(startPoint);
-        Point end = getPoint(endPoint);
+        Dimension window = driver.manage().window().getSize();
+        int width = window.width;
+        int height = window.height;
+
+        Point start = getPoint(startPoint, width, height);
+        Point end = getPoint(endPoint, width, height);
         long swipeDuration = getDurationInMsOfSwipeOneTime(durationInMsOfSwipeOneTime);
 
         for (int i = 0; i < Integer.parseInt(maxSwipeCount); i++) {
@@ -424,29 +429,32 @@ public class BasicAction {
     /**
      * 21.弹窗 允许/接受/...
      */
-    public void acceptAlert() {
+    public boolean acceptAlert() {
         try {
             if (driver instanceof AndroidDriver) {
                 driver.executeScript("mobile:acceptAlert");
             } else {
                 driver.switchTo().alert().accept();
             }
+            return true;
         } catch (Exception ign) {
+            return false;
         }
     }
 
     /**
      * 22.弹窗 拒绝/取消/...
      */
-    public void dismissAlert() {
+    public boolean dismissAlert() {
         try {
             if (driver instanceof AndroidDriver) {
                 driver.executeScript("mobile:dismissAlert");
             } else {
                 driver.switchTo().alert().dismiss();
             }
+            return true;
         } catch (Exception ign) {
-
+            return false;
         }
     }
 
@@ -458,6 +466,70 @@ public class BasicAction {
      */
     public void clearInput(String findBy, String value) {
         findElement(findBy, value).clear();
+    }
+
+    /**
+     * 24.异步accept alert
+     *
+     * @param timeoutInSeconds 超时处理时间
+     * @param once     是否只处理一次
+     */
+    public void asyncAcceptAlert(String timeoutInSeconds, String once) {
+        long _timeoutInSeconds;
+        boolean _once;
+        try {
+            _timeoutInSeconds = Long.parseLong(timeoutInSeconds);
+            _once = Boolean.parseBoolean(once);
+        } catch (Exception e) {
+            throw new RuntimeException("非法参数");
+        }
+
+        new Thread(() -> {
+            long startTime = System.currentTimeMillis();
+            while (System.currentTimeMillis() - startTime < _timeoutInSeconds * 1000) {
+                boolean success = acceptAlert();
+                if (_once && success) {
+                    break;
+                }
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+
+                }
+            }
+        }).start();
+    }
+
+    /**
+     * 25.异步dismiss alert
+     *
+     * @param timeoutInSeconds 超时处理时间
+     * @param once     是否只处理一次
+     */
+    public void asyncDismissAlert(String timeoutInSeconds, String once) {
+        long _timeoutInSeconds;
+        boolean _once;
+        try {
+            _timeoutInSeconds = Long.parseLong(timeoutInSeconds);
+            _once = Boolean.parseBoolean(once);
+        } catch (Exception e) {
+            throw new RuntimeException("非法参数");
+        }
+
+        new Thread(() -> {
+            long startTime = System.currentTimeMillis();
+            while (System.currentTimeMillis() - startTime < _timeoutInSeconds * 1000) {
+                boolean success = dismissAlert();
+                if (_once && success) {
+                    break;
+                }
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+
+                }
+            }
+        }).start();
     }
 
     private By getBy(String findBy, String value) {

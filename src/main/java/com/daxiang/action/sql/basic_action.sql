@@ -357,9 +357,9 @@ INSERT INTO `action` (
 VALUES
 (
   21,
-  '对话框-接受/允许/确定/是...[acceptAlert]',
+  'accept对话框[acceptAlert]',
   '$.acceptAlert',
-  'void'
+  'boolean'
 );
 
 -- 22.dismissAlert
@@ -372,9 +372,9 @@ INSERT INTO `action` (
 VALUES
 (
   22,
-  '对话框-拒绝/取消/否...[dismissAlert]',
+  'dismiss对话框[dismissAlert]',
   '$.dismissAlert',
-  'void'
+  'boolean'
 );
 
 -- 23.clearInput
@@ -392,4 +392,36 @@ VALUES
   '$.clearInput',
   'void',
   REPLACE('[#]','#',@findbyAndValue)
+);
+
+-- 24.asyncAcceptAlert
+INSERT INTO `action` (
+  `id`,
+  `name`,
+  `invoke`,
+  `return_value`
+)
+VALUES
+(
+  24,
+  '异步accept对话框[asyncAcceptAlert]',
+  '$.asyncAcceptAlert',
+  'void',
+  '[{"name":"timeoutInSeconds","type":"String","description":"超时时间,单位: 秒"},{"name":"once","type":"String","description":"是否只处理一次, true or false"}]'
+);
+
+-- 25.asyncDismissAlert
+INSERT INTO `action` (
+  `id`,
+  `name`,
+  `invoke`,
+  `return_value`
+)
+VALUES
+(
+  25,
+  '异步dismiss对话框[asyncDismissAlert]',
+  '$.asyncDismissAlert',
+  'void',
+  '[{"name":"timeoutInSeconds","type":"String","description":"超时时间,单位: 秒"},{"name":"once","type":"String","description":"是否只处理一次, true or false"}]'
 );
