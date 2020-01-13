@@ -63,14 +63,14 @@ public class Scrcpy {
         new Thread(() -> {
             try {
                 String startCmd = "CLASSPATH=" + REMOTE_SCRCPY_PATH + " app_process / com.genymobile.scrcpy.Server " +
-                        App.getProperty("scrcpyVersion") + " " +    // clientVersion
-                        "800 " +                                    // maxSize
-                        App.getProperty("scrcpyBitRate") + " " +    // bitRate
-                        "60 " +                                     // maxFps >=android10才生效
-                        "true " +                                   // tunnelForward
-                        "- " +                                      // crop
-                        "true " +                                   // sendFrameMeta
-                        "true";                                     // control
+                        App.getProperty("scrcpyVersion") + " " +            // clientVersion
+                        "800 " +                                            // maxSize
+                        App.getProperty("remoteScrcpyBitRate") + " " +      // bitRate
+                        "60 " +                                             // maxFps >=android10才生效
+                        "true " +                                           // tunnelForward
+                        "- " +                                              // crop
+                        "true " +                                           // sendFrameMeta
+                        "true";                                             // control
 
                 log.info("[scrcpy][{}]start: {}", deviceId, startCmd);
                 iDevice.executeShellCommand(startCmd, new MultiLineReceiver() {
@@ -250,6 +250,7 @@ public class Scrcpy {
     // Scrcpy.server ControlMessageReader.parseInjectTouchEvent
     private void commitTouchEvent(int actionType, int x, int y, int screenWidth, int screenHeight) {
         touchEventBuffer.rewind();
+
         touchEventBuffer.put((byte) TYPE_INJECT_TOUCH_EVENT);
         touchEventBuffer.put((byte) actionType);
         touchEventBuffer.putLong(-1L); // pointerId
@@ -259,6 +260,7 @@ public class Scrcpy {
         touchEventBuffer.putShort((short) screenHeight);
         touchEventBuffer.putShort(Short.MAX_VALUE); // pressure
         touchEventBuffer.putInt(1); // buttons
+
         commit(touchEventBuffer.array());
     }
 
@@ -275,6 +277,7 @@ public class Scrcpy {
     // Scrcpy.server ControlMessageReader.parseInjectKeycode
     private void commitKeyCode(int keycode) {
         keycodeBuffer.rewind();
+
         keycodeBuffer.put((byte) TYPE_INJECT_KEYCODE);
         keycodeBuffer.put((byte) KEY_EVENT_ACTION_DOWN); // 按下
         keycodeBuffer.putInt(keycode); // keycode

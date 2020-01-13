@@ -67,6 +67,13 @@ public class Terminal {
         return executeAsyncAndGetWatchdog(command, true);
     }
 
+    public static void executeAsync(String command, PumpStreamHandler pumpStreamHandler) throws IOException {
+        DefaultExecutor executor = new DefaultExecutor();
+        executor.setExitValues(null);
+        executor.setStreamHandler(pumpStreamHandler);
+        executor.execute(createCommandLine(command), new DefaultExecuteResultHandler());
+    }
+
     public static ExecuteWatchdog executeAsyncAndGetWatchdog(String command, boolean showLog) throws IOException {
         DefaultExecutor executor = new DefaultExecutor();
         executor.setExitValues(null);

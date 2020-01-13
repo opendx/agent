@@ -6,6 +6,7 @@ import com.daxiang.App;
 import com.daxiang.api.MasterApi;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.android.scrcpy.Scrcpy;
+import com.daxiang.core.android.scrcpy.ScrcpyVideoRecorder;
 import com.daxiang.core.android.stf.AdbKit;
 import com.daxiang.core.android.stf.Minicap;
 import com.daxiang.core.android.stf.Minitouch;
@@ -21,7 +22,6 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.dom4j.DocumentException;
-import org.openqa.selenium.OutputType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
@@ -49,6 +49,8 @@ public class AndroidDevice extends MobileDevice {
     private Minicap minicap;
     private Minitouch minitouch;
     private AdbKit adbKit;
+
+    private ScrcpyVideoRecorder scrcpyVideoRecorder;
 
     private Integer sdkVersion;
 
@@ -104,7 +106,7 @@ public class AndroidDevice extends MobileDevice {
                 AndroidStartScreenRecordingOptions androidOptions = new AndroidStartScreenRecordingOptions();
                 // Since Appium 1.8.2 the time limit can be up to 1800 seconds (30 minutes).
                 androidOptions.withTimeLimit(Duration.ofMinutes(30));
-                androidOptions.withBitRate(2000000); // default 4000000
+                androidOptions.withBitRate(Integer.parseInt(App.getProperty("androidRecordVideoBitRate")) * 1000000); // default 4000000
                 ((AndroidDriver) getAppiumDriver()).startRecordingScreen(androidOptions);
                 return;
             } catch (Exception e) {
@@ -113,7 +115,10 @@ public class AndroidDevice extends MobileDevice {
             }
         }
 
-        // todo 使用scrcpy录屏
+        if (scrcpyVideoRecorder == null) {
+            scrcpyVideoRecorder = new ScrcpyVideoRecorder(iDevice);
+        }
+        scrcpyVideoRecorder.start();
     }
 
     @Override
@@ -124,8 +129,7 @@ public class AndroidDevice extends MobileDevice {
             FileUtils.writeByteArrayToFile(videoFile, Base64.getDecoder().decode(base64Video), false);
             return videoFile;
         } else {
-            // todo 使用scrcpy录屏
-            return null;
+            return scrcpyVideoRecorder.stop();
         }
     }
 

@@ -48,6 +48,10 @@ public class PortProvider {
     private static final int SCRCPY_PORT_END = 29999;
     private static int scrcpyPort = SCRCPY_PORT_START;
 
+    private static final int SCRCPY_RECORD_VIDEO_PORT_START = 30000;
+    private static final int SCRCPY_RECORD_VIDEO_PORT_END = 30999;
+    private static int scrcpyRecordVideoPort = SCRCPY_RECORD_VIDEO_PORT_START;
+
     public static synchronized int getChromeDriverAvailablePort() {
         int availablePort = getAvailablePort(CHROME_DRIVER_PORT_START, CHROME_DRIVER_PORT_END, chromeDriverPort);
         chromeDriverPort = availablePort + 1;
@@ -105,6 +109,12 @@ public class PortProvider {
     public static synchronized int getScrcpyAvailablePort() {
         int availablePort = getAvailablePort(SCRCPY_PORT_START, SCRCPY_PORT_END, scrcpyPort);
         scrcpyPort = availablePort + 1;
+        return availablePort;
+    }
+
+    public static synchronized int getScrcpyRecordVideoPort() {
+        int availablePort = getAvailablePort(SCRCPY_RECORD_VIDEO_PORT_START, SCRCPY_RECORD_VIDEO_PORT_END, scrcpyRecordVideoPort);
+        scrcpyRecordVideoPort = availablePort + 1;
         return availablePort;
     }
 
