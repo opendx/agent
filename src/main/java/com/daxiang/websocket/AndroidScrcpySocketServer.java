@@ -56,7 +56,8 @@ public class AndroidScrcpySocketServer {
 
         androidDevice.saveUsingDeviceToMaster(username);
 
-        androidDevice.getScrcpy().start(imgData -> {
+        scrcpy = androidDevice.getScrcpy();
+        scrcpy.start(imgData -> {
             try {
                 remoteEndpoint.sendBinary(imgData);
             } catch (IOException e) {
@@ -68,8 +69,6 @@ public class AndroidScrcpySocketServer {
         androidDriver = (AndroidDriver)androidDevice.freshAppiumDriver(platform);
         remoteEndpoint.sendText("初始化appium driver完成");
         remoteEndpoint.sendText(JSON.toJSONString(ImmutableMap.of("appiumSessionId", androidDriver.getSessionId().toString())));
-
-        scrcpy = androidDevice.getScrcpy();
     }
 
     @OnClose
@@ -78,7 +77,7 @@ public class AndroidScrcpySocketServer {
 
         if (androidDevice != null) {
             MobileDeviceWebSocketSessionPool.remove(deviceId);
-            androidDevice.getScrcpy().stop();
+            scrcpy.stop();
             androidDevice.quitAppiumDriver();
             androidDevice.saveIdleDeviceToMaster();
         }
