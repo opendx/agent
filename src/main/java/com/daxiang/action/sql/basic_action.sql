@@ -399,7 +399,8 @@ INSERT INTO `action` (
   `id`,
   `name`,
   `invoke`,
-  `return_value`
+  `return_value`,
+  `params`
 )
 VALUES
 (
@@ -415,7 +416,8 @@ INSERT INTO `action` (
   `id`,
   `name`,
   `invoke`,
-  `return_value`
+  `return_value`,
+  `params`
 )
 VALUES
 (
