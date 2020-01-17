@@ -163,10 +163,11 @@ public class AndroidUtil {
         if (StringUtils.isEmpty(imeListString)) {
             return Collections.emptyList();
         }
-        return Arrays.asList(imeListString.split("\r\n"));
+        return Arrays.asList(imeListString.split("\\r?\\n"));
     }
 
     public static void setIme(IDevice iDevice, String ime) throws IDeviceExecuteShellCommandException {
         executeShellCommand(iDevice, "ime set " + ime);
     }
+
 }
