@@ -78,7 +78,7 @@ public class Terminal {
         Executor executor = new DaemonExecutor();
         executor.setExitValues(null);
 
-        ExecuteWatchdog watchdog = new ExecuteWatchdog(Integer.MAX_VALUE);
+        ExecuteWatchdog watchdog = new ExecuteWatchdog(ExecuteWatchdog.INFINITE_TIMEOUT);
         executor.setWatchdog(watchdog);
 
         if (showLog) {
