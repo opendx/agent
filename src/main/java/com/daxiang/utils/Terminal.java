@@ -29,7 +29,7 @@ public class Terminal {
     }
 
     public static String execute(String command, boolean showLog) throws IOException {
-        DefaultExecutor executor = new DefaultExecutor();
+        Executor executor = new DaemonExecutor();
         executor.setExitValues(null);
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -68,14 +68,14 @@ public class Terminal {
     }
 
     public static void executeAsync(String command, PumpStreamHandler pumpStreamHandler) throws IOException {
-        DefaultExecutor executor = new DefaultExecutor();
+        Executor executor = new DaemonExecutor();
         executor.setExitValues(null);
         executor.setStreamHandler(pumpStreamHandler);
         executor.execute(createCommandLine(command), new DefaultExecuteResultHandler());
     }
 
     public static ExecuteWatchdog executeAsyncAndGetWatchdog(String command, boolean showLog) throws IOException {
-        DefaultExecutor executor = new DefaultExecutor();
+        Executor executor = new DaemonExecutor();
         executor.setExitValues(null);
 
         ExecuteWatchdog watchdog = new ExecuteWatchdog(Integer.MAX_VALUE);
