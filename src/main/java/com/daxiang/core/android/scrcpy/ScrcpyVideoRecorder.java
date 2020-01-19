@@ -1,10 +1,7 @@
 package com.daxiang.core.android.scrcpy;
 
-import com.android.ddmlib.IDevice;
 import com.daxiang.App;
 import com.daxiang.core.PortProvider;
-import com.daxiang.core.android.AndroidUtil;
-import com.daxiang.core.android.IDeviceExecuteShellCommandException;
 import com.daxiang.utils.Terminal;
 import com.daxiang.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -15,8 +12,6 @@ import org.springframework.util.StringUtils;
 import java.io.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by jiangyitao.
@@ -24,16 +19,15 @@ import java.util.regex.Pattern;
 @Slf4j
 public class ScrcpyVideoRecorder {
 
-    private IDevice iDevice;
     private String deviceId;
 
+    private String startCmd;
     private String videoName;
     private boolean isRecording = false;
     private CountDownLatch countDownLatch;
 
-    public ScrcpyVideoRecorder(IDevice iDevice) {
-        this.iDevice = iDevice;
-        this.deviceId = iDevice.getSerialNumber();
+    public ScrcpyVideoRecorder(String deviceId) {
+        this.deviceId = deviceId;
 
         try {
             String version = Terminal.execute("scrcpy -v");
@@ -54,7 +48,7 @@ public class ScrcpyVideoRecorder {
 
         try {
             videoName = UUIDUtil.getUUID() + ".mp4";
-            String startCmd = String.format("scrcpy -s %s -Nr %s -b%sM -p %d",
+            startCmd = String.format("scrcpy -s %s -Nr %s -b%sM -p %d",
                     deviceId,
                     videoName,
                     App.getProperty("androidRecordVideoBitRate"),
@@ -77,36 +71,21 @@ public class ScrcpyVideoRecorder {
     }
 
     /**
-     * 由于ExecuteWatchdog.destroyProcess()会导致最后一部分视频无法写入文件
-     * 目前处理方法为kill手机内scrcpy server，由scrcpy写入最后一部分视频，得到完整视频
+     * 由于ExecuteWatchdog.destroyProcess()会导致最后一部分视频无法写入
+     * scrcpy收到kill信号后，会写入最后一部分视频
      */
-    public synchronized File stop() {
+    public synchronized File stop() throws IOException {
         if (!isRecording) {
             throw new RuntimeException("video is not in recording");
         }
 
         log.info("[scrcpy][{}]stop record video: {}", deviceId, videoName);
 
-        // shell     7460  7458  808868 34124 ffffffff b6e43a28 S app_process
-        String scrcpyServerInfo;
-        try {
-            scrcpyServerInfo = AndroidUtil.executeShellCommand(iDevice, "ps |grep shell |grep app_process");
-        } catch (IDeviceExecuteShellCommandException e) {
-            throw new RuntimeException(e);
-        }
-
-        if (StringUtils.isEmpty(scrcpyServerInfo) || !scrcpyServerInfo.contains("app_process")) {
-            throw new RuntimeException("cannot find scrcpy server ps info");
-        }
-
-        Matcher matcher = Pattern.compile("shell(\\s+)(\\d+)").matcher(scrcpyServerInfo);
-        while (matcher.find()) {
-            int pid = Integer.parseInt(matcher.group(2));
-            try {
-                AndroidUtil.executeShellCommand(iDevice, "kill -9 " + pid);
-            } catch (IDeviceExecuteShellCommandException e) {
-                throw new RuntimeException(e);
-            }
+        if (Terminal.IS_WINDOWS) {
+            // todo windows
+        } else {
+            String killScrcpyCmd = String.format("ps -ef|grep '%s'|grep -v grep|awk '{print \"kill \"$2}'|sh", startCmd);
+            Terminal.execute(killScrcpyCmd);
         }
 
         try {

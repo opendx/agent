@@ -116,7 +116,7 @@ public class AndroidDevice extends MobileDevice {
         }
 
         if (scrcpyVideoRecorder == null) {
-            scrcpyVideoRecorder = new ScrcpyVideoRecorder(iDevice);
+            scrcpyVideoRecorder = new ScrcpyVideoRecorder(getId());
         }
         scrcpyVideoRecorder.start();
     }
