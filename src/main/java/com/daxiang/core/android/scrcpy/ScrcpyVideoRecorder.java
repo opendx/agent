@@ -29,6 +29,10 @@ public class ScrcpyVideoRecorder {
     public ScrcpyVideoRecorder(String deviceId) {
         this.deviceId = deviceId;
 
+        if (Terminal.IS_WINDOWS) {
+            throw new RuntimeException("暂不支持windows录屏");
+        }
+
         try {
             String version = Terminal.execute("scrcpy -v");
             if (StringUtils.isEmpty(version) || !version.startsWith("scrcpy")) {
@@ -71,8 +75,12 @@ public class ScrcpyVideoRecorder {
     }
 
     /**
-     * 由于ExecuteWatchdog.destroyProcess()会导致最后一部分视频无法写入
-     * scrcpy收到kill信号后，会写入最后一部分视频
+     * 1. kill scrcpy server来停止录制视频是最优方案。但大多数安卓手机只能通过ps（非ps -ef）获取到scrcpy server进程,
+     * 此时的进程名为app_process, appium在手机里运行的进程也是app_process，所以可能会误杀appium在手机里运行的进程，不采用该方法
+     * 2. ExecuteWatchdog.destroyProcess()会导致最后一部分视频无法写入，
+     * 因为运行在pc的scrcpy进程被直接干掉，无法写入最终的视频，导致获取到破损的视频
+     * 3. 在非windows操作系统下，scrcpy收到kill信号后，会写入最后一部分视频，目前采用该方法
+     * 4. 无法在windows上使用，windows taskkill和ExecuteWatchdog.destroyProcess()一样
      */
     public synchronized File stop() throws IOException {
         if (!isRecording) {
@@ -81,12 +89,8 @@ public class ScrcpyVideoRecorder {
 
         log.info("[scrcpy][{}]stop record video: {}", deviceId, videoName);
 
-        if (Terminal.IS_WINDOWS) {
-            // todo windows
-        } else {
-            String killScrcpyCmd = String.format("ps -ef|grep '%s'|grep -v grep|awk '{print \"kill \"$2}'|sh", startCmd);
-            Terminal.execute(killScrcpyCmd);
-        }
+        String killScrcpyCmd = String.format("ps -ef|grep '%s'|grep -v grep|awk '{print \"kill \"$2}'|sh", startCmd);
+        Terminal.execute(killScrcpyCmd);
 
         try {
             // 等待视频写入完成，最多等3min
