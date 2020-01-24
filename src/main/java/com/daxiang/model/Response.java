@@ -50,6 +50,10 @@ public class Response<T> {
         return buildResponse(FAIL, msg, null);
     }
 
+    public static <T> Response<T> fail(String msg, T data) {
+        return buildResponse(FAIL, msg, data);
+    }
+
     public static Response error(String msg) {
         return buildResponse(ERROR, msg, null);
     }

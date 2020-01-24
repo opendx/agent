@@ -3,6 +3,7 @@ package com.daxiang.core.javacompile;
 import lombok.extern.slf4j.Slf4j;
 import org.dvare.dynamic.compiler.DynamicCompiler;
 import org.dvare.dynamic.exceptions.DynamicCompilerException;
+import org.springframework.util.Assert;
 
 
 /**
@@ -11,6 +12,9 @@ import org.dvare.dynamic.exceptions.DynamicCompilerException;
 @Slf4j
 public class JavaCompiler {
     public static Class compile(String className, String code) throws DynamicCompilerException {
+        Assert.hasLength(className, "className cannot be empty");
+        Assert.hasLength(code, "code cannot be empty");
+
         DynamicCompiler dynamicCompiler = new DynamicCompiler();
         dynamicCompiler.addSource(className, code);
         log.info("[java编译]开始编译{}", className);

@@ -8,11 +8,11 @@ import com.daxiang.model.devicetesttask.Testcase;
 import com.daxiang.model.request.ActionDebugRequest;
 import com.daxiang.core.testng.TestNGCodeConverter;
 import com.daxiang.utils.UUIDUtil;
+import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.dvare.dynamic.exceptions.DynamicCompilerException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -46,9 +46,6 @@ public class ActionService {
             String code = new TestNGCodeConverter()
                     .convert(deviceTestTask, className, "/codetemplate", "mobile.ftl");
             log.info("[调试action][{}]code: {}", request.getDeviceId(), code);
-            if (StringUtils.isEmpty(code)) {
-                return Response.fail("转换后的代码为空，无法调试");
-            }
 
             return compileAndDebug(className, code);
         } catch (Exception e) {
@@ -75,8 +72,12 @@ public class ActionService {
     /**
      * 编译调试运行
      */
-    private Response compileAndDebug(String className, String code) throws DynamicCompilerException {
-        Class clazz = JavaCompiler.compile(className, code);
-        return TestNGRunner.debugAction(clazz);
+    private Response compileAndDebug(String className, String code) {
+        try {
+            return TestNGRunner.debugAction(JavaCompiler.compile(className, code), code);
+        } catch (DynamicCompilerException e) {
+            log.error(e.getMessage());
+            return Response.fail(e.getMessage(), ImmutableMap.of("code", code));
+        }
     }
 }

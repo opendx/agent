@@ -54,29 +54,29 @@ public class TestNGCodeConverter {
         Action beforeClass = deviceTestTask.getBeforeClass();
         if (beforeClass != null) {
             actionTreeList.add(beforeClass);
-            String callBeforeClass = convertToInvokeMethodStringWithParamNull(beforeClass);
-            dataModel.put("beforeClass", callBeforeClass);
+            String invokeBeforeClass = convertToInvokeMethodStringWithParamNull(beforeClass);
+            dataModel.put("beforeClass", invokeBeforeClass);
         }
 
         Action afterClass = deviceTestTask.getAfterClass();
         if (afterClass != null) {
             actionTreeList.add(afterClass);
-            String callAfterClass = convertToInvokeMethodStringWithParamNull(afterClass);
-            dataModel.put("afterClass", callAfterClass);
+            String invokeAfterClass = convertToInvokeMethodStringWithParamNull(afterClass);
+            dataModel.put("afterClass", invokeAfterClass);
         }
 
         Action beforeMethod = deviceTestTask.getBeforeMethod();
         if (beforeMethod != null) {
             actionTreeList.add(beforeMethod);
-            String callBeforeMethod = convertToInvokeMethodStringWithParamNull(beforeMethod);
-            dataModel.put("beforeMethod", callBeforeMethod);
+            String invokeBeforeMethod = convertToInvokeMethodStringWithParamNull(beforeMethod);
+            dataModel.put("beforeMethod", invokeBeforeMethod);
         }
 
         Action afterMethod = deviceTestTask.getAfterMethod();
         if (afterMethod != null) {
             actionTreeList.add(afterMethod);
-            String callAfterMethod = convertToInvokeMethodStringWithParamNull(afterMethod);
-            dataModel.put("afterMethod", callAfterMethod);
+            String invokeAfterMethod = convertToInvokeMethodStringWithParamNull(afterMethod);
+            dataModel.put("afterMethod", invokeAfterMethod);
         }
 
         parseActions(actionTreeList);
@@ -173,6 +173,7 @@ public class TestNGCodeConverter {
         for (Action action : actions) {
             Action cachedAction = cachedActions.get(action.getId());
             if (cachedAction == null) {
+                // steps
                 List<Step> steps = action.getSteps();
                 if (!CollectionUtils.isEmpty(steps)) {
                     for (Step step : steps) {
@@ -182,6 +183,13 @@ public class TestNGCodeConverter {
                         }
                     }
                 }
+
+                // importActions
+                List<Action> importActions = action.getImportActions();
+                if (!CollectionUtils.isEmpty(importActions)) {
+                    parseActions(importActions);
+                }
+
                 cachedActions.put(action.getId(), action);
             }
         }
