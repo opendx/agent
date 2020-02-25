@@ -4,15 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.*;
-import java.util.Enumeration;
 
 /**
  * Created by jiangyitao.
  */
 @Slf4j
 public class NetUtil {
-
-    private static String ip = null;
 
     /**
      * 检测本地端口是否可用
@@ -36,27 +33,20 @@ public class NetUtil {
         }
     }
 
-    /**
-     * 获取本机ip
-     *
-     * @return
-     */
-    public static String getIp() throws SocketException {
-        if(ip != null) {
-            return ip;
+    public static int getAvailablePort(int startPort, int endPort, int port) {
+        if (startPort >= endPort) {
+            throw new IllegalArgumentException();
         }
-        Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-        while (networkInterfaces.hasMoreElements()) {
-            NetworkInterface networkInterface = networkInterfaces.nextElement();
-            Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
-            while (inetAddresses.hasMoreElements()) {
-                InetAddress inetAddress = inetAddresses.nextElement();
-                if (!inetAddress.isLinkLocalAddress() && !inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
-                    ip = inetAddress.getHostAddress();
-                    return ip;
-                }
+
+        while (true) {
+            if (port > endPort || port < startPort) {
+                port = startPort;
+            }
+            if (isPortAvailable(port)) {
+                return port;
+            } else {
+                port++;
             }
         }
-        return ip;
     }
 }
