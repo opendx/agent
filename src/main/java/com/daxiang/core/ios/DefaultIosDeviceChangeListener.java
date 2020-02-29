@@ -5,6 +5,7 @@ import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
+import com.daxiang.model.UploadFile;
 import com.daxiang.websocket.MobileDeviceWebSocketSessionPool;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
@@ -131,8 +132,8 @@ public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
         }
 
         // 截图并上传到服务器
-        String imgDownloadUrl = iosDevice.screenshotAndUploadToMaster();
-        device.setImgUrl(imgDownloadUrl);
+        UploadFile uploadFile = iosDevice.screenshotAndUploadToMaster();
+        device.setImgName(uploadFile.getFileName());
 
         appiumDriver.quit();
         return iosDevice;

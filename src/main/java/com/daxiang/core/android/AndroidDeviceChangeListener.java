@@ -12,6 +12,7 @@ import com.daxiang.core.android.stf.Minitouch;
 import com.daxiang.core.android.stf.MinitouchInstaller;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
+import com.daxiang.model.UploadFile;
 import com.daxiang.websocket.MobileDeviceWebSocketSessionPool;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
@@ -180,8 +181,8 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         log.info("[android][{}]初始化appium完成", deviceId);
 
         // 截图并上传到服务器
-        String imgDownloadUrl = androidDevice.screenshotAndUploadToMaster();
-        device.setImgUrl(imgDownloadUrl);
+        UploadFile uploadFile = androidDevice.screenshotAndUploadToMaster();
+        device.setImgName(uploadFile.getFileName());
 
         appiumDriver.quit();
 

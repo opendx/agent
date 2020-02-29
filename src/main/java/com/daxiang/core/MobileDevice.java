@@ -6,6 +6,7 @@ import com.daxiang.core.appium.AppiumDriverFactory;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
 import com.daxiang.model.FileType;
+import com.daxiang.model.UploadFile;
 import com.daxiang.utils.UUIDUtil;
 import io.appium.java_client.AppiumDriver;
 import lombok.Data;
@@ -91,7 +92,7 @@ public abstract class MobileDevice {
         return device.getStatus() == Device.IDLE_STATUS;
     }
 
-    public String screenshotAndUploadToMaster() {
+    public UploadFile screenshotAndUploadToMaster() {
         File screenshotFile = appiumDriver.getScreenshotAs(OutputType.FILE);
         try {
             return MasterApi.getInstance().uploadFile(screenshotFile, FileType.IMG);
@@ -163,7 +164,7 @@ public abstract class MobileDevice {
 
     public abstract File stopRecordingScreen() throws IOException;
 
-    public String stopRecordingScreenAndUploadToMaster() throws IOException {
+    public UploadFile stopRecordingScreenAndUploadToMaster() throws IOException {
         File video = null;
         try {
             video = stopRecordingScreen();

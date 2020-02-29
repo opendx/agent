@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.model.Response;
+import com.daxiang.model.UploadFile;
 import lombok.extern.slf4j.Slf4j;
 import org.dom4j.DocumentException;
 import org.openqa.selenium.Dimension;
@@ -25,16 +26,17 @@ public class MobileService {
             return Response.fail("设备未连接");
         }
 
-        String downloadURL;
+        UploadFile uploadFile;
         try {
-            downloadURL = mobileDevice.screenshotAndUploadToMaster();
+            uploadFile = mobileDevice.screenshotAndUploadToMaster();
         } catch (Exception e) {
             log.error("[{}]截图并上传到master失败", deviceId, e);
             return Response.fail(e.getMessage());
         }
 
         JSONObject response = new JSONObject();
-        response.put("downloadURL", downloadURL);
+        response.put("imgUrl", uploadFile.getDownloadUrl());
+        response.put("imgName", uploadFile.getFileName());
 
         // 由于ios截图分辨率与dump的windowHierarchy bounds不一致，需要把当前屏幕信息传给前端处理
         // 在竖/横屏时，若android截图有虚拟按键，这里window的高度/宽度不包含虚拟按键

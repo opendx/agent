@@ -24,7 +24,7 @@ public class Device {
     private String memSize;
     private Integer screenWidth;
     private Integer screenHeight;
-    private String imgUrl;
+    private String imgName;
     private Integer platform;
     private Integer status;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")

@@ -3,6 +3,7 @@ package com.daxiang.api;
 import com.daxiang.App;
 import com.daxiang.model.Device;
 import com.daxiang.model.Response;
+import com.daxiang.model.UploadFile;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.model.devicetesttask.Testcase;
 import lombok.extern.slf4j.Slf4j;
@@ -132,18 +133,18 @@ public class MasterApi {
      *
      * @return 下载地址
      */
-    public String uploadFile(File file, Integer fileType) {
+    public UploadFile uploadFile(File file, Integer fileType) {
         FileSystemResource resource = new FileSystemResource(file);
         MultiValueMap<String, Object> multiValueMap = new LinkedMultiValueMap<>();
         multiValueMap.add("file", resource);
         HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(multiValueMap);
 
-        Response<Map<String, String>> response = restTemplate.exchange(uploadFileApi + "?fileType=" + fileType, HttpMethod.POST, httpEntity,
-                new ParameterizedTypeReference<Response<Map<String, String>>>() {
+        Response<UploadFile> response = restTemplate.exchange(uploadFileApi + "?fileType=" + fileType, HttpMethod.POST, httpEntity,
+                new ParameterizedTypeReference<Response<UploadFile>>() {
                 }).getBody();
 
         if (response.isSuccess()) {
-            return response.getData().get("downloadURL");
+            return response.getData();
         } else {
             throw new RuntimeException(response.getMsg());
         }

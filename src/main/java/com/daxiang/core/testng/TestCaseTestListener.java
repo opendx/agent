@@ -101,7 +101,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         testcase.setId(testDesc.getTestcaseId());
         testcase.setEndTime(new Date());
         testcase.setStatus(Testcase.PASS_STATUS);
-        testcase.setVideoUrl(getVideoDownloadUrl(testDesc));
+        testcase.setVideoName(uploadVideo(testDesc));
         MASTER_API.updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
     }
 
@@ -114,9 +114,9 @@ public class TestCaseTestListener extends TestListenerAdapter {
         testcase.setId(testDesc.getTestcaseId());
         testcase.setEndTime(new Date());
         testcase.setStatus(Testcase.FAIL_STATUS);
-        testcase.setFailImgUrl(getScreenshotDownloadUrl(testDesc));
+        testcase.setFailImgName(uploadScreenshot(testDesc));
         testcase.setFailInfo(ExceptionUtils.getStackTrace(tr.getThrowable()));
-        testcase.setVideoUrl(getVideoDownloadUrl(testDesc));
+        testcase.setVideoName(uploadVideo(testDesc));
         MASTER_API.updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
     }
 
@@ -136,8 +136,8 @@ public class TestCaseTestListener extends TestListenerAdapter {
             testcase.setFailInfo(tr.getThrowable().getMessage());
         } else { // 正常情况下的跳过，throw SkipException导致
             testcase.setFailInfo(tr.getThrowable().getMessage());
-            testcase.setFailImgUrl(getScreenshotDownloadUrl(testDesc));
-            testcase.setVideoUrl(getVideoDownloadUrl(testDesc));
+            testcase.setFailImgName(uploadScreenshot(testDesc));
+            testcase.setVideoName(uploadVideo(testDesc));
         }
 
         MASTER_API.updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
@@ -157,16 +157,16 @@ public class TestCaseTestListener extends TestListenerAdapter {
         CONFIG_FAIL_ERR_INFO.set(tr.getName() + "执行失败!\n\n" + ExceptionUtils.getStackTrace(tr.getThrowable()));
     }
 
-    private String getScreenshotDownloadUrl(TestDescription testDesc) {
+    private String uploadScreenshot(TestDescription testDesc) {
         try {
-            return testDesc.getMobileDevice().screenshotAndUploadToMaster();
+            return testDesc.getMobileDevice().screenshotAndUploadToMaster().getFileName();
         } catch (Exception e) {
             log.error("[自动化测试][{}]testcaseId: {}，截图并上传到master失败", testDesc.getDeviceId(), testDesc.getTestcaseId(), e);
             return null;
         }
     }
 
-    private String getVideoDownloadUrl(TestDescription testDesc) {
+    private String uploadVideo(TestDescription testDesc) {
         if (!testDesc.getRecordVideo()) {
             return null;
         }
@@ -174,9 +174,9 @@ public class TestCaseTestListener extends TestListenerAdapter {
         try {
             log.info("[自动化测试][{}]testcaseId: {}, 停止录制视频...", testDesc.getDeviceId(), testDesc.getTestcaseId());
             long startTime = System.currentTimeMillis();
-            String downloadUrl = testDesc.getMobileDevice().stopRecordingScreenAndUploadToMaster();
+            String uploadFileName = testDesc.getMobileDevice().stopRecordingScreenAndUploadToMaster().getFileName();
             log.info("[自动化测试][{}]testcaseId: {}, 停止录制视频并上传到master完成，耗时: {} ms", testDesc.getDeviceId(), testDesc.getTestcaseId(), System.currentTimeMillis() - startTime);
-            return downloadUrl;
+            return uploadFileName;
         } catch (Exception e) {
             log.error("[自动化测试][{}]testcaseId: {}，stopRecordingScreenAndUploadToMaster err", testDesc.getDeviceId(), testDesc.getTestcaseId(), e);
             return null;
