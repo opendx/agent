@@ -7,6 +7,6 @@ import lombok.Data;
  */
 @Data
 public class UploadFile {
-    private String fileName;
+    private String filePath;
     private String downloadUrl;
 }

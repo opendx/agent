@@ -26,7 +26,7 @@ public class Testcase extends Action {
     /**
      * 失败截图
      */
-    private String failImgName;
+    private String failImgPath;
     /**
      * 失败信息
      */
@@ -34,6 +34,6 @@ public class Testcase extends Action {
     /**
      * 运行视频
      */
-    private String videoName;
+    private String videoPath;
     private Integer status;
 }

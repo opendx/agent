@@ -182,7 +182,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
 
         // 截图并上传到服务器
         UploadFile uploadFile = androidDevice.screenshotAndUploadToMaster();
-        device.setImgName(uploadFile.getFileName());
+        device.setImgPath(uploadFile.getFilePath());
 
         appiumDriver.quit();
 

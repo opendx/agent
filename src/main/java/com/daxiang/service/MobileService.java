@@ -36,7 +36,7 @@ public class MobileService {
 
         JSONObject response = new JSONObject();
         response.put("imgUrl", uploadFile.getDownloadUrl());
-        response.put("imgName", uploadFile.getFileName());
+        response.put("imgPath", uploadFile.getFilePath());
 
         // 由于ios截图分辨率与dump的windowHierarchy bounds不一致，需要把当前屏幕信息传给前端处理
         // 在竖/横屏时，若android截图有虚拟按键，这里window的高度/宽度不包含虚拟按键

@@ -133,7 +133,7 @@ public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
 
         // 截图并上传到服务器
         UploadFile uploadFile = iosDevice.screenshotAndUploadToMaster();
-        device.setImgName(uploadFile.getFileName());
+        device.setImgPath(uploadFile.getFilePath());
 
         appiumDriver.quit();
         return iosDevice;
