@@ -1,6 +1,6 @@
 ## 环境
 * java （必须，java8）
-* appium （必须，不能低于1.15.0）
+* appium （必须，不能低于1.16.0）
 * aapt （非必须。若要dump apk信息获取packageName、启动activity等信息，需要将aapt(sdk/build-tools/{version})添加到环境变量）
 * ffmpeg (非必须。合成视频要用到)
 
