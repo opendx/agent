@@ -144,7 +144,13 @@ public class TestNGCodeConverter {
         cachedActions.values().forEach(action -> {
             List<String> javaImports = action.getJavaImports();
             if (!CollectionUtils.isEmpty(javaImports)) {
-                this.javaImports.addAll(javaImports);
+                this.javaImports.addAll(javaImports.stream().map(javaImport -> {
+                    String finalJavaImport = javaImport;
+                    if (!javaImport.endsWith(";")) {
+                        finalJavaImport = javaImport + ";";
+                    }
+                    return finalJavaImport;
+                }).collect(Collectors.toList()));
             }
         });
     }
