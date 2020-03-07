@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 @Data
 public class AndroidDevice extends MobileDevice {
 
-    public final static String TMP_FOLDER = "/data/local/tmp";
+    public static final String TMP_FOLDER = "/data/local/tmp";
 
     private IDevice iDevice;
 

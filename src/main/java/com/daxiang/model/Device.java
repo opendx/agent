@@ -11,9 +11,9 @@ import java.util.Date;
 @Data
 public class Device {
 
-    public static final Integer OFFLINE_STATUS = 0;
-    public static final Integer USING_STATUS = 1;
-    public static final Integer IDLE_STATUS = 2;
+    public static final int OFFLINE_STATUS = 0;
+    public static final int USING_STATUS = 1;
+    public static final int IDLE_STATUS = 2;
 
     private String id;
     private String name;

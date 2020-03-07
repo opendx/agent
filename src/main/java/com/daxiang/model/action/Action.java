@@ -10,8 +10,8 @@ import java.util.List;
 @Data
 public class Action {
 
-    public static final Integer TYPE_BASE = 1;
-    public static final Integer HAS_RETURN_VALUE = 1;
+    public static final int TYPE_BASE = 1;
+    public static final int HAS_RETURN_VALUE = 1;
 
     private Integer id;
     private String name;

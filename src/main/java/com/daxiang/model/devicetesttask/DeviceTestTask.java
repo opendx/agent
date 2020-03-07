@@ -23,15 +23,15 @@ public class DeviceTestTask {
     /**
      * 未开始
      */
-    public static final Integer UNSTART_STATUS = 0;
+    public static final int UNSTART_STATUS = 0;
     /**
      * 运行中
      */
-    public static final Integer RUNNING_STATUS = 1;
+    public static final int RUNNING_STATUS = 1;
     /**
      * 完成
      */
-    public static final Integer FINISHED_STATUS = 2;
+    public static final int FINISHED_STATUS = 2;
 
     private Integer id;
     private Integer platform;
