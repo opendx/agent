@@ -11,4 +11,5 @@ public class GlobalVar {
     private String type;
     private String name;
     private String value;
+    private String description;
 }

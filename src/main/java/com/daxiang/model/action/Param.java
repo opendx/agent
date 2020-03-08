@@ -9,5 +9,6 @@ import lombok.Data;
 public class Param {
     private String type;
     private String name;
+    private String description;
 }
 

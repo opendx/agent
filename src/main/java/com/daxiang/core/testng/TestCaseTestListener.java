@@ -174,9 +174,9 @@ public class TestCaseTestListener extends TestListenerAdapter {
         try {
             log.info("[自动化测试][{}]testcaseId: {}, 停止录制视频...", testDesc.getDeviceId(), testDesc.getTestcaseId());
             long startTime = System.currentTimeMillis();
-            String uploadFileName = testDesc.getMobileDevice().stopRecordingScreenAndUploadToMaster().getFilePath();
+            String uploadFilePath = testDesc.getMobileDevice().stopRecordingScreenAndUploadToMaster().getFilePath();
             log.info("[自动化测试][{}]testcaseId: {}, 停止录制视频并上传到master完成，耗时: {} ms", testDesc.getDeviceId(), testDesc.getTestcaseId(), System.currentTimeMillis() - startTime);
-            return uploadFileName;
+            return uploadFilePath;
         } catch (Exception e) {
             log.error("[自动化测试][{}]testcaseId: {}，stopRecordingScreenAndUploadToMaster err", testDesc.getDeviceId(), testDesc.getTestcaseId(), e);
             return null;
