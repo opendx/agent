@@ -12,10 +12,17 @@ public class ${className} {
         <#list deviceTestTask.pages as page>
             <#if page.elements?? && (page.elements?size>0)>
 
-                <#lt>    // page元素
+                <#lt>    // page.${page.name} Elements
                 <#list page.elements as element>
                     <#lt>    ${(element.findBy)[0]}(${(element.findBy)[1]} = "${element.value}")
-                    <#lt>    private WebElement ${page.name}_${element.name};
+                    <#lt>    private WebElement ${page.name}_${element.name};<#if element.description?? && element.description!=''> // ${element.description}</#if>
+                </#list>
+            </#if>
+            <#if page.bys?? && (page.bys?size>0)>
+
+                <#lt>    // page.${page.name} Bys
+                <#list page.bys as by>
+                    <#lt>    private By ${page.name}_${by.name} = ${by.findBy[0]}.${by.findBy[1]}("${by.value}");<#if by.description?? && by.description!=''> // ${by.description}</#if>
                 </#list>
             </#if>
         </#list>

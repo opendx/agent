@@ -8,9 +8,9 @@ import java.util.List;
  * Created by jiangyitao.
  */
 @Data
-public class Element {
+public class By {
     private String name;
-    // ["@AndroidFindBy", "uiAutomator"]
+    // ["MobileBy", "id"]
     private List<String> findBy;
     private String value;
     private String description;

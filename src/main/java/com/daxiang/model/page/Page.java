@@ -12,4 +12,5 @@ public class Page {
     private Integer id;
     private String name;
     private List<Element> elements;
+    private List<By> bys;
 }

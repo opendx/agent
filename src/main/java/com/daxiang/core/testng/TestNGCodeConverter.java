@@ -129,7 +129,7 @@ public class TestNGCodeConverter {
 
     private void handleJavaImports() {
         javaImports.add("import com.daxiang.core.MobileDeviceHolder");
-        javaImports.add("import io.appium.java_client.AppiumDriver");
+        javaImports.add("import io.appium.java_client.*");
         javaImports.add("import io.appium.java_client.pagefactory.*");
         javaImports.add("import org.testng.annotations.*");
         javaImports.add("import org.testng.SkipException");
