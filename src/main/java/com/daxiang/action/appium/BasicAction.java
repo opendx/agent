@@ -549,7 +549,6 @@ public class BasicAction {
                 break;
             case "AndroidUIAutomator":
                 // http://appium.io/docs/en/writing-running-appium/android/uiautomator-uiselector/
-                value = value.replaceAll("'", "\"");
                 by = MobileBy.AndroidUIAutomator(value);
                 break;
             case "iOSClassChain":
