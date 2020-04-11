@@ -8,10 +8,16 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 /**
  * Created by jiangyitao.
  */
-public class WxAppBrandDriverBuilder implements AppiumDriverBuilder {
+class WxAppBrandDriverBuilder extends AppiumDriverBuilder {
+
+    public WxAppBrandDriverBuilder(MobileDevice mobileDevice) {
+        super(mobileDevice);
+    }
 
     @Override
-    public AppiumDriver build(MobileDevice mobileDevice) {
+    public AppiumDriver build() {
+        MobileDevice mobileDevice = getMobileDevice();
+
         DesiredCapabilities capabilities = new DesiredCapabilitiesBuilder(mobileDevice)
                 .androidBasic()
                 .androidSkip()

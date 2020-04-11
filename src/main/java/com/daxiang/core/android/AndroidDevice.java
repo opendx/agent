@@ -3,19 +3,18 @@ package com.daxiang.core.android;
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.InstallException;
 import com.daxiang.App;
-import com.daxiang.api.MasterApi;
+import com.daxiang.server.ServerApi;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.android.scrcpy.Scrcpy;
 import com.daxiang.core.android.scrcpy.ScrcpyVideoRecorder;
 import com.daxiang.core.android.stf.AdbKit;
 import com.daxiang.core.android.stf.Minicap;
 import com.daxiang.core.android.stf.Minitouch;
-import com.daxiang.core.appium.AndroidDriverBuilder;
 import com.daxiang.core.appium.AndroidNativePageSourceHandler;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
+import com.daxiang.utils.HttpUtil;
 import com.daxiang.utils.UUIDUtil;
-import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidStartScreenRecordingOptions;
 import lombok.Data;
@@ -23,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.dom4j.DocumentException;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,7 +60,7 @@ public class AndroidDevice extends MobileDevice {
     }
 
     public void setIDevice(IDevice iDevice) {
-        // 手机重新插拔后，IDevice需要更新
+        // 设备重新插拔后，IDevice需要更新
         this.iDevice = iDevice;
         if (minicap != null) {
             minicap.setIDevice(iDevice);
@@ -83,20 +81,46 @@ public class AndroidDevice extends MobileDevice {
     }
 
     @Override
-    public AppiumDriver initAppiumDriver() {
-        AppiumDriver driver = new AndroidDriverBuilder().init(this);
-        setAppiumDriver(driver);
-        return driver;
+    public void installApp(File appFile) throws InstallException {
+        ScheduledExecutorService service = handleInstallBtnAsync();
+        try {
+            AndroidUtil.installApk(iDevice, appFile.getAbsolutePath());
+        } finally {
+            FileUtils.deleteQuietly(appFile);
+            if (!service.isShutdown()) {
+                service.shutdown();
+            }
+        }
     }
 
     @Override
-    public void installApp(File appFile) throws InstallException {
-        AndroidUtil.installApk(iDevice, appFile.getAbsolutePath());
+    public void uninstallApp(String app) throws InstallException {
+        AndroidUtil.uninstallApk(iDevice, app);
     }
 
     @Override
     public String dump() throws IOException, DocumentException {
         return new AndroidNativePageSourceHandler(getAppiumDriver()).getPageSource();
+    }
+
+    @Override
+    public boolean acceptAlert() {
+        try {
+            getAppiumDriver().executeScript("mobile:acceptAlert");
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean dismissAlert() {
+        try {
+            getAppiumDriver().executeScript("mobile:dismissAlert");
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
@@ -133,20 +157,6 @@ public class AndroidDevice extends MobileDevice {
         }
     }
 
-    @Override
-    public void installApp(String appDownloadUrl) throws Exception {
-        File apk = downloadApp(appDownloadUrl);
-        ScheduledExecutorService service = handleInstallBtnAsync();
-        try {
-            AndroidUtil.installApk(iDevice, apk.getAbsolutePath());
-        } finally {
-            FileUtils.deleteQuietly(apk);
-            if (!service.isShutdown()) {
-                service.shutdown();
-            }
-        }
-    }
-
     /**
      * 处理安装app时弹窗
      */
@@ -162,7 +172,7 @@ public class AndroidDevice extends MobileDevice {
     }
 
     public synchronized Optional<String> getChromedriverFilePath() {
-        Optional<String> chromedriverDownloadUrl = MasterApi.getInstance().getChromedriverDownloadUrl(getId());
+        Optional<String> chromedriverDownloadUrl = ServerApi.getInstance().getChromedriverDownloadUrl(getId());
         if (!chromedriverDownloadUrl.isPresent()) {
             return Optional.empty();
         }
@@ -179,9 +189,9 @@ public class AndroidDevice extends MobileDevice {
             // 文件不存在 -> 下载
             try {
                 log.info("[chromedriver][{}]download => {}", getId(), downloadUrl);
-                FileUtils.writeByteArrayToFile(chromedriverFile, App.getBean(RestTemplate.class).getForObject(downloadUrl, byte[].class), false);
+                HttpUtil.downloadFile(downloadUrl, chromedriverFile);
             } catch (IOException e) {
-                log.error("write chromedriver file err", e);
+                log.error("download chromedriver file err", e);
                 return Optional.empty();
             }
         } else {

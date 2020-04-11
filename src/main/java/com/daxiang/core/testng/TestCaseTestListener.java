@@ -1,6 +1,6 @@
 package com.daxiang.core.testng;
 
-import com.daxiang.api.MasterApi;
+import com.daxiang.server.ServerApi;
 import com.daxiang.model.action.Step;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.model.devicetesttask.Testcase;
@@ -20,7 +20,6 @@ import java.util.Date;
 public class TestCaseTestListener extends TestListenerAdapter {
 
     public static final String TEST_DESCRIPTION = "test_desc";
-    private static final MasterApi MASTER_API = MasterApi.getInstance();
     private static final ThreadLocal<Integer> CURRENT_TEST_CASE_ID = new ThreadLocal<>();
     private static final ThreadLocal<String> CONFIG_FAIL_ERR_INFO = new ThreadLocal<>();
 
@@ -39,7 +38,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         deviceTestTask.setId(testDesc.getDeviceTestTaskId());
         deviceTestTask.setStartTime(new Date());
         deviceTestTask.setStatus(DeviceTestTask.RUNNING_STATUS);
-        MASTER_API.updateDeviceTestTask(deviceTestTask);
+        ServerApi.getInstance().updateDeviceTestTask(deviceTestTask);
     }
 
     /**
@@ -59,7 +58,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         deviceTestTask.setId(testDesc.getDeviceTestTaskId());
         deviceTestTask.setEndTime(new Date());
         deviceTestTask.setStatus(DeviceTestTask.FINISHED_STATUS);
-        MASTER_API.updateDeviceTestTask(deviceTestTask);
+        ServerApi.getInstance().updateDeviceTestTask(deviceTestTask);
     }
 
     /**
@@ -78,7 +77,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         Testcase testcase = new Testcase();
         testcase.setId(testcaseId);
         testcase.setStartTime(new Date());
-        MASTER_API.updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
+        ServerApi.getInstance().updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
 
         // 当前置任务执行失败，或依赖的用例执行失败，tr.getThrowable() != null，此时不需要开启视频录制，因为testng会马上调用onTestSkip
         if (tr.getThrowable() == null && testDesc.getRecordVideo()) {
@@ -102,7 +101,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         testcase.setEndTime(new Date());
         testcase.setStatus(Testcase.PASS_STATUS);
         testcase.setVideoPath(uploadVideo(testDesc));
-        MASTER_API.updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
+        ServerApi.getInstance().updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
     }
 
     @Override
@@ -117,7 +116,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         testcase.setFailImgPath(uploadScreenshot(testDesc));
         testcase.setFailInfo(ExceptionUtils.getStackTrace(tr.getThrowable()));
         testcase.setVideoPath(uploadVideo(testDesc));
-        MASTER_API.updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
+        ServerApi.getInstance().updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
     }
 
     @Override
@@ -140,7 +139,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
             testcase.setVideoPath(uploadVideo(testDesc));
         }
 
-        MASTER_API.updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
+        ServerApi.getInstance().updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
     }
 
     /**
@@ -159,9 +158,9 @@ public class TestCaseTestListener extends TestListenerAdapter {
 
     private String uploadScreenshot(TestDescription testDesc) {
         try {
-            return testDesc.getMobileDevice().screenshotAndUploadToMaster().getFilePath();
+            return testDesc.getMobileDevice().screenshotAndUploadToServer().getFilePath();
         } catch (Exception e) {
-            log.error("[自动化测试][{}]testcaseId: {}，截图并上传到master失败", testDesc.getDeviceId(), testDesc.getTestcaseId(), e);
+            log.error("[自动化测试][{}]testcaseId: {}，截图并上传到server失败", testDesc.getDeviceId(), testDesc.getTestcaseId(), e);
             return null;
         }
     }
@@ -174,11 +173,11 @@ public class TestCaseTestListener extends TestListenerAdapter {
         try {
             log.info("[自动化测试][{}]testcaseId: {}, 停止录制视频...", testDesc.getDeviceId(), testDesc.getTestcaseId());
             long startTime = System.currentTimeMillis();
-            String uploadFilePath = testDesc.getMobileDevice().stopRecordingScreenAndUploadToMaster().getFilePath();
-            log.info("[自动化测试][{}]testcaseId: {}, 停止录制视频并上传到master完成，耗时: {} ms", testDesc.getDeviceId(), testDesc.getTestcaseId(), System.currentTimeMillis() - startTime);
+            String uploadFilePath = testDesc.getMobileDevice().stopRecordingScreenAndUploadToServer().getFilePath();
+            log.info("[自动化测试][{}]testcaseId: {}, 停止录制视频并上传到server完成，耗时: {} ms", testDesc.getDeviceId(), testDesc.getTestcaseId(), System.currentTimeMillis() - startTime);
             return uploadFilePath;
         } catch (Exception e) {
-            log.error("[自动化测试][{}]testcaseId: {}，stopRecordingScreenAndUploadToMaster err", testDesc.getDeviceId(), testDesc.getTestcaseId(), e);
+            log.error("[自动化测试][{}]testcaseId: {}，stopRecordingScreenAndUploadToServer err", testDesc.getDeviceId(), testDesc.getTestcaseId(), e);
             return null;
         }
     }
@@ -204,6 +203,6 @@ public class TestCaseTestListener extends TestListenerAdapter {
         Testcase testcase = new Testcase();
         testcase.setId(currentTestcaseId);
         testcase.setSteps(Arrays.asList(step));
-        MASTER_API.updateTestcase(deviceTestTaskId, testcase);
+        ServerApi.getInstance().updateTestcase(deviceTestTaskId, testcase);
     }
 }

@@ -34,6 +34,7 @@ public class Terminal {
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
              ByteArrayOutputStream errorStream = new ByteArrayOutputStream()) {
+
             PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(outputStream, errorStream);
             executor.setStreamHandler(pumpStreamHandler);
 
@@ -41,10 +42,12 @@ public class Terminal {
                 log.info("[==>]{}", command);
             }
             executor.execute(createCommandLine(command));
+
             String result = outputStream.toString() + errorStream.toString();
             if (showLog) {
                 log.info("[<==]{}", result);
             }
+
             if (!StringUtils.isEmpty(result)) {
                 if (result.endsWith("\r\n")) {
                     result = result.substring(0, result.length() - 2);
@@ -52,6 +55,7 @@ public class Terminal {
                     result = result.substring(0, result.length() - 1);
                 }
             }
+
             return result;
         }
     }
@@ -71,6 +75,7 @@ public class Terminal {
         Executor executor = new DaemonExecutor();
         executor.setExitValues(null);
         executor.setStreamHandler(pumpStreamHandler);
+
         executor.execute(createCommandLine(command), new DefaultExecuteResultHandler());
     }
 

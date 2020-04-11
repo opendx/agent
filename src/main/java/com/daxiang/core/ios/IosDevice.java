@@ -2,12 +2,10 @@ package com.daxiang.core.ios;
 
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.appium.AppiumServer;
-import com.daxiang.core.appium.IosDriverBuilder;
 import com.daxiang.core.appium.IosNativePageSourceHandler;
 import com.daxiang.model.Device;
 import com.daxiang.utils.Terminal;
 import com.daxiang.utils.UUIDUtil;
-import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.ios.IOSStartScreenRecordingOptions;
 import lombok.extern.slf4j.Slf4j;
@@ -29,28 +27,51 @@ public class IosDevice extends MobileDevice {
     /**
      * iproxy localPort remotePort deviceId
      */
-    private static final String IPROXY = "iproxy %d %d %s";
-    private ExecuteWatchdog mjpegServerIproxyWatchdog;
+    private static final String IPROXY_CMD = "iproxy %d %d %s";
+
+    private ExecuteWatchdog iproxyMjpegServerWatchdog;
 
     public IosDevice(Device device, AppiumServer appiumServer) {
         super(device, appiumServer);
     }
 
     @Override
-    public AppiumDriver initAppiumDriver() {
-        AppiumDriver driver = new IosDriverBuilder().build(this);
-        setAppiumDriver(driver);
-        return driver;
+    public void installApp(File appFile) throws IOException {
+        try {
+            IosUtil.installIpa(appFile.getAbsolutePath(), getId());
+        } finally {
+            FileUtils.deleteQuietly(appFile);
+        }
     }
 
     @Override
-    public void installApp(File app) throws IOException {
-        IosUtil.installIpa(app.getAbsolutePath(), getId());
+    public void uninstallApp(String app) {
+        IosUtil.uninstallApp(getAppiumDriver(), app);
     }
 
     @Override
     public String dump() throws IOException, DocumentException {
         return new IosNativePageSourceHandler(getAppiumDriver()).getPageSource();
+    }
+
+    @Override
+    public boolean acceptAlert() {
+        try {
+            getAppiumDriver().switchTo().alert().accept();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean dismissAlert() {
+        try {
+            getAppiumDriver().switchTo().alert().dismiss();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Override
@@ -72,16 +93,6 @@ public class IosDevice extends MobileDevice {
         return videoFile;
     }
 
-    @Override
-    public void installApp(String appDownloadUrl) throws IOException {
-        File app = downloadApp(appDownloadUrl);
-        try {
-            IosUtil.installIpa(app.getAbsolutePath(), getId());
-        } finally {
-            FileUtils.deleteQuietly(app);
-        }
-    }
-
     public int getMjpegServerPort() {
         Object mjpegServerPort = getAppiumDriver().getCapabilities().asMap().get("mjpegServerPort");
         return (int) ((long) mjpegServerPort);
@@ -89,15 +100,15 @@ public class IosDevice extends MobileDevice {
 
     public void startMjpegServerIproxy() throws IOException {
         int mjpegServerPort = getMjpegServerPort();
-        String cmd = String.format(IPROXY, mjpegServerPort, mjpegServerPort, getId());
+        String cmd = String.format(IPROXY_CMD, mjpegServerPort, mjpegServerPort, getId());
         log.info("[ios][{}]mjpegServer: {}", getId(), cmd);
-        mjpegServerIproxyWatchdog = Terminal.executeAsyncAndGetWatchdog(cmd);
+        iproxyMjpegServerWatchdog = Terminal.executeAsyncAndGetWatchdog(cmd);
     }
 
     public void stopMjpegServerIproxy() {
-        if (mjpegServerIproxyWatchdog != null) {
+        if (iproxyMjpegServerWatchdog != null) {
             log.info("[ios][{}]mjpegServer iproxy stop", getId());
-            mjpegServerIproxyWatchdog.destroyProcess();
+            iproxyMjpegServerWatchdog.destroyProcess();
         }
     }
 }

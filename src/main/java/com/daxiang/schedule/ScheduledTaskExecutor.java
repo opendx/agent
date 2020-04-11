@@ -2,7 +2,7 @@ package com.daxiang.schedule;
 
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
-import com.daxiang.api.MasterApi;
+import com.daxiang.server.ServerApi;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-public class ScheduledTaskExcutor {
+public class ScheduledTaskExecutor {
 
     @Autowired
-    private MasterApi masterApi;
+    private ServerApi serverApi;
 
     /**
      * 定时检测设备的测试任务
@@ -38,10 +38,10 @@ public class ScheduledTaskExcutor {
 
         idleMobileDevices.stream().parallel().forEach(idleMobileDevice -> {
             // 获取最早的一个未开始的设备测试任务
-            DeviceTestTask deviceTestTask = masterApi.getFirstUnStartDeviceTestTask(idleMobileDevice.getId());
+            DeviceTestTask deviceTestTask = serverApi.getFirstUnStartDeviceTestTask(idleMobileDevice.getId());
             if (deviceTestTask != null) {
-                idleMobileDevice.getDeviceTestTaskExecutor().commitTestTask(deviceTestTask);
                 log.info("[自动化测试][{}]提交测试任务，deviceTestTaskId: {}", idleMobileDevice.getId(), deviceTestTask.getId());
+                idleMobileDevice.getDeviceTestTaskExecutor().commitTestTask(deviceTestTask);
             }
         });
     }

@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 /**
  * Created by jiangyitao.
  */
-public class MinicapFrameParser {
+class MinicapFrameParser {
 
     private byte[] buffer = new byte[1024 * 1024];
 

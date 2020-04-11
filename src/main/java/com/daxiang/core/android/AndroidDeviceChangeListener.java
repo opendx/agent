@@ -1,7 +1,7 @@
 package com.daxiang.core.android;
 
 import com.android.ddmlib.*;
-import com.daxiang.api.MasterApi;
+import com.daxiang.server.ServerApi;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.android.scrcpy.Scrcpy;
@@ -13,6 +13,7 @@ import com.daxiang.core.android.stf.MinitouchInstaller;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
 import com.daxiang.model.UploadFile;
+import com.daxiang.service.MobileService;
 import com.daxiang.websocket.MobileDeviceWebSocketSessionPool;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,9 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
     private static final String APIDEMOS_APK = "vendor/apk/ApiDemos-debug.apk";
 
     @Autowired
-    private MasterApi masterApi;
+    private ServerApi serverApi;
+    @Autowired
+    private MobileService mobileService;
 
     @Override
     public void deviceConnected(IDevice device) {
@@ -60,9 +63,9 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         String deviceId = iDevice.getSerialNumber();
         log.info("[android][{}]已连接", deviceId);
 
-        log.info("[android][{}]等待手机上线", deviceId);
+        log.info("[android][{}]等待上线", deviceId);
         AndroidUtil.waitForDeviceOnline(iDevice, 5 * 60);
-        log.info("[android][{}]手机已上线", deviceId);
+        log.info("[android][{}]已上线", deviceId);
 
         MobileDevice mobileDevice = MobileDeviceHolder.get(deviceId);
         if (mobileDevice == null) {
@@ -73,10 +76,10 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
             appiumServer.start();
             log.info("[android][{}]启动appium server完成，url: {}", deviceId, appiumServer.getUrl());
 
-            log.info("[android][{}]检查是否已接入过master", deviceId);
-            Device device = masterApi.getDeviceById(deviceId);
+            log.info("[android][{}]检查是否已接入过server", deviceId);
+            Device device = serverApi.getDeviceById(deviceId);
             if (device == null) {
-                log.info("[android][{}]首次接入master，开始初始化设备", deviceId);
+                log.info("[android][{}]首次接入server，开始初始化设备", deviceId);
                 try {
                     mobileDevice = initAndroidDevice(iDevice, appiumServer);
                     log.info("[android][{}]初始化设备完成", deviceId);
@@ -85,7 +88,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
                     throw new RuntimeException("初始化设备" + deviceId + "出错", e);
                 }
             } else {
-                log.info("[android][{}]已接入过master", deviceId);
+                log.info("[android][{}]已接入过server", deviceId);
                 mobileDevice = new AndroidDevice(device, iDevice, appiumServer);
             }
 
@@ -101,7 +104,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
             log.info("[android][{}]非首次在agent上线", deviceId);
         }
 
-        mobileDevice.saveOnlineDeviceToMaster();
+        mobileService.saveOnlineDeviceToServer(mobileDevice);
         log.info("[android][{}]androidDeviceConnected处理完成", deviceId);
     }
 
@@ -118,7 +121,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
             return;
         }
 
-        mobileDevice.saveOfflineDeviceToMaster();
+        mobileService.saveOfflineDeviceToServer(mobileDevice);
 
         // 有人正在使用，则断开连接
         Session openedSession = MobileDeviceWebSocketSessionPool.getOpenedSession(deviceId);
@@ -181,7 +184,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         log.info("[android][{}]初始化appium完成", deviceId);
 
         // 截图并上传到服务器
-        UploadFile uploadFile = androidDevice.screenshotAndUploadToMaster();
+        UploadFile uploadFile = androidDevice.screenshotAndUploadToServer();
         device.setImgPath(uploadFile.getFilePath());
 
         appiumDriver.quit();

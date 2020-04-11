@@ -2,10 +2,12 @@ package com.daxiang.websocket;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.daxiang.App;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.ios.IosDevice;
 import com.daxiang.core.ios.IosUtil;
+import com.daxiang.service.MobileService;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.PointOption;
@@ -24,6 +26,8 @@ import java.time.Duration;
 @Component
 @ServerEndpoint(value = "/ios/{deviceId}/user/{username}/platform/{platform}")
 public class IosSocketServer {
+
+    private MobileService mobileService;
 
     private IosDevice iosDevice;
     private String deviceId;
@@ -46,22 +50,25 @@ public class IosSocketServer {
 
         MobileDevice mobileDevice = MobileDeviceHolder.getIdleDevice(deviceId);
         if (mobileDevice == null) {
-            basicRemote.sendText("手机未处于闲置状态，无法使用");
+            basicRemote.sendText("设备未处于闲置状态，无法使用");
             session.close();
             return;
         }
 
         Session openedSession = MobileDeviceWebSocketSessionPool.getOpenedSession(deviceId);
         if (openedSession != null) {
-            basicRemote.sendText(deviceId + "手机正在被" + openedSession.getId() + "连接占用，请稍后重试");
+            basicRemote.sendText(deviceId + "正在被" + openedSession.getId() + "连接占用，请稍后重试");
             session.close();
             return;
         }
 
         MobileDeviceWebSocketSessionPool.put(deviceId, session);
-        iosDevice = (IosDevice) mobileDevice;
 
-        mobileDevice.saveUsingDeviceToMaster(username);
+        iosDevice = (IosDevice) mobileDevice;
+        iosDevice.getDevice().setUsername(username);
+
+        mobileService = App.getBean(MobileService.class);
+        mobileService.saveUsingDeviceToServer(iosDevice);
 
         basicRemote.sendText("初始化appium driver...");
         JSONObject response = new JSONObject();
@@ -86,7 +93,7 @@ public class IosSocketServer {
             MobileDeviceWebSocketSessionPool.remove(deviceId);
             iosDevice.stopMjpegServerIproxy();
             iosDevice.quitAppiumDriver();
-            iosDevice.saveIdleDeviceToMaster();
+            mobileService.saveIdleDeviceToServer(iosDevice);
         }
     }
 

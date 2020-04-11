@@ -34,6 +34,6 @@ public class ActionController {
      */
     @PostMapping("/developer/debug")
     public Response developerDebug(String className, String code) {
-        return actionService.developerDebug(className, code);
+        return actionService.compileAndDebug(className, code);
     }
 }

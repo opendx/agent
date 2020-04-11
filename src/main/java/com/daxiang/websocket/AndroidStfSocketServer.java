@@ -6,6 +6,7 @@ import com.daxiang.App;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.AndroidDevice;
+import com.daxiang.service.MobileService;
 import com.google.common.collect.ImmutableMap;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.nativekey.AndroidKey;
@@ -26,6 +27,8 @@ import java.io.IOException;
 @ServerEndpoint(value = "/stf/android/{deviceId}/user/{username}/platform/{platform}")
 public class AndroidStfSocketServer {
 
+    private MobileService mobileService;
+
     private AndroidDevice androidDevice;
     private AndroidDriver androidDriver;
     private String deviceId;
@@ -40,29 +43,32 @@ public class AndroidStfSocketServer {
 
         MobileDevice mobileDevice = MobileDeviceHolder.getIdleDevice(deviceId);
         if (mobileDevice == null) {
-            remoteEndpoint.sendText("手机未处于闲置状态，无法使用");
+            remoteEndpoint.sendText("设备未处于闲置状态，无法使用");
             session.close();
             return;
         }
 
         Session openedSession = MobileDeviceWebSocketSessionPool.getOpenedSession(deviceId);
         if (openedSession != null) {
-            remoteEndpoint.sendText(deviceId + "手机正在被" + openedSession.getId() + "连接占用，请稍后重试");
+            remoteEndpoint.sendText(deviceId + "正在被" + openedSession.getId() + "连接占用，请稍后重试");
             session.close();
             return;
         }
 
         MobileDeviceWebSocketSessionPool.put(deviceId, session);
-        androidDevice = (AndroidDevice) mobileDevice;
 
-        androidDevice.saveUsingDeviceToMaster(username);
+        androidDevice = (AndroidDevice) mobileDevice;
+        androidDevice.getDevice().setUsername(username);
+
+        mobileService = App.getBean(MobileService.class);
+        mobileService.saveUsingDeviceToServer(androidDevice);
 
         int width = mobileDevice.getDevice().getScreenWidth();
         int height = mobileDevice.getDevice().getScreenHeight();
         String realResolution = width + "x" + height;
         String virtualResolution = width / 2 + "x" + height / 2;
 
-        // android5以下的手机不多，暂不处理横竖屏切换
+        // android5以下的设备不多，暂不处理横竖屏切换
         remoteEndpoint.sendText("启动minicap...");
         androidDevice.getMinicap().start(Integer.parseInt(App.getProperty("minicap-quality")),
                 realResolution,
@@ -84,6 +90,7 @@ public class AndroidStfSocketServer {
         remoteEndpoint.sendText("初始化appium driver...");
         androidDriver = (AndroidDriver)androidDevice.freshAppiumDriver(platform);
         remoteEndpoint.sendText("初始化appium driver完成");
+
         remoteEndpoint.sendText(JSON.toJSONString(ImmutableMap.of("appiumSessionId", androidDriver.getSessionId().toString())));
     }
 
@@ -96,7 +103,7 @@ public class AndroidStfSocketServer {
             androidDevice.getMinitouch().stop();
             androidDevice.getMinicap().stop();
             androidDevice.quitAppiumDriver();
-            androidDevice.saveIdleDeviceToMaster();
+            mobileService.saveIdleDeviceToServer(androidDevice);
         }
     }
 

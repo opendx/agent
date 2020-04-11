@@ -3,15 +3,22 @@ package com.daxiang.service;
 import com.alibaba.fastjson.JSONObject;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
+import com.daxiang.model.Device;
 import com.daxiang.model.Response;
 import com.daxiang.model.UploadFile;
+import com.daxiang.server.ServerApi;
+import com.daxiang.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.dom4j.DocumentException;
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Dimension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.io.File;
+import java.util.Date;
 
 /**
  * Created by jiangyitao.
@@ -20,19 +27,20 @@ import java.io.IOException;
 @Service
 public class MobileService {
 
+    @Value("${ip}")
+    private String ip;
+    @Value("${port}")
+    private Integer port;
+    @Autowired
+    private ServerApi serverApi;
+
     public Response screenshot(String deviceId) {
         MobileDevice mobileDevice = MobileDeviceHolder.getConnectedDevice(deviceId);
         if (mobileDevice == null) {
             return Response.fail("设备未连接");
         }
 
-        UploadFile uploadFile;
-        try {
-            uploadFile = mobileDevice.screenshotAndUploadToMaster();
-        } catch (Exception e) {
-            log.error("[{}]截图并上传到master失败", deviceId, e);
-            return Response.fail(e.getMessage());
-        }
+        UploadFile uploadFile = mobileDevice.screenshotAndUploadToServer();
 
         JSONObject response = new JSONObject();
         response.put("imgUrl", uploadFile.getDownloadUrl());
@@ -53,6 +61,7 @@ public class MobileService {
         if (mobileDevice == null) {
             return Response.fail("设备未连接");
         }
+
         if (!mobileDevice.isNativeContext()) {
             return Response.success("ok", mobileDevice.getAppiumDriver().getPageSource());
         }
@@ -60,11 +69,8 @@ public class MobileService {
         try {
             String pageSource = mobileDevice.dump();
             return Response.success("ok", pageSource);
-        } catch (DocumentException e) {
-            log.error("读取pageSource出错", e);
-            return Response.fail("读取pageSource出错，请稍后重试");
-        } catch (IOException e) {
-            log.error("io err", e);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return Response.fail(e.getMessage());
         }
     }
@@ -74,13 +80,62 @@ public class MobileService {
         if (mobileDevice == null) {
             return Response.fail("设备未连接");
         }
+
+        String fileName = app.getOriginalFilename();
+        if (fileName.contains(".")) {
+            fileName = UUIDUtil.getUUID() + "." + StringUtils.unqualify(fileName);
+        } else {
+            fileName = UUIDUtil.getUUID();
+        }
+
+        File appFile = new File(fileName);
         try {
-            mobileDevice.installApp(app);
+            FileUtils.copyInputStreamToFile(app.getInputStream(), appFile);
+            mobileDevice.installApp(appFile);
             return Response.success("安装成功");
         } catch (Exception e) {
             log.error("安装app失败", e);
             return Response.fail(e.getMessage());
+        } finally {
+            FileUtils.deleteQuietly(appFile);
         }
+    }
+
+    public void saveOnlineDeviceToServer(MobileDevice mobileDevice) {
+        Device device = mobileDevice.getDevice();
+        device.setAgentIp(ip);
+        device.setAgentPort(port);
+        device.setStatus(Device.IDLE_STATUS);
+        device.setLastOnlineTime(new Date());
+        log.info("saveOnlineDeviceToServer: {}", device);
+        serverApi.saveDevice(device);
+    }
+
+    public void saveUsingDeviceToServer(MobileDevice mobileDevice) {
+        if (mobileDevice.isConnected()) {
+            Device device = mobileDevice.getDevice();
+            device.setStatus(Device.USING_STATUS);
+            device.setUsername(device.getUsername());
+            log.info("saveUsingDeviceToServer: {}", device);
+            serverApi.saveDevice(device);
+        }
+    }
+
+    public void saveIdleDeviceToServer(MobileDevice mobileDevice) {
+        if (mobileDevice.isConnected()) {
+            Device device = mobileDevice.getDevice();
+            device.setStatus(Device.IDLE_STATUS);
+            log.info("saveIdleDeviceToServer: {}", device);
+            serverApi.saveDevice(device);
+        }
+    }
+
+    public void saveOfflineDeviceToServer(MobileDevice mobileDevice) {
+        Device device = mobileDevice.getDevice();
+        device.setStatus(Device.OFFLINE_STATUS);
+        device.setLastOfflineTime(new Date());
+        log.info("saveOfflineDeviceToServer: {}", device);
+        serverApi.saveDevice(device);
     }
 
 }

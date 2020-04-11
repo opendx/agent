@@ -55,10 +55,10 @@ public class IosNativePageSourceHandler extends AppiumNativePageSourceHandler {
             String height = heightAttr.getValue();
             element.remove(heightAttr);
 
-            String endX = String.valueOf(Integer.parseInt(startX) + Integer.parseInt(width));
-            String endY = String.valueOf(Integer.parseInt(startY) + Integer.parseInt(height));
+            Integer endX = Integer.parseInt(startX) + Integer.parseInt(width);
+            Integer endY = Integer.parseInt(startY) + Integer.parseInt(height);
 
-            String bounds = String.format("[%s,%s][%s,%s]", startX, startY, endX, endY);
+            String bounds = String.format("[%s,%s][%d,%d]", startX, startY, endX, endY);
             element.addAttribute("bounds", bounds);
 
             // 前端el-tree

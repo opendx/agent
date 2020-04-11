@@ -5,14 +5,11 @@ import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.AndroidDevice;
 import com.daxiang.core.android.AndroidUtil;
 import com.daxiang.model.Response;
-import com.daxiang.utils.UUIDUtil;
+import com.daxiang.utils.HttpUtil;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,9 +20,6 @@ import java.io.IOException;
 @Slf4j
 @Service
 public class AndroidService {
-
-    @Autowired
-    private RestTemplate restTemplate;
 
     public Response startAdbKit(String deviceId) {
         MobileDevice mobileDevice = MobileDeviceHolder.getConnectedDevice(deviceId);
@@ -53,15 +47,10 @@ public class AndroidService {
     }
 
     public Response aaptDumpBadging(String apkDownloadUrl) {
-        if (StringUtils.isEmpty(apkDownloadUrl)) {
-            return Response.fail("apk下载地址不能为空");
-        }
+        File apkFile = null;
 
-        // download apk
-        byte[] apkByteArr = restTemplate.getForObject(apkDownloadUrl, byte[].class);
-        File apkFile = new File(UUIDUtil.getUUID() + ".apk");
         try {
-            FileUtils.writeByteArrayToFile(apkFile, apkByteArr, false);
+            apkFile = HttpUtil.downloadFile(apkDownloadUrl);
             String result = AndroidUtil.aaptDumpBadging(apkFile.getAbsolutePath());
             return Response.success("ok", result);
         } catch (IOException e) {

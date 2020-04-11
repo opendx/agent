@@ -1,11 +1,13 @@
 package com.daxiang.core;
 
-import com.daxiang.api.MasterApi;
+import com.daxiang.App;
+import com.daxiang.server.ServerApi;
 import com.daxiang.core.javacompile.JavaCompiler;
 import com.daxiang.core.testng.TestNGCodeConvertException;
 import com.daxiang.core.testng.TestNGCodeConverter;
 import com.daxiang.core.testng.TestNGRunner;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
+import com.daxiang.service.MobileService;
 import com.daxiang.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -73,7 +75,13 @@ public class DeviceTestTaskExecutor {
      */
     private void executeTestTask(DeviceTestTask deviceTestTask) {
         log.info("[自动化测试][{}]开始执行测试任务, deviceTestTaskId: {}", deviceId, deviceTestTask.getId());
-        mobileDevice.saveUsingDeviceToMaster(deviceTestTask.getTestPlan().getName());
+
+        MobileService mobileService = App.getBean(MobileService.class);
+
+        // 设备变为使用中
+        mobileDevice.getDevice().setUsername(deviceTestTask.getTestPlan().getName());
+        mobileService.saveUsingDeviceToServer(mobileDevice);
+
         try {
             String className = "Test_" + UUIDUtil.getUUID();
             String code = new TestNGCodeConverter().convert(deviceTestTask, className, "/codetemplate", "mobile.ftl");
@@ -88,7 +96,7 @@ public class DeviceTestTaskExecutor {
             updateDeviceTestTaskStatusAndErrMsg(deviceTestTask.getId(), DeviceTestTask.ERROR_STATUS, ExceptionUtils.getStackTrace(e));
         } finally {
             mobileDevice.quitAppiumDriver();
-            mobileDevice.saveIdleDeviceToMaster();
+            mobileService.saveIdleDeviceToServer(mobileDevice);
         }
     }
 
@@ -96,7 +104,7 @@ public class DeviceTestTaskExecutor {
         DeviceTestTask deviceTestTask = new DeviceTestTask();
         deviceTestTask.setId(deviceTestTaskId);
         deviceTestTask.setCode(code);
-        MasterApi.getInstance().updateDeviceTestTask(deviceTestTask);
+        ServerApi.getInstance().updateDeviceTestTask(deviceTestTask);
     }
 
     private void updateDeviceTestTaskStatusAndErrMsg(Integer deviceTestTaskId, Integer status, String errMsg) {
@@ -104,6 +112,6 @@ public class DeviceTestTaskExecutor {
         deviceTestTask.setId(deviceTestTaskId);
         deviceTestTask.setStatus(status);
         deviceTestTask.setErrMsg(errMsg);
-        MasterApi.getInstance().updateDeviceTestTask(deviceTestTask);
+        ServerApi.getInstance().updateDeviceTestTask(deviceTestTask);
     }
 }

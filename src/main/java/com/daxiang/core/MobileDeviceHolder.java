@@ -37,10 +37,12 @@ public class MobileDeviceHolder {
         if (StringUtils.isEmpty(deviceId)) {
             return null;
         }
+
         MobileDevice mobileDevice = get(deviceId);
         if (mobileDevice == null || !mobileDevice.isConnected()) {
             return null;
         }
+
         return mobileDevice;
     }
 
@@ -49,6 +51,7 @@ public class MobileDeviceHolder {
         if (mobileDevice != null && mobileDevice.isIdle()) {
             return mobileDevice;
         }
+
         return null;
     }
 }

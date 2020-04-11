@@ -1,4 +1,4 @@
-package com.daxiang.api;
+package com.daxiang.server;
 
 import com.daxiang.App;
 import com.daxiang.model.Device;
@@ -32,34 +32,34 @@ import java.util.Optional;
  */
 @Component
 @Slf4j
-public class MasterApi {
+public class ServerApi {
 
-    private static MasterApi INSTANCE;
+    private static ServerApi INSTANCE;
 
     @Autowired
     private RestTemplate restTemplate;
 
-    @Value("${master}/upload/file")
+    @Value("${server}/upload/file")
     private String uploadFileApi;
 
-    @Value("${master}/device/list")
+    @Value("${server}/device/list")
     private String deviceListApi;
-    @Value("${master}/device/save")
+    @Value("${server}/device/save")
     private String deviceSaveApi;
 
-    @Value("${master}/driver/downloadUrl")
+    @Value("${server}/driver/downloadUrl")
     private String driverDownloadUrlApi;
 
-    @Value("${master}/deviceTestTask/update")
+    @Value("${server}/deviceTestTask/update")
     private String updateDeviceTestTaskApi;
-    @Value("${master}/deviceTestTask/firstUnStart/device/%s")
+    @Value("${server}/deviceTestTask/firstUnStart/device/%s")
     private String findFirstUnStartDeviceTestTaskApi;
-    @Value("${master}/deviceTestTask/%d/updateTestcase")
+    @Value("${server}/deviceTestTask/%d/updateTestcase")
     private String updateTestcaseApi;
 
-    public static MasterApi getInstance() {
+    public static ServerApi getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = App.getBean(MasterApi.class);
+            INSTANCE = App.getBean(ServerApi.class);
         }
         return INSTANCE;
     }

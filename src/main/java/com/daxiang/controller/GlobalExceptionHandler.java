@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * Created by jiangyitao.
  */
@@ -47,13 +45,11 @@ public class GlobalExceptionHandler {
      * 参数校验不通过，非@RequestBody
      *
      * @param e
-     * @param req
      * @return
      */
-    @ExceptionHandler({BindException.class})
+    @ExceptionHandler(BindException.class)
     @ResponseBody
-    public Response handleBindException(BindException e, HttpServletRequest req) {
-        log.info("[{}]参数校验失败:{}", req.getServletPath(), e.getFieldError().getDefaultMessage());
+    public Response handleBindException(BindException e) {
         return Response.fail(e.getFieldError().getDefaultMessage());
     }
 
@@ -61,13 +57,11 @@ public class GlobalExceptionHandler {
      * 参数校验不通过，@RequestBody
      *
      * @param e
-     * @param req
      * @return
      */
-    @ExceptionHandler({MethodArgumentNotValidException.class})
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
-    public Response handleMethodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletRequest req) {
-        log.info("[{}]参数校验失败:{}", req.getServletPath(), e.getBindingResult().getFieldError().getDefaultMessage());
+    public Response handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         return Response.fail(e.getBindingResult().getFieldError().getDefaultMessage());
     }
 

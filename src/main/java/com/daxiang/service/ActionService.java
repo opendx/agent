@@ -55,29 +55,15 @@ public class ActionService {
     }
 
     /**
-     * 开发者调试专用
-     *
-     * @param code
-     * @return
-     */
-    public Response developerDebug(String className, String code) {
-        try {
-            return compileAndDebug(className, code);
-        } catch (Exception e) {
-            log.error("调试出错", e);
-            return Response.fail(e.getMessage());
-        }
-    }
-
-    /**
      * 编译调试运行
      */
-    private Response compileAndDebug(String className, String code) {
+    public Response compileAndDebug(String className, String code) {
         try {
-            return TestNGRunner.debugAction(JavaCompiler.compile(className, code), code);
+            Class clazz = JavaCompiler.compile(className, code);
+            return TestNGRunner.debugAction(clazz, code);
         } catch (DynamicCompilerException e) {
-            log.error(e.getMessage());
             return Response.fail(e.getMessage(), ImmutableMap.of("code", code));
         }
     }
+
 }

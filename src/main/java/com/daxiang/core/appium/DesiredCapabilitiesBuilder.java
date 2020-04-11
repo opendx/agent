@@ -130,6 +130,7 @@ public class DesiredCapabilitiesBuilder {
         if (!StringUtils.isEmpty(updatedWDABundleId)) {
             capabilities.setCapability("updatedWDABundleId", updatedWDABundleId);
         }
+
         return this;
     }
 }

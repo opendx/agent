@@ -8,7 +8,7 @@ import java.io.InputStream;
 /**
  * Created by jiangyitao.
  */
-public class MinicapBannerParser {
+class MinicapBannerParser {
 
     /**
      * 解析出global header

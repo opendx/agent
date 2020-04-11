@@ -75,8 +75,8 @@ public class ScrcpyVideoRecorder {
     }
 
     /**
-     * 1. kill scrcpy server来停止录制视频是最优方案。但大多数安卓手机只能通过ps（非ps -ef）获取到scrcpy server进程,
-     * 此时的进程名为app_process, appium在手机里运行的进程也是app_process，所以可能会误杀appium在手机里运行的进程，不采用该方法
+     * 1. kill scrcpy server来停止录制视频是最优方案。但大多数安卓设备只能通过ps（非ps -ef）获取到scrcpy server进程,
+     * 此时的进程名为app_process, appium在设备里运行的进程也是app_process，所以可能会误杀appium在设备里运行的进程，不采用该方法
      * 2. ExecuteWatchdog.destroyProcess()会导致最后一部分视频无法写入，
      * 因为运行在pc的scrcpy进程被直接干掉，无法写入最终的视频，导致获取到破损的视频
      * 3. 在非windows操作系统下，scrcpy收到kill信号后，会写入最后一部分视频，目前采用该方法

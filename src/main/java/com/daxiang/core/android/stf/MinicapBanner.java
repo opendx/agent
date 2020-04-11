@@ -6,7 +6,7 @@ import lombok.Data;
  * Created by jiangyitao.
  */
 @Data
-public class MinicapBanner {
+class MinicapBanner {
     private Integer version;
     private Integer length;
     private Integer pid;

@@ -2,10 +2,12 @@ package com.daxiang.websocket;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.daxiang.App;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.AndroidDevice;
 import com.daxiang.core.android.scrcpy.Scrcpy;
+import com.daxiang.service.MobileService;
 import com.google.common.collect.ImmutableMap;
 import io.appium.java_client.android.AndroidDriver;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,8 @@ import java.io.IOException;
 @ServerEndpoint(value = "/scrcpy/android/{deviceId}/user/{username}/platform/{platform}")
 public class AndroidScrcpySocketServer {
 
+    private MobileService mobileService;
+
     private AndroidDevice androidDevice;
     private AndroidDriver androidDriver;
     private String deviceId;
@@ -39,22 +43,25 @@ public class AndroidScrcpySocketServer {
 
         MobileDevice mobileDevice = MobileDeviceHolder.getIdleDevice(deviceId);
         if (mobileDevice == null) {
-            remoteEndpoint.sendText("手机未处于闲置状态，无法使用");
+            remoteEndpoint.sendText("设备未处于闲置状态，无法使用");
             session.close();
             return;
         }
 
         Session openedSession = MobileDeviceWebSocketSessionPool.getOpenedSession(deviceId);
         if (openedSession != null) {
-            remoteEndpoint.sendText(deviceId + "手机正在被" + openedSession.getId() + "连接占用，请稍后重试");
+            remoteEndpoint.sendText(deviceId + "正在被" + openedSession.getId() + "连接占用，请稍后重试");
             session.close();
             return;
         }
 
         MobileDeviceWebSocketSessionPool.put(deviceId, session);
-        androidDevice = (AndroidDevice) mobileDevice;
 
-        androidDevice.saveUsingDeviceToMaster(username);
+        androidDevice = (AndroidDevice) mobileDevice;
+        androidDevice.getDevice().setUsername(username);
+
+        mobileService = App.getBean(MobileService.class);
+        mobileService.saveUsingDeviceToServer(androidDevice);
 
         scrcpy = androidDevice.getScrcpy();
         scrcpy.start(imgData -> {
@@ -66,8 +73,9 @@ public class AndroidScrcpySocketServer {
         });
 
         remoteEndpoint.sendText("初始化appium driver...");
-        androidDriver = (AndroidDriver)androidDevice.freshAppiumDriver(platform);
+        androidDriver = (AndroidDriver) androidDevice.freshAppiumDriver(platform);
         remoteEndpoint.sendText("初始化appium driver完成");
+
         remoteEndpoint.sendText(JSON.toJSONString(ImmutableMap.of("appiumSessionId", androidDriver.getSessionId().toString())));
     }
 
@@ -79,7 +87,7 @@ public class AndroidScrcpySocketServer {
             MobileDeviceWebSocketSessionPool.remove(deviceId);
             scrcpy.stop();
             androidDevice.quitAppiumDriver();
-            androidDevice.saveIdleDeviceToMaster();
+            mobileService.saveIdleDeviceToServer(androidDevice);
         }
     }
 

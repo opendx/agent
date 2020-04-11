@@ -8,10 +8,16 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 /**
  * Created by jiangyitao.
  */
-public class IosDriverBuilder implements AppiumDriverBuilder {
+class IosDriverBuilder extends AppiumDriverBuilder {
+
+    public IosDriverBuilder(MobileDevice mobileDevice) {
+        super(mobileDevice);
+    }
 
     @Override
-    public AppiumDriver build(MobileDevice mobileDevice) {
+    public AppiumDriver build() {
+        MobileDevice mobileDevice = getMobileDevice();
+
         DesiredCapabilities capabilities = new DesiredCapabilitiesBuilder(mobileDevice).iOSBasic().build();
         return new IOSDriver(mobileDevice.getAppiumServer().getUrl(), capabilities);
     }

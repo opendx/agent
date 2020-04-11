@@ -35,7 +35,7 @@ public class Minitouch {
     private int height;
 
     /**
-     * 运行在手机里的进程id
+     * 运行在设备里的进程id
      */
     private int pid;
 

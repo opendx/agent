@@ -7,11 +7,11 @@ import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.AndroidDevice;
 import com.daxiang.core.android.AndroidUtil;
 import com.daxiang.core.ios.IosUtil;
+import com.daxiang.utils.HttpUtil;
 import com.google.common.collect.ImmutableMap;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.TouchAction;
-import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.PointOption;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +42,7 @@ public class BasicAction {
         this.driver = driver;
         this.mobileDevice = MobileDeviceHolder.getMobileDeviceByAppiumDriver(driver);
         if (mobileDevice == null) {
-            throw new RuntimeException("手机不存在");
+            throw new RuntimeException("设备不存在");
         }
     }
 
@@ -66,11 +66,7 @@ public class BasicAction {
     public void uninstallApp(String packageName) throws Exception {
         Assert.hasText(packageName, "apk包名或ios bundleId不能为空");
 
-        if (driver instanceof AndroidDriver) {
-            AndroidUtil.uninstallApk(((AndroidDevice) mobileDevice).getIDevice(), packageName);
-        } else {
-            IosUtil.uninstallApp(driver, packageName);
-        }
+        mobileDevice.uninstallApp(packageName);
     }
 
     /**
@@ -83,7 +79,7 @@ public class BasicAction {
     public void installApp(String appDownloadUrl) throws Exception {
         Assert.hasText(appDownloadUrl, "appDownloadUrl不能为空");
 
-        mobileDevice.installApp(appDownloadUrl);
+        mobileDevice.installApp(HttpUtil.downloadFile(appDownloadUrl));
     }
 
     /**
@@ -430,32 +426,14 @@ public class BasicAction {
      * 21.弹窗 允许/接受/...
      */
     public boolean acceptAlert() {
-        try {
-            if (driver instanceof AndroidDriver) {
-                driver.executeScript("mobile:acceptAlert");
-            } else {
-                driver.switchTo().alert().accept();
-            }
-            return true;
-        } catch (Exception ign) {
-            return false;
-        }
+        return mobileDevice.acceptAlert();
     }
 
     /**
      * 22.弹窗 拒绝/取消/...
      */
     public boolean dismissAlert() {
-        try {
-            if (driver instanceof AndroidDriver) {
-                driver.executeScript("mobile:dismissAlert");
-            } else {
-                driver.switchTo().alert().dismiss();
-            }
-            return true;
-        } catch (Exception ign) {
-            return false;
-        }
+        return mobileDevice.dismissAlert();
     }
 
     /**
