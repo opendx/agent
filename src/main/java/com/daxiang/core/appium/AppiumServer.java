@@ -53,7 +53,7 @@ public class AppiumServer {
 
         try {
             watchdog = Terminal.executeAsyncAndGetWatchdog(cmd);
-            String url = "http://127.0.0.1:" + port + "/wd/hub";
+            String url = "http://localhost:" + port + "/wd/hub";
             this.url = new URL(url);
             new UrlChecker().waitUntilAvailable(60, TimeUnit.SECONDS, new URL(url + "/status"));
             isRunning = true;
