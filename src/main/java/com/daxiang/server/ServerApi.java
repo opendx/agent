@@ -39,7 +39,7 @@ public class ServerApi {
     @Autowired
     private RestTemplate restTemplate;
 
-    @Value("${server}/upload/file")
+    @Value("${server}/upload/file/{fileType}")
     private String uploadFileApi;
 
     @Value("${server}/device/list")
@@ -52,9 +52,9 @@ public class ServerApi {
 
     @Value("${server}/deviceTestTask/update")
     private String updateDeviceTestTaskApi;
-    @Value("${server}/deviceTestTask/firstUnStart/device/%s")
+    @Value("${server}/deviceTestTask/firstUnStart/device/{deviceId}")
     private String findFirstUnStartDeviceTestTaskApi;
-    @Value("${server}/deviceTestTask/%d/updateTestcase")
+    @Value("${server}/deviceTestTask/{deviceTestTaskId}/updateTestcase")
     private String updateTestcaseApi;
 
     public static ServerApi getInstance() {
@@ -76,9 +76,9 @@ public class ServerApi {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity(params, headers);
-
-        Response<List<Device>> response = restTemplate.exchange(deviceListApi, HttpMethod.POST, requestEntity,
+        Response<List<Device>> response = restTemplate.exchange(deviceListApi,
+                HttpMethod.POST,
+                new HttpEntity(params, headers),
                 new ParameterizedTypeReference<Response<List<Device>>>() {
                 }).getBody();
 
@@ -103,7 +103,9 @@ public class ServerApi {
         params.add("type", 1); // chromedriver
         params.add("platform", OS.isFamilyWindows() ? 1 : OS.isFamilyMac() ? 3 : 2); // 1.windows 2.linux 3.macos
 
-        Response<Map<String, String>> response = restTemplate.exchange(driverDownloadUrlApi, HttpMethod.POST, new HttpEntity<>(params),
+        Response<Map<String, String>> response = restTemplate.exchange(driverDownloadUrlApi,
+                HttpMethod.POST,
+                new HttpEntity<>(params),
                 new ParameterizedTypeReference<Response<Map<String, String>>>() {
                 }).getBody();
 
@@ -136,14 +138,15 @@ public class ServerApi {
      * @return 下载地址
      */
     public UploadFile uploadFile(File file, Integer fileType) {
-        FileSystemResource resource = new FileSystemResource(file);
         MultiValueMap<String, Object> multiValueMap = new LinkedMultiValueMap<>();
-        multiValueMap.add("file", resource);
-        HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(multiValueMap);
+        multiValueMap.add("file", new FileSystemResource(file));
 
-        Response<UploadFile> response = restTemplate.exchange(uploadFileApi + "?fileType=" + fileType, HttpMethod.POST, httpEntity,
+        Response<UploadFile> response = restTemplate.exchange(uploadFileApi,
+                HttpMethod.POST,
+                new HttpEntity<>(multiValueMap),
                 new ParameterizedTypeReference<Response<UploadFile>>() {
-                }).getBody();
+                },
+                fileType).getBody();
 
         if (response.isSuccess()) {
             return response.getData();
@@ -166,10 +169,12 @@ public class ServerApi {
      * 获取最早的未开始的测试任务
      */
     public DeviceTestTask getFirstUnStartDeviceTestTask(String deviceId) {
-        String url = String.format(findFirstUnStartDeviceTestTaskApi, deviceId);
-        Response<DeviceTestTask> response = restTemplate.exchange(url, HttpMethod.GET, null,
+        Response<DeviceTestTask> response = restTemplate.exchange(findFirstUnStartDeviceTestTaskApi,
+                HttpMethod.GET,
+                null,
                 new ParameterizedTypeReference<Response<DeviceTestTask>>() {
-                }).getBody();
+                },
+                deviceId).getBody();
 
         if (response.isSuccess()) {
             return response.getData();
@@ -185,8 +190,7 @@ public class ServerApi {
      * @param testcase
      */
     public void updateTestcase(Integer deviceTestTaskId, Testcase testcase) {
-        String url = String.format(updateTestcaseApi, deviceTestTaskId);
-        Response response = restTemplate.postForObject(url, testcase, Response.class);
+        Response response = restTemplate.postForObject(updateTestcaseApi, testcase, Response.class, deviceTestTaskId);
         if (!response.isSuccess()) {
             throw new RuntimeException(response.getMsg());
         }
