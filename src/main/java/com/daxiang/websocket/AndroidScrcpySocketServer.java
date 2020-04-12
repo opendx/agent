@@ -9,7 +9,7 @@ import com.daxiang.core.android.AndroidDevice;
 import com.daxiang.core.android.scrcpy.Scrcpy;
 import com.daxiang.service.MobileService;
 import com.google.common.collect.ImmutableMap;
-import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +29,6 @@ public class AndroidScrcpySocketServer {
     private MobileService mobileService;
 
     private AndroidDevice androidDevice;
-    private AndroidDriver androidDriver;
     private String deviceId;
     private Scrcpy scrcpy;
 
@@ -73,10 +72,10 @@ public class AndroidScrcpySocketServer {
         });
 
         remoteEndpoint.sendText("初始化appium driver...");
-        androidDriver = (AndroidDriver) androidDevice.freshAppiumDriver(platform);
+        AppiumDriver appiumDriver = androidDevice.freshAppiumDriver(platform);
         remoteEndpoint.sendText("初始化appium driver完成");
 
-        remoteEndpoint.sendText(JSON.toJSONString(ImmutableMap.of("appiumSessionId", androidDriver.getSessionId().toString())));
+        remoteEndpoint.sendText(JSON.toJSONString(ImmutableMap.of("appiumSessionId", appiumDriver.getSessionId().toString())));
     }
 
     @OnClose
@@ -95,7 +94,6 @@ public class AndroidScrcpySocketServer {
     public void onError(Throwable t) {
         log.error("[android-scrcpy-websocket][{}]onError", deviceId, t);
     }
-
 
     @OnMessage
     public void onMessage(String message) {

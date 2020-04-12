@@ -43,6 +43,7 @@ public class AndroidUtil {
         if (StringUtils.isEmpty(cpuInfo) || !cpuInfo.startsWith("Hardware")) {
             return null;
         }
+
         return cpuInfo.split(":")[1].trim();
     }
 
@@ -87,9 +88,11 @@ public class AndroidUtil {
             if (System.currentTimeMillis() - startTime > maxWaitTimeInSeconds * 1000) {
                 throw new RuntimeException("[" + iDevice.getSerialNumber() + "]设备未上线");
             }
+
             if (iDevice.isOnline()) {
                 return;
             }
+
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -123,6 +126,7 @@ public class AndroidUtil {
         } catch (TimeoutException | AdbCommandRejectedException | ShellCommandUnresponsiveException | IOException e) {
             throw new IDeviceExecuteShellCommandException(e);
         }
+
         String response = collectingOutputReceiver.getOutput();
         log.info("[{}<==]{}", cmd, response);
         return response;
@@ -150,11 +154,13 @@ public class AndroidUtil {
      */
     public static String getResolution(IDevice iDevice) throws IDeviceExecuteShellCommandException {
         String wmSize = executeShellCommand(iDevice, "wm size");
+
         Pattern pattern = Pattern.compile("Physical size: (\\d+x\\d+)");
         Matcher matcher = pattern.matcher(wmSize);
         while (matcher.find()) {
             return matcher.group(1);
         }
+
         throw new RuntimeException("cannot find physical size, execute: wm size => " + wmSize);
     }
 
@@ -163,6 +169,7 @@ public class AndroidUtil {
         if (StringUtils.isEmpty(imeListString)) {
             return Collections.emptyList();
         }
+
         return Arrays.asList(imeListString.split("\\r?\\n"));
     }
 

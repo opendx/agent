@@ -35,9 +35,6 @@ public class IosSocketServer {
     PointOption downPointOption;
     PointOption moveToPointOption;
 
-    private int width;
-    private int height;
-
     long pressStartTime;
 
     @OnOpen
@@ -70,17 +67,15 @@ public class IosSocketServer {
         mobileService = App.getBean(MobileService.class);
         mobileService.saveUsingDeviceToServer(iosDevice);
 
-        basicRemote.sendText("初始化appium driver...");
         JSONObject response = new JSONObject();
+
+        basicRemote.sendText("初始化appium driver...");
         response.put("appiumSessionId", mobileDevice.freshAppiumDriver(platform).getSessionId().toString());
         response.put("mjpegServerPort", ((IosDevice) mobileDevice).getMjpegServerPort());
         basicRemote.sendText("初始化appium driver完成");
 
         // 转发本地端口到wdaMjpegServer,这样可以通过localhost访问到wdaMjpegServer获取屏幕数据
         iosDevice.startMjpegServerIproxy();
-
-        width = mobileDevice.getDevice().getScreenWidth();
-        height = mobileDevice.getDevice().getScreenHeight();
 
         basicRemote.sendText(JSON.toJSONString(response));
     }
@@ -142,8 +137,12 @@ public class IosSocketServer {
     }
 
     private PointOption getPointOption(int x, int y, int screenWidth, int screenHeight) {
+        int width = iosDevice.getDevice().getScreenWidth();
+        int height = iosDevice.getDevice().getScreenHeight();
+
         x = (int) (((float) x) / screenWidth * width);
         y = (int) (((float) y) / screenHeight * height);
+
         return PointOption.point(x, y);
     }
 }

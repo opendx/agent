@@ -32,17 +32,15 @@ public class ActionService {
      */
     public Response debug(ActionDebugRequest request) {
         try {
-            String className = "Debug_" + UUIDUtil.getUUID();
-
             DeviceTestTask deviceTestTask = new DeviceTestTask();
             BeanUtils.copyProperties(request, deviceTestTask);
-
             deviceTestTask.setTestcases(Arrays.asList(request.getAction()).stream().map(a -> {
                 Testcase testcase = new Testcase();
                 BeanUtils.copyProperties(a, testcase);
                 return testcase;
             }).collect(Collectors.toList()));
 
+            String className = "Debug_" + UUIDUtil.getUUID();
             String code = new TestNGCodeConverter()
                     .convert(deviceTestTask, className, "/codetemplate", "mobile.ftl");
             log.info("[调试action][{}]code: {}", request.getDeviceId(), code);

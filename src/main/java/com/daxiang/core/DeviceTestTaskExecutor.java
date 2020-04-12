@@ -47,6 +47,7 @@ public class DeviceTestTaskExecutor {
                     log.info("[自动化测试][{}]停止获取测试任务", deviceId);
                     break;
                 }
+
                 try {
                     executeTestTask(deviceTestTask);
                 } catch (Throwable e) {

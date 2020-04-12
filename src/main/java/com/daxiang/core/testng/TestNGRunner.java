@@ -35,6 +35,7 @@ public class TestNGRunner {
             // 运行有错误
             String failMsg = DebugActionTestListener.failMsg.get();
             DebugActionTestListener.failMsg.remove();
+
             return Response.fail(failMsg, ImmutableMap.of("code", code));
         } else {
             // 运行成功
@@ -43,6 +44,7 @@ public class TestNGRunner {
             if (CollectionUtils.isEmpty(printMsgList)) {
                 printMsgList = Arrays.asList("执行成功");
             }
+
             return Response.success(printMsgList.stream().collect(Collectors.joining("\n")), ImmutableMap.of("code", code));
         }
     }

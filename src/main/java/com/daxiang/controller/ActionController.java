@@ -18,9 +18,6 @@ public class ActionController {
     @Autowired
     private ActionService actionService;
 
-    /**
-     * 调试action
-     */
     @PostMapping("/debug")
     public Response debug(@Valid @RequestBody ActionDebugRequest request) {
         return actionService.debug(request);

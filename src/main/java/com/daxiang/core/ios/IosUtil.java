@@ -21,6 +21,7 @@ public class IosUtil {
             if (StringUtils.isEmpty(result)) {
                 return Collections.emptyList();
             }
+
             return Arrays.asList(result.split("\\r?\\n"));
         } catch (IOException e) {
             log.error("execute 'idevice_id -l' err", e);

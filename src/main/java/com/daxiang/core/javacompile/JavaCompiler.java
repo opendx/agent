@@ -17,10 +17,12 @@ public class JavaCompiler {
 
         DynamicCompiler dynamicCompiler = new DynamicCompiler();
         dynamicCompiler.addSource(className, code);
+
         log.info("[java编译]开始编译{}", className);
         long start = System.currentTimeMillis();
         Class<?> clazz = dynamicCompiler.build().get(className);
         log.info("[java编译]编译{}成功，耗时：{} ms", className, System.currentTimeMillis() - start);
+
         return clazz;
     }
 }

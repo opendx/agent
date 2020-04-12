@@ -30,4 +30,9 @@ public class MobileController {
     public Response screenshot(@PathVariable String deviceId) {
         return mobileService.screenshot(deviceId);
     }
+
+    @GetMapping("/status")
+    public Response status(String deviceId) {
+        return mobileService.getStatus(deviceId);
+    }
 }

@@ -72,8 +72,10 @@ public class ServerApi {
     public Device getDeviceById(String deviceId) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("id", deviceId);
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity(params, headers);
 
         Response<List<Device>> response = restTemplate.exchange(deviceListApi, HttpMethod.POST, requestEntity,

@@ -42,7 +42,7 @@ public class BasicAction {
         this.driver = driver;
         this.mobileDevice = MobileDeviceHolder.getMobileDeviceByAppiumDriver(driver);
         if (mobileDevice == null) {
-            throw new RuntimeException("设备不存在");
+            throw new IllegalArgumentException("设备不存在");
         }
     }
 
@@ -226,6 +226,7 @@ public class BasicAction {
      */
     public void sleep(String sleepTimeInSeconds) throws InterruptedException {
         Assert.hasText(sleepTimeInSeconds, "休眠时长不能为空");
+
         long sleepTime = (long) (Float.parseFloat(sleepTimeInSeconds) * 1000);
         Thread.sleep(sleepTime);
     }
@@ -241,6 +242,7 @@ public class BasicAction {
         Dimension window = driver.manage().window().getSize();
         int width = window.width;
         int height = window.height;
+
         swipeInScreen(getPoint(startPoint, width, height),
                 getPoint(endPoint, width, height),
                 getDurationInMsOfSwipeOneTime(durationInMsOfSwipeOneTime));
@@ -263,8 +265,10 @@ public class BasicAction {
         } catch (Exception e) {
             throw new RuntimeException("格式错误, 正确格式: {x:0.5,y:0.5}");
         }
+
         int x = (int) (_point.getFloat("x") * screenWidth);
         int y = (int) (_point.getFloat("y") * screenHeight);
+
         return new Point(x, y);
     }
 
@@ -291,7 +295,6 @@ public class BasicAction {
         Assert.hasText(maxSwipeCount, "最大滑动次数不能为空");
 
         By by = getBy(findBy, value);
-
         try {
             return driver.findElement(by);
         } catch (Exception e) {
@@ -459,7 +462,7 @@ public class BasicAction {
             _timeoutInSeconds = Long.parseLong(timeoutInSeconds);
             _once = Boolean.parseBoolean(once);
         } catch (Exception e) {
-            throw new RuntimeException("非法参数");
+            throw new IllegalArgumentException("非法参数");
         }
 
         new Thread(() -> {
@@ -491,7 +494,7 @@ public class BasicAction {
             _timeoutInSeconds = Long.parseLong(timeoutInSeconds);
             _once = Boolean.parseBoolean(once);
         } catch (Exception e) {
-            throw new RuntimeException("非法参数");
+            throw new IllegalArgumentException("非法参数");
         }
 
         new Thread(() -> {
@@ -558,7 +561,7 @@ public class BasicAction {
                 by = MobileBy.tagName(value);
                 break;
             default:
-                throw new RuntimeException("暂不支持: " + findBy);
+                throw new IllegalArgumentException("暂不支持: " + findBy);
         }
         return by;
     }

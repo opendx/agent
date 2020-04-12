@@ -19,6 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Created by jiangyitao.
@@ -138,4 +141,14 @@ public class MobileService {
         serverApi.saveDevice(device);
     }
 
+    public Response getStatus(String deviceId) {
+        if (StringUtils.isEmpty(deviceId)) {
+            List<Device> devices = MobileDeviceHolder.getAll().stream()
+                    .map(MobileDevice::getDevice).collect(Collectors.toList());
+            return Response.success(devices);
+        } else {
+            MobileDevice mobileDevice = MobileDeviceHolder.get(deviceId);
+            return Objects.isNull(mobileDevice) ? Response.success() : Response.success(mobileDevice.getDevice());
+        }
+    }
 }

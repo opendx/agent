@@ -36,7 +36,6 @@ public class TestNGCodeConverter {
      */
     public String convert(DeviceTestTask deviceTestTask, String className, String ftlBasePackagePath, String ftlFileName) throws TestNGCodeConvertException {
         Map<String, Object> dataModel = new HashMap();
-
         List<Action> actionTreeList = new ArrayList<>();
 
         List<Testcase> testcases = deviceTestTask.getTestcases();
@@ -107,6 +106,7 @@ public class TestNGCodeConverter {
         if (deviceTestTask.getId() == null) { // 调试
             return null;
         }
+
         return deviceTestTask.getDeviceId()
                 + "_"
                 + deviceTestTask.getId()

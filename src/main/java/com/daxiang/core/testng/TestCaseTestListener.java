@@ -20,6 +20,7 @@ import java.util.Date;
 public class TestCaseTestListener extends TestListenerAdapter {
 
     public static final String TEST_DESCRIPTION = "test_desc";
+
     private static final ThreadLocal<Integer> CURRENT_TEST_CASE_ID = new ThreadLocal<>();
     private static final ThreadLocal<String> CONFIG_FAIL_ERR_INFO = new ThreadLocal<>();
 
@@ -38,6 +39,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         deviceTestTask.setId(testDesc.getDeviceTestTaskId());
         deviceTestTask.setStartTime(new Date());
         deviceTestTask.setStatus(DeviceTestTask.RUNNING_STATUS);
+
         ServerApi.getInstance().updateDeviceTestTask(deviceTestTask);
     }
 
@@ -58,6 +60,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         deviceTestTask.setId(testDesc.getDeviceTestTaskId());
         deviceTestTask.setEndTime(new Date());
         deviceTestTask.setStatus(DeviceTestTask.FINISHED_STATUS);
+
         ServerApi.getInstance().updateDeviceTestTask(deviceTestTask);
     }
 
@@ -77,6 +80,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         Testcase testcase = new Testcase();
         testcase.setId(testcaseId);
         testcase.setStartTime(new Date());
+
         ServerApi.getInstance().updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
 
         // 当前置任务执行失败，或依赖的用例执行失败，tr.getThrowable() != null，此时不需要开启视频录制，因为testng会马上调用onTestSkip
@@ -101,6 +105,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         testcase.setEndTime(new Date());
         testcase.setStatus(Testcase.PASS_STATUS);
         testcase.setVideoPath(uploadVideo(testDesc));
+
         ServerApi.getInstance().updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
     }
 
@@ -116,6 +121,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         testcase.setFailImgPath(uploadScreenshot(testDesc));
         testcase.setFailInfo(ExceptionUtils.getStackTrace(tr.getThrowable()));
         testcase.setVideoPath(uploadVideo(testDesc));
+
         ServerApi.getInstance().updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
     }
 
@@ -203,6 +209,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         Testcase testcase = new Testcase();
         testcase.setId(currentTestcaseId);
         testcase.setSteps(Arrays.asList(step));
+
         ServerApi.getInstance().updateTestcase(deviceTestTaskId, testcase);
     }
 }

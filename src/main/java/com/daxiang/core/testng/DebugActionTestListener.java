@@ -28,6 +28,7 @@ public class DebugActionTestListener extends TestListenerAdapter {
             msgList = new ArrayList<>();
             printMsgList.set(msgList);
         }
+
         msgList.add(msg);
     }
 
