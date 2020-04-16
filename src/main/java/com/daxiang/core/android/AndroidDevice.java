@@ -21,6 +21,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.dom4j.DocumentException;
+import org.openqa.selenium.By;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
@@ -164,8 +165,9 @@ public class AndroidDevice extends MobileDevice {
         final ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
         service.scheduleAtFixedRate(() -> {
             try {
-                getAppiumDriver().executeScript("mobile:acceptAlert");
-            } catch (Exception ignore) {
+                String installBtnXpath = "//android.widget.Button[contains(@text, '安装') or contains(@text, '下一步') or contains(@text, '确定') or contains(@text, '确认')]";
+                getAppiumDriver().findElement(By.xpath(installBtnXpath)).click();
+            } catch (Exception ign) {
             }
         }, 0, 1, TimeUnit.SECONDS);
         return service;
