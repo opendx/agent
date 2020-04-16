@@ -253,13 +253,13 @@ public class Scrcpy {
 
         touchEventBuffer.put((byte) TYPE_INJECT_TOUCH_EVENT);
         touchEventBuffer.put((byte) actionType);
-        touchEventBuffer.putLong(-1L); // pointerId
+        touchEventBuffer.putLong(0L); // pointerId
         touchEventBuffer.putInt(x);
         touchEventBuffer.putInt(y);
         touchEventBuffer.putShort((short) screenWidth);
         touchEventBuffer.putShort((short) screenHeight);
-        touchEventBuffer.putShort(Short.MAX_VALUE); // pressure
-        touchEventBuffer.putInt(1); // buttons
+        touchEventBuffer.putShort((short) 0); // pressure
+        touchEventBuffer.putInt(0); // buttons
 
         commit(touchEventBuffer.array());
     }
