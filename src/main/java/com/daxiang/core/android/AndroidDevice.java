@@ -14,6 +14,7 @@ import com.daxiang.core.appium.AndroidNativePageSourceHandler;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
 import com.daxiang.utils.HttpUtil;
+import com.daxiang.utils.Terminal;
 import com.daxiang.utils.UUIDUtil;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidStartScreenRecordingOptions;
@@ -26,9 +27,13 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermission;
 import java.time.Duration;
 import java.util.Base64;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -188,12 +193,21 @@ public class AndroidDevice extends MobileDevice {
         String fileName = downloadUrl.substring(downloadUrl.lastIndexOf("/") + 1);
         File chromedriverFile = new File("vendor/driver/" + fileName);
         if (!chromedriverFile.exists()) {
-            // 文件不存在 -> 下载
             try {
                 log.info("[chromedriver][{}]download => {}", getId(), downloadUrl);
                 HttpUtil.downloadFile(downloadUrl, chromedriverFile);
-            } catch (IOException e) {
-                log.error("download chromedriver file err", e);
+
+                if (!Terminal.IS_WINDOWS) {
+                    // 权限
+                    Set<PosixFilePermission> permissions = new HashSet<>();
+                    permissions.add(PosixFilePermission.OWNER_READ);
+                    permissions.add(PosixFilePermission.OWNER_WRITE);
+                    permissions.add(PosixFilePermission.OWNER_EXECUTE);
+                    // 赋予权限
+                    Files.setPosixFilePermissions(chromedriverFile.toPath(), permissions);
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
                 return Optional.empty();
             }
         } else {
