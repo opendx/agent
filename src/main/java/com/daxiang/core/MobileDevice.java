@@ -113,6 +113,6 @@ public abstract class MobileDevice {
     }
 
     public boolean isAndroid() {
-        return device.getPlatform() == MobileDevice.ANDROID;
+        return device.getPlatform() == ANDROID;
     }
 }
