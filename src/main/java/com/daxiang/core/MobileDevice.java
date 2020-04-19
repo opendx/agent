@@ -111,4 +111,8 @@ public abstract class MobileDevice {
             FileUtils.deleteQuietly(video);
         }
     }
+
+    public boolean isAndroid() {
+        return device.getPlatform() == MobileDevice.ANDROID;
+    }
 }

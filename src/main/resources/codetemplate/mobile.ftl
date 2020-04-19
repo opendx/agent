@@ -4,7 +4,7 @@
 
 public class ${className} {
 
-    private AppiumDriver driver;
+    private <#if isAndroid>AndroidDriver<#else>IOSDriver</#if> driver;
     private BasicAction $;
     private Map<String, Object> vars;
     <#-- pages -->
@@ -38,7 +38,12 @@ public class ${className} {
 
     @BeforeSuite
     public void beforeSuite() throws Throwable {
-        driver = MobileDeviceHolder.get("${deviceTestTask.deviceId}").getAppiumDriver();
+        AppiumDriver appiumDriver = MobileDeviceHolder.get("${deviceTestTask.deviceId}").getAppiumDriver();
+        <#if isAndroid>
+            <#lt>        driver = (AndroidDriver) appiumDriver;
+        <#else>
+            <#lt>        driver = (IOSDriver) appiumDriver;
+        </#if>
         $ = new BasicAction(driver);
         vars = new HashMap();
         PageFactory.initElements(new AppiumFieldDecorator(driver), this);

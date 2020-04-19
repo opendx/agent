@@ -2,6 +2,7 @@ package com.daxiang.core.testng;
 
 import com.alibaba.fastjson.JSONObject;
 import com.daxiang.action.appium.BasicAction;
+import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.model.action.*;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.model.devicetesttask.Testcase;
@@ -94,6 +95,7 @@ public class TestNGCodeConverter {
         dataModel.put("javaImports", javaImports);
 
         dataModel.put("deviceTestTask", deviceTestTask);
+        dataModel.put("isAndroid", MobileDeviceHolder.get(deviceTestTask.getDeviceId()).isAndroid());
 
         try {
             return FreemarkerUtil.process(ftlBasePackagePath, ftlFileName, dataModel);
@@ -130,6 +132,8 @@ public class TestNGCodeConverter {
     private void handleJavaImports() {
         javaImports.add("import com.daxiang.core.MobileDeviceHolder");
         javaImports.add("import io.appium.java_client.*");
+        javaImports.add("import io.appium.java_client.ios.IOSDriver");
+        javaImports.add("import io.appium.java_client.android.AndroidDriver");
         javaImports.add("import io.appium.java_client.pagefactory.*");
         javaImports.add("import org.testng.annotations.*");
         javaImports.add("import org.testng.SkipException");
