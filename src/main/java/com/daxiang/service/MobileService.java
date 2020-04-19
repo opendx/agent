@@ -49,12 +49,14 @@ public class MobileService {
         response.put("imgUrl", uploadFile.getDownloadUrl());
         response.put("imgPath", uploadFile.getFilePath());
 
-        // 由于ios截图分辨率与dump的windowHierarchy bounds不一致，需要把当前屏幕信息传给前端处理
-        // 在竖/横屏时，若android截图有虚拟按键，这里window的高度/宽度不包含虚拟按键
-        Dimension window = mobileDevice.getAppiumDriver().manage().window().getSize();
-        response.put("windowHeight", window.getHeight());
-        response.put("windowWidth", window.getWidth());
-        response.put("windowOrientation", mobileDevice.getAppiumDriver().getOrientation().value());
+        if (mobileDevice.isNativeContext()) {
+            // 由于ios截图分辨率与dump的windowHierarchy bounds不一致，需要把当前屏幕信息传给前端处理
+            // 在竖/横屏时，若android截图有虚拟按键，这里window的高度/宽度不包含虚拟按键
+            Dimension window = mobileDevice.getAppiumDriver().manage().window().getSize();
+            response.put("windowHeight", window.getHeight());
+            response.put("windowWidth", window.getWidth());
+            response.put("windowOrientation", mobileDevice.getAppiumDriver().getOrientation().value());
+        }
 
         return Response.success(response);
     }
