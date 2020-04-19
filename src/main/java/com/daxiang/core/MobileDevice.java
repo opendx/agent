@@ -1,20 +1,24 @@
 package com.daxiang.core;
 
+import com.daxiang.model.page.Page;
 import com.daxiang.server.ServerApi;
 import com.daxiang.core.appium.AppiumDriverFactory;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
 import com.daxiang.model.FileType;
 import com.daxiang.model.UploadFile;
+import com.google.common.collect.ImmutableMap;
 import io.appium.java_client.AppiumDriver;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.dom4j.DocumentException;
+import org.json.XML;
 import org.openqa.selenium.OutputType;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Created by jiangyitao.
@@ -93,7 +97,26 @@ public abstract class MobileDevice {
 
     public abstract void uninstallApp(String app) throws Exception;
 
-    public abstract String dump() throws IOException, DocumentException;
+    public Map<String, Object> dump() throws IOException, DocumentException {
+        Integer type;
+        String pageSource;
+
+        if (isNativeContext()) {
+            if (isAndroid()) {
+                type = Page.TYPE_ANDROID_NATIVE;
+            } else {
+                type = Page.TYPE_IOS_NATIVE;
+            }
+            pageSource = XML.toJSONObject(dumpNativePage()).toString();
+        } else {
+            type = Page.TYPE_WEB;
+            pageSource = getAppiumDriver().getPageSource();
+        }
+
+        return ImmutableMap.of("type", type, "pageSource", pageSource);
+    }
+
+    public abstract String dumpNativePage() throws IOException, DocumentException;
 
     public abstract boolean acceptAlert();
 

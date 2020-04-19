@@ -5,7 +5,6 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-import org.json.XML;
 import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
@@ -39,7 +38,7 @@ public abstract class AppiumNativePageSourceHandler {
             Document document = saxReader.read(in);
             handleElement(document.getRootElement());
 
-            return XML.toJSONObject(document.asXML()).toString();
+            return document.asXML();
         }
     }
 }

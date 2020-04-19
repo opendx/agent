@@ -1,6 +1,5 @@
 package com.daxiang.core.appium;
 
-import com.daxiang.core.MobileDevice;
 import io.appium.java_client.AppiumDriver;
 import org.dom4j.Element;
 import org.springframework.util.StringUtils;
@@ -34,8 +33,6 @@ public class AndroidNativePageSourceHandler extends AppiumNativePageSourceHandle
 
         if (!"hierarchy".equals(elementName)) {
             element.setName("node");
-        } else {
-            element.addAttribute("platform", MobileDevice.ANDROID + "");
         }
 
         List<Element> elements = element.elements();

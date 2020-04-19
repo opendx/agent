@@ -105,7 +105,7 @@ public class AndroidDevice extends MobileDevice {
     }
 
     @Override
-    public String dump() throws IOException, DocumentException {
+    public String dumpNativePage() throws IOException, DocumentException {
         return new AndroidNativePageSourceHandler(getAppiumDriver()).getPageSource();
     }
 

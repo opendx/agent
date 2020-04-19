@@ -67,13 +67,8 @@ public class MobileService {
             return Response.fail("设备未连接");
         }
 
-        if (!mobileDevice.isNativeContext()) {
-            return Response.success("ok", mobileDevice.getAppiumDriver().getPageSource());
-        }
-
         try {
-            String pageSource = mobileDevice.dump();
-            return Response.success("ok", pageSource);
+            return Response.success(mobileDevice.dump());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return Response.fail(e.getMessage());

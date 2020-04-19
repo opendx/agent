@@ -1,6 +1,5 @@
 package com.daxiang.core.appium;
 
-import com.daxiang.core.MobileDevice;
 import io.appium.java_client.AppiumDriver;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
@@ -35,7 +34,6 @@ public class IosNativePageSourceHandler extends AppiumNativePageSourceHandler {
 
         if ("AppiumAUT".equals(elementName)) {
             element.setName("hierarchy");
-            element.addAttribute("platform", MobileDevice.IOS + "");
         } else {
             element.setName("node");
 
