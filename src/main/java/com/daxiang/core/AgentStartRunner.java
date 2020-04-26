@@ -29,9 +29,9 @@ public class AgentStartRunner implements ApplicationRunner {
     private IosDeviceChangeListener iosDeviceChangeListener;
 
     @Value("${android}")
-    private boolean needAndroid;
+    private boolean enableAndroid;
     @Value("${ios}")
-    private boolean needIos;
+    private boolean enableIos;
 
     @Override
     public void run(ApplicationArguments args) throws IOException, InterruptedException {
@@ -40,7 +40,7 @@ public class AgentStartRunner implements ApplicationRunner {
         System.setProperty("appiumVersion", appiumVersion);
 
         if (!appiumVersion.matches("\\d+.\\d+.\\d+")) {
-            throw new Error("appium版本错误: " + appiumVersion);
+            throw new IllegalStateException("appium版本错误: " + appiumVersion);
         }
 
         String[] appiumVersionArr = appiumVersion.split("\\.");
@@ -48,7 +48,7 @@ public class AgentStartRunner implements ApplicationRunner {
         int middle = Integer.parseInt(appiumVersionArr[1]);
 
         if (first < 1 || (first == 1 && middle < 16)) {
-            throw new Error("appium版本必须>=1.16.0");
+            throw new IllegalStateException("appium版本必须>=1.16.0");
         }
 
         // 是否配置了aapt
@@ -62,7 +62,7 @@ public class AgentStartRunner implements ApplicationRunner {
         // ffmpeg
         Terminal.execute("ffmpeg -version");
 
-        if (needAndroid) {
+        if (enableAndroid) {
             ADB.killServer();
             Thread.sleep(1000);
             ADB.startServer();
@@ -72,7 +72,7 @@ public class AgentStartRunner implements ApplicationRunner {
             log.info("[android]未开启Android功能");
         }
 
-        if (needIos) {
+        if (enableIos) {
             IosDeviceMonitor iosDeviceMonitor = IosDeviceMonitor.getInstance();
             iosDeviceMonitor.start(iosDeviceChangeListener);
             log.info("[ios]开始监听设备连接/断开");
