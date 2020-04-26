@@ -20,7 +20,7 @@ class IosSafariDriverBuilder extends AppiumDriverBuilder {
 
         DesiredCapabilities capabilities = new DesiredCapabilitiesBuilder(mobileDevice)
                 .iOSBasic()
-                .iosSafari()
+                .iOSSafari()
                 .build();
         return new IOSDriver(mobileDevice.getAppiumServer().getUrl(), capabilities);
     }

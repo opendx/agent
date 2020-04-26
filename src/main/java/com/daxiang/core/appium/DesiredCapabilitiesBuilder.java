@@ -144,7 +144,7 @@ public class DesiredCapabilitiesBuilder {
         return this;
     }
 
-    public DesiredCapabilitiesBuilder iosSafari() {
+    public DesiredCapabilitiesBuilder iOSSafari() {
         capabilities.setCapability(MobileCapabilityType.BROWSER_NAME, "Safari");
         return this;
     }
