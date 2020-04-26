@@ -21,6 +21,10 @@ public class AppiumDriverFactory {
                 return new WxToolsDriverBuilder(mobileDevice).build();
             case Platform.ANDROID_WX_APP_BRAND:
                 return new WxAppBrandDriverBuilder(mobileDevice).build();
+            case Platform.ANDROID_CHROME:
+                return new AndroidChromeDriverBuilder(mobileDevice).build();
+            case Platform.IOS_SAFARI:
+                return new IosSafariDriverBuilder(mobileDevice).build();
             default:
                 throw new IllegalArgumentException("不支持的platform: " + platform);
         }

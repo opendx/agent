@@ -8,4 +8,6 @@ public interface Platform {
     int IOS = 2;
     int ANDROID_WX_TOOLS = 3;
     int ANDROID_WX_APP_BRAND = 4;
+    int ANDROID_CHROME = 5;
+    int IOS_SAFARI = 6;
 }

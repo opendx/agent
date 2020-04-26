@@ -9,6 +9,7 @@ import com.daxiang.utils.NetUtil;
 public class PortProvider {
 
     // [startPort, endPort, port]
+    // 移动端
     private static final int[] APPIUM_SERVER_PORTS = {20000, 20999, 20000};
     private static final int[] MINITOUCH_PORTS = {21000, 21999, 21000};
     private static final int[] MINICAP_PORTS = {22000, 22999, 22000};
@@ -16,13 +17,13 @@ public class PortProvider {
     private static final int[] UIAUTOMATOR2_SERVER_PORTS = {24000, 24999, 24000};
     private static final int[] WDA_LOCAL_PORTS = {25000, 25999, 25000};
     private static final int[] WDA_MJPEG_SERVER_PORTS = {26000, 26999, 26000};
-    private static final int[] CHROME_DRIVER_PORTS = {27000, 27999, 27000};
+    private static final int[] ANDROID_CHROME_DRIVER_PORTS = {27000, 27999, 27000};
     private static final int[] WEBKIT_DEBUG_PROXY_PORTS = {28000, 28999, 28000};
     private static final int[] SCRCPY_PORTS = {29000, 29999, 29000};
     private static final int[] SCRCPY_RECORD_VIDEO_PORTS = {30000, 30999, 30000};
 
-    public static synchronized int getChromeDriverAvailablePort() {
-        return getAvaliablePort(CHROME_DRIVER_PORTS);
+    public static synchronized int getAndroidChromeDriverAvailablePort() {
+        return getAvaliablePort(ANDROID_CHROME_DRIVER_PORTS);
     }
 
     public static synchronized int getWebkitDebugProxyAvalilablePort() {

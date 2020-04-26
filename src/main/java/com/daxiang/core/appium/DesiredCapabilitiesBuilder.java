@@ -50,7 +50,7 @@ public class DesiredCapabilitiesBuilder {
         }
 
         capabilities.setCapability(AndroidMobileCapabilityType.SYSTEM_PORT, PortProvider.getUiautomator2ServerAvailablePort());
-        capabilities.setCapability("chromedriverPort", PortProvider.getChromeDriverAvailablePort());
+        capabilities.setCapability("chromedriverPort", PortProvider.getAndroidChromeDriverAvailablePort());
         // capabilities.setCapability("showChromedriverLog", true);
         Optional<String> chromedriverFilePath = ((AndroidDevice) mobileDevice).getChromedriverFilePath();
         if (chromedriverFilePath.isPresent()) {
@@ -103,6 +103,16 @@ public class DesiredCapabilitiesBuilder {
         return this;
     }
 
+    public DesiredCapabilitiesBuilder androidChrome() {
+        capabilities.setCapability(MobileCapabilityType.BROWSER_NAME, "Chrome");
+
+        ChromeOptions chromeOptions = new ChromeOptions();
+        chromeOptions.setExperimentalOption("w3c", false); // 防止报错: unknown command Cannot call non W3C standard command while in W3C mode
+
+        capabilities.setCapability(AndroidMobileCapabilityType.CHROME_OPTIONS, chromeOptions);
+        return this;
+    }
+
     public DesiredCapabilitiesBuilder iOSBasic() {
         capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
         capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.IOS_XCUI_TEST);
@@ -131,6 +141,11 @@ public class DesiredCapabilitiesBuilder {
             capabilities.setCapability("updatedWDABundleId", updatedWDABundleId);
         }
 
+        return this;
+    }
+
+    public DesiredCapabilitiesBuilder iosSafari() {
+        capabilities.setCapability(MobileCapabilityType.BROWSER_NAME, "Safari");
         return this;
     }
 }
