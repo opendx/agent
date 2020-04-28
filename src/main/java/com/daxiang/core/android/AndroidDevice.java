@@ -106,13 +106,13 @@ public class AndroidDevice extends MobileDevice {
 
     @Override
     public String dumpNativePage() throws IOException, DocumentException {
-        return new AndroidNativePageSourceHandler(getAppiumDriver()).getPageSource();
+        return new AndroidNativePageSourceHandler(appiumDriver).getPageSource();
     }
 
     @Override
     public boolean acceptAlert() {
         try {
-            getAppiumDriver().executeScript("mobile:acceptAlert");
+            appiumDriver.executeScript("mobile:acceptAlert");
             return true;
         } catch (Exception e) {
             return false;
@@ -122,7 +122,7 @@ public class AndroidDevice extends MobileDevice {
     @Override
     public boolean dismissAlert() {
         try {
-            getAppiumDriver().executeScript("mobile:dismissAlert");
+            appiumDriver.executeScript("mobile:dismissAlert");
             return true;
         } catch (Exception e) {
             return false;
@@ -137,7 +137,7 @@ public class AndroidDevice extends MobileDevice {
                 // Since Appium 1.8.2 the time limit can be up to 1800 seconds (30 minutes).
                 androidOptions.withTimeLimit(Duration.ofMinutes(30));
                 androidOptions.withBitRate(Integer.parseInt(App.getProperty("androidRecordVideoBitRate")) * 1000000); // default 4000000
-                ((AndroidDriver) getAppiumDriver()).startRecordingScreen(androidOptions);
+                ((AndroidDriver) appiumDriver).startRecordingScreen(androidOptions);
                 return;
             } catch (Exception e) {
                 log.warn("[{}]无法使用appium录制视频，改用scrcpy录制视频", getId(), e);
@@ -155,7 +155,7 @@ public class AndroidDevice extends MobileDevice {
     public File stopRecordingScreen() throws IOException {
         if (canUseAppiumRecordVideo) {
             File videoFile = new File(UUIDUtil.getUUID() + ".mp4");
-            String base64Video = ((AndroidDriver) getAppiumDriver()).stopRecordingScreen();
+            String base64Video = ((AndroidDriver) appiumDriver).stopRecordingScreen();
             FileUtils.writeByteArrayToFile(videoFile, Base64.getDecoder().decode(base64Video), false);
             return videoFile;
         } else {
@@ -171,7 +171,7 @@ public class AndroidDevice extends MobileDevice {
         service.scheduleAtFixedRate(() -> {
             try {
                 String installBtnXpath = "//android.widget.Button[contains(@text, '安装') or contains(@text, '下一步') or contains(@text, '确定') or contains(@text, '确认')]";
-                getAppiumDriver().findElement(By.xpath(installBtnXpath)).click();
+                appiumDriver.findElement(By.xpath(installBtnXpath)).click();
             } catch (Exception ign) {
             }
         }, 0, 1, TimeUnit.SECONDS);

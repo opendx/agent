@@ -32,11 +32,11 @@ public abstract class MobileDevice {
     public static final int ANDROID = 1;
     public static final int IOS = 2;
 
-    private Device device;
-    private DeviceTestTaskExecutor deviceTestTaskExecutor;
+    protected Device device;
+    protected DeviceTestTaskExecutor deviceTestTaskExecutor;
 
-    private AppiumServer appiumServer;
-    private AppiumDriver appiumDriver;
+    protected AppiumServer appiumServer;
+    protected AppiumDriver appiumDriver;
 
     public MobileDevice(Device device, AppiumServer appiumServer) {
         this.device = device;
@@ -110,7 +110,7 @@ public abstract class MobileDevice {
             pageSource = XML.toJSONObject(dumpNativePage()).toString();
         } else {
             type = Page.TYPE_WEB;
-            pageSource = getAppiumDriver().getPageSource();
+            pageSource = appiumDriver.getPageSource();
         }
 
         return ImmutableMap.of("type", type, "pageSource", pageSource);

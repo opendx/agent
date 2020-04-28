@@ -46,18 +46,18 @@ public class IosDevice extends MobileDevice {
 
     @Override
     public void uninstallApp(String app) {
-        IosUtil.uninstallApp(getAppiumDriver(), app);
+        IosUtil.uninstallApp(appiumDriver, app);
     }
 
     @Override
     public String dumpNativePage() throws IOException, DocumentException {
-        return new IosNativePageSourceHandler(getAppiumDriver()).getPageSource();
+        return new IosNativePageSourceHandler(appiumDriver).getPageSource();
     }
 
     @Override
     public boolean acceptAlert() {
         try {
-            getAppiumDriver().switchTo().alert().accept();
+            appiumDriver.switchTo().alert().accept();
             return true;
         } catch (Exception e) {
             return false;
@@ -67,7 +67,7 @@ public class IosDevice extends MobileDevice {
     @Override
     public boolean dismissAlert() {
         try {
-            getAppiumDriver().switchTo().alert().dismiss();
+            appiumDriver.switchTo().alert().dismiss();
             return true;
         } catch (Exception e) {
             return false;
@@ -82,19 +82,19 @@ public class IosDevice extends MobileDevice {
         iosOptions.withFps(10); // default 10
         iosOptions.withVideoQuality(IOSStartScreenRecordingOptions.VideoQuality.LOW);
         iosOptions.withVideoType("libx264");
-        ((IOSDriver) getAppiumDriver()).startRecordingScreen(iosOptions);
+        ((IOSDriver) appiumDriver).startRecordingScreen(iosOptions);
     }
 
     @Override
     public File stopRecordingScreen() throws IOException {
         File videoFile = new File(UUIDUtil.getUUID() + ".mp4");
-        String base64Video = ((IOSDriver) getAppiumDriver()).stopRecordingScreen();
+        String base64Video = ((IOSDriver) appiumDriver).stopRecordingScreen();
         FileUtils.writeByteArrayToFile(videoFile, Base64.getDecoder().decode(base64Video), false);
         return videoFile;
     }
 
     public int getMjpegServerPort() {
-        Object mjpegServerPort = getAppiumDriver().getCapabilities().asMap().get("mjpegServerPort");
+        Object mjpegServerPort = appiumDriver.getCapabilities().asMap().get("mjpegServerPort");
         return (int) ((long) mjpegServerPort);
     }
 
