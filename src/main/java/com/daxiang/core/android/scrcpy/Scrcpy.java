@@ -36,7 +36,7 @@ public class Scrcpy {
 
     private OutputStream controlOutputStream;
 
-    private boolean isRun = false;
+    private boolean isRunning = false;
 
     public Scrcpy(IDevice iDevice) {
         this.iDevice = iDevice;
@@ -50,7 +50,7 @@ public class Scrcpy {
     public synchronized void start(AndroidImgDataConsumer androidImgDataConsumer) throws Exception {
         Assert.notNull(androidImgDataConsumer, "dataConsumer cannot be null");
 
-        if (isRun) {
+        if (isRunning) {
             return;
         }
 
@@ -95,7 +95,7 @@ public class Scrcpy {
                     }
                 }, 0, TimeUnit.SECONDS);
                 log.info("[scrcpy][{}]已停止运行", deviceId);
-                isRun = false;
+                isRunning = false;
             } catch (Exception e) {
                 throw new RuntimeException("启动scrcpy失败", e);
             }
@@ -103,7 +103,7 @@ public class Scrcpy {
 
         countDownLatch.await(30, TimeUnit.SECONDS);
         log.info("[scrcpy][{}]scrcpy启动完成", deviceId);
-        isRun = true;
+        isRunning = true;
 
         int localPort = PortProvider.getScrcpyAvailablePort();
 
@@ -137,7 +137,7 @@ public class Scrcpy {
 
                 byte[] packet = new byte[1024 * 1024];
 
-                while (isRun) {
+                while (isRunning) {
                     // Scrcpy.server - ScreenEncoder.java
                     // private final ByteBuffer headerBuffer = ByteBuffer.allocate(12);
                     // headerBuffer.putLong(presentationTimeUs); 8字节
@@ -187,7 +187,7 @@ public class Scrcpy {
     }
 
     public synchronized void stop() {
-        if (isRun) {
+        if (isRunning) {
             String cmd = "kill -9 " + pid;
             try {
                 log.info("[scrcpy][{}]kill scrcpy: {}", deviceId, cmd);

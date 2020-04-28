@@ -44,7 +44,7 @@ public class Minitouch {
      */
     private PrintWriter printWriter;
 
-    private boolean isRun = false;
+    private boolean isRunning = false;
 
 
     public Minitouch(IDevice iDevice) {
@@ -62,7 +62,7 @@ public class Minitouch {
      * @throws Exception
      */
     public synchronized void start() throws Exception {
-        if (isRun) {
+        if (isRunning) {
             return;
         }
 
@@ -88,7 +88,7 @@ public class Minitouch {
                     }
                 }, 0, TimeUnit.SECONDS);
                 log.info("[minitouch][{}]已停止运行", deviceId);
-                isRun = false;
+                isRunning = false;
             } catch (Exception e) {
                 throw new RuntimeException("启动minitouch失败", e);
             }
@@ -101,7 +101,7 @@ public class Minitouch {
 
         countDownLatch.await(30, TimeUnit.SECONDS);
         log.info("[minitouch][{}]minitouch启动完成", deviceId);
-        isRun = true;
+        isRunning = true;
 
         new Thread(() -> {
             try (Socket socket = new Socket("127.0.0.1", localPort);
@@ -149,7 +149,7 @@ public class Minitouch {
      * 停止运行monitouch
      */
     public synchronized void stop() {
-        if (isRun) {
+        if (isRunning) {
             String cmd = "kill -9 " + pid;
             try {
                 log.info("[minitouch][{}]kill minitouch: {}", deviceId, cmd);
