@@ -1,7 +1,7 @@
 package com.daxiang.core;
 
 import com.daxiang.model.page.Page;
-import com.daxiang.server.ServerApi;
+import com.daxiang.server.ServerClient;
 import com.daxiang.core.appium.AppiumDriverFactory;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
@@ -87,7 +87,7 @@ public abstract class MobileDevice {
     public UploadFile screenshotAndUploadToServer() {
         File screenshotFile = screenshot();
         try {
-            return ServerApi.getInstance().uploadFile(screenshotFile, FileType.IMG);
+            return ServerClient.getInstance().uploadFile(screenshotFile, FileType.IMG);
         } finally {
             FileUtils.deleteQuietly(screenshotFile);
         }
@@ -129,7 +129,7 @@ public abstract class MobileDevice {
     public UploadFile stopRecordingScreenAndUploadToServer() throws IOException {
         File video = stopRecordingScreen();
         try {
-            return ServerApi.getInstance().uploadFile(video, FileType.VIDEO);
+            return ServerClient.getInstance().uploadFile(video, FileType.VIDEO);
         } finally {
             FileUtils.deleteQuietly(video);
         }

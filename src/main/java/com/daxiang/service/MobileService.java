@@ -6,7 +6,7 @@ import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.model.Device;
 import com.daxiang.model.Response;
 import com.daxiang.model.UploadFile;
-import com.daxiang.server.ServerApi;
+import com.daxiang.server.ServerClient;
 import com.daxiang.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -35,7 +35,7 @@ public class MobileService {
     @Value("${port}")
     private Integer port;
     @Autowired
-    private ServerApi serverApi;
+    private ServerClient serverClient;
 
     public Response screenshot(String deviceId) {
         MobileDevice mobileDevice = MobileDeviceHolder.getConnectedDevice(deviceId);
@@ -108,7 +108,7 @@ public class MobileService {
         device.setStatus(Device.IDLE_STATUS);
         device.setLastOnlineTime(new Date());
         log.info("saveOnlineDeviceToServer: {}", device);
-        serverApi.saveDevice(device);
+        serverClient.saveDevice(device);
     }
 
     public void saveUsingDeviceToServer(MobileDevice mobileDevice) {
@@ -117,7 +117,7 @@ public class MobileService {
             device.setStatus(Device.USING_STATUS);
             device.setUsername(device.getUsername());
             log.info("saveUsingDeviceToServer: {}", device);
-            serverApi.saveDevice(device);
+            serverClient.saveDevice(device);
         }
     }
 
@@ -126,7 +126,7 @@ public class MobileService {
             Device device = mobileDevice.getDevice();
             device.setStatus(Device.IDLE_STATUS);
             log.info("saveIdleDeviceToServer: {}", device);
-            serverApi.saveDevice(device);
+            serverClient.saveDevice(device);
         }
     }
 
@@ -135,7 +135,7 @@ public class MobileService {
         device.setStatus(Device.OFFLINE_STATUS);
         device.setLastOfflineTime(new Date());
         log.info("saveOfflineDeviceToServer: {}", device);
-        serverApi.saveDevice(device);
+        serverClient.saveDevice(device);
     }
 
     public Response getStatus(String deviceId) {

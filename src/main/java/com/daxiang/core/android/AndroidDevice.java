@@ -3,7 +3,7 @@ package com.daxiang.core.android;
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.InstallException;
 import com.daxiang.App;
-import com.daxiang.server.ServerApi;
+import com.daxiang.server.ServerClient;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.android.scrcpy.Scrcpy;
 import com.daxiang.core.android.scrcpy.ScrcpyVideoRecorder;
@@ -179,7 +179,7 @@ public class AndroidDevice extends MobileDevice {
     }
 
     public synchronized Optional<String> getChromedriverFilePath() {
-        Optional<String> chromedriverDownloadUrl = ServerApi.getInstance().getChromedriverDownloadUrl(getId());
+        Optional<String> chromedriverDownloadUrl = ServerClient.getInstance().getChromedriverDownloadUrl(getId());
         if (!chromedriverDownloadUrl.isPresent()) {
             return Optional.empty();
         }

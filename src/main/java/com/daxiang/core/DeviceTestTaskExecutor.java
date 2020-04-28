@@ -1,7 +1,7 @@
 package com.daxiang.core;
 
 import com.daxiang.App;
-import com.daxiang.server.ServerApi;
+import com.daxiang.server.ServerClient;
 import com.daxiang.core.javacompile.JavaCompiler;
 import com.daxiang.core.testng.TestNGCodeConvertException;
 import com.daxiang.core.testng.TestNGCodeConverter;
@@ -105,7 +105,7 @@ public class DeviceTestTaskExecutor {
         DeviceTestTask deviceTestTask = new DeviceTestTask();
         deviceTestTask.setId(deviceTestTaskId);
         deviceTestTask.setCode(code);
-        ServerApi.getInstance().updateDeviceTestTask(deviceTestTask);
+        ServerClient.getInstance().updateDeviceTestTask(deviceTestTask);
     }
 
     private void updateDeviceTestTaskStatusAndErrMsg(Integer deviceTestTaskId, Integer status, String errMsg) {
@@ -113,6 +113,6 @@ public class DeviceTestTaskExecutor {
         deviceTestTask.setId(deviceTestTaskId);
         deviceTestTask.setStatus(status);
         deviceTestTask.setErrMsg(errMsg);
-        ServerApi.getInstance().updateDeviceTestTask(deviceTestTask);
+        ServerClient.getInstance().updateDeviceTestTask(deviceTestTask);
     }
 }

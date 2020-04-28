@@ -1,6 +1,6 @@
 package com.daxiang.core.ios;
 
-import com.daxiang.server.ServerApi;
+import com.daxiang.server.ServerClient;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.appium.AppiumServer;
@@ -26,7 +26,7 @@ import java.util.Date;
 public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
 
     @Autowired
-    private ServerApi serverApi;
+    private ServerClient serverClient;
     @Autowired
     private MobileService mobileService;
 
@@ -53,7 +53,7 @@ public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
             log.info("[ios][{}]启动appium server完成，url: {}", deviceId, appiumServer.getUrl());
 
             log.info("[ios][{}]检查是否已接入过server", deviceId);
-            Device device = serverApi.getDeviceById(deviceId);
+            Device device = serverClient.getDeviceById(deviceId);
             if (device == null) {
                 log.info("[ios][{}]首次接入server，开始初始化设备", deviceId);
                 try {

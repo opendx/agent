@@ -1,6 +1,6 @@
 package com.daxiang.core.testng;
 
-import com.daxiang.server.ServerApi;
+import com.daxiang.server.ServerClient;
 import com.daxiang.model.action.Step;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.model.devicetesttask.Testcase;
@@ -40,7 +40,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         deviceTestTask.setStartTime(new Date());
         deviceTestTask.setStatus(DeviceTestTask.RUNNING_STATUS);
 
-        ServerApi.getInstance().updateDeviceTestTask(deviceTestTask);
+        ServerClient.getInstance().updateDeviceTestTask(deviceTestTask);
     }
 
     /**
@@ -61,7 +61,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         deviceTestTask.setEndTime(new Date());
         deviceTestTask.setStatus(DeviceTestTask.FINISHED_STATUS);
 
-        ServerApi.getInstance().updateDeviceTestTask(deviceTestTask);
+        ServerClient.getInstance().updateDeviceTestTask(deviceTestTask);
     }
 
     /**
@@ -81,7 +81,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         testcase.setId(testcaseId);
         testcase.setStartTime(new Date());
 
-        ServerApi.getInstance().updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
+        ServerClient.getInstance().updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
 
         // 当前置任务执行失败，或依赖的用例执行失败，tr.getThrowable() != null，此时不需要开启视频录制，因为testng会马上调用onTestSkip
         if (tr.getThrowable() == null && testDesc.getRecordVideo()) {
@@ -106,7 +106,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         testcase.setStatus(Testcase.PASS_STATUS);
         testcase.setVideoPath(uploadVideo(testDesc));
 
-        ServerApi.getInstance().updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
+        ServerClient.getInstance().updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
     }
 
     @Override
@@ -122,7 +122,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         testcase.setFailInfo(ExceptionUtils.getStackTrace(tr.getThrowable()));
         testcase.setVideoPath(uploadVideo(testDesc));
 
-        ServerApi.getInstance().updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
+        ServerClient.getInstance().updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
     }
 
     @Override
@@ -145,7 +145,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
             testcase.setVideoPath(uploadVideo(testDesc));
         }
 
-        ServerApi.getInstance().updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
+        ServerClient.getInstance().updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
     }
 
     /**
@@ -210,6 +210,6 @@ public class TestCaseTestListener extends TestListenerAdapter {
         testcase.setId(currentTestcaseId);
         testcase.setSteps(Arrays.asList(step));
 
-        ServerApi.getInstance().updateTestcase(deviceTestTaskId, testcase);
+        ServerClient.getInstance().updateTestcase(deviceTestTaskId, testcase);
     }
 }
