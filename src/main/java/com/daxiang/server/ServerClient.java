@@ -48,7 +48,7 @@ public class ServerClient {
     private String deviceSaveUrl;
 
     @Value("${server}/driver/downloadUrl")
-    private String driverDownloadUrlUrl;
+    private String driverDownloadUrl;
 
     @Value("${server}/deviceTestTask/update")
     private String updateDeviceTestTaskUrl;
@@ -103,7 +103,7 @@ public class ServerClient {
         params.add("type", 1); // chromedriver
         params.add("platform", OS.isFamilyWindows() ? 1 : OS.isFamilyMac() ? 3 : 2); // 1.windows 2.linux 3.macos
 
-        Response<Map<String, String>> response = restTemplate.exchange(driverDownloadUrlUrl,
+        Response<Map<String, String>> response = restTemplate.exchange(driverDownloadUrl,
                 HttpMethod.POST,
                 new HttpEntity<>(params),
                 new ParameterizedTypeReference<Response<Map<String, String>>>() {
