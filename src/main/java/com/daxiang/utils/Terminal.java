@@ -14,6 +14,9 @@ import java.io.IOException;
 public class Terminal {
 
     public static final boolean IS_WINDOWS = OS.isFamilyWindows();
+    public static final boolean IS_MACOS = OS.isFamilyMac();
+    public static final int PLATFORM = IS_WINDOWS ? 1 : IS_MACOS ? 3 : 2;
+
     private static final String BASH = "/bin/sh";
     private static final String CMD_EXE = "cmd.exe";
 

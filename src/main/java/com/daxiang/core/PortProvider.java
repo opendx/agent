@@ -2,7 +2,6 @@ package com.daxiang.core;
 
 import com.daxiang.utils.NetUtil;
 
-
 /**
  * Created by jiangyitao.
  */
@@ -21,6 +20,9 @@ public class PortProvider {
     private static final int[] WEBKIT_DEBUG_PROXY_PORTS = {28000, 28999, 28000};
     private static final int[] SCRCPY_PORTS = {29000, 29999, 29000};
     private static final int[] SCRCPY_RECORD_VIDEO_PORTS = {30000, 30999, 30000};
+
+    // pc web
+    private static final int[] PC_DRIVER_SERVICE_PORTS = {31000, 34999, 31000};
 
     public static synchronized int getAndroidChromeDriverAvailablePort() {
         return getAvaliablePort(ANDROID_CHROME_DRIVER_PORTS);
@@ -64,6 +66,10 @@ public class PortProvider {
 
     public static synchronized int getScrcpyRecordVideoPort() {
         return getAvaliablePort(SCRCPY_RECORD_VIDEO_PORTS);
+    }
+
+    public static synchronized int getPcDriverServiceAvailablePort() {
+        return getAvaliablePort(PC_DRIVER_SERVICE_PORTS);
     }
 
     private static int getAvaliablePort(int[] ports) {

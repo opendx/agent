@@ -5,6 +5,8 @@ import com.daxiang.core.android.AndroidDeviceChangeListener;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.core.ios.IosDeviceChangeListener;
 import com.daxiang.core.ios.IosDeviceMonitor;
+import com.daxiang.core.pcweb.Browser;
+import com.daxiang.core.pcweb.BrowserInitializer;
 import com.daxiang.utils.Terminal;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -32,23 +34,41 @@ public class AgentStartRunner implements ApplicationRunner {
     private boolean enableAndroid;
     @Value("${ios}")
     private boolean enableIos;
+    @Value("${pc-web}")
+    private boolean enablePcWeb;
 
     @Override
     public void run(ApplicationArguments args) throws IOException, InterruptedException {
-        // appium版本
-        String appiumVersion = AppiumServer.getVersion();
-        System.setProperty("appiumVersion", appiumVersion);
+        // 移动端
+        if (enableAndroid || enableIos) {
+            String appiumVersion = AppiumServer.getVersion();
+            checkAppiumVersion(appiumVersion);
+            System.setProperty("appiumVersion", appiumVersion);
 
-        if (!appiumVersion.matches("\\d+.\\d+.\\d+")) {
-            throw new IllegalStateException("appium版本错误: " + appiumVersion);
+            if (enableAndroid) {
+                ADB.killServer();
+                Thread.sleep(1000);
+                ADB.startServer();
+                ADB.addDeviceChangeListener(androidDeviceChangeListener);
+                log.info("[android]开始监听设备连接/断开");
+            } else {
+                log.info("[android]未开启Android功能");
+            }
+
+            if (enableIos) {
+                IosDeviceMonitor iosDeviceMonitor = IosDeviceMonitor.getInstance();
+                iosDeviceMonitor.start(iosDeviceChangeListener);
+                log.info("[ios]开始监听设备连接/断开");
+            } else {
+                log.info("[ios]未开启ios功能");
+            }
         }
 
-        String[] appiumVersionArr = appiumVersion.split("\\.");
-        int first = Integer.parseInt(appiumVersionArr[0]);
-        int middle = Integer.parseInt(appiumVersionArr[1]);
-
-        if (first < 1 || (first == 1 && middle < 16)) {
-            throw new IllegalStateException("appium版本必须>=1.16.0");
+        // pc端
+        if (enablePcWeb) {
+            new BrowserInitializer(Browser.PROPERTIES_PATH).init();
+        } else {
+            log.info("[web]未开启pc web功能");
         }
 
         // 是否配置了aapt
@@ -61,23 +81,19 @@ public class AgentStartRunner implements ApplicationRunner {
 
         // ffmpeg
         Terminal.execute("ffmpeg -version");
+    }
 
-        if (enableAndroid) {
-            ADB.killServer();
-            Thread.sleep(1000);
-            ADB.startServer();
-            ADB.addDeviceChangeListener(androidDeviceChangeListener);
-            log.info("[android]开始监听设备连接/断开");
-        } else {
-            log.info("[android]未开启Android功能");
+    private void checkAppiumVersion(String appiumVersion) {
+        if (StringUtils.isEmpty(appiumVersion) || !appiumVersion.matches("\\d+.\\d+.\\d+")) {
+            throw new IllegalStateException("appium版本错误: " + appiumVersion);
         }
 
-        if (enableIos) {
-            IosDeviceMonitor iosDeviceMonitor = IosDeviceMonitor.getInstance();
-            iosDeviceMonitor.start(iosDeviceChangeListener);
-            log.info("[ios]开始监听设备连接/断开");
-        } else {
-            log.info("[ios]未开启ios功能");
+        String[] appiumVersionArr = appiumVersion.split("\\.");
+        int first = Integer.parseInt(appiumVersionArr[0]);
+        int middle = Integer.parseInt(appiumVersionArr[1]);
+
+        if (first < 1 || (first == 1 && middle < 16)) {
+            throw new IllegalStateException("appium版本必须>=1.16.0");
         }
     }
 
