@@ -3,7 +3,7 @@ package com.daxiang.core.pcweb;
 import com.daxiang.core.PortProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.remote.service.DriverService;
-import org.springframework.util.StringUtils;
+import org.openqa.selenium.remote.service.DriverService.Builder;
 
 import java.io.File;
 import java.net.URL;
@@ -14,18 +14,18 @@ import java.net.URL;
 @Slf4j
 public class BrowserDriverServer {
 
-    private String builderClassName;
+    private Class<? extends Builder> builderClass;
     private File driverFile;
 
     private DriverService driverService;
     private boolean isRunning;
 
-    public BrowserDriverServer(String builderClassName, File driverFile) {
-        if (StringUtils.isEmpty(builderClassName) || driverFile == null || !driverFile.exists()) {
+    public BrowserDriverServer(Class<? extends Builder> builderClass, File driverFile) {
+        if (builderClass == null || driverFile == null || !driverFile.exists()) {
             throw new IllegalArgumentException();
         }
 
-        this.builderClassName = builderClassName;
+        this.builderClass = builderClass;
         this.driverFile = driverFile;
         isRunning = false;
     }
@@ -36,7 +36,7 @@ public class BrowserDriverServer {
         }
 
         try {
-            DriverService.Builder builder = (DriverService.Builder) Class.forName(builderClassName).newInstance();
+            DriverService.Builder builder = builderClass.newInstance();
 
             builder.usingDriverExecutable(driverFile);
             int port = PortProvider.getPcDriverServiceAvailablePort();

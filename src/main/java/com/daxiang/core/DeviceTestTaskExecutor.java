@@ -87,7 +87,7 @@ public class DeviceTestTaskExecutor {
 
         try {
             String className = "Test_" + UUIDUtil.getUUID();
-            String code = new TestNGCodeConverter().convert(deviceTestTask, className, "/codetemplate", "mobile.ftl");
+            String code = new TestNGCodeConverter().convert(deviceTestTask, className);
             log.info("[自动化测试][{}]deviceTestTaskId: {}, 转换代码: {}", deviceId, deviceTestTask.getId(), code);
             updateDeviceTestTaskCode(deviceTestTask.getId(), code);
 

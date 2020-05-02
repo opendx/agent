@@ -7,7 +7,7 @@ import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.model.Device;
 import com.daxiang.model.UploadFile;
 import com.daxiang.service.MobileService;
-import com.daxiang.websocket.MobileDeviceWebSocketSessionPool;
+import com.daxiang.websocket.WebSocketSessionPool;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.Dimension;
@@ -87,7 +87,7 @@ public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
         mobileService.saveOfflineDeviceToServer(mobileDevice);
 
         // 有人正在使用，则断开连接
-        Session openedSession = MobileDeviceWebSocketSessionPool.getOpenedSession(deviceId);
+        Session openedSession = WebSocketSessionPool.getOpenedSession(deviceId);
         if (openedSession != null) {
             try {
                 log.info("[ios][{}]sessionId: {}正在使用，关闭连接", deviceId, openedSession.getId());

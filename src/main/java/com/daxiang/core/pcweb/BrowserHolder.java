@@ -24,4 +24,12 @@ public class BrowserHolder {
         return new ArrayList<>(BROWSER_HOLDER.values());
     }
 
+    public static Browser getIdleBrowser(String browserId) {
+        Browser browser = get(browserId);
+        if (browser != null && browser.isIdle()) {
+            return browser;
+        }
+        return null;
+    }
+
 }

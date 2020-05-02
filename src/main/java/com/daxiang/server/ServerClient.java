@@ -2,6 +2,7 @@ package com.daxiang.server;
 
 import com.alibaba.fastjson.JSONObject;
 import com.daxiang.App;
+import com.daxiang.core.pcweb.Browser;
 import com.daxiang.model.Device;
 import com.daxiang.model.Response;
 import com.daxiang.model.UploadFile;
@@ -49,6 +50,8 @@ public class ServerClient {
     private String deviceListUrl;
     @Value("${server}/device/save")
     private String deviceSaveUrl;
+    @Value("${server}/browser/save")
+    private String browserSaveUrl;
     @Value("${server}/driver/downloadUrl")
     private String driverDownloadUrl;
 
@@ -97,11 +100,6 @@ public class ServerClient {
         }
     }
 
-    /**
-     * 通过设备id获取Device
-     *
-     * @return
-     */
     public Device getDeviceById(String deviceId) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("id", deviceId);
@@ -153,11 +151,6 @@ public class ServerClient {
         }
     }
 
-    /**
-     * 保存设备
-     *
-     * @param device
-     */
     public void saveDevice(Device device) {
         Response response = restTemplate.postForObject(deviceSaveUrl, device, Response.class);
         if (!response.isSuccess()) {
@@ -165,11 +158,13 @@ public class ServerClient {
         }
     }
 
-    /**
-     * 上传文件
-     *
-     * @return 下载地址
-     */
+    public void saveBrowser(Browser browser) {
+        Response response = restTemplate.postForObject(browserSaveUrl, browser, Response.class);
+        if (!response.isSuccess()) {
+            throw new RuntimeException(response.getMsg());
+        }
+    }
+
     public UploadFile uploadFile(File file, Integer fileType) {
         MultiValueMap<String, Object> multiValueMap = new LinkedMultiValueMap<>();
         multiValueMap.add("file", new FileSystemResource(file));
@@ -188,9 +183,6 @@ public class ServerClient {
         }
     }
 
-    /**
-     * 更新DeviceTestTask
-     */
     public void updateDeviceTestTask(DeviceTestTask deviceTestTask) {
         Response response = restTemplate.postForObject(updateDeviceTestTaskUrl, deviceTestTask, Response.class);
         if (!response.isSuccess()) {

@@ -14,6 +14,8 @@ import java.util.List;
  */
 @Data
 public class ActionDebugRequest {
+    @NotNull(message = "platform不能为空")
+    private Integer platform;
     @NotNull(message = "action不能为空")
     private Action action;
     private List<GlobalVar> globalVars;

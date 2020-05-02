@@ -42,7 +42,7 @@ public class ActionService {
 
             String className = "Debug_" + UUIDUtil.getUUID();
             String code = new TestNGCodeConverter()
-                    .convert(deviceTestTask, className, "/codetemplate", "mobile.ftl");
+                    .convert(deviceTestTask, className);
             log.info("[调试action][{}]code: {}", request.getDeviceId(), code);
 
             return compileAndDebug(className, code);

@@ -1,9 +1,8 @@
 [
-  {
-    "type": "",
-    "driverPath": "",
-    "version": "",
-    "name": "",
-    "path": ""
-  }
+	{
+		"driverPath":"",
+		"path":"",
+		"type":"",
+		"version":""
+	}
 ]

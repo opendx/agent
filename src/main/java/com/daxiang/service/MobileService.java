@@ -115,7 +115,6 @@ public class MobileService {
         if (mobileDevice.isConnected()) {
             Device device = mobileDevice.getDevice();
             device.setStatus(Device.USING_STATUS);
-            device.setUsername(device.getUsername());
             log.info("saveUsingDeviceToServer: {}", device);
             serverClient.saveDevice(device);
         }
@@ -133,7 +132,6 @@ public class MobileService {
     public void saveOfflineDeviceToServer(MobileDevice mobileDevice) {
         Device device = mobileDevice.getDevice();
         device.setStatus(Device.OFFLINE_STATUS);
-        device.setLastOfflineTime(new Date());
         log.info("saveOfflineDeviceToServer: {}", device);
         serverClient.saveDevice(device);
     }

@@ -1,7 +1,10 @@
 package com.daxiang.service;
 
+import com.daxiang.core.pcweb.Browser;
 import com.daxiang.core.pcweb.BrowserHolder;
 import com.daxiang.model.Response;
+import com.daxiang.server.ServerClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -11,14 +14,21 @@ import org.springframework.util.StringUtils;
 @Service
 public class BrowserService {
 
-    public Response getAll() {
-        return Response.success(BrowserHolder.getAll());
+    @Autowired
+    private ServerClient serverClient;
+
+    public Response getStatus(String browserId) {
+        return StringUtils.isEmpty(browserId) ? Response.success(BrowserHolder.getAll())
+                : Response.success(BrowserHolder.get(browserId));
     }
 
-    public Response findById(String id) {
-        if (!StringUtils.hasText(id)) {
-            return Response.fail("id不能为空");
-        }
-        return Response.success(BrowserHolder.get(id));
+    public void saveUsingBrowserToServer(Browser browser) {
+        browser.setStatus(browser.USING_STATUS);
+        serverClient.saveBrowser(browser);
+    }
+
+    public void saveIdleBrowserToServer(Browser browser) {
+        browser.setStatus(Browser.IDLE_STATUS);
+        serverClient.saveBrowser(browser);
     }
 }

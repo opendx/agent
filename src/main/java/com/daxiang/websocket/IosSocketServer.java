@@ -53,14 +53,14 @@ public class IosSocketServer {
             return;
         }
 
-        Session openedSession = MobileDeviceWebSocketSessionPool.getOpenedSession(deviceId);
+        Session openedSession = WebSocketSessionPool.getOpenedSession(deviceId);
         if (openedSession != null) {
             basicRemote.sendText(deviceId + "正在被" + openedSession.getId() + "连接占用，请稍后重试");
             session.close();
             return;
         }
 
-        MobileDeviceWebSocketSessionPool.put(deviceId, session);
+        WebSocketSessionPool.put(deviceId, session);
 
         iosDevice = (IosDevice) mobileDevice;
         iosDevice.getDevice().setUsername(username);
@@ -89,7 +89,7 @@ public class IosSocketServer {
         log.info("[ios-websocket][{}]onClose", deviceId);
 
         if (iosDevice != null) {
-            MobileDeviceWebSocketSessionPool.remove(deviceId);
+            WebSocketSessionPool.remove(deviceId);
             iosDevice.stopMjpegServerIproxy();
             iosDevice.quitAppiumDriver();
             mobileService.saveIdleDeviceToServer(iosDevice);

@@ -7,20 +7,20 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by jiangyitao.
  */
-public class MobileDeviceWebSocketSessionPool {
+public class WebSocketSessionPool {
 
     private static final Map<String, Session> SESSION_POOL = new ConcurrentHashMap<>();
 
-    public static void put(String deviceId, Session session) {
-        SESSION_POOL.put(deviceId, session);
+    public static void put(String id, Session session) {
+        SESSION_POOL.put(id, session);
     }
 
-    public static void remove(String deviceId) {
-        SESSION_POOL.remove(deviceId);
+    public static void remove(String id) {
+        SESSION_POOL.remove(id);
     }
 
-    public static Session getOpenedSession(String deviceId) {
-        Session session = SESSION_POOL.get(deviceId);
+    public static Session getOpenedSession(String id) {
+        Session session = SESSION_POOL.get(id);
         if (session != null && session.isOpen()) {
             return session;
         } else {

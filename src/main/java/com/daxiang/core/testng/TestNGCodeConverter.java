@@ -1,7 +1,7 @@
 package com.daxiang.core.testng;
 
 import com.alibaba.fastjson.JSONObject;
-import com.daxiang.action.appium.BasicAction;
+import com.daxiang.action.BaseAction;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.model.action.*;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
@@ -35,7 +35,7 @@ public class TestNGCodeConverter {
     /**
      * 转换为testng代码
      */
-    public String convert(DeviceTestTask deviceTestTask, String className, String ftlBasePackagePath, String ftlFileName) throws TestNGCodeConvertException {
+    public String convert(DeviceTestTask deviceTestTask, String className) throws TestNGCodeConvertException {
         Map<String, Object> dataModel = new HashMap();
         List<Action> actionTreeList = new ArrayList<>();
 
@@ -89,13 +89,16 @@ public class TestNGCodeConverter {
         dataModel.put("className", className);
         dataModel.put("actionPrefix", ACTION_PREFIX);
         dataModel.put("testcasePrefix", TESTCASE_PREFIX);
-        dataModel.put("executeJavaCodeActionId", BasicAction.EXECUTE_JAVA_CODE_ID);
+        dataModel.put("executeJavaCodeActionId", BaseAction.EXECUTE_JAVA_CODE_ID);
 
         handleJavaImports();
         dataModel.put("javaImports", javaImports);
 
         dataModel.put("deviceTestTask", deviceTestTask);
         dataModel.put("isAndroid", MobileDeviceHolder.get(deviceTestTask.getDeviceId()).isAndroid());
+
+        String ftlBasePackagePath = "/codetemplate";
+        String ftlFileName = "mobile.ftl";
 
         try {
             return FreemarkerUtil.process(ftlBasePackagePath, ftlFileName, dataModel);
@@ -139,7 +142,7 @@ public class TestNGCodeConverter {
         javaImports.add("import org.testng.SkipException");
         javaImports.add("import com.daxiang.core.testng.TestCaseTestListener");
         javaImports.add("import com.daxiang.core.testng.DebugActionTestListener");
-        javaImports.add("import com.daxiang.action.appium.BasicAction");
+        javaImports.add("import com.daxiang.action.*");
         javaImports.add("import org.openqa.selenium.*");
         javaImports.add("import org.openqa.selenium.support.*");
         javaImports.add("import java.util.*");
@@ -199,7 +202,7 @@ public class TestNGCodeConverter {
         }
 
         // 2019-10-02 新增内嵌代码ExecuteJavaCode，ExecuteJavaCode.ID是不需要调用的
-        cachedActions.remove(BasicAction.EXECUTE_JAVA_CODE_ID);
+        cachedActions.remove(BaseAction.EXECUTE_JAVA_CODE_ID);
     }
 
     /**
@@ -231,7 +234,7 @@ public class TestNGCodeConverter {
                     if (!CollectionUtils.isEmpty(paramValues)) {
                         for (ParamValue paramValue : paramValues) {
                             // 2019-10-02 ExecuteJavaCode直接嵌入代码，无需做处理
-                            if (step.getActionId() != BasicAction.EXECUTE_JAVA_CODE_ID) {
+                            if (step.getActionId() != BaseAction.EXECUTE_JAVA_CODE_ID) {
                                 paramValue.setParamValue(handleValue(paramValue.getParamValue()));
                             }
                         }

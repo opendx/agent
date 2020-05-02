@@ -5,7 +5,6 @@ import com.daxiang.core.android.AndroidDeviceChangeListener;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.core.ios.IosDeviceChangeListener;
 import com.daxiang.core.ios.IosDeviceMonitor;
-import com.daxiang.core.pcweb.Browser;
 import com.daxiang.core.pcweb.BrowserInitializer;
 import com.daxiang.utils.Terminal;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +28,8 @@ public class AgentStartRunner implements ApplicationRunner {
     private AndroidDeviceChangeListener androidDeviceChangeListener;
     @Autowired
     private IosDeviceChangeListener iosDeviceChangeListener;
+    @Autowired
+    private BrowserInitializer browserInitializer;
 
     @Value("${android}")
     private boolean enableAndroid;
@@ -66,7 +67,7 @@ public class AgentStartRunner implements ApplicationRunner {
 
         // pc端
         if (enablePcWeb) {
-            new BrowserInitializer(Browser.PROPERTIES_PATH).init();
+            browserInitializer.init();
         } else {
             log.info("[web]未开启pc web功能");
         }
