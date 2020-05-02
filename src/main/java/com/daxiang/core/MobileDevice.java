@@ -1,5 +1,6 @@
 package com.daxiang.core;
 
+import com.alibaba.fastjson.JSONObject;
 import com.daxiang.model.page.Page;
 import com.daxiang.server.ServerClient;
 import com.daxiang.core.appium.AppiumDriverFactory;
@@ -44,14 +45,9 @@ public abstract class MobileDevice {
         deviceTestTaskExecutor = new DeviceTestTaskExecutor(this);
     }
 
-    public AppiumDriver initAppiumDriver() {
-        appiumDriver = AppiumDriverFactory.initAppiumDriver(this);
-        return appiumDriver;
-    }
-
-    public AppiumDriver freshAppiumDriver(Integer platform) {
+    public AppiumDriver freshAppiumDriver(JSONObject capabilities) {
         quitAppiumDriver();
-        appiumDriver = AppiumDriverFactory.create(this, platform);
+        appiumDriver = AppiumDriverFactory.create(this, capabilities);
         return appiumDriver;
     }
 

@@ -7,6 +7,7 @@ import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.android.AndroidDevice;
 import com.daxiang.core.android.scrcpy.Scrcpy;
+import com.daxiang.server.ServerClient;
 import com.daxiang.service.MobileService;
 import com.google.common.collect.ImmutableMap;
 import io.appium.java_client.AppiumDriver;
@@ -23,7 +24,7 @@ import java.io.IOException;
  */
 @Slf4j
 @Component
-@ServerEndpoint(value = "/scrcpy/android/{deviceId}/user/{username}/platform/{platform}")
+@ServerEndpoint(value = "/scrcpy/android/{deviceId}/user/{username}/project/{projectId}")
 public class AndroidScrcpySocketServer {
 
     private MobileService mobileService;
@@ -33,7 +34,7 @@ public class AndroidScrcpySocketServer {
     private Scrcpy scrcpy;
 
     @OnOpen
-    public void onOpen(@PathParam("deviceId") String deviceId, @PathParam("username") String username, @PathParam("platform") Integer platform, Session session) throws Exception {
+    public void onOpen(@PathParam("deviceId") String deviceId, @PathParam("username") String username, @PathParam("projectId") Integer projectId, Session session) throws Exception {
         log.info("[android-scrcpy-websocket][{}]onOpen: username -> {}", deviceId, username);
         this.deviceId = deviceId;
 
@@ -71,8 +72,10 @@ public class AndroidScrcpySocketServer {
             }
         });
 
+        JSONObject caps = ServerClient.getInstance().getCapabilitiesByProjectId(projectId);
+
         remoteEndpoint.sendText("初始化appium driver...");
-        AppiumDriver appiumDriver = androidDevice.freshAppiumDriver(platform);
+        AppiumDriver appiumDriver = androidDevice.freshAppiumDriver(caps);
         remoteEndpoint.sendText("初始化appium driver完成");
 
         remoteEndpoint.sendText(JSON.toJSONString(ImmutableMap.of("appiumSessionId", appiumDriver.getSessionId().toString())));

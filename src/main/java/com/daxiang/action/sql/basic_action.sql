@@ -65,7 +65,7 @@ VALUES
   '清除APK数据[clearApkData]',
   '$.clearApkData',
   'void',
-  '[1,3,4]',
+  '[1]',
   '[{"name":"packageName","type":"String","description":"包名"}]'
 );
 
@@ -84,7 +84,7 @@ VALUES
   '启动/重启Apk[restartApk]',
   '$.restartApk',
   'void',
-  '[1,3,4]',
+  '[1]',
   '[{"name":"packageName","type":"String","description":"包名"},{"name":"launchActivity","type":"String","description":"启动Activity名"}]'
 );
 

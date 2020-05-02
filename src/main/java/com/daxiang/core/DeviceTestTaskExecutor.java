@@ -1,5 +1,6 @@
 package com.daxiang.core;
 
+import com.alibaba.fastjson.JSONObject;
 import com.daxiang.App;
 import com.daxiang.server.ServerClient;
 import com.daxiang.core.javacompile.JavaCompiler;
@@ -12,6 +13,7 @@ import com.daxiang.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.dvare.dynamic.exceptions.DynamicCompilerException;
+import org.springframework.util.StringUtils;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -90,7 +92,17 @@ public class DeviceTestTaskExecutor {
             updateDeviceTestTaskCode(deviceTestTask.getId(), code);
 
             Class clazz = JavaCompiler.compile(className, code);
-            mobileDevice.freshAppiumDriver(deviceTestTask.getPlatform());
+
+            JSONObject caps = new JSONObject();
+            try {
+                if (StringUtils.hasText(deviceTestTask.getCapabilities())) {
+                    caps = JSONObject.parseObject(deviceTestTask.getCapabilities());
+                }
+            } catch (Exception e) {
+                log.warn("parse capabilities fail, deviceTestTask: {}", deviceTestTask, e);
+            }
+            mobileDevice.freshAppiumDriver(caps);
+
             TestNGRunner.runTestCases(new Class[]{clazz}, deviceTestTask.getTestPlan().getFailRetryCount());
         } catch (TestNGCodeConvertException | DynamicCompilerException e) {
             log.error("[自动化测试][{}]deviceTestTaskId: {}", deviceId, deviceTestTask.getId(), e);

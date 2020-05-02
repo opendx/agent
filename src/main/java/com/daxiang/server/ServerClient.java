@@ -1,5 +1,6 @@
 package com.daxiang.server;
 
+import com.alibaba.fastjson.JSONObject;
 import com.daxiang.App;
 import com.daxiang.model.Device;
 import com.daxiang.model.Response;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
@@ -41,12 +43,12 @@ public class ServerClient {
 
     @Value("${server}/upload/file/{fileType}")
     private String uploadFileUrl;
-
+    @Value("${server}/project/list")
+    private String projectListUrl;
     @Value("${server}/device/list")
     private String deviceListUrl;
     @Value("${server}/device/save")
     private String deviceSaveUrl;
-
     @Value("${server}/driver/downloadUrl")
     private String driverDownloadUrl;
 
@@ -62,6 +64,37 @@ public class ServerClient {
             INSTANCE = App.getBean(ServerClient.class);
         }
         return INSTANCE;
+    }
+
+    public JSONObject getCapabilitiesByProjectId(Integer projectId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("id", projectId + "");
+
+        Response<List<Map<String, String>>> response = restTemplate.exchange(projectListUrl,
+                HttpMethod.POST,
+                new HttpEntity(params, headers),
+                new ParameterizedTypeReference<Response<List<Map<String, String>>>>() {
+                }).getBody();
+
+        if (response.isSuccess()) {
+            Optional<Map<String, String>> project = response.getData().stream().findFirst();
+            if (project.isPresent()) {
+                String capabilities = project.get().get("capabilities");
+                if (StringUtils.hasText(capabilities)) {
+                    try {
+                        return JSONObject.parseObject(capabilities);
+                    } catch (Exception ign) {
+                    }
+                }
+            }
+
+            return new JSONObject();
+        } else {
+            throw new RuntimeException(response.getMsg());
+        }
     }
 
     /**

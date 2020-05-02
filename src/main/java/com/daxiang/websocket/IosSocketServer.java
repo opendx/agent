@@ -7,6 +7,7 @@ import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.ios.IosDevice;
 import com.daxiang.core.ios.IosUtil;
+import com.daxiang.server.ServerClient;
 import com.daxiang.service.MobileService;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.touch.WaitOptions;
@@ -24,7 +25,7 @@ import java.time.Duration;
  */
 @Slf4j
 @Component
-@ServerEndpoint(value = "/ios/{deviceId}/user/{username}/platform/{platform}")
+@ServerEndpoint(value = "/ios/{deviceId}/user/{username}/project/{projectId}")
 public class IosSocketServer {
 
     private MobileService mobileService;
@@ -38,7 +39,7 @@ public class IosSocketServer {
     long pressStartTime;
 
     @OnOpen
-    public void onOpen(@PathParam("deviceId") String deviceId, @PathParam("username") String username, @PathParam("platform") Integer platform, Session session) throws Exception {
+    public void onOpen(@PathParam("deviceId") String deviceId, @PathParam("username") String username, @PathParam("projectId") Integer projectId, Session session) throws Exception {
         log.info("[ios-websocket][{}]onOpen: username -> {}", deviceId, username);
         this.deviceId = deviceId;
 
@@ -67,12 +68,15 @@ public class IosSocketServer {
         mobileService = App.getBean(MobileService.class);
         mobileService.saveUsingDeviceToServer(iosDevice);
 
-        JSONObject response = new JSONObject();
+        JSONObject caps = ServerClient.getInstance().getCapabilitiesByProjectId(projectId);
 
         basicRemote.sendText("初始化appium driver...");
-        response.put("appiumSessionId", mobileDevice.freshAppiumDriver(platform).getSessionId().toString());
-        response.put("mjpegServerPort", ((IosDevice) mobileDevice).getMjpegServerPort());
+        String sessionId = mobileDevice.freshAppiumDriver(caps).getSessionId().toString();
         basicRemote.sendText("初始化appium driver完成");
+
+        JSONObject response = new JSONObject();
+        response.put("appiumSessionId", sessionId);
+        response.put("mjpegServerPort", iosDevice.getMjpegServerPort());
 
         // 转发本地端口到wdaMjpegServer,这样可以通过localhost访问到wdaMjpegServer获取屏幕数据
         iosDevice.startMjpegServerIproxy();

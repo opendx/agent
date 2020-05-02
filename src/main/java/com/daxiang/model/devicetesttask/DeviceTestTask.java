@@ -35,6 +35,7 @@ public class DeviceTestTask {
 
     private Integer id;
     private Integer platform;
+    private String capabilities;
     private Integer testTaskId;
     private String deviceId;
     private Integer status;

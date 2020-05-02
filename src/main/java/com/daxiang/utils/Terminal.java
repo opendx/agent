@@ -42,13 +42,13 @@ public class Terminal {
             executor.setStreamHandler(pumpStreamHandler);
 
             if (showLog) {
-                log.info("[==>]{}", command);
+                log.info("[=>]{}", command);
             }
             executor.execute(createCommandLine(command));
 
             String result = outputStream.toString() + errorStream.toString();
             if (showLog) {
-                log.info("[<==]{}", result);
+                log.info("[<=]{}", result);
             }
 
             if (!StringUtils.isEmpty(result)) {
@@ -90,11 +90,11 @@ public class Terminal {
         executor.setWatchdog(watchdog);
 
         if (showLog) {
-            log.info("[==>]{}", command);
+            log.info("[=>]{}", command);
             PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(new LogOutputStream() {
                 @Override
                 protected void processLine(String line, int i) {
-                    log.info("[<==]{}", line);
+                    log.info("[<=]{}", line);
                 }
             });
             executor.setStreamHandler(pumpStreamHandler);

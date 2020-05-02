@@ -43,7 +43,7 @@ public class AgentStartRunner implements ApplicationRunner {
         if (enableAndroid || enableIos) {
             String appiumVersion = AppiumServer.getVersion();
             checkAppiumVersion(appiumVersion);
-            System.setProperty("appiumVersion", appiumVersion);
+            System.setProperty("appium.version", appiumVersion);
 
             if (enableAndroid) {
                 ADB.killServer();

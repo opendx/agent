@@ -1,5 +1,6 @@
 package com.daxiang.core.android;
 
+import com.alibaba.fastjson.JSONObject;
 import com.android.ddmlib.*;
 import com.daxiang.server.ServerClient;
 import com.daxiang.core.MobileDeviceHolder;
@@ -179,8 +180,14 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
             log.info("[android][{}]安装{}完成", deviceId, APIDEMOS_APK);
         }
 
+        JSONObject caps = new JSONObject();
+        caps.put("skipServerInstallation", false);
+        caps.put("skipDeviceInitialization", false);
+        caps.put("skipUnlock", false);
+        caps.put("skipLogcatCapture", false);
+
         log.info("[android][{}]开始初始化appium", deviceId);
-        AppiumDriver appiumDriver = androidDevice.initAppiumDriver();
+        AppiumDriver appiumDriver = androidDevice.freshAppiumDriver(caps);
         log.info("[android][{}]初始化appium完成", deviceId);
 
         // 截图并上传到服务器
