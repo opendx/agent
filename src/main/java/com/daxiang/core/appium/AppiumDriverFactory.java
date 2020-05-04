@@ -115,7 +115,7 @@ public class AppiumDriverFactory {
 
         // **** 以上caps可被传入的capabilities覆盖 ****
 
-        if (CollectionUtils.isEmpty(capabilities)) {
+        if (!CollectionUtils.isEmpty(capabilities)) {
             caps.putAll(capabilities);
         }
 
