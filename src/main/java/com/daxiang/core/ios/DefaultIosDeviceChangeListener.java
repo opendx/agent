@@ -31,17 +31,17 @@ public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
     private MobileService mobileService;
 
     @Override
-    public void onDeviceConnected(String deviceId) {
-        new Thread(() -> iosDeviceConnected(deviceId)).start();
+    public void onDeviceConnected(String deviceId, boolean isRealDevice) {
+        new Thread(() -> iosDeviceConnected(deviceId, isRealDevice)).start();
     }
 
     @Override
-    public void onDeviceDisconnected(String deviceId) {
-        new Thread(() -> iosDeviceDisconnected(deviceId)).start();
+    public void onDeviceDisconnected(String deviceId, boolean isRealDevice) {
+        new Thread(() -> iosDeviceDisconnected(deviceId, isRealDevice)).start();
     }
 
-    private void iosDeviceConnected(String deviceId) {
-        log.info("[ios][{}]已连接", deviceId);
+    private void iosDeviceConnected(String deviceId, boolean isRealDevice) {
+        log.info("[ios][{}]已连接, 是否真机: {}", deviceId, isRealDevice);
 
         MobileDevice mobileDevice = MobileDeviceHolder.get(deviceId);
         if (mobileDevice == null) {
@@ -57,7 +57,7 @@ public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
             if (device == null) {
                 log.info("[ios][{}]首次接入server，开始初始化设备", deviceId);
                 try {
-                    mobileDevice = initIosDevice(deviceId, appiumServer);
+                    mobileDevice = initIosDevice(deviceId, isRealDevice, appiumServer);
                     log.info("[ios][{}]初始化设备完成", deviceId);
                 } catch (Exception e) {
                     appiumServer.stop();
@@ -77,8 +77,8 @@ public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
         log.info("[ios][{}]iosDeviceConnected处理完成", deviceId);
     }
 
-    private void iosDeviceDisconnected(String deviceId) {
-        log.info("[ios][{}]断开连接", deviceId);
+    private void iosDeviceDisconnected(String deviceId, boolean isRealDevice) {
+        log.info("[ios][{}]断开连接, 是否真机: {}", deviceId, isRealDevice);
         MobileDevice mobileDevice = MobileDeviceHolder.get(deviceId);
         if (mobileDevice == null) {
             return;
@@ -100,24 +100,32 @@ public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
         log.info("[ios][{}]iosDeviceDisconnected处理完成", deviceId);
     }
 
-    private MobileDevice initIosDevice(String deviceId, AppiumServer appiumServer) throws Exception {
+    private MobileDevice initIosDevice(String deviceId, boolean isRealDevice, AppiumServer appiumServer) throws Exception {
         Device device = new Device();
 
         device.setPlatform(MobileDevice.IOS);
         device.setCreateTime(new Date());
         device.setId(deviceId);
-        device.setSystemVersion(IosUtil.getSystemVersion(deviceId));
-        device.setName(IosUtil.getDeviceName(deviceId));
+        device.setName(IosUtil.getDeviceName(deviceId, isRealDevice));
 
-        String msg = "请根据productType：" + IosUtil.getProductType(deviceId) + "查出相应的信息，补充到device表";
-        device.setCpuInfo(msg);
-        device.setMemSize(msg);
+        if (isRealDevice) {
+            device.setSystemVersion(IosUtil.getRealDeviceSystemVersion(deviceId));
+        }
 
         IosDevice iosDevice = new IosDevice(device, appiumServer);
 
         log.info("[ios][{}]开始初始化appium", deviceId);
         AppiumDriver appiumDriver = iosDevice.freshAppiumDriver(null);
         log.info("[ios][{}]初始化appium完成", deviceId);
+
+        if (!isRealDevice) {
+            try {
+                String sdkVersion = (String) appiumDriver.getSessionDetail("sdkVersion");
+                device.setSystemVersion(sdkVersion);
+            } catch (Exception e) {
+                log.warn("[ios][{}]获取sdkVersion失败", deviceId, e);
+            }
+        }
 
         // 有时window获取的宽高可能为0
         while (true) {

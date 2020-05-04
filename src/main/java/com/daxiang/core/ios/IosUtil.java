@@ -8,6 +8,9 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Created by jiangyitao.
@@ -15,17 +18,52 @@ import java.util.*;
 @Slf4j
 public class IosUtil {
 
-    public static List<String> getDeviceList(boolean showLog) {
+    /**
+     * 获取正在连接的真机列表
+     *
+     * @param showLog
+     * @return
+     */
+    public static Set<String> getRealDeviceList(boolean showLog) {
+        String cmd = "idevice_id -l";
         try {
-            String result = Terminal.execute("idevice_id -l", showLog);
-            if (StringUtils.isEmpty(result)) {
-                return Collections.emptyList();
+            String cmdResponse = Terminal.execute(cmd, showLog);
+            if (!StringUtils.hasText(cmdResponse)) {
+                return Collections.emptySet();
             }
 
-            return Arrays.asList(result.split("\\r?\\n"));
-        } catch (IOException e) {
-            log.error("execute 'idevice_id -l' err", e);
-            return Collections.emptyList();
+            return Arrays.asList(cmdResponse.split("\\r?\\n")).stream().collect(Collectors.toSet());
+        } catch (Exception e) {
+            log.error("execute " + cmd + " err", e);
+            return Collections.emptySet();
+        }
+    }
+
+    /**
+     * 获取正在运行的模拟器列表
+     *
+     * @param showLog
+     * @return
+     */
+    public static Set<String> getSimulatorList(boolean showLog) {
+        String cmd = "xcrun simctl list devices |grep Booted";
+        try {
+            String cmdResponse = Terminal.execute(cmd, showLog);
+            if (!StringUtils.hasText(cmdResponse)) {
+                return Collections.emptySet();
+            }
+
+            Set<String> simulatorIds = new HashSet<>();
+
+            Matcher matcher = Pattern.compile("\\((.*-.*?)\\)").matcher(cmdResponse);
+            while (matcher.find()) {
+                simulatorIds.add(matcher.group(1));
+            }
+
+            return simulatorIds;
+        } catch (Exception e) {
+            log.error("execute " + cmd + " err", e);
+            return Collections.emptySet();
         }
     }
 
@@ -34,30 +72,17 @@ public class IosUtil {
      * @return eg. 10.3.4
      * @throws IOException
      */
-    public static String getSystemVersion(String deviceId) throws IOException {
+    public static String getRealDeviceSystemVersion(String deviceId) throws IOException {
         return Terminal.execute("ideviceinfo -k ProductVersion -u " + deviceId);
     }
 
-    /**
-     * @param deviceId
-     * @return eg. iPhone5,2
-     * @throws IOException
-     */
-    public static String getProductType(String deviceId) throws IOException {
-        return Terminal.execute("ideviceinfo -k ProductType -u " + deviceId);
-    }
-
-    public static String getDeviceName(String deviceId) throws IOException {
-        return Terminal.execute("ideviceinfo -k DeviceName -u " + deviceId);
-    }
-
-    // http://appium.io/docs/en/commands/mobile-command/
-    public static void pressHome(AppiumDriver appiumDriver) {
-        appiumDriver.executeScript("mobile:pressButton", ImmutableMap.of("name", "home"));
-    }
-
-    public static void installIpa(String ipaPath, String deviceId) throws IOException {
-        Terminal.execute("ideviceinstaller -i " + ipaPath + " -u " + deviceId);
+    public static String getDeviceName(String deviceId, boolean isRealDevice) throws IOException {
+        if (isRealDevice) {
+            return Terminal.execute("ideviceinfo -k DeviceName -u " + deviceId);
+        } else {
+            String cmdResponse = Terminal.execute("xcrun simctl list devices |grep " + deviceId);
+            return cmdResponse.substring(0, cmdResponse.indexOf("(")).trim();
+        }
     }
 
     public static void uninstallApp(AppiumDriver appiumDriver, String bundleId) {
@@ -71,5 +96,10 @@ public class IosUtil {
     // Terminates an existing application on the device. If the application is not running then the returned result will be false, otherwise true
     public static boolean terminateApp(AppiumDriver appiumDriver, String bundleId) {
         return (Boolean) appiumDriver.executeScript("mobile: terminateApp", ImmutableMap.of("bundleId", bundleId));
+    }
+
+    // http://appium.io/docs/en/commands/mobile-command/
+    public static void pressHome(AppiumDriver appiumDriver) {
+        appiumDriver.executeScript("mobile:pressButton", ImmutableMap.of("name", "home"));
     }
 }

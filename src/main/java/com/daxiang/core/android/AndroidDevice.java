@@ -87,12 +87,15 @@ public class AndroidDevice extends MobileDevice {
     }
 
     @Override
-    public void installApp(File appFile) throws InstallException {
+    public void installApp(File appFile) {
         ScheduledExecutorService service = handleInstallBtnAsync();
         try {
+            // 若使用appium安装，将导致handleInstallBtnAsync无法继续处理安装时的弹窗
+            // 主要因为appium server无法在安装app时，响应其他请求，所以这里用ddmlib安装
             AndroidUtil.installApk(iDevice, appFile.getAbsolutePath());
+        } catch (InstallException e) {
+            throw new RuntimeException("安装app失败", e);
         } finally {
-            FileUtils.deleteQuietly(appFile);
             if (!service.isShutdown()) {
                 service.shutdown();
             }

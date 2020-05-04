@@ -89,7 +89,13 @@ public abstract class MobileDevice {
         }
     }
 
-    public abstract void installApp(File appFile) throws Exception;
+    public void installApp(File appFile) {
+        try {
+            appiumDriver.installApp(appFile.getAbsolutePath());
+        } finally {
+            FileUtils.deleteQuietly(appFile);
+        }
+    }
 
     public abstract void uninstallApp(String app) throws Exception;
 

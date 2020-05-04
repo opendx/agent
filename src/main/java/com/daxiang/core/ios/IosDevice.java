@@ -36,15 +36,6 @@ public class IosDevice extends MobileDevice {
     }
 
     @Override
-    public void installApp(File appFile) throws IOException {
-        try {
-            IosUtil.installIpa(appFile.getAbsolutePath(), getId());
-        } finally {
-            FileUtils.deleteQuietly(appFile);
-        }
-    }
-
-    @Override
     public void uninstallApp(String app) {
         IosUtil.uninstallApp(appiumDriver, app);
     }

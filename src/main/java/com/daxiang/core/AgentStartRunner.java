@@ -86,7 +86,7 @@ public class AgentStartRunner implements ApplicationRunner {
 
     private void checkAppiumVersion(String appiumVersion) {
         if (StringUtils.isEmpty(appiumVersion) || !appiumVersion.matches("\\d+.\\d+.\\d+")) {
-            throw new IllegalStateException("appium版本错误: " + appiumVersion);
+            throw new IllegalArgumentException("appium版本错误: " + appiumVersion);
         }
 
         String[] appiumVersionArr = appiumVersion.split("\\.");
@@ -94,7 +94,7 @@ public class AgentStartRunner implements ApplicationRunner {
         int middle = Integer.parseInt(appiumVersionArr[1]);
 
         if (first < 1 || (first == 1 && middle < 16)) {
-            throw new IllegalStateException("appium版本必须>=1.16.0");
+            throw new IllegalArgumentException("appium版本必须>=1.16.0");
         }
     }
 
