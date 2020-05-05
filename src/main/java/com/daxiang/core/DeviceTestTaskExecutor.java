@@ -40,8 +40,8 @@ public class DeviceTestTaskExecutor {
         this.deviceId = mobileDevice.getId();
 
         executeTestTaskThread = new Thread(() -> {
+            DeviceTestTask deviceTestTask;
             while (true) {
-                DeviceTestTask deviceTestTask;
                 try {
                     deviceTestTask = testTaskQueue.take(); // 没有测试任务，线程阻塞在此
                 } catch (InterruptedException e) {

@@ -136,6 +136,7 @@ public class Scrcpy {
                 }
 
                 byte[] packet = new byte[1024 * 1024];
+                int packetSize;
 
                 while (isRunning) {
                     // Scrcpy.server - ScreenEncoder.java
@@ -146,7 +147,7 @@ public class Scrcpy {
                         screenStream.read();
                     }
 
-                    int packetSize = IOUtil.readInt(screenStream);
+                    packetSize = IOUtil.readInt(screenStream);
                     if (packetSize > packet.length) {
                         packet = new byte[packetSize];
                     }

@@ -7,8 +7,11 @@ import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.ios.IosDevice;
 import com.daxiang.core.ios.IosUtil;
+import com.daxiang.core.ios.WdaMjpegInputStream;
 import com.daxiang.server.ServerClient;
 import com.daxiang.service.MobileService;
+import com.google.common.collect.ImmutableMap;
+import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.PointOption;
@@ -18,6 +21,9 @@ import org.springframework.stereotype.Component;
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.Duration;
 
 /**
@@ -71,17 +77,32 @@ public class IosSocketServer {
         JSONObject caps = ServerClient.getInstance().getCapabilitiesByProjectId(projectId);
 
         basicRemote.sendText("初始化appium driver...");
-        String sessionId = mobileDevice.freshAppiumDriver(caps).getSessionId().toString();
+        AppiumDriver driver = mobileDevice.freshAppiumDriver(caps);
         basicRemote.sendText("初始化appium driver完成");
 
-        JSONObject response = new JSONObject();
-        response.put("appiumSessionId", sessionId);
-        response.put("mjpegServerPort", iosDevice.getMjpegServerPort());
-
         // 转发本地端口到wdaMjpegServer,这样可以通过localhost访问到wdaMjpegServer获取屏幕数据
-        iosDevice.startMjpegServerIproxy();
+        int mjpegServerPort = iosDevice.startMjpegServerIproxy();
+        String mjpegServerUrl = "http://localhost:" + mjpegServerPort;
 
-        basicRemote.sendText(JSON.toJSONString(response));
+        URL url = new URL(mjpegServerUrl);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setConnectTimeout(30000); // ms
+        connection.setReadTimeout(30000); // ms
+        connection.connect();
+
+        new Thread(() -> {
+            try (InputStream in = connection.getInputStream();
+                 WdaMjpegInputStream wdaIn = new WdaMjpegInputStream(in)) {
+                while (true) {
+                    basicRemote.sendBinary(wdaIn.readImg());
+                }
+            } catch (Exception e) {
+                log.info("[ios-websocket][{}]{}", deviceId, e.getMessage());
+            }
+            log.info("[ios-websocket][{}]停止发送图片数据", deviceId);
+        }).start();
+
+        basicRemote.sendText(JSON.toJSONString(ImmutableMap.of("appiumSessionId", driver.getSessionId().toString())));
     }
 
     @OnClose

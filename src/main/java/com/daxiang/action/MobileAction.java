@@ -188,8 +188,9 @@ public class MobileAction extends BaseAction {
 
         new Thread(() -> {
             long startTime = System.currentTimeMillis();
+            boolean success;
             while (System.currentTimeMillis() - startTime < _timeoutInSeconds * 1000) {
-                boolean success = acceptAlert();
+                success = acceptAlert();
                 if (_once && success) {
                     break;
                 }
@@ -221,8 +222,9 @@ public class MobileAction extends BaseAction {
 
         new Thread(() -> {
             long startTime = System.currentTimeMillis();
+            boolean success;
             while (System.currentTimeMillis() - startTime < _timeoutInSeconds * 1000) {
-                boolean success = dismissAlert();
+                success = dismissAlert();
                 if (_once && success) {
                     break;
                 }

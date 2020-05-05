@@ -89,11 +89,12 @@ public class IosDevice extends MobileDevice {
         return (int) ((long) mjpegServerPort);
     }
 
-    public void startMjpegServerIproxy() throws IOException {
+    public int startMjpegServerIproxy() throws IOException {
         int mjpegServerPort = getMjpegServerPort();
         String cmd = String.format(IPROXY_CMD, mjpegServerPort, mjpegServerPort, getId());
         log.info("[ios][{}]mjpegServer: {}", getId(), cmd);
         iproxyMjpegServerWatchdog = Terminal.executeAsyncAndGetWatchdog(cmd);
+        return mjpegServerPort;
     }
 
     public void stopMjpegServerIproxy() {

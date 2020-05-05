@@ -12,6 +12,7 @@ import java.nio.ByteBuffer;
 class MinicapFrameParser {
 
     private byte[] buffer = new byte[1024 * 1024];
+    private int frameSize;
 
     /**
      * 解析出图片数据
@@ -21,7 +22,7 @@ class MinicapFrameParser {
      * @return
      */
     public ByteBuffer parse(InputStream inputStream) throws IOException, MinicapFrameSizeException {
-        int frameSize = IOUtil.readUInt32LE(inputStream);
+        frameSize = IOUtil.readUInt32LE(inputStream);
         if (frameSize <= 0) {
             throw new MinicapFrameSizeException("获取图片数据失败,frameSize: " + frameSize);
         }
