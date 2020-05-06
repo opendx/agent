@@ -88,7 +88,19 @@ public class IosSocketServer {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setConnectTimeout(30000); // ms
         connection.setReadTimeout(30000); // ms
-        connection.connect();
+
+        long startTime = System.currentTimeMillis();
+        while (true) {
+            try {
+                connection.connect();
+                break;
+            } catch (Exception e) {
+                Thread.sleep(1000);
+            }
+            if (System.currentTimeMillis() - startTime > 15000) {
+                throw new RuntimeException(String.format("连接%s失败", mjpegServerUrl));
+            }
+        }
 
         new Thread(() -> {
             try (InputStream in = connection.getInputStream();
@@ -100,6 +112,7 @@ public class IosSocketServer {
                 log.info("[ios-websocket][{}]{}", deviceId, e.getMessage());
             }
             log.info("[ios-websocket][{}]停止发送图片数据", deviceId);
+            connection.disconnect();
         }).start();
 
         basicRemote.sendText(JSON.toJSONString(ImmutableMap.of("appiumSessionId", driver.getSessionId().toString())));

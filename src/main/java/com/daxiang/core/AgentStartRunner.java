@@ -63,6 +63,8 @@ public class AgentStartRunner implements ApplicationRunner {
             } else {
                 log.info("[ios]未开启ios功能");
             }
+        } else {
+            log.info("[mobile]未开启Android & iOS功能");
         }
 
         // pc端
