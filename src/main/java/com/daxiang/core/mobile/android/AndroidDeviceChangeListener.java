@@ -2,10 +2,10 @@ package com.daxiang.core.mobile.android;
 
 import com.alibaba.fastjson.JSONObject;
 import com.android.ddmlib.*;
-import com.daxiang.model.Mobile;
+import com.daxiang.core.mobile.Mobile;
 import com.daxiang.server.ServerClient;
 import com.daxiang.core.MobileDeviceHolder;
-import com.daxiang.core.MobileDevice;
+import com.daxiang.core.mobile.MobileDevice;
 import com.daxiang.core.mobile.android.scrcpy.Scrcpy;
 import com.daxiang.core.mobile.android.stf.AdbKit;
 import com.daxiang.core.mobile.android.stf.Minicap;

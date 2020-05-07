@@ -1,7 +1,7 @@
 package com.daxiang.action;
 
 import com.alibaba.fastjson.JSONObject;
-import com.daxiang.core.MobileDevice;
+import com.daxiang.core.mobile.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.utils.HttpUtil;
 import io.appium.java_client.AppiumDriver;

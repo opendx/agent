@@ -3,7 +3,7 @@ package com.daxiang.websocket;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.daxiang.App;
-import com.daxiang.core.MobileDevice;
+import com.daxiang.core.mobile.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.mobile.android.AndroidDevice;
 import com.daxiang.core.mobile.android.scrcpy.Scrcpy;

@@ -2,7 +2,7 @@ package com.daxiang.core.mobile.appium;
 
 import com.alibaba.fastjson.JSONObject;
 import com.daxiang.App;
-import com.daxiang.core.MobileDevice;
+import com.daxiang.core.mobile.MobileDevice;
 import com.daxiang.core.PortProvider;
 import com.daxiang.core.mobile.android.AndroidDevice;
 import com.daxiang.core.mobile.ios.IosDevice;

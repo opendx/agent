@@ -1,4 +1,4 @@
-package com.daxiang.core.pcweb;
+package com.daxiang.core.pc.web;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;

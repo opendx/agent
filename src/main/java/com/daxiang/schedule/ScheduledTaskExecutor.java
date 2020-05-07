@@ -1,6 +1,6 @@
 package com.daxiang.schedule;
 
-import com.daxiang.core.MobileDevice;
+import com.daxiang.core.mobile.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.server.ServerClient;
 import com.daxiang.model.devicetesttask.DeviceTestTask;

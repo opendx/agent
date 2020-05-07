@@ -2,8 +2,8 @@ package com.daxiang.websocket;
 
 import com.alibaba.fastjson.JSON;
 import com.daxiang.App;
-import com.daxiang.core.pcweb.Browser;
-import com.daxiang.core.pcweb.BrowserHolder;
+import com.daxiang.core.pc.web.Browser;
+import com.daxiang.core.pc.web.BrowserHolder;
 import com.daxiang.service.BrowserService;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;

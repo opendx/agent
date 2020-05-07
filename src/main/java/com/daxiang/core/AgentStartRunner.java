@@ -5,7 +5,7 @@ import com.daxiang.core.mobile.android.AndroidDeviceChangeListener;
 import com.daxiang.core.mobile.appium.AppiumServer;
 import com.daxiang.core.mobile.ios.IosDeviceChangeListener;
 import com.daxiang.core.mobile.ios.IosDeviceMonitor;
-import com.daxiang.core.pcweb.BrowserInitializer;
+import com.daxiang.core.pc.web.BrowserInitializer;
 import com.daxiang.utils.Terminal;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

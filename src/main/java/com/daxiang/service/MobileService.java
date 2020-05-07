@@ -1,9 +1,9 @@
 package com.daxiang.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.daxiang.core.MobileDevice;
+import com.daxiang.core.mobile.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
-import com.daxiang.model.Mobile;
+import com.daxiang.core.mobile.Mobile;
 import com.daxiang.model.Response;
 import com.daxiang.model.UploadFile;
 import com.daxiang.server.ServerClient;

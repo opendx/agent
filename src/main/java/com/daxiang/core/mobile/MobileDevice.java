@@ -1,7 +1,7 @@
-package com.daxiang.core;
+package com.daxiang.core.mobile;
 
 import com.alibaba.fastjson.JSONObject;
-import com.daxiang.model.Mobile;
+import com.daxiang.core.DeviceTestTaskExecutor;
 import com.daxiang.model.page.Page;
 import com.daxiang.server.ServerClient;
 import com.daxiang.core.mobile.appium.AppiumDriverFactory;

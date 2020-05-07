@@ -1,4 +1,4 @@
-package com.daxiang.core.pcweb;
+package com.daxiang.core.pc.web;
 
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.chrome.ChromeOptions;

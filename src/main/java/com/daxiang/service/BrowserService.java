@@ -1,7 +1,7 @@
 package com.daxiang.service;
 
-import com.daxiang.core.pcweb.Browser;
-import com.daxiang.core.pcweb.BrowserHolder;
+import com.daxiang.core.pc.web.Browser;
+import com.daxiang.core.pc.web.BrowserHolder;
 import com.daxiang.model.Response;
 import com.daxiang.server.ServerClient;
 import org.springframework.beans.factory.annotation.Autowired;

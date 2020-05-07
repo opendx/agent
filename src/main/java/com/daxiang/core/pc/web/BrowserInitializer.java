@@ -1,4 +1,4 @@
-package com.daxiang.core.pcweb;
+package com.daxiang.core.pc.web;
 
 import com.alibaba.fastjson.JSONArray;
 import com.daxiang.server.ServerClient;

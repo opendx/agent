@@ -1,4 +1,4 @@
-package com.daxiang.model;
+package com.daxiang.core.mobile;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;

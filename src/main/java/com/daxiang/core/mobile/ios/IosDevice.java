@@ -1,9 +1,9 @@
 package com.daxiang.core.mobile.ios;
 
-import com.daxiang.core.MobileDevice;
+import com.daxiang.core.mobile.MobileDevice;
 import com.daxiang.core.mobile.appium.AppiumServer;
 import com.daxiang.core.mobile.appium.IosNativePageSourceHandler;
-import com.daxiang.model.Mobile;
+import com.daxiang.core.mobile.Mobile;
 import com.daxiang.utils.Terminal;
 import com.daxiang.utils.UUIDUtil;
 import io.appium.java_client.ios.IOSDriver;

@@ -2,6 +2,7 @@ package com.daxiang.core;
 
 import com.alibaba.fastjson.JSONObject;
 import com.daxiang.App;
+import com.daxiang.core.mobile.MobileDevice;
 import com.daxiang.server.ServerClient;
 import com.daxiang.core.javacompile.JavaCompiler;
 import com.daxiang.core.testng.TestNGCodeConvertException;

@@ -2,8 +2,8 @@ package com.daxiang.server;
 
 import com.alibaba.fastjson.JSONObject;
 import com.daxiang.App;
-import com.daxiang.core.pcweb.Browser;
-import com.daxiang.model.Mobile;
+import com.daxiang.core.pc.web.Browser;
+import com.daxiang.core.mobile.Mobile;
 import com.daxiang.model.Response;
 import com.daxiang.model.UploadFile;
 import com.daxiang.model.devicetesttask.DeviceTestTask;

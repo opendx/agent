@@ -1,6 +1,6 @@
 package com.daxiang.core.testng;
 
-import com.daxiang.core.MobileDevice;
+import com.daxiang.core.mobile.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.model.devicetesttask.TestPlan;
 import lombok.Data;

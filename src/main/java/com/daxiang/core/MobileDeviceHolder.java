@@ -1,5 +1,6 @@
 package com.daxiang.core;
 
+import com.daxiang.core.mobile.MobileDevice;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.remote.MobileCapabilityType;
 import org.springframework.util.StringUtils;
