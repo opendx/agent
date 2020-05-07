@@ -1,6 +1,6 @@
 package com.daxiang.action;
 
-import com.daxiang.core.ios.IosUtil;
+import com.daxiang.core.mobile.ios.IosUtil;
 import io.appium.java_client.ios.IOSDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;

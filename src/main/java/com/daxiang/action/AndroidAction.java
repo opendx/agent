@@ -1,8 +1,8 @@
 package com.daxiang.action;
 
-import com.daxiang.core.android.AndroidDevice;
-import com.daxiang.core.android.AndroidUtil;
-import com.daxiang.core.android.IDeviceExecuteShellCommandException;
+import com.daxiang.core.mobile.android.AndroidDevice;
+import com.daxiang.core.mobile.android.AndroidUtil;
+import com.daxiang.core.mobile.android.IDeviceExecuteShellCommandException;
 import io.appium.java_client.android.AndroidDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;

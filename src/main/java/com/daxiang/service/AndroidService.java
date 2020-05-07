@@ -2,8 +2,8 @@ package com.daxiang.service;
 
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
-import com.daxiang.core.android.AndroidDevice;
-import com.daxiang.core.android.AndroidUtil;
+import com.daxiang.core.mobile.android.AndroidDevice;
+import com.daxiang.core.mobile.android.AndroidUtil;
 import com.daxiang.model.Response;
 import com.daxiang.utils.HttpUtil;
 import com.google.common.collect.ImmutableMap;
