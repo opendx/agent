@@ -30,7 +30,7 @@ public class Scrcpy {
     private static final String REMOTE_SCRCPY_PATH = AndroidDevice.TMP_FOLDER + "/scrcpy-server.jar";
 
     private IDevice iDevice;
-    private String deviceId;
+    private String mobileId;
 
     private int pid;
 
@@ -40,7 +40,7 @@ public class Scrcpy {
 
     public Scrcpy(IDevice iDevice) {
         this.iDevice = iDevice;
-        deviceId = iDevice.getSerialNumber();
+        mobileId = iDevice.getSerialNumber();
     }
 
     public void setIDevice(IDevice iDevice) {
@@ -72,16 +72,16 @@ public class Scrcpy {
                         "true " +                                           // sendFrameMeta
                         "true";                                             // control
 
-                log.info("[scrcpy][{}]start: {}", deviceId, startCmd);
+                log.info("[scrcpy][{}]start: {}", mobileId, startCmd);
                 iDevice.executeShellCommand(startCmd, new MultiLineReceiver() {
                     @Override
                     public void processNewLines(String[] lines) {
                         for (String line : lines) {
-                            log.info("[scrcpy][{}]{}", deviceId, line);
+                            log.info("[scrcpy][{}]{}", mobileId, line);
                             if (!StringUtils.isEmpty(line)) {
                                 if (line.contains("pid:")) { // [server] INFO: pid:11151
                                     pid = Integer.parseInt(line.substring(19));
-                                    log.info("[scrcpy][{}]进程id: {}", deviceId, pid);
+                                    log.info("[scrcpy][{}]进程id: {}", mobileId, pid);
                                 } else if (line.contains("wait for connection")) {
                                     countDownLatch.countDown();
                                 }
@@ -94,7 +94,7 @@ public class Scrcpy {
                         return false;
                     }
                 }, 0, TimeUnit.SECONDS);
-                log.info("[scrcpy][{}]已停止运行", deviceId);
+                log.info("[scrcpy][{}]已停止运行", mobileId);
                 isRunning = false;
             } catch (Exception e) {
                 throw new RuntimeException("启动scrcpy失败", e);
@@ -102,12 +102,12 @@ public class Scrcpy {
         }).start();
 
         countDownLatch.await(30, TimeUnit.SECONDS);
-        log.info("[scrcpy][{}]scrcpy启动完成", deviceId);
+        log.info("[scrcpy][{}]scrcpy启动完成", mobileId);
         isRunning = true;
 
         int localPort = PortProvider.getScrcpyAvailablePort();
 
-        log.info("[scrcpy][{}]adb forward: {} -> remote scrcpy", deviceId, localPort);
+        log.info("[scrcpy][{}]adb forward: {} -> remote scrcpy", mobileId, localPort);
         iDevice.createForward(localPort, "scrcpy", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
 
         new Thread(() -> {
@@ -119,10 +119,10 @@ public class Scrcpy {
                 // send one byte so the client may read() to detect a connection error
                 // videoSocket.getOutputStream().write(0);
                 if (screenStream.read() != 0) {
-                    throw new RuntimeException(String.format("device: %s, scrcpy connection error", deviceId));
+                    throw new RuntimeException(String.format("mobile: %s, scrcpy connection error", mobileId));
                 }
 
-                log.info("[scrcpy][{}]connect scrcpy success", deviceId);
+                log.info("[scrcpy][{}]connect scrcpy success", mobileId);
 
                 controlSocket = new Socket("127.0.0.1", localPort);
                 controlOutputStream = controlSocket.getOutputStream();
@@ -160,7 +160,7 @@ public class Scrcpy {
                 }
             } catch (IndexOutOfBoundsException ign) {
             } catch (Exception e) {
-                log.warn("[scrcpy][{}]处理scrcpy数据失败", deviceId, e);
+                log.warn("[scrcpy][{}]处理scrcpy数据失败", mobileId, e);
             } finally {
                 if (controlOutputStream != null) {
                     try {
@@ -175,14 +175,14 @@ public class Scrcpy {
                     }
                 }
             }
-            log.info("[scrcpy][{}]已停止消费scrcpy图片数据", deviceId);
+            log.info("[scrcpy][{}]已停止消费scrcpy图片数据", mobileId);
 
             // 移除adb forward
             try {
-                log.info("[scrcpy][{}]移除adb forward: {} -> remote scrcpy", deviceId, localPort);
+                log.info("[scrcpy][{}]移除adb forward: {} -> remote scrcpy", mobileId, localPort);
                 iDevice.removeForward(localPort, "scrcpy", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
             } catch (Exception e) {
-                log.error("[scrcpy][{}]移除adb forward出错", deviceId, e);
+                log.error("[scrcpy][{}]移除adb forward出错", mobileId, e);
             }
         }).start();
     }
@@ -191,20 +191,20 @@ public class Scrcpy {
         if (isRunning) {
             String cmd = "kill -9 " + pid;
             try {
-                log.info("[scrcpy][{}]kill scrcpy: {}", deviceId, cmd);
+                log.info("[scrcpy][{}]kill scrcpy: {}", mobileId, cmd);
                 iDevice.executeShellCommand(cmd, new NullOutputReceiver());
             } catch (Exception e) {
-                log.error("[scrcpy][{}]{}执行出错", deviceId, cmd, e);
+                log.error("[scrcpy][{}]{}执行出错", mobileId, cmd, e);
             }
         }
     }
 
     private void pushScrcpyToDevice() throws Exception {
-        log.info("[scrcpy][{}]push scrcpy to device, {} -> {}", deviceId, LOCAL_SCRCPY_PATH, REMOTE_SCRCPY_PATH);
+        log.info("[scrcpy][{}]push scrcpy to mobile, {} -> {}", mobileId, LOCAL_SCRCPY_PATH, REMOTE_SCRCPY_PATH);
         iDevice.pushFile(LOCAL_SCRCPY_PATH, REMOTE_SCRCPY_PATH);
 
         String chmodCmd = "chmod 777 " + REMOTE_SCRCPY_PATH;
-        log.info("[scrcpy][{}]{} ", deviceId, chmodCmd);
+        log.info("[scrcpy][{}]{} ", mobileId, chmodCmd);
         iDevice.executeShellCommand(chmodCmd, new NullOutputReceiver());
     }
 
@@ -297,7 +297,7 @@ public class Scrcpy {
             controlOutputStream.write(msg);
             controlOutputStream.flush();
         } catch (IOException e) {
-            log.error("[scrcpy][{}]commit msg err", deviceId, e);
+            log.error("[scrcpy][{}]commit msg err", mobileId, e);
         }
     }
 }

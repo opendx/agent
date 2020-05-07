@@ -29,12 +29,12 @@ public class MinicapInstaller {
             String localMinicapPath = String.format(Minicap.LOCAL_MINICAP_PATH, cpuAbi);
             String localMinicapSoPath = String.format(Minicap.LOCAL_MINICAP_SO_PATH, sdkVersion, cpuAbi);
 
-            // push minicap to device
-            log.info("[minicap][{}]push minicap to device, {} -> {}", deviceId, localMinicapPath, Minicap.REMOTE_MINICAP_PATH);
+            // push minicap to mobile
+            log.info("[minicap][{}]push minicap to mobile, {} -> {}", deviceId, localMinicapPath, Minicap.REMOTE_MINICAP_PATH);
             iDevice.pushFile(localMinicapPath, Minicap.REMOTE_MINICAP_PATH);
 
-            // push minicap.so to device
-            log.info("[minicap][{}]push minicap.so to device, {} -> {}", deviceId, localMinicapSoPath, Minicap.REMOTE_MINICAP_SO_PATH);
+            // push minicap.so to mobile
+            log.info("[minicap][{}]push minicap.so to mobile, {} -> {}", deviceId, localMinicapSoPath, Minicap.REMOTE_MINICAP_SO_PATH);
             iDevice.pushFile(localMinicapSoPath, Minicap.REMOTE_MINICAP_SO_PATH);
 
             String chmodCmd = String.format("chmod 777 %s %s", Minicap.REMOTE_MINICAP_PATH, Minicap.REMOTE_MINICAP_SO_PATH);

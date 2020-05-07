@@ -82,7 +82,7 @@ public class DeviceTestTaskExecutor {
         MobileService mobileService = App.getBean(MobileService.class);
 
         // 设备变为使用中
-        mobileDevice.getDevice().setUsername(deviceTestTask.getTestPlan().getName());
+        mobileDevice.getMobile().setUsername(deviceTestTask.getTestPlan().getName());
         mobileService.saveUsingDeviceToServer(mobileDevice);
 
         try {

@@ -3,6 +3,7 @@ package com.daxiang.core.android;
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.InstallException;
 import com.daxiang.App;
+import com.daxiang.model.Mobile;
 import com.daxiang.server.ServerClient;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.android.scrcpy.Scrcpy;
@@ -12,7 +13,6 @@ import com.daxiang.core.android.stf.Minicap;
 import com.daxiang.core.android.stf.Minitouch;
 import com.daxiang.core.appium.AndroidNativePageSourceHandler;
 import com.daxiang.core.appium.AppiumServer;
-import com.daxiang.model.Device;
 import com.daxiang.utils.HttpUtil;
 import com.daxiang.utils.Terminal;
 import com.daxiang.utils.UUIDUtil;
@@ -60,8 +60,8 @@ public class AndroidDevice extends MobileDevice {
 
     private boolean canUseAppiumRecordVideo = true;
 
-    public AndroidDevice(Device device, IDevice iDevice, AppiumServer appiumServer) {
-        super(device, appiumServer);
+    public AndroidDevice(Mobile mobile, IDevice iDevice, AppiumServer appiumServer) {
+        super(mobile, appiumServer);
         this.iDevice = iDevice;
     }
 

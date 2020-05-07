@@ -9,7 +9,7 @@ import java.util.Date;
  * Created by jiangyitao.
  */
 @Data
-public class Device {
+public class Mobile {
 
     public static final int OFFLINE_STATUS = 0;
     public static final int USING_STATUS = 1;

@@ -31,13 +31,13 @@ import java.time.Duration;
  */
 @Slf4j
 @Component
-@ServerEndpoint(value = "/ios/{deviceId}/user/{username}/project/{projectId}")
+@ServerEndpoint(value = "/ios/{mobileId}/user/{username}/project/{projectId}")
 public class IosSocketServer {
 
     private MobileService mobileService;
 
     private IosDevice iosDevice;
-    private String deviceId;
+    private String mobileId;
 
     PointOption downPointOption;
     PointOption moveToPointOption;
@@ -45,31 +45,31 @@ public class IosSocketServer {
     long pressStartTime;
 
     @OnOpen
-    public void onOpen(@PathParam("deviceId") String deviceId, @PathParam("username") String username, @PathParam("projectId") Integer projectId, Session session) throws Exception {
-        log.info("[ios-websocket][{}]onOpen: username -> {}", deviceId, username);
-        this.deviceId = deviceId;
+    public void onOpen(@PathParam("mobileId") String mobileId, @PathParam("username") String username, @PathParam("projectId") Integer projectId, Session session) throws Exception {
+        log.info("[ios-websocket][{}]onOpen: username -> {}", mobileId, username);
+        this.mobileId = mobileId;
 
         RemoteEndpoint.Basic basicRemote = session.getBasicRemote();
         basicRemote.sendText("ios websocket连接成功");
 
-        MobileDevice mobileDevice = MobileDeviceHolder.getIdleDevice(deviceId);
+        MobileDevice mobileDevice = MobileDeviceHolder.getIdleDevice(mobileId);
         if (mobileDevice == null) {
             basicRemote.sendText("设备未处于闲置状态，无法使用");
             session.close();
             return;
         }
 
-        Session openedSession = WebSocketSessionPool.getOpenedSession(deviceId);
+        Session openedSession = WebSocketSessionPool.getOpenedSession(mobileId);
         if (openedSession != null) {
-            basicRemote.sendText(deviceId + "正在被" + openedSession.getId() + "连接占用，请稍后重试");
+            basicRemote.sendText(mobileId + "正在被" + openedSession.getId() + "连接占用，请稍后重试");
             session.close();
             return;
         }
 
-        WebSocketSessionPool.put(deviceId, session);
+        WebSocketSessionPool.put(mobileId, session);
 
         iosDevice = (IosDevice) mobileDevice;
-        iosDevice.getDevice().setUsername(username);
+        iosDevice.getMobile().setUsername(username);
 
         mobileService = App.getBean(MobileService.class);
         mobileService.saveUsingDeviceToServer(iosDevice);
@@ -109,21 +109,21 @@ public class IosSocketServer {
                     basicRemote.sendBinary(wdaIn.readImg());
                 }
             } catch (Exception e) {
-                log.info("[ios-websocket][{}]{}", deviceId, e.getMessage());
+                log.info("[ios-websocket][{}]{}", mobileId, e.getMessage());
             }
-            log.info("[ios-websocket][{}]停止发送图片数据", deviceId);
+            log.info("[ios-websocket][{}]停止发送图片数据", mobileId);
             connection.disconnect();
         }).start();
 
-        basicRemote.sendText(JSON.toJSONString(ImmutableMap.of("appiumSessionId", driver.getSessionId().toString())));
+        basicRemote.sendText(JSON.toJSONString(ImmutableMap.of("driverSessionId", driver.getSessionId().toString())));
     }
 
     @OnClose
     public void onClose() {
-        log.info("[ios-websocket][{}]onClose", deviceId);
+        log.info("[ios-websocket][{}]onClose", mobileId);
 
         if (iosDevice != null) {
-            WebSocketSessionPool.remove(deviceId);
+            WebSocketSessionPool.remove(mobileId);
             iosDevice.stopMjpegServerIproxy();
             iosDevice.quitAppiumDriver();
             mobileService.saveIdleDeviceToServer(iosDevice);
@@ -132,7 +132,7 @@ public class IosSocketServer {
 
     @OnError
     public void onError(Throwable t) {
-        log.error("[ios-websocket][{}]onError", deviceId, t);
+        log.error("[ios-websocket][{}]onError", mobileId, t);
     }
 
     @OnMessage
@@ -175,8 +175,8 @@ public class IosSocketServer {
     }
 
     private PointOption getPointOption(int x, int y, int screenWidth, int screenHeight) {
-        int width = iosDevice.getDevice().getScreenWidth();
-        int height = iosDevice.getDevice().getScreenHeight();
+        int width = iosDevice.getMobile().getScreenWidth();
+        int height = iosDevice.getMobile().getScreenHeight();
 
         x = (int) (((float) x) / screenWidth * width);
         y = (int) (((float) y) / screenHeight * height);

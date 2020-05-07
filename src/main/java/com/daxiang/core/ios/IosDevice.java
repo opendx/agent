@@ -3,7 +3,7 @@ package com.daxiang.core.ios;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.appium.AppiumServer;
 import com.daxiang.core.appium.IosNativePageSourceHandler;
-import com.daxiang.model.Device;
+import com.daxiang.model.Mobile;
 import com.daxiang.utils.Terminal;
 import com.daxiang.utils.UUIDUtil;
 import io.appium.java_client.ios.IOSDriver;
@@ -25,14 +25,14 @@ import java.util.Base64;
 public class IosDevice extends MobileDevice {
 
     /**
-     * iproxy localPort remotePort deviceId
+     * iproxy localPort remotePort mobileId
      */
     private static final String IPROXY_CMD = "iproxy %d %d %s";
 
     private ExecuteWatchdog iproxyMjpegServerWatchdog;
 
-    public IosDevice(Device device, AppiumServer appiumServer) {
-        super(device, appiumServer);
+    public IosDevice(Mobile mobile, AppiumServer appiumServer) {
+        super(mobile, appiumServer);
     }
 
     @Override

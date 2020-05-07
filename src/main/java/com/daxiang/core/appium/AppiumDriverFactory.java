@@ -81,9 +81,9 @@ public class AppiumDriverFactory {
         }
 
         caps.put(MobileCapabilityType.UDID, androidDevice.getId());
-        caps.put(MobileCapabilityType.DEVICE_NAME, androidDevice.getDevice().getName());
+        caps.put(MobileCapabilityType.DEVICE_NAME, androidDevice.getMobile().getName());
         caps.put(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
-        caps.put(MobileCapabilityType.PLATFORM_VERSION, androidDevice.getDevice().getSystemVersion());
+        caps.put(MobileCapabilityType.PLATFORM_VERSION, androidDevice.getMobile().getSystemVersion());
         caps.put(MobileCapabilityType.NEW_COMMAND_TIMEOUT, NEW_COMMAND_TIMEOUT);
 
         return new AndroidDriver(androidDevice.getAppiumServer().getUrl(), new DesiredCapabilities(caps));
@@ -127,10 +127,10 @@ public class AppiumDriverFactory {
         caps.put("mjpegServerPort", PortProvider.getWdaMjpegServerAvailablePort());
         caps.put("webkitDebugProxyPort", PortProvider.getWebkitDebugProxyAvalilablePort());
 
-        caps.put(MobileCapabilityType.DEVICE_NAME, iosDevice.getDevice().getName());
+        caps.put(MobileCapabilityType.DEVICE_NAME, iosDevice.getMobile().getName());
         caps.put(MobileCapabilityType.UDID, iosDevice.getId());
         caps.put(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.IOS);
-        caps.put(MobileCapabilityType.PLATFORM_VERSION, iosDevice.getDevice().getSystemVersion());
+        caps.put(MobileCapabilityType.PLATFORM_VERSION, iosDevice.getMobile().getSystemVersion());
         caps.put(MobileCapabilityType.NEW_COMMAND_TIMEOUT, NEW_COMMAND_TIMEOUT);
 
         return new IOSDriver(iosDevice.getAppiumServer().getUrl(), new DesiredCapabilities(caps));

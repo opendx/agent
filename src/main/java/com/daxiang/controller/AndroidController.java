@@ -15,14 +15,14 @@ public class AndroidController {
     @Autowired
     private AndroidService androidService;
 
-    @GetMapping("/{deviceId}/adbkit/start")
-    public Response startAdbKit(@PathVariable String deviceId) {
-        return androidService.startAdbKit(deviceId);
+    @GetMapping("/{mobileId}/adbkit/start")
+    public Response startAdbKit(@PathVariable String mobileId) {
+        return androidService.startAdbKit(mobileId);
     }
 
-    @GetMapping("/{deviceId}/adbkit/stop")
-    public Response stop(@PathVariable String deviceId) {
-        return androidService.stopAdbKit(deviceId);
+    @GetMapping("/{mobileId}/adbkit/stop")
+    public Response stop(@PathVariable String mobileId) {
+        return androidService.stopAdbKit(mobileId);
     }
 
     @PostMapping("/aaptDumpBadging")
@@ -30,13 +30,13 @@ public class AndroidController {
         return androidService.aaptDumpBadging(apkDownloadUrl);
     }
 
-    @GetMapping("{deviceId}/imeList")
-    public Response getImeList(@PathVariable String deviceId) {
-        return androidService.getImeList(deviceId);
+    @GetMapping("{mobileId}/imeList")
+    public Response getImeList(@PathVariable String mobileId) {
+        return androidService.getImeList(mobileId);
     }
 
-    @PostMapping("{deviceId}/ime")
-    public Response setIme(@PathVariable String deviceId, String ime) {
-        return androidService.setIme(deviceId, ime);
+    @PostMapping("{mobileId}/ime")
+    public Response setIme(@PathVariable String mobileId, String ime) {
+        return androidService.setIme(mobileId, ime);
     }
 }

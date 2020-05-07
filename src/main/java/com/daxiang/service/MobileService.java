@@ -3,7 +3,7 @@ package com.daxiang.service;
 import com.alibaba.fastjson.JSONObject;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
-import com.daxiang.model.Device;
+import com.daxiang.model.Mobile;
 import com.daxiang.model.Response;
 import com.daxiang.model.UploadFile;
 import com.daxiang.server.ServerClient;
@@ -37,8 +37,8 @@ public class MobileService {
     @Autowired
     private ServerClient serverClient;
 
-    public Response screenshot(String deviceId) {
-        MobileDevice mobileDevice = MobileDeviceHolder.getConnectedDevice(deviceId);
+    public Response screenshot(String mobileId) {
+        MobileDevice mobileDevice = MobileDeviceHolder.getConnectedDevice(mobileId);
         if (mobileDevice == null) {
             return Response.fail("设备未连接");
         }
@@ -61,8 +61,8 @@ public class MobileService {
         return Response.success(response);
     }
 
-    public Response dump(String deviceId) {
-        MobileDevice mobileDevice = MobileDeviceHolder.getConnectedDevice(deviceId);
+    public Response dump(String mobileId) {
+        MobileDevice mobileDevice = MobileDeviceHolder.getConnectedDevice(mobileId);
         if (mobileDevice == null) {
             return Response.fail("设备未连接");
         }
@@ -75,8 +75,8 @@ public class MobileService {
         }
     }
 
-    public Response installApp(MultipartFile app, String deviceId) {
-        MobileDevice mobileDevice = MobileDeviceHolder.getConnectedDevice(deviceId);
+    public Response installApp(MultipartFile app, String mobileId) {
+        MobileDevice mobileDevice = MobileDeviceHolder.getConnectedDevice(mobileId);
         if (mobileDevice == null) {
             return Response.fail("设备未连接");
         }
@@ -102,48 +102,48 @@ public class MobileService {
     }
 
     public void saveOnlineDeviceToServer(MobileDevice mobileDevice) {
-        Device device = mobileDevice.getDevice();
-        device.setAgentIp(ip);
-        device.setAgentPort(port);
-        device.setStatus(Device.IDLE_STATUS);
-        device.setLastOnlineTime(new Date());
-        log.info("saveOnlineDeviceToServer: {}", device);
-        serverClient.saveDevice(device);
+        Mobile mobile = mobileDevice.getMobile();
+        mobile.setAgentIp(ip);
+        mobile.setAgentPort(port);
+        mobile.setStatus(Mobile.IDLE_STATUS);
+        mobile.setLastOnlineTime(new Date());
+        log.info("saveOnlineDeviceToServer: {}", mobile);
+        serverClient.saveDevice(mobile);
     }
 
     public void saveUsingDeviceToServer(MobileDevice mobileDevice) {
         if (mobileDevice.isConnected()) {
-            Device device = mobileDevice.getDevice();
-            device.setStatus(Device.USING_STATUS);
-            log.info("saveUsingDeviceToServer: {}", device);
-            serverClient.saveDevice(device);
+            Mobile mobile = mobileDevice.getMobile();
+            mobile.setStatus(Mobile.USING_STATUS);
+            log.info("saveUsingDeviceToServer: {}", mobile);
+            serverClient.saveDevice(mobile);
         }
     }
 
     public void saveIdleDeviceToServer(MobileDevice mobileDevice) {
         if (mobileDevice.isConnected()) {
-            Device device = mobileDevice.getDevice();
-            device.setStatus(Device.IDLE_STATUS);
-            log.info("saveIdleDeviceToServer: {}", device);
-            serverClient.saveDevice(device);
+            Mobile mobile = mobileDevice.getMobile();
+            mobile.setStatus(Mobile.IDLE_STATUS);
+            log.info("saveIdleDeviceToServer: {}", mobile);
+            serverClient.saveDevice(mobile);
         }
     }
 
     public void saveOfflineDeviceToServer(MobileDevice mobileDevice) {
-        Device device = mobileDevice.getDevice();
-        device.setStatus(Device.OFFLINE_STATUS);
-        log.info("saveOfflineDeviceToServer: {}", device);
-        serverClient.saveDevice(device);
+        Mobile mobile = mobileDevice.getMobile();
+        mobile.setStatus(Mobile.OFFLINE_STATUS);
+        log.info("saveOfflineDeviceToServer: {}", mobile);
+        serverClient.saveDevice(mobile);
     }
 
-    public Response getStatus(String deviceId) {
-        if (StringUtils.isEmpty(deviceId)) {
-            List<Device> devices = MobileDeviceHolder.getAll().stream()
-                    .map(MobileDevice::getDevice).collect(Collectors.toList());
-            return Response.success(devices);
+    public Response getStatus(String mobileId) {
+        if (StringUtils.isEmpty(mobileId)) {
+            List<Mobile> mobiles = MobileDeviceHolder.getAll().stream()
+                    .map(MobileDevice::getMobile).collect(Collectors.toList());
+            return Response.success(mobiles);
         } else {
-            MobileDevice mobileDevice = MobileDeviceHolder.get(deviceId);
-            return Objects.isNull(mobileDevice) ? Response.success() : Response.success(mobileDevice.getDevice());
+            MobileDevice mobileDevice = MobileDeviceHolder.get(mobileId);
+            return Objects.isNull(mobileDevice) ? Response.success() : Response.success(mobileDevice.getMobile());
         }
     }
 }

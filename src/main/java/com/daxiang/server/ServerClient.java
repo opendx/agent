@@ -3,7 +3,7 @@ package com.daxiang.server;
 import com.alibaba.fastjson.JSONObject;
 import com.daxiang.App;
 import com.daxiang.core.pcweb.Browser;
-import com.daxiang.model.Device;
+import com.daxiang.model.Mobile;
 import com.daxiang.model.Response;
 import com.daxiang.model.UploadFile;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
@@ -46,9 +46,9 @@ public class ServerClient {
     private String uploadFileUrl;
     @Value("${server}/project/list")
     private String projectListUrl;
-    @Value("${server}/device/list")
+    @Value("${server}/mobile/list")
     private String deviceListUrl;
-    @Value("${server}/device/save")
+    @Value("${server}/mobile/save")
     private String deviceSaveUrl;
     @Value("${server}/browser/save")
     private String browserSaveUrl;
@@ -100,17 +100,17 @@ public class ServerClient {
         }
     }
 
-    public Device getDeviceById(String deviceId) {
+    public Mobile getMobileById(String mobileId) {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("id", deviceId);
+        params.add("id", mobileId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        Response<List<Device>> response = restTemplate.exchange(deviceListUrl,
+        Response<List<Mobile>> response = restTemplate.exchange(deviceListUrl,
                 HttpMethod.POST,
                 new HttpEntity(params, headers),
-                new ParameterizedTypeReference<Response<List<Device>>>() {
+                new ParameterizedTypeReference<Response<List<Mobile>>>() {
                 }).getBody();
 
         if (response.isSuccess()) {
@@ -127,6 +127,7 @@ public class ServerClient {
      * @return
      */
     public Optional<String> getChromedriverDownloadUrl(String deviceId) {
+        // todo mobileId
         Assert.hasText(deviceId, "deviceId不能为空");
 
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
@@ -151,8 +152,8 @@ public class ServerClient {
         }
     }
 
-    public void saveDevice(Device device) {
-        Response response = restTemplate.postForObject(deviceSaveUrl, device, Response.class);
+    public void saveDevice(Mobile mobile) {
+        Response response = restTemplate.postForObject(deviceSaveUrl, mobile, Response.class);
         if (!response.isSuccess()) {
             throw new RuntimeException(response.getMsg());
         }

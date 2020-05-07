@@ -1,11 +1,11 @@
 package com.daxiang.core;
 
 import com.alibaba.fastjson.JSONObject;
+import com.daxiang.model.Mobile;
 import com.daxiang.model.page.Page;
 import com.daxiang.server.ServerClient;
 import com.daxiang.core.appium.AppiumDriverFactory;
 import com.daxiang.core.appium.AppiumServer;
-import com.daxiang.model.Device;
 import com.daxiang.model.FileType;
 import com.daxiang.model.UploadFile;
 import com.google.common.collect.ImmutableMap;
@@ -33,14 +33,14 @@ public abstract class MobileDevice {
     public static final int ANDROID = 1;
     public static final int IOS = 2;
 
-    protected Device device;
+    protected Mobile mobile;
     protected DeviceTestTaskExecutor deviceTestTaskExecutor;
 
     protected AppiumServer appiumServer;
     protected AppiumDriver appiumDriver;
 
-    public MobileDevice(Device device, AppiumServer appiumServer) {
-        this.device = device;
+    public MobileDevice(Mobile mobile, AppiumServer appiumServer) {
+        this.mobile = mobile;
         this.appiumServer = appiumServer;
         deviceTestTaskExecutor = new DeviceTestTaskExecutor(this);
     }
@@ -61,15 +61,15 @@ public abstract class MobileDevice {
     }
 
     public String getId() {
-        return device.getId();
+        return mobile.getId();
     }
 
     public boolean isConnected() {
-        return device.getStatus() != Device.OFFLINE_STATUS;
+        return mobile.getStatus() != Mobile.OFFLINE_STATUS;
     }
 
     public boolean isIdle() {
-        return device.getStatus() == Device.IDLE_STATUS;
+        return mobile.getStatus() == Mobile.IDLE_STATUS;
     }
 
     public boolean isNativeContext() {
@@ -138,6 +138,6 @@ public abstract class MobileDevice {
     }
 
     public boolean isAndroid() {
-        return device.getPlatform() == ANDROID;
+        return mobile.getPlatform() == ANDROID;
     }
 }

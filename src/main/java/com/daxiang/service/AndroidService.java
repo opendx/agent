@@ -21,8 +21,8 @@ import java.io.IOException;
 @Service
 public class AndroidService {
 
-    public Response startAdbKit(String deviceId) {
-        MobileDevice mobileDevice = MobileDeviceHolder.getConnectedDevice(deviceId);
+    public Response startAdbKit(String mobileId) {
+        MobileDevice mobileDevice = MobileDeviceHolder.getConnectedDevice(mobileId);
         if (mobileDevice == null) {
             return Response.fail("设备未连接");
         }
@@ -36,8 +36,8 @@ public class AndroidService {
         }
     }
 
-    public Response stopAdbKit(String deviceId) {
-        MobileDevice mobileDevice = MobileDeviceHolder.getConnectedDevice(deviceId);
+    public Response stopAdbKit(String mobileId) {
+        MobileDevice mobileDevice = MobileDeviceHolder.getConnectedDevice(mobileId);
         if (mobileDevice == null) {
             return Response.fail("设备未连接");
         }
@@ -61,8 +61,8 @@ public class AndroidService {
         }
     }
 
-    public Response getImeList(String deviceId) {
-        MobileDevice device = MobileDeviceHolder.getConnectedDevice(deviceId);
+    public Response getImeList(String mobileId) {
+        MobileDevice device = MobileDeviceHolder.getConnectedDevice(mobileId);
         if (device == null) {
             return Response.fail("设备未连接");
         }
@@ -75,8 +75,8 @@ public class AndroidService {
         }
     }
 
-    public Response setIme(String deviceId, String ime) {
-        MobileDevice device = MobileDeviceHolder.getConnectedDevice(deviceId);
+    public Response setIme(String mobileId, String ime) {
+        MobileDevice device = MobileDeviceHolder.getConnectedDevice(mobileId);
         if (device == null) {
             return Response.fail("设备未连接");
         }

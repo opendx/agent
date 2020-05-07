@@ -24,41 +24,41 @@ import java.io.IOException;
  */
 @Slf4j
 @Component
-@ServerEndpoint(value = "/scrcpy/android/{deviceId}/user/{username}/project/{projectId}")
+@ServerEndpoint(value = "/scrcpy/android/{mobileId}/user/{username}/project/{projectId}")
 public class AndroidScrcpySocketServer {
 
     private MobileService mobileService;
 
     private AndroidDevice androidDevice;
-    private String deviceId;
+    private String mobileId;
     private Scrcpy scrcpy;
 
     @OnOpen
-    public void onOpen(@PathParam("deviceId") String deviceId, @PathParam("username") String username, @PathParam("projectId") Integer projectId, Session session) throws Exception {
-        log.info("[android-scrcpy-websocket][{}]onOpen: username -> {}", deviceId, username);
-        this.deviceId = deviceId;
+    public void onOpen(@PathParam("mobileId") String mobileId, @PathParam("username") String username, @PathParam("projectId") Integer projectId, Session session) throws Exception {
+        log.info("[android-scrcpy-websocket][{}]onOpen: username -> {}", mobileId, username);
+        this.mobileId = mobileId;
 
         RemoteEndpoint.Basic remoteEndpoint = session.getBasicRemote();
         remoteEndpoint.sendText("android scrcpy websocket连接成功");
 
-        MobileDevice mobileDevice = MobileDeviceHolder.getIdleDevice(deviceId);
+        MobileDevice mobileDevice = MobileDeviceHolder.getIdleDevice(mobileId);
         if (mobileDevice == null) {
             remoteEndpoint.sendText("设备未处于闲置状态，无法使用");
             session.close();
             return;
         }
 
-        Session openedSession = WebSocketSessionPool.getOpenedSession(deviceId);
+        Session openedSession = WebSocketSessionPool.getOpenedSession(mobileId);
         if (openedSession != null) {
-            remoteEndpoint.sendText(deviceId + "正在被" + openedSession.getId() + "连接占用，请稍后重试");
+            remoteEndpoint.sendText(mobileId + "正在被" + openedSession.getId() + "连接占用，请稍后重试");
             session.close();
             return;
         }
 
-        WebSocketSessionPool.put(deviceId, session);
+        WebSocketSessionPool.put(mobileId, session);
 
         androidDevice = (AndroidDevice) mobileDevice;
-        androidDevice.getDevice().setUsername(username);
+        androidDevice.getMobile().setUsername(username);
 
         mobileService = App.getBean(MobileService.class);
         mobileService.saveUsingDeviceToServer(androidDevice);
@@ -68,7 +68,7 @@ public class AndroidScrcpySocketServer {
             try {
                 remoteEndpoint.sendBinary(imgData);
             } catch (IOException e) {
-                log.error("[android-scrcpy-websocket][{}]发送scrcpy数据异常", deviceId, e);
+                log.error("[android-scrcpy-websocket][{}]发送scrcpy数据异常", mobileId, e);
             }
         });
 
@@ -78,15 +78,15 @@ public class AndroidScrcpySocketServer {
         AppiumDriver appiumDriver = androidDevice.freshAppiumDriver(caps);
         remoteEndpoint.sendText("初始化appium driver完成");
 
-        remoteEndpoint.sendText(JSON.toJSONString(ImmutableMap.of("appiumSessionId", appiumDriver.getSessionId().toString())));
+        remoteEndpoint.sendText(JSON.toJSONString(ImmutableMap.of("driverSessionId", appiumDriver.getSessionId().toString())));
     }
 
     @OnClose
     public void onClose() {
-        log.info("[android-scrcpy-websocket][{}]onClose", deviceId);
+        log.info("[android-scrcpy-websocket][{}]onClose", mobileId);
 
         if (androidDevice != null) {
-            WebSocketSessionPool.remove(deviceId);
+            WebSocketSessionPool.remove(mobileId);
             scrcpy.stop();
             androidDevice.quitAppiumDriver();
             mobileService.saveIdleDeviceToServer(androidDevice);
@@ -95,7 +95,7 @@ public class AndroidScrcpySocketServer {
 
     @OnError
     public void onError(Throwable t) {
-        log.error("[android-scrcpy-websocket][{}]onError", deviceId, t);
+        log.error("[android-scrcpy-websocket][{}]onError", mobileId, t);
     }
 
     @OnMessage

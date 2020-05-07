@@ -25,47 +25,47 @@ import java.io.IOException;
  */
 @Slf4j
 @Component
-@ServerEndpoint(value = "/stf/android/{deviceId}/user/{username}/project/{projectId}")
+@ServerEndpoint(value = "/stf/android/{mobileId}/user/{username}/project/{projectId}")
 public class AndroidStfSocketServer {
 
     private MobileService mobileService;
 
     private AndroidDevice androidDevice;
     private AndroidDriver androidDriver;
-    private String deviceId;
+    private String mobileId;
 
     @OnOpen
-    public void onOpen(@PathParam("deviceId") String deviceId, @PathParam("username") String username, @PathParam("projectId") Integer projectId, Session session) throws Exception {
-        log.info("[android-stf-websocket][{}]onOpen: username -> {}", deviceId, username);
-        this.deviceId = deviceId;
+    public void onOpen(@PathParam("mobileId") String mobileId, @PathParam("username") String username, @PathParam("projectId") Integer projectId, Session session) throws Exception {
+        log.info("[android-stf-websocket][{}]onOpen: username -> {}", mobileId, username);
+        this.mobileId = mobileId;
 
         RemoteEndpoint.Basic remoteEndpoint = session.getBasicRemote();
         remoteEndpoint.sendText("android stf websocket连接成功");
 
-        MobileDevice mobileDevice = MobileDeviceHolder.getIdleDevice(deviceId);
+        MobileDevice mobileDevice = MobileDeviceHolder.getIdleDevice(mobileId);
         if (mobileDevice == null) {
             remoteEndpoint.sendText("设备未处于闲置状态，无法使用");
             session.close();
             return;
         }
 
-        Session openedSession = WebSocketSessionPool.getOpenedSession(deviceId);
+        Session openedSession = WebSocketSessionPool.getOpenedSession(mobileId);
         if (openedSession != null) {
-            remoteEndpoint.sendText(deviceId + "正在被" + openedSession.getId() + "连接占用，请稍后重试");
+            remoteEndpoint.sendText(mobileId + "正在被" + openedSession.getId() + "连接占用，请稍后重试");
             session.close();
             return;
         }
 
-        WebSocketSessionPool.put(deviceId, session);
+        WebSocketSessionPool.put(mobileId, session);
 
         androidDevice = (AndroidDevice) mobileDevice;
-        androidDevice.getDevice().setUsername(username);
+        androidDevice.getMobile().setUsername(username);
 
         mobileService = App.getBean(MobileService.class);
         mobileService.saveUsingDeviceToServer(androidDevice);
 
-        int width = mobileDevice.getDevice().getScreenWidth();
-        int height = mobileDevice.getDevice().getScreenHeight();
+        int width = mobileDevice.getMobile().getScreenWidth();
+        int height = mobileDevice.getMobile().getScreenHeight();
         String realResolution = width + "x" + height;
         String virtualResolution = width / 2 + "x" + height / 2;
 
@@ -79,7 +79,7 @@ public class AndroidStfSocketServer {
                     try {
                         remoteEndpoint.sendBinary(minicapImgData);
                     } catch (IOException e) {
-                        log.error("[android-stf-websocket][{}]发送minicap数据异常", deviceId, e);
+                        log.error("[android-stf-websocket][{}]发送minicap数据异常", mobileId, e);
                     }
                 });
         remoteEndpoint.sendText("启动minicap完成");
@@ -94,15 +94,15 @@ public class AndroidStfSocketServer {
         androidDriver = (AndroidDriver)androidDevice.freshAppiumDriver(caps);
         remoteEndpoint.sendText("初始化appium driver完成");
 
-        remoteEndpoint.sendText(JSON.toJSONString(ImmutableMap.of("appiumSessionId", androidDriver.getSessionId().toString())));
+        remoteEndpoint.sendText(JSON.toJSONString(ImmutableMap.of("driverSessionId", androidDriver.getSessionId().toString())));
     }
 
     @OnClose
     public void onClose() {
-        log.info("[android-stf-websocket][{}]onClose", deviceId);
+        log.info("[android-stf-websocket][{}]onClose", mobileId);
 
         if (androidDevice != null) {
-            WebSocketSessionPool.remove(deviceId);
+            WebSocketSessionPool.remove(mobileId);
             androidDevice.getMinitouch().stop();
             androidDevice.getMinicap().stop();
             androidDevice.quitAppiumDriver();
@@ -112,7 +112,7 @@ public class AndroidStfSocketServer {
 
     @OnError
     public void onError(Throwable t) {
-        log.error("[android-stf-websocket][{}]onError", deviceId, t);
+        log.error("[android-stf-websocket][{}]onError", mobileId, t);
     }
 
 

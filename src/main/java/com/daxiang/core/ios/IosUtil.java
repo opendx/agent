@@ -93,7 +93,7 @@ public class IosUtil {
         appiumDriver.executeScript("mobile: launchApp", ImmutableMap.of("bundleId", bundleId));
     }
 
-    // Terminates an existing application on the device. If the application is not running then the returned result will be false, otherwise true
+    // Terminates an existing application on the mobile. If the application is not running then the returned result will be false, otherwise true
     public static boolean terminateApp(AppiumDriver appiumDriver, String bundleId) {
         return (Boolean) appiumDriver.executeScript("mobile: terminateApp", ImmutableMap.of("bundleId", bundleId));
     }

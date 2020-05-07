@@ -22,16 +22,16 @@ public class MinitouchInstaller {
      */
     public void install() throws StfComponentInstallException {
         try {
-            String deviceId = iDevice.getSerialNumber();
+            String mobileId = iDevice.getSerialNumber();
 
             String cpuAbi = AndroidUtil.getCpuAbi(iDevice);
             String localMinitouchPath = String.format(Minitouch.LOCAL_MINITOUCH_PATH, cpuAbi);
 
-            log.info("[minitouch][{}]push minitouch to device, {} -> {}", deviceId, localMinitouchPath, Minitouch.REMOTE_MINITOUCH_PATH);
+            log.info("[minitouch][{}]push minitouch to mobile, {} -> {}", mobileId, localMinitouchPath, Minitouch.REMOTE_MINITOUCH_PATH);
             iDevice.pushFile(localMinitouchPath, Minitouch.REMOTE_MINITOUCH_PATH);
 
             String chmodCmd = "chmod 777 " + Minitouch.REMOTE_MINITOUCH_PATH;
-            log.info("[minitouch][{}]{} ", deviceId, chmodCmd);
+            log.info("[minitouch][{}]{} ", mobileId, chmodCmd);
             iDevice.executeShellCommand(chmodCmd, new NullOutputReceiver());
         } catch (Exception e) {
             throw new StfComponentInstallException(e);

@@ -2,7 +2,7 @@ package com.daxiang.core.testng;
 
 import com.alibaba.fastjson.JSONObject;
 import com.daxiang.action.BaseAction;
-import com.daxiang.core.Platform;
+import com.daxiang.core.ProjectPlatform;
 import com.daxiang.model.action.*;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.model.devicetesttask.Testcase;
@@ -95,7 +95,7 @@ public class TestNGCodeConverter {
         dataModel.put("javaImports", javaImports);
 
         dataModel.put("deviceTestTask", deviceTestTask);
-        dataModel.put("isAndroid", deviceTestTask.getPlatform() == Platform.ANDROID);
+        dataModel.put("isAndroid", deviceTestTask.getPlatform() == ProjectPlatform.ANDROID);
 
         String ftlBasePackagePath = "/codetemplate";
         String ftlFileName = "mobile.ftl";

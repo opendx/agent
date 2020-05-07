@@ -16,23 +16,23 @@ public class MobileController {
     @Autowired
     private MobileService mobileService;
 
-    @PostMapping("/{deviceId}/installApp")
-    public Response installApp(MultipartFile app, @PathVariable String deviceId) {
-        return mobileService.installApp(app, deviceId);
+    @PostMapping("/{mobileId}/installApp")
+    public Response installApp(MultipartFile app, @PathVariable String mobileId) {
+        return mobileService.installApp(app, mobileId);
     }
 
-    @GetMapping("/{deviceId}/dump")
-    public Response dump(@PathVariable String deviceId) {
-        return mobileService.dump(deviceId);
+    @GetMapping("/{mobileId}/dump")
+    public Response dump(@PathVariable String mobileId) {
+        return mobileService.dump(mobileId);
     }
 
-    @GetMapping("/{deviceId}/screenshot")
-    public Response screenshot(@PathVariable String deviceId) {
-        return mobileService.screenshot(deviceId);
+    @GetMapping("/{mobileId}/screenshot")
+    public Response screenshot(@PathVariable String mobileId) {
+        return mobileService.screenshot(mobileId);
     }
 
     @GetMapping("/status")
-    public Response status(String deviceId) {
-        return mobileService.getStatus(deviceId);
+    public Response status(String mobileId) {
+        return mobileService.getStatus(mobileId);
     }
 }

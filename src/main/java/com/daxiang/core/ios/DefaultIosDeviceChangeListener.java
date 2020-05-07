@@ -1,10 +1,10 @@
 package com.daxiang.core.ios;
 
+import com.daxiang.model.Mobile;
 import com.daxiang.server.ServerClient;
 import com.daxiang.core.MobileDevice;
 import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.core.appium.AppiumServer;
-import com.daxiang.model.Device;
 import com.daxiang.model.UploadFile;
 import com.daxiang.service.MobileService;
 import com.daxiang.websocket.WebSocketSessionPool;
@@ -31,55 +31,55 @@ public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
     private MobileService mobileService;
 
     @Override
-    public void onDeviceConnected(String deviceId, boolean isRealDevice) {
-        new Thread(() -> iosDeviceConnected(deviceId, isRealDevice)).start();
+    public void onDeviceConnected(String mobileId, boolean isRealDevice) {
+        new Thread(() -> iosDeviceConnected(mobileId, isRealDevice)).start();
     }
 
     @Override
-    public void onDeviceDisconnected(String deviceId, boolean isRealDevice) {
-        new Thread(() -> iosDeviceDisconnected(deviceId, isRealDevice)).start();
+    public void onDeviceDisconnected(String mobileId, boolean isRealDevice) {
+        new Thread(() -> iosDeviceDisconnected(mobileId, isRealDevice)).start();
     }
 
-    private void iosDeviceConnected(String deviceId, boolean isRealDevice) {
-        log.info("[ios][{}]已连接, 是否真机: {}", deviceId, isRealDevice);
+    private void iosDeviceConnected(String mobileId, boolean isRealDevice) {
+        log.info("[ios][{}]已连接, 是否真机: {}", mobileId, isRealDevice);
 
-        MobileDevice mobileDevice = MobileDeviceHolder.get(deviceId);
+        MobileDevice mobileDevice = MobileDeviceHolder.get(mobileId);
         if (mobileDevice == null) {
-            log.info("[ios][{}]首次在agent上线", deviceId);
+            log.info("[ios][{}]首次在agent上线", mobileId);
 
-            log.info("[ios][{}]启动appium server...", deviceId);
+            log.info("[ios][{}]启动appium server...", mobileId);
             AppiumServer appiumServer = new AppiumServer();
             appiumServer.start();
-            log.info("[ios][{}]启动appium server完成，url: {}", deviceId, appiumServer.getUrl());
+            log.info("[ios][{}]启动appium server完成，url: {}", mobileId, appiumServer.getUrl());
 
-            log.info("[ios][{}]检查是否已接入过server", deviceId);
-            Device device = serverClient.getDeviceById(deviceId);
-            if (device == null) {
-                log.info("[ios][{}]首次接入server，开始初始化设备", deviceId);
+            log.info("[ios][{}]检查是否已接入过server", mobileId);
+            Mobile mobile = serverClient.getMobileById(mobileId);
+            if (mobile == null) {
+                log.info("[ios][{}]首次接入server，开始初始化设备", mobileId);
                 try {
-                    mobileDevice = initIosDevice(deviceId, isRealDevice, appiumServer);
-                    log.info("[ios][{}]初始化设备完成", deviceId);
+                    mobileDevice = initIosDevice(mobileId, isRealDevice, appiumServer);
+                    log.info("[ios][{}]初始化设备完成", mobileId);
                 } catch (Exception e) {
                     appiumServer.stop();
-                    throw new RuntimeException("初始化设备" + deviceId + "出错", e);
+                    throw new RuntimeException("初始化设备" + mobileId + "出错", e);
                 }
             } else {
-                log.info("[ios][{}]已接入过server", deviceId);
-                mobileDevice = new IosDevice(device, appiumServer);
+                log.info("[ios][{}]已接入过server", mobileId);
+                mobileDevice = new IosDevice(mobile, appiumServer);
             }
 
-            MobileDeviceHolder.add(deviceId, mobileDevice);
+            MobileDeviceHolder.add(mobileId, mobileDevice);
         } else {
-            log.info("[ios][{}]非首次在agent上线", deviceId);
+            log.info("[ios][{}]非首次在agent上线", mobileId);
         }
 
         mobileService.saveOnlineDeviceToServer(mobileDevice);
-        log.info("[ios][{}]iosDeviceConnected处理完成", deviceId);
+        log.info("[ios][{}]iosDeviceConnected处理完成", mobileId);
     }
 
-    private void iosDeviceDisconnected(String deviceId, boolean isRealDevice) {
-        log.info("[ios][{}]断开连接, 是否真机: {}", deviceId, isRealDevice);
-        MobileDevice mobileDevice = MobileDeviceHolder.get(deviceId);
+    private void iosDeviceDisconnected(String mobileId, boolean isRealDevice) {
+        log.info("[ios][{}]断开连接, 是否真机: {}", mobileId, isRealDevice);
+        MobileDevice mobileDevice = MobileDeviceHolder.get(mobileId);
         if (mobileDevice == null) {
             return;
         }
@@ -87,43 +87,43 @@ public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
         mobileService.saveOfflineDeviceToServer(mobileDevice);
 
         // 有人正在使用，则断开连接
-        Session openedSession = WebSocketSessionPool.getOpenedSession(deviceId);
+        Session openedSession = WebSocketSessionPool.getOpenedSession(mobileId);
         if (openedSession != null) {
             try {
-                log.info("[ios][{}]sessionId: {}正在使用，关闭连接", deviceId, openedSession.getId());
+                log.info("[ios][{}]sessionId: {}正在使用，关闭连接", mobileId, openedSession.getId());
                 openedSession.close();
             } catch (IOException e) {
                 log.error("close opened session err", e);
             }
         }
 
-        log.info("[ios][{}]iosDeviceDisconnected处理完成", deviceId);
+        log.info("[ios][{}]iosDeviceDisconnected处理完成", mobileId);
     }
 
-    private MobileDevice initIosDevice(String deviceId, boolean isRealDevice, AppiumServer appiumServer) throws Exception {
-        Device device = new Device();
+    private MobileDevice initIosDevice(String mobileId, boolean isRealDevice, AppiumServer appiumServer) throws Exception {
+        Mobile mobile = new Mobile();
 
-        device.setPlatform(MobileDevice.IOS);
-        device.setCreateTime(new Date());
-        device.setId(deviceId);
-        device.setName(IosUtil.getDeviceName(deviceId, isRealDevice));
+        mobile.setPlatform(MobileDevice.IOS);
+        mobile.setCreateTime(new Date());
+        mobile.setId(mobileId);
+        mobile.setName(IosUtil.getDeviceName(mobileId, isRealDevice));
 
         if (isRealDevice) {
-            device.setSystemVersion(IosUtil.getRealDeviceSystemVersion(deviceId));
+            mobile.setSystemVersion(IosUtil.getRealDeviceSystemVersion(mobileId));
         }
 
-        IosDevice iosDevice = new IosDevice(device, appiumServer);
+        IosDevice iosDevice = new IosDevice(mobile, appiumServer);
 
-        log.info("[ios][{}]开始初始化appium", deviceId);
+        log.info("[ios][{}]开始初始化appium", mobileId);
         AppiumDriver appiumDriver = iosDevice.freshAppiumDriver(null);
-        log.info("[ios][{}]初始化appium完成", deviceId);
+        log.info("[ios][{}]初始化appium完成", mobileId);
 
         if (!isRealDevice) {
             try {
                 String sdkVersion = (String) appiumDriver.getSessionDetail("sdkVersion");
-                device.setSystemVersion(sdkVersion);
+                mobile.setSystemVersion(sdkVersion);
             } catch (Exception e) {
-                log.warn("[ios][{}]获取sdkVersion失败", deviceId, e);
+                log.warn("[ios][{}]获取sdkVersion失败", mobileId, e);
             }
         }
 
@@ -134,17 +134,17 @@ public class DefaultIosDeviceChangeListener implements IosDeviceChangeListener {
             int height = window.getHeight();
 
             if (width > 0 && height > 0) {
-                device.setScreenWidth(width);
-                device.setScreenHeight(height);
+                mobile.setScreenWidth(width);
+                mobile.setScreenHeight(height);
                 break;
             } else {
-                log.warn("[ios][{}]未获取到正确的屏幕宽高: {}", deviceId, window);
+                log.warn("[ios][{}]未获取到正确的屏幕宽高: {}", mobileId, window);
             }
         }
 
         // 截图并上传到服务器
         UploadFile uploadFile = iosDevice.screenshotAndUploadToServer();
-        device.setImgPath(uploadFile.getFilePath());
+        mobile.setImgPath(uploadFile.getFilePath());
 
         appiumDriver.quit();
         return iosDevice;
