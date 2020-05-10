@@ -1,6 +1,6 @@
 package com.daxiang.controller;
 
-import com.daxiang.exception.BusinessException;
+import com.daxiang.exception.AgentException;
 import com.daxiang.model.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindException;
@@ -30,14 +30,14 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * BusinessException
+     * AgentException
      *
      * @param e
      * @return
      */
     @ResponseBody
-    @ExceptionHandler(BusinessException.class)
-    public Response handleBusinessException(BusinessException e) {
+    @ExceptionHandler(AgentException.class)
+    public Response handleBusinessException(AgentException e) {
         return Response.fail(e.getMessage());
     }
 

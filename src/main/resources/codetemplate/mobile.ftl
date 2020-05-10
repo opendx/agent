@@ -38,13 +38,15 @@ public class ${className} {
 
     @BeforeSuite
     public void beforeSuite() throws Throwable {
-        AppiumDriver appiumDriver = MobileDeviceHolder.get("${deviceTestTask.deviceId}").getAppiumDriver();
+        Device device = DeviceHolder.get("${deviceTestTask.deviceId}");
         <#if isAndroid>
-            <#lt>        driver = (AndroidDriver) appiumDriver;
-            <#lt>        $ = new AndroidAction(driver);
+            <#lt>        AndroidDevice androidDevice = (AndroidDevice) device;
+            <#lt>        $ = new AndroidAction(androidDevice);
+            <#lt>        driver = (AndroidDriver) androidDevice.getDriver();
         <#else>
-            <#lt>        driver = (IOSDriver) appiumDriver;
-            <#lt>        $ = new IosAction(driver);
+            <#lt>        IosDevice iosDevice = (IosDevice) device;
+            <#lt>        $ = new IosAction(iosDevice);
+            <#lt>        driver = (IosDriver) iosDevice.getDriver();
         </#if>
         vars = new HashMap();
         PageFactory.initElements(new AppiumFieldDecorator(driver), this);

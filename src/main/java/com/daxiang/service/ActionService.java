@@ -1,6 +1,7 @@
 package com.daxiang.service;
 
-import com.daxiang.core.javacompile.JavaCompiler;
+import com.daxiang.core.JavaCompiler;
+import com.daxiang.core.testng.TestNGCodeConvertException;
 import com.daxiang.core.testng.TestNGRunner;
 import com.daxiang.model.Response;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
@@ -15,7 +16,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 /**
  * Created by jiangyitao.
@@ -31,25 +31,25 @@ public class ActionService {
      * @return
      */
     public Response debug(ActionDebugRequest request) {
+        DeviceTestTask deviceTestTask = new DeviceTestTask();
+        BeanUtils.copyProperties(request, deviceTestTask);
+
+        Testcase testcase = new Testcase();
+        BeanUtils.copyProperties(request.getAction(), testcase);
+        deviceTestTask.setTestcases(Arrays.asList(testcase));
+
+        String className = "Debug_" + UUIDUtil.getUUID();
+        String code;
         try {
-            DeviceTestTask deviceTestTask = new DeviceTestTask();
-            BeanUtils.copyProperties(request, deviceTestTask);
-            deviceTestTask.setTestcases(Arrays.asList(request.getAction()).stream().map(a -> {
-                Testcase testcase = new Testcase();
-                BeanUtils.copyProperties(a, testcase);
-                return testcase;
-            }).collect(Collectors.toList()));
-
-            String className = "Debug_" + UUIDUtil.getUUID();
-            String code = new TestNGCodeConverter()
-                    .convert(deviceTestTask, className);
-            log.info("[调试action][{}]code: {}", request.getDeviceId(), code);
-
-            return compileAndDebug(className, code);
-        } catch (Exception e) {
-            log.error("调试出错", e);
+            code = new TestNGCodeConverter().convert(deviceTestTask, className);
+        } catch (TestNGCodeConvertException e) {
+            log.error("{}转换代码失败", request.getDeviceId(), e);
             return Response.fail(e.getMessage());
         }
+
+        Response response = compileAndDebug(className, code);
+        response.setData(ImmutableMap.of("code", code));
+        return response;
     }
 
     /**
@@ -58,9 +58,9 @@ public class ActionService {
     public Response compileAndDebug(String className, String code) {
         try {
             Class clazz = JavaCompiler.compile(className, code);
-            return TestNGRunner.debugAction(clazz, code);
+            return TestNGRunner.debugAction(clazz);
         } catch (DynamicCompilerException e) {
-            return Response.fail(e.getMessage(), ImmutableMap.of("code", code));
+            return Response.fail(e.getMessage());
         }
     }
 

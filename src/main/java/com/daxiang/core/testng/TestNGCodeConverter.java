@@ -133,18 +133,24 @@ public class TestNGCodeConverter {
     }
 
     private void handleJavaImports() {
-        javaImports.add("import com.daxiang.core.MobileDeviceHolder");
+        javaImports.add("import com.daxiang.core.*");
+        javaImports.add("import com.daxiang.core.mobile.android.AndroidDevice");
+        javaImports.add("import com.daxiang.core.mobile.ios.IosDevice");
+        javaImports.add("import com.daxiang.core.testng.TestCaseTestListener");
+        javaImports.add("import com.daxiang.core.testng.DebugActionTestListener");
+        javaImports.add("import com.daxiang.action.*");
+
         javaImports.add("import io.appium.java_client.*");
         javaImports.add("import io.appium.java_client.ios.IOSDriver");
         javaImports.add("import io.appium.java_client.android.AndroidDriver");
         javaImports.add("import io.appium.java_client.pagefactory.*");
+
         javaImports.add("import org.testng.annotations.*");
         javaImports.add("import org.testng.SkipException");
-        javaImports.add("import com.daxiang.core.testng.TestCaseTestListener");
-        javaImports.add("import com.daxiang.core.testng.DebugActionTestListener");
-        javaImports.add("import com.daxiang.action.*");
+
         javaImports.add("import org.openqa.selenium.*");
         javaImports.add("import org.openqa.selenium.support.*");
+
         javaImports.add("import java.util.*");
         javaImports.add("import static org.assertj.core.api.Assertions.*");
 

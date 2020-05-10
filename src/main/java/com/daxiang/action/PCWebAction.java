@@ -1,6 +1,6 @@
 package com.daxiang.action;
 
-import org.openqa.selenium.remote.RemoteWebDriver;
+import com.daxiang.core.pc.web.BrowserDevice;
 
 /**
  * Created by jiangyitao.
@@ -9,10 +9,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
  */
 public class PCWebAction extends BaseAction {
 
-    private RemoteWebDriver driver;
-
-    public PCWebAction(RemoteWebDriver driver) {
-        super(driver);
-        this.driver = driver;
+    public PCWebAction(BrowserDevice browserDevice) {
+        super(browserDevice);
     }
 }

@@ -1,7 +1,7 @@
 package com.daxiang.schedule;
 
-import com.daxiang.core.mobile.MobileDevice;
-import com.daxiang.core.MobileDeviceHolder;
+import com.daxiang.core.Device;
+import com.daxiang.core.DeviceHolder;
 import com.daxiang.server.ServerClient;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
 import lombok.extern.slf4j.Slf4j;
@@ -29,19 +29,19 @@ public class ScheduledTaskExecutor {
     @Scheduled(fixedRate = 10000)
     public void commitDeviceTestTask() {
         // 在线闲置的设备
-        List<MobileDevice> idleMobileDevices = MobileDeviceHolder.getAll().stream()
-                .filter(MobileDevice::isIdle)
+        List<Device> devices = DeviceHolder.getAll().stream()
+                .filter(Device::isIdle)
                 .collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(idleMobileDevices)) {
+        if (CollectionUtils.isEmpty(devices)) {
             return;
         }
 
-        idleMobileDevices.stream().parallel().forEach(idleMobileDevice -> {
+        devices.stream().parallel().forEach(device -> {
             // 获取最早的一个未开始的设备测试任务
-            DeviceTestTask deviceTestTask = serverClient.getFirstUnStartDeviceTestTask(idleMobileDevice.getId());
+            DeviceTestTask deviceTestTask = serverClient.getFirstUnStartDeviceTestTask(device.getId());
             if (deviceTestTask != null) {
-                log.info("[自动化测试][{}]提交测试任务，deviceTestTaskId: {}", idleMobileDevice.getId(), deviceTestTask.getId());
-                idleMobileDevice.getDeviceTestTaskExecutor().commitTestTask(deviceTestTask);
+                log.info("[自动化测试][{}]提交测试任务，deviceTestTaskId: {}", device.getId(), deviceTestTask.getId());
+                device.getDeviceTestTaskExecutor().commitTestTask(deviceTestTask);
             }
         });
     }

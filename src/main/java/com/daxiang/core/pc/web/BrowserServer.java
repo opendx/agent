@@ -1,35 +1,30 @@
 package com.daxiang.core.pc.web;
 
+import com.daxiang.core.DeviceServer;
 import com.daxiang.core.PortProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.remote.service.DriverService;
 import org.openqa.selenium.remote.service.DriverService.Builder;
 
 import java.io.File;
-import java.net.URL;
 
 /**
  * Created by jiangyitao.
  */
 @Slf4j
-public class BrowserDriverServer {
+public class BrowserServer extends DeviceServer {
 
     private Class<? extends Builder> builderClass;
     private File driverFile;
 
     private DriverService driverService;
-    private boolean isRunning;
 
-    public BrowserDriverServer(Class<? extends Builder> builderClass, File driverFile) {
-        if (builderClass == null || driverFile == null || !driverFile.exists()) {
-            throw new IllegalArgumentException();
-        }
-
+    public BrowserServer(Class<? extends Builder> builderClass, File driverFile) {
         this.builderClass = builderClass;
         this.driverFile = driverFile;
-        isRunning = false;
     }
 
+    @Override
     public synchronized void start() {
         if (isRunning) {
             return;
@@ -43,8 +38,9 @@ public class BrowserDriverServer {
             builder.usingPort(port);
 
             driverService = builder.build();
-            log.info("start driver service, port: {}, driverFile: {}", port, driverFile.getAbsolutePath());
+            log.info("start driver service, agentPort: {}, driverFile: {}", port, driverFile.getAbsolutePath());
             driverService.start();
+            url = driverService.getUrl();
 
             isRunning = driverService.isRunning();
         } catch (Exception e) {
@@ -52,17 +48,12 @@ public class BrowserDriverServer {
         }
     }
 
+    @Override
     public synchronized void stop() {
         if (isRunning) {
             driverService.stop();
+            isRunning = false;
         }
-    }
-
-    public URL getUrl() {
-        if (!isRunning) {
-            throw new IllegalStateException("driverService is not in running");
-        }
-        return driverService.getUrl();
     }
 
 }

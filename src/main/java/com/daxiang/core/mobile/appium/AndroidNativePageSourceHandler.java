@@ -1,6 +1,5 @@
 package com.daxiang.core.mobile.appium;
 
-import io.appium.java_client.AppiumDriver;
 import org.dom4j.Element;
 import org.springframework.util.StringUtils;
 
@@ -10,10 +9,6 @@ import java.util.List;
  * Created by jiangyitao.
  */
 public class AndroidNativePageSourceHandler extends AppiumNativePageSourceHandler {
-
-    public AndroidNativePageSourceHandler(AppiumDriver appiumDriver) {
-        super(appiumDriver);
-    }
 
     /**
      * 由于appium pageSource返回的xml不是规范的xml，需要把除了hierarchy节点以外的节点替换成node，否则xml转json会出问题

@@ -72,8 +72,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
     @Override
     public void onTestStart(ITestResult tr) {
         TestDescription testDesc = (TestDescription) tr.getTestContext().getAttribute(TEST_DESCRIPTION);
-        Integer testcaseId = TestDescription.parseTestcaseId(tr.getMethod().getDescription());
-        testDesc.setTestcaseId(testcaseId);
+        Integer testcaseId = testDesc.setTestcaseIdByTestDesc(tr.getMethod().getDescription());
         CURRENT_TEST_CASE_ID.set(testcaseId);
         log.info("[自动化测试][{}]onTestStart, testcaseId: {}", testDesc.getDeviceId(), testcaseId);
 
@@ -87,7 +86,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         if (tr.getThrowable() == null && testDesc.getRecordVideo()) {
             try {
                 log.info("[自动化测试][{}]testcaseId: {}, 开始录制视频...", testDesc.getDeviceId(), testcaseId);
-                testDesc.getMobileDevice().startRecordingScreen();
+                testDesc.getDevice().startRecordingScreen();
             } catch (Exception e) {
                 log.error("[自动化测试][{}]testcaseId: {}, 启动录制视频失败", testDesc.getDeviceId(), testcaseId, e);
                 testDesc.setRecordVideo(false);
@@ -164,7 +163,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
 
     private String uploadScreenshot(TestDescription testDesc) {
         try {
-            return testDesc.getMobileDevice().screenshotAndUploadToServer().getFilePath();
+            return testDesc.getDevice().screenshotAndUploadToServer().getFilePath();
         } catch (Exception e) {
             log.error("[自动化测试][{}]testcaseId: {}，截图并上传到server失败", testDesc.getDeviceId(), testDesc.getTestcaseId(), e);
             return null;
@@ -179,7 +178,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         try {
             log.info("[自动化测试][{}]testcaseId: {}, 停止录制视频...", testDesc.getDeviceId(), testDesc.getTestcaseId());
             long startTime = System.currentTimeMillis();
-            String uploadFilePath = testDesc.getMobileDevice().stopRecordingScreenAndUploadToServer().getFilePath();
+            String uploadFilePath = testDesc.getDevice().stopRecordingScreenAndUploadToServer().getFilePath();
             log.info("[自动化测试][{}]testcaseId: {}, 停止录制视频并上传到server完成，耗时: {} ms", testDesc.getDeviceId(), testDesc.getTestcaseId(), System.currentTimeMillis() - startTime);
             return uploadFilePath;
         } catch (Exception e) {

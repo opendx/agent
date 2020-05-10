@@ -1,6 +1,5 @@
 package com.daxiang.core.mobile.appium;
 
-import io.appium.java_client.AppiumDriver;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 import org.springframework.util.StringUtils;
@@ -11,10 +10,6 @@ import java.util.List;
  * Created by jiangyitao.
  */
 public class IosNativePageSourceHandler extends AppiumNativePageSourceHandler {
-
-    public IosNativePageSourceHandler(AppiumDriver appiumDriver) {
-        super(appiumDriver);
-    }
 
     /**
      * android / ios 复用一套前端inspector组件，将ios的布局转成android格式

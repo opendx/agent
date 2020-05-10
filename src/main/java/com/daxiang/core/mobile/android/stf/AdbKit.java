@@ -32,7 +32,7 @@ public class AdbKit {
 
         int localPort = PortProvider.getAdbKitAvailablePort();
         // https://github.com/openstf/adbkit
-        String cmd = String.format("node " + LOCAL_ADBKIT + " usb-device-to-tcp -p %d %s", localPort, mobileId);
+        String cmd = String.format("node %s usb-device-to-tcp -p %d %s", LOCAL_ADBKIT, localPort, mobileId);
 
         log.info("[adbkit][{}]开启远程调试功能: {}", mobileId, cmd);
         watchdog = Terminal.executeAsyncAndGetWatchdog(cmd);

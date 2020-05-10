@@ -1,6 +1,5 @@
 package com.daxiang.core.mobile.appium;
 
-import io.appium.java_client.AppiumDriver;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -17,18 +16,11 @@ import java.nio.charset.Charset;
  */
 public abstract class AppiumNativePageSourceHandler {
 
-    private AppiumDriver appiumDriver;
-
-    public AppiumNativePageSourceHandler(AppiumDriver appiumDriver) {
-        this.appiumDriver = appiumDriver;
-    }
-
     abstract void handleElement(Element element);
 
-    public String getPageSource() throws IOException, DocumentException {
-        String pageSource = appiumDriver.getPageSource();
+    public String handle(String pageSource) throws IOException, DocumentException {
         if (StringUtils.isEmpty(pageSource)) {
-            throw new RuntimeException("empty pageSource");
+            throw new IllegalArgumentException("pageSource cannot be empty");
         }
 
         try (InputStream in = new ByteArrayInputStream(pageSource.getBytes(Charset.forName("UTF-8")))) {

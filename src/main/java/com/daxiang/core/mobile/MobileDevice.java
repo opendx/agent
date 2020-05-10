@@ -1,106 +1,57 @@
 package com.daxiang.core.mobile;
 
-import com.alibaba.fastjson.JSONObject;
-import com.daxiang.core.DeviceTestTaskExecutor;
+import com.daxiang.core.Device;
+import com.daxiang.core.mobile.appium.AppiumNativePageSourceHandler;
 import com.daxiang.model.page.Page;
-import com.daxiang.server.ServerClient;
-import com.daxiang.core.mobile.appium.AppiumDriverFactory;
 import com.daxiang.core.mobile.appium.AppiumServer;
-import com.daxiang.model.FileType;
-import com.daxiang.model.UploadFile;
 import com.google.common.collect.ImmutableMap;
 import io.appium.java_client.AppiumDriver;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.dom4j.DocumentException;
 import org.json.XML;
-import org.openqa.selenium.OutputType;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 
 /**
  * Created by jiangyitao.
  */
 @Slf4j
-@Data
-public abstract class MobileDevice {
+public abstract class MobileDevice extends Device {
 
     public static final String NATIVE_CONTEXT = "NATIVE_APP";
 
-    public static final int ANDROID = 1;
-    public static final int IOS = 2;
+    public static final int PLATFORM_ANDROID = 1;
+    public static final int PLATFORM_IOS = 2;
 
     protected Mobile mobile;
-    protected DeviceTestTaskExecutor deviceTestTaskExecutor;
-
-    protected AppiumServer appiumServer;
-    protected AppiumDriver appiumDriver;
+    protected AppiumNativePageSourceHandler nativePageSourceHandler;
 
     public MobileDevice(Mobile mobile, AppiumServer appiumServer) {
+        super(appiumServer);
         this.mobile = mobile;
-        this.appiumServer = appiumServer;
-        deviceTestTaskExecutor = new DeviceTestTaskExecutor(this);
     }
 
-    public AppiumDriver freshAppiumDriver(JSONObject capabilities) {
-        quitAppiumDriver();
-        appiumDriver = AppiumDriverFactory.create(this, capabilities);
-        return appiumDriver;
-    }
+    public abstract void uninstallApp(String app) throws Exception;
 
-    public void quitAppiumDriver() {
-        if (appiumDriver != null) {
-            try {
-                appiumDriver.quit();
-            } catch (Exception ign) {
-            }
-        }
-    }
+    public abstract boolean acceptAlert();
 
-    public String getId() {
-        return mobile.getId();
-    }
-
-    public boolean isConnected() {
-        return mobile.getStatus() != Mobile.OFFLINE_STATUS;
-    }
-
-    public boolean isIdle() {
-        return mobile.getStatus() == Mobile.IDLE_STATUS;
-    }
-
-    public boolean isNativeContext() {
-        return NATIVE_CONTEXT.equals(appiumDriver.getContext());
-    }
-
-    public File screenshot() {
-        return appiumDriver.getScreenshotAs(OutputType.FILE);
-    }
-
-    public UploadFile screenshotAndUploadToServer() {
-        File screenshotFile = screenshot();
-        try {
-            return ServerClient.getInstance().uploadFile(screenshotFile, FileType.IMG);
-        } finally {
-            FileUtils.deleteQuietly(screenshotFile);
-        }
-    }
+    public abstract boolean dismissAlert();
 
     public void installApp(File appFile) {
         try {
-            appiumDriver.installApp(appFile.getAbsolutePath());
+            ((AppiumDriver) driver).installApp(appFile.getAbsolutePath());
         } finally {
             FileUtils.deleteQuietly(appFile);
         }
     }
 
-    public abstract void uninstallApp(String app) throws Exception;
-
-    public Map<String, Object> dump() throws IOException, DocumentException {
-        Integer type;
+    @Override
+    public Map<String, Object> dump() {
+        int type;
         String pageSource;
 
         if (isNativeContext()) {
@@ -109,35 +60,67 @@ public abstract class MobileDevice {
             } else {
                 type = Page.TYPE_IOS_NATIVE;
             }
-            pageSource = XML.toJSONObject(dumpNativePage()).toString();
+
+            try {
+                pageSource = nativePageSourceHandler.handle(driver.getPageSource());
+            } catch (IOException | DocumentException e) {
+                throw new RuntimeException(e);
+            }
+
+            pageSource = XML.toJSONObject(pageSource).toString();
         } else {
-            type = Page.TYPE_WEB;
-            pageSource = appiumDriver.getPageSource();
+            return super.dump();
         }
 
         return ImmutableMap.of("type", type, "pageSource", pageSource);
     }
 
-    public abstract String dumpNativePage() throws IOException, DocumentException;
+    @Override
+    public void onlineToServer() {
+        mobile.setAgentIp(agentIp);
+        mobile.setAgentPort(agentPort);
+        mobile.setLastOnlineTime(new Date());
+        idleToServer();
+    }
 
-    public abstract boolean acceptAlert();
+    @Override
+    public void usingToServer(String username) {
+        mobile.setUsername(username);
+        mobile.setStatus(Device.USING_STATUS);
+        serverClient.saveMobile(mobile);
+    }
 
-    public abstract boolean dismissAlert();
+    @Override
+    public void idleToServer() {
+        mobile.setStatus(Device.IDLE_STATUS);
+        serverClient.saveMobile(mobile);
+    }
 
-    public abstract void startRecordingScreen();
+    @Override
+    public void offlineToServer() {
+        mobile.setStatus(Device.OFFLINE_STATUS);
+        serverClient.saveMobile(mobile);
+    }
 
-    public abstract File stopRecordingScreen() throws IOException;
+    public Mobile getMobile() {
+        return mobile;
+    }
 
-    public UploadFile stopRecordingScreenAndUploadToServer() throws IOException {
-        File video = stopRecordingScreen();
-        try {
-            return ServerClient.getInstance().uploadFile(video, FileType.VIDEO);
-        } finally {
-            FileUtils.deleteQuietly(video);
-        }
+    @Override
+    public String getId() {
+        return mobile.getId();
+    }
+
+    @Override
+    public Integer getStatus() {
+        return mobile.getStatus();
+    }
+
+    public boolean isNativeContext() {
+        return NATIVE_CONTEXT.equals(((AppiumDriver) driver).getContext());
     }
 
     public boolean isAndroid() {
-        return mobile.getPlatform() == ANDROID;
+        return mobile.getPlatform() == PLATFORM_ANDROID;
     }
 }

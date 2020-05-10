@@ -1,9 +1,11 @@
 package com.daxiang.service;
 
-import com.daxiang.core.mobile.MobileDevice;
-import com.daxiang.core.MobileDeviceHolder;
+import com.android.ddmlib.IDevice;
+import com.daxiang.core.Device;
+import com.daxiang.core.DeviceHolder;
 import com.daxiang.core.mobile.android.AndroidDevice;
 import com.daxiang.core.mobile.android.AndroidUtil;
+import com.daxiang.core.mobile.android.IDeviceExecuteShellCommandException;
 import com.daxiang.model.Response;
 import com.daxiang.utils.HttpUtil;
 import com.google.common.collect.ImmutableMap;
@@ -22,27 +24,27 @@ import java.io.IOException;
 public class AndroidService {
 
     public Response startAdbKit(String mobileId) {
-        MobileDevice mobileDevice = MobileDeviceHolder.getConnectedDevice(mobileId);
-        if (mobileDevice == null) {
-            return Response.fail("设备未连接");
+        Device device = DeviceHolder.getConnectedDevice(mobileId);
+        if (device == null) {
+            return Response.fail(mobileId + "未连接");
         }
 
         try {
-            int port = ((AndroidDevice) mobileDevice).getAdbKit().start();
+            int port = ((AndroidDevice) device).getAdbKit().start();
             return Response.success(ImmutableMap.of("port", port));
         } catch (IOException e) {
-            log.error("启动adbkit失败", e);
+            log.error("[{}]启动adbkit失败", device.getId(), e);
             return Response.fail(e.getMessage());
         }
     }
 
     public Response stopAdbKit(String mobileId) {
-        MobileDevice mobileDevice = MobileDeviceHolder.getConnectedDevice(mobileId);
-        if (mobileDevice == null) {
-            return Response.fail("设备未连接");
+        Device device = DeviceHolder.getConnectedDevice(mobileId);
+        if (device == null) {
+            return Response.fail(mobileId + "未连接");
         }
 
-        ((AndroidDevice) mobileDevice).getAdbKit().stop();
+        ((AndroidDevice) device).getAdbKit().stop();
         return Response.success("停止完成");
     }
 
@@ -62,30 +64,32 @@ public class AndroidService {
     }
 
     public Response getImeList(String mobileId) {
-        MobileDevice device = MobileDeviceHolder.getConnectedDevice(mobileId);
+        Device device = DeviceHolder.getConnectedDevice(mobileId);
         if (device == null) {
-            return Response.fail("设备未连接");
+            return Response.fail(mobileId + "未连接");
         }
 
         try {
-            return Response.success(AndroidUtil.getImeList(((AndroidDevice) device).getIDevice()));
-        } catch (Exception e) {
-            log.error("[{}]获取输入法列表异常", device.getId(), e);
+            IDevice iDevice = ((AndroidDevice) device).getIDevice();
+            return Response.success(AndroidUtil.getImeList(iDevice));
+        } catch (IDeviceExecuteShellCommandException e) {
+            log.error("[{}]获取输入法失败", device.getId(), e);
             return Response.fail(e.getMessage());
         }
     }
 
     public Response setIme(String mobileId, String ime) {
-        MobileDevice device = MobileDeviceHolder.getConnectedDevice(mobileId);
+        Device device = DeviceHolder.getConnectedDevice(mobileId);
         if (device == null) {
-            return Response.fail("设备未连接");
+            return Response.fail(mobileId + "未连接");
         }
 
         try {
-            AndroidUtil.setIme(((AndroidDevice) device).getIDevice(), ime);
-            return Response.success("设置成功");
-        } catch (Exception e) {
-            log.error("[{}]设置输入法异常", device.getId(), e);
+            IDevice iDevice = ((AndroidDevice) device).getIDevice();
+            AndroidUtil.setIme(iDevice, ime);
+            return Response.success("设置输入法成功");
+        } catch (IDeviceExecuteShellCommandException e) {
+            log.error("[{}]设置输入法失败", device.getId(), e);
             return Response.fail(e.getMessage());
         }
     }

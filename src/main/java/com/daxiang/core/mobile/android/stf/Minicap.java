@@ -58,7 +58,9 @@ public class Minicap {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         new Thread(() -> {
             try {
-                String startMinicapCmd = String.format("LD_LIBRARY_PATH=" + AndroidDevice.TMP_FOLDER + " " + REMOTE_MINICAP_PATH + " -S -Q %d -P %s@%s/%d",
+                String startMinicapCmd = String.format("LD_LIBRARY_PATH=%s %s -S -Q %d -P %s@%s/%d",
+                        AndroidDevice.TMP_FOLDER,
+                        REMOTE_MINICAP_PATH,
                         quality,
                         realResolution,
                         virtualResolution,

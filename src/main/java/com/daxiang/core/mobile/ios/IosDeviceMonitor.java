@@ -46,11 +46,11 @@ public class IosDeviceMonitor {
             // 新增的真机
             currentRealDeviceSet.stream()
                     .filter(deviceId -> !lastRealDeviceSet.contains(deviceId))
-                    .forEach(deviceId -> iosDeviceChangeListener.onDeviceConnected(deviceId, true));
+                    .forEach(deviceId -> iosDeviceChangeListener.deviceConnected(new IosIDevice(deviceId, true)));
             // 减少的真机
             lastRealDeviceSet.stream()
                     .filter(deviceId -> !currentRealDeviceSet.contains(deviceId))
-                    .forEach(deviceId -> iosDeviceChangeListener.onDeviceDisconnected(deviceId, true));
+                    .forEach(deviceId -> iosDeviceChangeListener.deviceDisconnected(new IosIDevice(deviceId, true)));
             lastRealDeviceSet = currentRealDeviceSet;
 
             // 模拟器
@@ -58,11 +58,11 @@ public class IosDeviceMonitor {
             // 新增的模拟器
             currentSimulatorSet.stream()
                     .filter(deviceId -> !lastSimulatorSet.contains(deviceId))
-                    .forEach(deviceId -> iosDeviceChangeListener.onDeviceConnected(deviceId, false));
+                    .forEach(deviceId -> iosDeviceChangeListener.deviceConnected(new IosIDevice(deviceId, false)));
             // 减少的模拟器
             lastSimulatorSet.stream()
                     .filter(deviceId -> !currentSimulatorSet.contains(deviceId))
-                    .forEach(deviceId -> iosDeviceChangeListener.onDeviceDisconnected(deviceId, false));
+                    .forEach(deviceId -> iosDeviceChangeListener.deviceDisconnected(new IosIDevice(deviceId, false)));
             lastSimulatorSet = currentSimulatorSet;
 
         }, 0, MONITOR_PERIOD_SECONDS, TimeUnit.SECONDS);

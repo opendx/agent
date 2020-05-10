@@ -1,7 +1,6 @@
 package com.daxiang.core.testng;
 
 import com.daxiang.model.Response;
-import com.google.common.collect.ImmutableMap;
 import org.springframework.util.CollectionUtils;
 import org.testng.ITestNGListener;
 import org.testng.TestNG;
@@ -29,23 +28,17 @@ public class TestNGRunner {
     /**
      * 调试action
      */
-    public static Response debugAction(Class clazz, String code) {
+    public static Response debugAction(Class clazz) {
         TestNG testNG = run(new Class[]{clazz}, Arrays.asList(DebugActionTestListener.class));
-        if (testNG.getStatus() != 0) {
-            // 运行有错误
-            String failMsg = DebugActionTestListener.failMsg.get();
-            DebugActionTestListener.failMsg.remove();
-
-            return Response.fail(failMsg, ImmutableMap.of("code", code));
-        } else {
-            // 运行成功
-            List<String> printMsgList = DebugActionTestListener.printMsgList.get();
-            DebugActionTestListener.printMsgList.remove();
+        if (testNG.getStatus() != 0) { // 运行有错误
+            return Response.fail(DebugActionTestListener.getFailMsg());
+        } else { // 运行成功
+            List<String> printMsgList = DebugActionTestListener.getPrintMsgList();
             if (CollectionUtils.isEmpty(printMsgList)) {
                 printMsgList = Arrays.asList("执行成功");
             }
 
-            return Response.success(printMsgList.stream().collect(Collectors.joining("\n")), ImmutableMap.of("code", code));
+            return Response.success(printMsgList.stream().collect(Collectors.joining("\n")));
         }
     }
 

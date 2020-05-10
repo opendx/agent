@@ -1,7 +1,7 @@
 package com.daxiang.core.testng;
 
-import com.daxiang.core.mobile.MobileDevice;
-import com.daxiang.core.MobileDeviceHolder;
+import com.daxiang.core.Device;
+import com.daxiang.core.DeviceHolder;
 import com.daxiang.model.devicetesttask.TestPlan;
 import lombok.Data;
 
@@ -17,7 +17,7 @@ public class TestDescription {
     private Integer failRetryCount;
 
     private Boolean recordVideo;
-    private MobileDevice mobileDevice;
+    private Device device;
 
     /**
      * @param testDesc deviceId_deviceTestTaskId_testcaseId_enableRecordVideo_failRetryCount
@@ -32,11 +32,12 @@ public class TestDescription {
         this.enableRecordVideo = Integer.valueOf(testDescArr[3]);
         this.failRetryCount = Integer.valueOf(testDescArr[4]);
 
-        this.mobileDevice = MobileDeviceHolder.get(deviceId);
+        this.device = DeviceHolder.get(deviceId);
         this.recordVideo = (enableRecordVideo == TestPlan.ENABLE_RECORD_VIDEO);
     }
 
-    public static Integer parseTestcaseId(String testDesc) {
-        return Integer.valueOf(testDesc.split("_")[2]);
+    public Integer setTestcaseIdByTestDesc(String testDesc) {
+        testcaseId = Integer.valueOf(testDesc.split("_")[2]);
+        return testcaseId;
     }
 }

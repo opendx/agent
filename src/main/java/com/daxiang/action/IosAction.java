@@ -1,7 +1,7 @@
 package com.daxiang.action;
 
+import com.daxiang.core.mobile.ios.IosDevice;
 import com.daxiang.core.mobile.ios.IosUtil;
-import io.appium.java_client.ios.IOSDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
@@ -13,11 +13,8 @@ import org.springframework.util.Assert;
 @Slf4j
 public class IosAction extends MobileAction {
 
-    private IOSDriver driver;
-
-    public IosAction(IOSDriver driver) {
-        super(driver);
-        this.driver = driver;
+    public IosAction(IosDevice iosDevice) {
+        super(iosDevice);
     }
 
     /**

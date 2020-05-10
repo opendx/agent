@@ -21,18 +21,8 @@ public class MobileController {
         return mobileService.installApp(app, mobileId);
     }
 
-    @GetMapping("/{mobileId}/dump")
-    public Response dump(@PathVariable String mobileId) {
-        return mobileService.dump(mobileId);
-    }
-
-    @GetMapping("/{mobileId}/screenshot")
-    public Response screenshot(@PathVariable String mobileId) {
-        return mobileService.screenshot(mobileId);
-    }
-
-    @GetMapping("/status")
-    public Response status(String mobileId) {
-        return mobileService.getStatus(mobileId);
+    @GetMapping("/{mobileId}")
+    public Response getMobile(@PathVariable String mobileId) {
+        return mobileService.getMobile(mobileId);
     }
 }

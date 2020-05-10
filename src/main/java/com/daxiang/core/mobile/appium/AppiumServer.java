@@ -1,6 +1,7 @@
 package com.daxiang.core.mobile.appium;
 
 import com.daxiang.App;
+import com.daxiang.core.DeviceServer;
 import com.daxiang.core.PortProvider;
 import com.daxiang.utils.Terminal;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * Created by jiangyitao.
  */
 @Slf4j
-public class AppiumServer {
+public class AppiumServer extends DeviceServer {
 
     private static final String APPIUM_JS = App.getProperty("appiumJs");
     private static String version;
@@ -33,49 +34,39 @@ public class AppiumServer {
     }
 
     private ExecuteWatchdog watchdog;
-    private boolean isRunning = false;
-    private int port;
-    private URL url;
 
+    @Override
     public synchronized void start() {
         if (isRunning) {
             return;
         }
 
-        port = PortProvider.getAppiumServerAvailablePort();
-        String cmd = " -p " + port + " --session-override";
+        int port = PortProvider.getAppiumServerAvailablePort();
 
+        String startCmd;
         if (StringUtils.isEmpty(APPIUM_JS)) {
-            cmd = "appium" + cmd;
+            startCmd = String.format("appium -p %d --session-override", port);
         } else {
-            cmd = "node " + APPIUM_JS + cmd;
+            startCmd = String.format("node %s -p %d --session-override", APPIUM_JS, port);
         }
 
         try {
-            watchdog = Terminal.executeAsyncAndGetWatchdog(cmd);
+            watchdog = Terminal.executeAsyncAndGetWatchdog(startCmd);
             String url = "http://localhost:" + port + "/wd/hub";
             this.url = new URL(url);
             new UrlChecker().waitUntilAvailable(60, TimeUnit.SECONDS, new URL(url + "/status"));
             isRunning = true;
         } catch (Exception e) {
-            throw new RuntimeException("启动appium失败", e);
+            throw new RuntimeException("启动appium server失败", e);
         }
 
     }
 
-    public URL getUrl() {
-        if (isRunning) {
-            return url;
-        } else {
-            throw new RuntimeException("appium未启动");
-        }
-    }
-
-    public void stop() {
+    @Override
+    public synchronized void stop() {
         if (isRunning) {
             watchdog.destroyProcess();
-        } else {
-            throw new RuntimeException("appium未启动");
+            isRunning = false;
         }
     }
 }

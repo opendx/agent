@@ -2,7 +2,6 @@ package com.daxiang.core.mobile.appium;
 
 import com.alibaba.fastjson.JSONObject;
 import com.daxiang.App;
-import com.daxiang.core.mobile.MobileDevice;
 import com.daxiang.core.PortProvider;
 import com.daxiang.core.mobile.android.AndroidDevice;
 import com.daxiang.core.mobile.ios.IosDevice;
@@ -14,8 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-
-import java.util.Optional;
 
 /**
  * Created by jiangyitao.
@@ -29,20 +26,11 @@ public class AppiumDriverFactory {
      */
     private static final int NEW_COMMAND_TIMEOUT = 60 * 60 * 12;
 
-    public static AppiumDriver create(MobileDevice mobileDevice, JSONObject capabilities) {
-        if (mobileDevice instanceof AndroidDevice) {
-            return createAndroidDriver((AndroidDevice) mobileDevice, capabilities);
-        } else if (mobileDevice instanceof IosDevice) {
-            return createIosDriver((IosDevice) mobileDevice, capabilities);
-        }
-
-        throw new IllegalArgumentException("不支持的设备: " + mobileDevice.getId());
-    }
-
-    private static AppiumDriver createAndroidDriver(AndroidDevice androidDevice, JSONObject capabilities) {
+    public static AppiumDriver createAndroidDriver(AndroidDevice androidDevice, JSONObject capabilities) {
         JSONObject caps = new JSONObject();
         caps.put(MobileCapabilityType.NO_RESET, true);
         caps.put(AndroidMobileCapabilityType.UNICODE_KEYBOARD, true);
+        caps.put(AndroidMobileCapabilityType.RESET_KEYBOARD, true);
         caps.put("showChromedriverLog", true);
         caps.put("recreateChromeDriverSessions", true);
         caps.put("extractChromeAndroidPackageFromContextName", true);
@@ -51,6 +39,7 @@ public class AppiumDriverFactory {
         caps.put("skipServerInstallation", true);
         caps.put("skipDeviceInitialization", true);
         caps.put("skipUnlock", true);
+        // 这个暂时用不到 先skip提升性能
         caps.put("skipLogcatCapture", true);
 
         if (!androidDevice.greaterOrEqualsToAndroid5()) { // 小于安卓5，必须指定app，否则会创建driver失败
@@ -75,9 +64,9 @@ public class AppiumDriverFactory {
         caps.put(AndroidMobileCapabilityType.SYSTEM_PORT, PortProvider.getUiautomator2ServerAvailablePort());
 
         caps.put("chromedriverPort", PortProvider.getAndroidChromeDriverAvailablePort());
-        Optional<String> chromedriverFilePath = androidDevice.getChromedriverFilePath();
-        if (chromedriverFilePath.isPresent()) {
-            caps.put(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, chromedriverFilePath.get());
+        String chromedriverFilePath = androidDevice.getChromedriverFilePath();
+        if (StringUtils.isEmpty(chromedriverFilePath)) {
+            caps.put(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, chromedriverFilePath);
         }
 
         caps.put(MobileCapabilityType.UDID, androidDevice.getId());
@@ -86,18 +75,15 @@ public class AppiumDriverFactory {
         caps.put(MobileCapabilityType.PLATFORM_VERSION, androidDevice.getMobile().getSystemVersion());
         caps.put(MobileCapabilityType.NEW_COMMAND_TIMEOUT, NEW_COMMAND_TIMEOUT);
 
-        return new AndroidDriver(androidDevice.getAppiumServer().getUrl(), new DesiredCapabilities(caps));
+        return new AndroidDriver(androidDevice.getDeviceServer().getUrl(), new DesiredCapabilities(caps));
     }
 
-    private static AppiumDriver createIosDriver(IosDevice iosDevice, JSONObject capabilities) {
+    public static AppiumDriver createIosDriver(IosDevice iosDevice, JSONObject capabilities) {
         JSONObject caps = new JSONObject();
         caps.put(MobileCapabilityType.NO_RESET, true);
         caps.put("waitForQuiescence", false);
         caps.put("skipLogCapture", true);
-        // Get JSON source from WDA and parse into XML on Appium server. This can be much faster, especially on large devices.
-        caps.put("useJSONSource", true);
-        caps.put(IOSMobileCapabilityType.WDA_STARTUP_RETRIES, 0);
-        caps.put("mjpegServerFramerate", Integer.parseInt(App.getProperty("mjpegServerFramerate")));
+        caps.put("useJSONSource", true); // // Get JSON source from WDA and parse into XML on Appium server. This can be much faster, especially on large devices.
 
         // https://github.com/appium/appium-xcuitest-driver/blob/master/docs/real-device-config.md
         String xcodeOrgId = App.getProperty("xcodeOrgId");
@@ -133,6 +119,6 @@ public class AppiumDriverFactory {
         caps.put(MobileCapabilityType.PLATFORM_VERSION, iosDevice.getMobile().getSystemVersion());
         caps.put(MobileCapabilityType.NEW_COMMAND_TIMEOUT, NEW_COMMAND_TIMEOUT);
 
-        return new IOSDriver(iosDevice.getAppiumServer().getUrl(), new DesiredCapabilities(caps));
+        return new IOSDriver(iosDevice.getDeviceServer().getUrl(), new DesiredCapabilities(caps));
     }
 }

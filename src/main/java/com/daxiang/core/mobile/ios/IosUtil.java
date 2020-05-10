@@ -2,8 +2,8 @@ package com.daxiang.core.mobile.ios;
 
 import com.daxiang.utils.Terminal;
 import com.google.common.collect.ImmutableMap;
-import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -55,9 +55,9 @@ public class IosUtil {
 
             Set<String> simulatorIds = new HashSet<>();
 
-            Matcher matcher = Pattern.compile("\\((.*-.*?)\\)").matcher(cmdResponse);
+            Matcher matcher = Pattern.compile("\\w{8}(-\\w{4}){3}-\\w{12}").matcher(cmdResponse);
             while (matcher.find()) {
-                simulatorIds.add(matcher.group(1));
+                simulatorIds.add(matcher.group());
             }
 
             return simulatorIds;
@@ -67,39 +67,34 @@ public class IosUtil {
         }
     }
 
-    /**
-     * @param deviceId
-     * @return eg. 10.3.4
-     * @throws IOException
-     */
-    public static String getRealDeviceSystemVersion(String deviceId) throws IOException {
-        return Terminal.execute("ideviceinfo -k ProductVersion -u " + deviceId);
+    public static String getRealDeviceSystemVersion(String mobileId) throws IOException {
+        return Terminal.execute("ideviceinfo -k ProductVersion -u " + mobileId);
     }
 
-    public static String getDeviceName(String deviceId, boolean isRealDevice) throws IOException {
+    public static String getDeviceName(String mobileId, boolean isRealDevice) throws IOException {
         if (isRealDevice) {
-            return Terminal.execute("ideviceinfo -k DeviceName -u " + deviceId);
+            return Terminal.execute("ideviceinfo -k DeviceName -u " + mobileId);
         } else {
-            String cmdResponse = Terminal.execute("xcrun simctl list devices |grep " + deviceId);
+            String cmdResponse = Terminal.execute(String.format("xcrun simctl list devices |grep '%s'", mobileId));
             return cmdResponse.substring(0, cmdResponse.indexOf("(")).trim();
         }
     }
 
-    public static void uninstallApp(AppiumDriver appiumDriver, String bundleId) {
-        appiumDriver.executeScript("mobile: removeApp", ImmutableMap.of("bundleId", bundleId));
+    public static void uninstallApp(RemoteWebDriver driver, String bundleId) {
+        driver.executeScript("mobile: removeApp", ImmutableMap.of("bundleId", bundleId));
     }
 
-    public static void launchApp(AppiumDriver appiumDriver, String bundleId) {
-        appiumDriver.executeScript("mobile: launchApp", ImmutableMap.of("bundleId", bundleId));
+    public static void launchApp(RemoteWebDriver driver, String bundleId) {
+        driver.executeScript("mobile: launchApp", ImmutableMap.of("bundleId", bundleId));
     }
 
     // Terminates an existing application on the mobile. If the application is not running then the returned result will be false, otherwise true
-    public static boolean terminateApp(AppiumDriver appiumDriver, String bundleId) {
-        return (Boolean) appiumDriver.executeScript("mobile: terminateApp", ImmutableMap.of("bundleId", bundleId));
+    public static boolean terminateApp(RemoteWebDriver driver, String bundleId) {
+        return (Boolean) driver.executeScript("mobile: terminateApp", ImmutableMap.of("bundleId", bundleId));
     }
 
     // http://appium.io/docs/en/commands/mobile-command/
-    public static void pressHome(AppiumDriver appiumDriver) {
-        appiumDriver.executeScript("mobile:pressButton", ImmutableMap.of("name", "home"));
+    public static void pressHome(RemoteWebDriver driver) {
+        driver.executeScript("mobile:pressButton", ImmutableMap.of("name", "home"));
     }
 }

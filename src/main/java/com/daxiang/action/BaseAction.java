@@ -1,9 +1,10 @@
 package com.daxiang.action;
 
+import com.daxiang.core.Device;
 import io.appium.java_client.MobileBy;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.util.Assert;
@@ -20,10 +21,10 @@ public class BaseAction {
 
     public static final int EXECUTE_JAVA_CODE_ID = 1;
 
-    private WebDriver driver;
+    protected RemoteWebDriver driver;
 
-    public BaseAction(WebDriver driver) {
-        this.driver = driver;
+    public BaseAction(Device device) {
+        this.driver = device.getDriver();
     }
 
     /**

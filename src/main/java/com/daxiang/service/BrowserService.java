@@ -1,10 +1,9 @@
 package com.daxiang.service;
 
-import com.daxiang.core.pc.web.Browser;
-import com.daxiang.core.pc.web.BrowserHolder;
+import com.daxiang.core.Device;
+import com.daxiang.core.DeviceHolder;
+import com.daxiang.core.pc.web.BrowserDevice;
 import com.daxiang.model.Response;
-import com.daxiang.server.ServerClient;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -14,21 +13,18 @@ import org.springframework.util.StringUtils;
 @Service
 public class BrowserService {
 
-    @Autowired
-    private ServerClient serverClient;
+    public Response getBrowser(String browserId) {
+        if (StringUtils.isEmpty(browserId)) {
+            return Response.fail("browserId不能为空");
+        }
 
-    public Response getStatus(String browserId) {
-        return StringUtils.isEmpty(browserId) ? Response.success(BrowserHolder.getAll())
-                : Response.success(BrowserHolder.get(browserId));
+        Device device = DeviceHolder.get(browserId);
+        if (device == null) {
+            return Response.success();
+        } else {
+            BrowserDevice browserDevice = (BrowserDevice) device;
+            return Response.success(browserDevice.getBrowser());
+        }
     }
 
-    public void saveUsingBrowserToServer(Browser browser) {
-        browser.setStatus(browser.USING_STATUS);
-        serverClient.saveBrowser(browser);
-    }
-
-    public void saveIdleBrowserToServer(Browser browser) {
-        browser.setStatus(Browser.IDLE_STATUS);
-        serverClient.saveBrowser(browser);
-    }
 }

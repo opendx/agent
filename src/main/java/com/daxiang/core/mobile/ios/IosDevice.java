@@ -1,6 +1,8 @@
 package com.daxiang.core.mobile.ios;
 
+import com.alibaba.fastjson.JSONObject;
 import com.daxiang.core.mobile.MobileDevice;
+import com.daxiang.core.mobile.appium.AppiumDriverFactory;
 import com.daxiang.core.mobile.appium.AppiumServer;
 import com.daxiang.core.mobile.appium.IosNativePageSourceHandler;
 import com.daxiang.core.mobile.Mobile;
@@ -11,7 +13,7 @@ import io.appium.java_client.ios.IOSStartScreenRecordingOptions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.io.FileUtils;
-import org.dom4j.DocumentException;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,22 +35,23 @@ public class IosDevice extends MobileDevice {
 
     public IosDevice(Mobile mobile, AppiumServer appiumServer) {
         super(mobile, appiumServer);
+        nativePageSourceHandler = new IosNativePageSourceHandler();
+    }
+
+    @Override
+    public RemoteWebDriver newDriver(JSONObject caps) {
+        return AppiumDriverFactory.createIosDriver(this, caps);
     }
 
     @Override
     public void uninstallApp(String app) {
-        IosUtil.uninstallApp(appiumDriver, app);
-    }
-
-    @Override
-    public String dumpNativePage() throws IOException, DocumentException {
-        return new IosNativePageSourceHandler(appiumDriver).getPageSource();
+        IosUtil.uninstallApp(driver, app);
     }
 
     @Override
     public boolean acceptAlert() {
         try {
-            appiumDriver.switchTo().alert().accept();
+            driver.switchTo().alert().accept();
             return true;
         } catch (Exception e) {
             return false;
@@ -58,7 +61,7 @@ public class IosDevice extends MobileDevice {
     @Override
     public boolean dismissAlert() {
         try {
-            appiumDriver.switchTo().alert().dismiss();
+            driver.switchTo().alert().dismiss();
             return true;
         } catch (Exception e) {
             return false;
@@ -73,19 +76,19 @@ public class IosDevice extends MobileDevice {
         iosOptions.withFps(10); // default 10
         iosOptions.withVideoQuality(IOSStartScreenRecordingOptions.VideoQuality.LOW);
         iosOptions.withVideoType("libx264");
-        ((IOSDriver) appiumDriver).startRecordingScreen(iosOptions);
+        ((IOSDriver) driver).startRecordingScreen(iosOptions);
     }
 
     @Override
     public File stopRecordingScreen() throws IOException {
         File videoFile = new File(UUIDUtil.getUUID() + ".mp4");
-        String base64Video = ((IOSDriver) appiumDriver).stopRecordingScreen();
+        String base64Video = ((IOSDriver) driver).stopRecordingScreen();
         FileUtils.writeByteArrayToFile(videoFile, Base64.getDecoder().decode(base64Video), false);
         return videoFile;
     }
 
     public int getMjpegServerPort() {
-        Object mjpegServerPort = appiumDriver.getCapabilities().asMap().get("mjpegServerPort");
+        Object mjpegServerPort = driver.getCapabilities().asMap().get("mjpegServerPort");
         return (int) ((long) mjpegServerPort);
     }
 
@@ -103,4 +106,5 @@ public class IosDevice extends MobileDevice {
             iproxyMjpegServerWatchdog.destroyProcess();
         }
     }
+
 }

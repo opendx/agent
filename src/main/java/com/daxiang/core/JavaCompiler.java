@@ -1,4 +1,4 @@
-package com.daxiang.core.javacompile;
+package com.daxiang.core;
 
 import lombok.extern.slf4j.Slf4j;
 import org.dvare.dynamic.compiler.DynamicCompiler;
@@ -20,7 +20,7 @@ public class JavaCompiler {
 
         log.info("[java编译]开始编译{}", className);
         long start = System.currentTimeMillis();
-        Class<?> clazz = dynamicCompiler.build().get(className);
+        Class clazz = dynamicCompiler.build().get(className);
         log.info("[java编译]编译{}成功，耗时：{} ms", className, System.currentTimeMillis() - start);
 
         return clazz;

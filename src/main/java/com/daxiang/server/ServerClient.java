@@ -8,8 +8,8 @@ import com.daxiang.model.Response;
 import com.daxiang.model.UploadFile;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.model.devicetesttask.Testcase;
+import com.daxiang.utils.Terminal;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.exec.OS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -123,17 +123,16 @@ public class ServerClient {
     /**
      * 获取chromedriver下载地址
      *
-     * @param deviceId
+     * @param mobileId
      * @return
      */
-    public Optional<String> getChromedriverDownloadUrl(String deviceId) {
-        // todo mobileId
-        Assert.hasText(deviceId, "deviceId不能为空");
+    public String getChromedriverDownloadUrl(String mobileId) {
+        Assert.hasText(mobileId, "mobileId不能为空");
 
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
-        params.add("deviceId", deviceId);
+        params.add("deviceId", mobileId);
         params.add("type", 1); // chromedriver
-        params.add("platform", OS.isFamilyWindows() ? 1 : OS.isFamilyMac() ? 3 : 2); // 1.windows 2.linux 3.macos
+        params.add("platform", Terminal.PLATFORM); // 1.windows 2.linux 3.macos
 
         Response<Map<String, String>> response = restTemplate.exchange(driverDownloadUrl,
                 HttpMethod.POST,
@@ -142,17 +141,13 @@ public class ServerClient {
                 }).getBody();
 
         if (response.isSuccess()) {
-            if (response.getData() == null) {
-                return Optional.empty();
-            } else {
-                return Optional.of(response.getData().get("downloadUrl"));
-            }
+            return response.getData() != null ? response.getData().get("downloadUrl") : null;
         } else {
             throw new RuntimeException(response.getMsg());
         }
     }
 
-    public void saveDevice(Mobile mobile) {
+    public void saveMobile(Mobile mobile) {
         Response response = restTemplate.postForObject(deviceSaveUrl, mobile, Response.class);
         if (!response.isSuccess()) {
             throw new RuntimeException(response.getMsg());

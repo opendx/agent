@@ -3,7 +3,6 @@ package com.daxiang.action;
 import com.daxiang.core.mobile.android.AndroidDevice;
 import com.daxiang.core.mobile.android.AndroidUtil;
 import com.daxiang.core.mobile.android.IDeviceExecuteShellCommandException;
-import io.appium.java_client.android.AndroidDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
@@ -15,11 +14,11 @@ import org.springframework.util.Assert;
 @Slf4j
 public class AndroidAction extends MobileAction {
 
-    private AndroidDriver driver;
+    private AndroidDevice androidDevice;
 
-    public AndroidAction(AndroidDriver driver) {
-        super(driver);
-        this.driver = driver;
+    public AndroidAction(AndroidDevice androidDevice) {
+        super(androidDevice);
+        this.androidDevice = androidDevice;
     }
 
     /**
@@ -28,7 +27,7 @@ public class AndroidAction extends MobileAction {
     public void clearApkData(String packageName) throws IDeviceExecuteShellCommandException {
         Assert.hasText(packageName, "包名不能为空");
 
-        AndroidUtil.clearApkData(((AndroidDevice) mobileDevice).getIDevice(), packageName);
+        AndroidUtil.clearApkData(androidDevice.getIDevice(), packageName);
     }
 
     /**
@@ -38,6 +37,6 @@ public class AndroidAction extends MobileAction {
         Assert.hasText(packageName, "包名不能为空");
         Assert.hasText(launchActivity, "启动Activity不能为空");
 
-        AndroidUtil.restartApk(((AndroidDevice) mobileDevice).getIDevice(), packageName, launchActivity);
+        AndroidUtil.restartApk(androidDevice.getIDevice(), packageName, launchActivity);
     }
 }

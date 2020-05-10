@@ -2,7 +2,6 @@ package com.daxiang.action;
 
 import com.alibaba.fastjson.JSONObject;
 import com.daxiang.core.mobile.MobileDevice;
-import com.daxiang.core.MobileDeviceHolder;
 import com.daxiang.utils.HttpUtil;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.TouchAction;
@@ -25,16 +24,13 @@ public class MobileAction extends BaseAction {
 
     private static final long DEFAULT_SWIPE_DURATION_IN_MS = 100L;
 
-    private AppiumDriver driver;
-    protected MobileDevice mobileDevice;
+    private MobileDevice mobileDevice;
+    protected AppiumDriver driver;
 
-    public MobileAction(AppiumDriver driver) {
-        super(driver);
-        this.driver = driver;
-        this.mobileDevice = MobileDeviceHolder.getMobileDeviceByAppiumDriver(driver);
-        if (mobileDevice == null) {
-            throw new IllegalArgumentException("设备不存在");
-        }
+    public MobileAction(MobileDevice mobileDevice) {
+        super(mobileDevice);
+        this.mobileDevice = mobileDevice;
+        driver = (AppiumDriver) mobileDevice.getDriver();
     }
 
     /**

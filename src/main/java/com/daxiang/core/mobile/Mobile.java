@@ -11,12 +11,12 @@ import java.util.Date;
 @Data
 public class Mobile {
 
-    public static final int OFFLINE_STATUS = 0;
-    public static final int USING_STATUS = 1;
-    public static final int IDLE_STATUS = 2;
+    public static final int REAL_MOBILE = 0;
+    public static final int EMULATOR = 1;
 
     private String id;
     private String name;
+    private Integer emulator;
     private String agentIp;
     private Integer agentPort;
     private String systemVersion;

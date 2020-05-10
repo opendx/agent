@@ -1,24 +1,24 @@
 package com.daxiang.core.pc.web;
 
 import com.alibaba.fastjson.JSONArray;
-import com.daxiang.server.ServerClient;
+import com.daxiang.core.DeviceHolder;
 import com.daxiang.utils.Terminal;
 import com.daxiang.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.remote.service.DriverService;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -30,13 +30,6 @@ import java.util.stream.Collectors;
 @Component
 public class BrowserInitializer {
 
-    @Autowired
-    private ServerClient serverClient;
-    @Value("${ip}")
-    private String ip;
-    @Value("${port}")
-    private Integer port;
-
     public void init() throws IOException {
         List<BrowserJsonItem> browserJsonItems = parseBrowserProperties();
         if (browserJsonItems.isEmpty()) {
@@ -44,6 +37,7 @@ public class BrowserInitializer {
             return;
         }
 
+        // 检查浏览器配置文件是否合法
         checkBrowserJsonItems(browserJsonItems);
 
         boolean reWriteBrowserProperties = false;
@@ -60,34 +54,38 @@ public class BrowserInitializer {
         }
 
         browserJsonItems.forEach(browserJsonItem -> {
-            Browser browser;
-            try {
-                browser = Browser.BROWSER_MAP.get(browserJsonItem.getType()).newInstance();
-            } catch (Exception e) {
-                log.error("{} 初始化browser失败", browserJsonItem, e);
-                return;
-            }
-
-            try {
-                Class<? extends DriverService.Builder> builderClass = Browser.DRIVER_SERVICE_BUILDER_MAP.get(browserJsonItem.getType());
-                File driverFile = new File(browserJsonItem.getDriverPath());
-                BrowserDriverServer driverServer = new BrowserDriverServer(builderClass, driverFile);
-                driverServer.start();
-                browser.setDriverServer(driverServer);
-            } catch (Exception e) {
-                log.error("{} 启动driver server失败", browserJsonItem, e);
-                return;
-            }
-
+            Browser browser = new Browser();
             BeanUtils.copyProperties(browserJsonItem, browser);
-            browser.setAgentIp(ip);
-            browser.setAgentPort(port);
             browser.setPlatform(Terminal.PLATFORM);
-            browser.setStatus(Browser.IDLE_STATUS);
-            browser.setLastOnlineTime(new Date());
 
-            serverClient.saveBrowser(browser);
-            BrowserHolder.add(browser.getId(), browser);
+            BrowserServer browserServer;
+            try {
+                Class<? extends DriverService.Builder> builderClass = BrowserDevice.DRIVER_SERVICE_BUILDER_MAP.get(browserJsonItem.getType());
+                if (builderClass == null) {
+                    log.warn("{} 找不到DriverService.Builder", browserJsonItem);
+                    return;
+                }
+                File driverFile = new File(browserJsonItem.getDriverPath());
+
+                browserServer = new BrowserServer(builderClass, driverFile);
+                browserServer.start();
+            } catch (Exception e) {
+                log.error("{} 启动browserServer失败", browserJsonItem, e);
+                return;
+            }
+
+            BrowserDevice browserDevice;
+            try {
+                Class<? extends BrowserDevice> clazz = BrowserDevice.BROWSER_MAP.get(browserJsonItem.getType());
+                Constructor<? extends BrowserDevice> constructor = clazz.getConstructor(Browser.class, BrowserServer.class);
+                browserDevice = constructor.newInstance(browser, browserServer);
+            } catch (Exception e) {
+                log.error("{} 初始化browserDevice失败", browserJsonItem, e);
+                return;
+            }
+
+            browserDevice.onlineToServer();
+            DeviceHolder.put(browser.getId(), browserDevice);
         });
     }
 
@@ -115,10 +113,12 @@ public class BrowserInitializer {
 
     private void checkBrowserJsonItems(List<BrowserJsonItem> browserJsonItems) {
         for (BrowserJsonItem browserJsonItem : browserJsonItems) {
-            if (StringUtils.isEmpty(browserJsonItem.getType()) || !Browser.DRIVER_SERVICE_BUILDER_MAP.containsKey(browserJsonItem.getType())) {
+            if (StringUtils.isEmpty(browserJsonItem.getType())
+                    || !BrowserDevice.DRIVER_SERVICE_BUILDER_MAP.containsKey(browserJsonItem.getType())) {
                 throw new IllegalArgumentException("illegal browserType");
             }
-            if (StringUtils.isEmpty(browserJsonItem.getDriverPath())) {
+            if (StringUtils.isEmpty(browserJsonItem.getDriverPath())
+                    || !Files.exists(Paths.get(browserJsonItem.getDriverPath()))) {
                 throw new IllegalArgumentException("illegal driverPath");
             }
             if (StringUtils.isEmpty(browserJsonItem.getVersion())) {

@@ -7,13 +7,18 @@ import org.springframework.util.StringUtils;
 /**
  * Created by jiangyitao.
  */
-public class ChromeBrowser extends Browser {
+public class ChromeDevice extends BrowserDevice {
+
+    public ChromeDevice(Browser browser, BrowserServer browserServer) {
+        super(browser, browserServer);
+    }
+
     @Override
-    protected Capabilities createCapabilities() {
+    public Capabilities createCapabilities() {
         ChromeOptions chromeOptions = new ChromeOptions();
 
-        if (!StringUtils.isEmpty(path)) {
-            chromeOptions.setBinary(path);
+        if (!StringUtils.isEmpty(browser.getPath())) {
+            chromeOptions.setBinary(browser.getPath());
         }
 
         return chromeOptions;

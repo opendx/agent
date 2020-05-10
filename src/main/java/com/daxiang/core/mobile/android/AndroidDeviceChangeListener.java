@@ -2,9 +2,9 @@ package com.daxiang.core.mobile.android;
 
 import com.alibaba.fastjson.JSONObject;
 import com.android.ddmlib.*;
+import com.daxiang.core.Device;
 import com.daxiang.core.mobile.Mobile;
-import com.daxiang.server.ServerClient;
-import com.daxiang.core.MobileDeviceHolder;
+import com.daxiang.core.mobile.MobileChangeHandler;
 import com.daxiang.core.mobile.MobileDevice;
 import com.daxiang.core.mobile.android.scrcpy.Scrcpy;
 import com.daxiang.core.mobile.android.stf.AdbKit;
@@ -14,16 +14,11 @@ import com.daxiang.core.mobile.android.stf.Minitouch;
 import com.daxiang.core.mobile.android.stf.MinitouchInstaller;
 import com.daxiang.core.mobile.appium.AppiumServer;
 import com.daxiang.model.UploadFile;
-import com.daxiang.service.MobileService;
-import com.daxiang.websocket.WebSocketSessionPool;
-import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.springframework.stereotype.Component;
 
-import javax.websocket.Session;
 import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 
 /**
@@ -31,15 +26,10 @@ import java.util.Date;
  */
 @Component
 @Slf4j
-public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceChangeListener {
+public class AndroidDeviceChangeListener extends MobileChangeHandler implements AndroidDebugBridge.IDeviceChangeListener {
 
     // http://appium.github.io/appium/assets/ApiDemos-debug.apk
     private static final String APIDEMOS_APK = "vendor/apk/ApiDemos-debug.apk";
-
-    @Autowired
-    private ServerClient serverClient;
-    @Autowired
-    private MobileService mobileService;
 
     @Override
     public void deviceConnected(IDevice device) {
@@ -48,18 +38,14 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
 
     @Override
     public void deviceDisconnected(IDevice device) {
-        new Thread(() -> androidDeviceDisconnected(device)).start();
+        new Thread(() -> mobileDisconnected(device.getSerialNumber())).start();
     }
 
     @Override
     public void deviceChanged(IDevice device, int changeMask) {
+        // ignore
     }
 
-    /**
-     * Android设备连接到电脑
-     *
-     * @param iDevice
-     */
     private void androidDeviceConnected(IDevice iDevice) {
         String mobileId = iDevice.getSerialNumber();
         log.info("[android][{}]已连接", mobileId);
@@ -68,91 +54,23 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         AndroidUtil.waitForDeviceOnline(iDevice, 5 * 60);
         log.info("[android][{}]已上线", mobileId);
 
-        MobileDevice mobileDevice = MobileDeviceHolder.get(mobileId);
-        if (mobileDevice == null) {
-            log.info("[android][{}]首次在agent上线", mobileId);
-
-            log.info("[android][{}]启动appium server...", mobileId);
-            AppiumServer appiumServer = new AppiumServer();
-            appiumServer.start();
-            log.info("[android][{}]启动appium server完成，url: {}", mobileId, appiumServer.getUrl());
-
-            log.info("[android][{}]检查是否已接入过server", mobileId);
-            Mobile mobile = serverClient.getMobileById(mobileId);
-            if (mobile == null) {
-                log.info("[android][{}]首次接入server，开始初始化设备", mobileId);
-                try {
-                    mobileDevice = initAndroidDevice(iDevice, appiumServer);
-                    log.info("[android][{}]初始化设备完成", mobileId);
-                } catch (Exception e) {
-                    appiumServer.stop();
-                    throw new RuntimeException("初始化设备" + mobileId + "出错", e);
-                }
-            } else {
-                log.info("[android][{}]已接入过server", mobileId);
-                mobileDevice = new AndroidDevice(mobile, iDevice, appiumServer);
-            }
-
-            AndroidDevice androidDevice = (AndroidDevice) mobileDevice;
-            androidDevice.setMinicap(new Minicap(iDevice));
-            androidDevice.setMinitouch(new Minitouch(iDevice));
-            androidDevice.setAdbKit(new AdbKit(mobileId));
-            androidDevice.setScrcpy(new Scrcpy(iDevice));
-
-            MobileDeviceHolder.add(mobileId, mobileDevice);
-        } else {
-            ((AndroidDevice) mobileDevice).setIDevice(iDevice);
-            log.info("[android][{}]非首次在agent上线", mobileId);
-        }
-
-        mobileService.saveOnlineDeviceToServer(mobileDevice);
-        log.info("[android][{}]androidDeviceConnected处理完成", mobileId);
+        mobileConnected(iDevice);
     }
 
-    /**
-     * Android设备断开电脑
-     *
-     * @param iDevice
-     */
-    public void androidDeviceDisconnected(IDevice iDevice) {
-        String mobileId = iDevice.getSerialNumber();
-        log.info("[android][{}]断开连接", mobileId);
-        MobileDevice mobileDevice = MobileDeviceHolder.get(mobileId);
-        if (mobileDevice == null) {
-            return;
-        }
-
-        mobileService.saveOfflineDeviceToServer(mobileDevice);
-
-        // 有人正在使用，则断开连接
-        Session openedSession = WebSocketSessionPool.getOpenedSession(mobileId);
-        if (openedSession != null) {
-            try {
-                log.info("[android][{}]sessionId: {}正在使用，关闭连接", mobileId, openedSession.getId());
-                openedSession.close();
-            } catch (IOException e) {
-                log.error("close opened session err", e);
-            }
-        }
-
-        log.info("[android][{}]androidDeviceDisconnected处理完成", mobileId);
-    }
-
-    /**
-     * 首次接入系统，初始化Android设备
-     */
-    private MobileDevice initAndroidDevice(IDevice iDevice, AppiumServer appiumServer) throws Exception {
+    @Override
+    protected MobileDevice initMobile(IDevice iDevice, AppiumServer appiumServer) throws Exception {
         String mobileId = iDevice.getSerialNumber();
 
         Mobile mobile = new Mobile();
 
-        mobile.setPlatform(MobileDevice.ANDROID);
+        mobile.setPlatform(MobileDevice.PLATFORM_ANDROID);
         mobile.setCreateTime(new Date());
         mobile.setId(mobileId);
         mobile.setSystemVersion(AndroidUtil.getAndroidVersion(AndroidUtil.getSdkVersion(iDevice)));
         mobile.setName(AndroidUtil.getDeviceName(iDevice));
         mobile.setCpuInfo(AndroidUtil.getCpuInfo(iDevice));
         mobile.setMemSize(AndroidUtil.getMemSize(iDevice));
+        mobile.setEmulator(iDevice.isEmulator() ? Mobile.EMULATOR : Mobile.REAL_MOBILE);
 
         String resolution = AndroidUtil.getResolution(iDevice); // 720x1280
         String[] res = resolution.split("x");
@@ -187,15 +105,36 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
         caps.put("skipLogcatCapture", false);
 
         log.info("[android][{}]开始初始化appium", mobileId);
-        AppiumDriver appiumDriver = androidDevice.freshAppiumDriver(caps);
+        RemoteWebDriver driver = androidDevice.freshDriver(caps);
         log.info("[android][{}]初始化appium完成", mobileId);
 
         // 截图并上传到服务器
         UploadFile uploadFile = androidDevice.screenshotAndUploadToServer();
         mobile.setImgPath(uploadFile.getFilePath());
 
-        appiumDriver.quit();
+        driver.quit();
 
         return androidDevice;
+    }
+
+    @Override
+    protected MobileDevice newMobile(IDevice iDevice, Mobile mobile, AppiumServer appiumServer) {
+        return new AndroidDevice(mobile, iDevice, appiumServer);
+    }
+
+    @Override
+    protected void reconnectToAgent(Device device, IDevice iDevice) {
+        ((AndroidDevice) device).setIDevice(iDevice);
+    }
+
+    @Override
+    protected void beforePutDeviceToHolder(Device device) {
+        AndroidDevice androidDevice = (AndroidDevice) device;
+        IDevice iDevice = androidDevice.getIDevice();
+
+        androidDevice.setMinicap(new Minicap(iDevice));
+        androidDevice.setMinitouch(new Minitouch(iDevice));
+        androidDevice.setScrcpy(new Scrcpy(iDevice));
+        androidDevice.setAdbKit(new AdbKit(androidDevice.getId()));
     }
 }
