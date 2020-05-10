@@ -55,9 +55,9 @@ public class IosUtil {
 
             Set<String> simulatorIds = new HashSet<>();
 
-            Matcher matcher = Pattern.compile("\\((.*-.*?)\\)").matcher(cmdResponse);
+            Matcher matcher = Pattern.compile("\\w{8}(-\\w{4}){3}-\\w{12}").matcher(cmdResponse);
             while (matcher.find()) {
-                simulatorIds.add(matcher.group(1));
+                simulatorIds.add(matcher.group());
             }
 
             return simulatorIds;
