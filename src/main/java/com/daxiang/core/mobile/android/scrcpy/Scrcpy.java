@@ -32,6 +32,10 @@ public class Scrcpy {
     private IDevice iDevice;
     private String mobileId;
 
+    private int maxSize = 800;
+    private int width;
+    private int heigth;
+
     private int pid;
 
     private OutputStream controlOutputStream;
@@ -64,7 +68,7 @@ public class Scrcpy {
             try {
                 String startCmd = "CLASSPATH=" + REMOTE_SCRCPY_PATH + " app_process / com.genymobile.scrcpy.Server " +
                         App.getProperty("scrcpyVersion") + " " +            // clientVersion
-                        "800 " +                                            // maxSize
+                        maxSize + " " +                                     // maxSize
                         App.getProperty("remoteScrcpyBitRate") + " " +      // bitRate
                         "60 " +                                             // maxFps >=android10才生效
                         "true " +                                           // tunnelForward
@@ -131,9 +135,13 @@ public class Scrcpy {
                 // deviceName 64
                 // width 2
                 // height 2
-                for (int i = 0; i < 68; i++) {
+                for (int i = 0; i < 64; i++) {
                     screenStream.read();
                 }
+
+                width = screenStream.read() << 8 | screenStream.read();
+                heigth = screenStream.read() << 8 | screenStream.read();
+                log.info("[scrcpy][{}]width: {} heigth: {}", deviceId, width, heigth);
 
                 byte[] packet = new byte[1024 * 1024];
                 int packetSize;
@@ -208,7 +216,6 @@ public class Scrcpy {
         iDevice.executeShellCommand(chmodCmd, new NullOutputReceiver());
     }
 
-
     public void touchDown(int x, int y, int screenWidth, int screenHeight) {
         commitTouchEvent(ACTION_DOWN, x, y, screenWidth, screenHeight);
     }
@@ -250,6 +257,15 @@ public class Scrcpy {
 
     // Scrcpy.server ControlMessageReader.parseInjectTouchEvent
     private void commitTouchEvent(int actionType, int x, int y, int screenWidth, int screenHeight) {
+        // Scrcpy.server Device.computeVideoSize
+        // 由于H264只接收8的倍数的宽高，所以scrcpy重新计算了video size
+        // scrcpy输出的video size不能直接拿来用，否则会出现commitTouchEvent无效的问题
+        if (screenHeight == maxSize) {
+            screenWidth = heigth == maxSize ? width : heigth;
+        } else if (screenWidth == maxSize) {
+            screenHeight = width == maxSize ? heigth : width;
+        }
+
         touchEventBuffer.rewind();
 
         touchEventBuffer.put((byte) TYPE_INJECT_TOUCH_EVENT);
