@@ -34,7 +34,7 @@ public class IosUtil {
 
             return Arrays.asList(cmdResponse.split("\\r?\\n")).stream().collect(Collectors.toSet());
         } catch (Exception e) {
-            log.error("execute " + cmd + " err", e);
+            log.error("execute '{}' err", cmd, e);
             return Collections.emptySet();
         }
     }
@@ -62,7 +62,7 @@ public class IosUtil {
 
             return simulatorIds;
         } catch (Exception e) {
-            log.error("execute " + cmd + " err", e);
+            log.error("execute '{}' err", cmd, e);
             return Collections.emptySet();
         }
     }

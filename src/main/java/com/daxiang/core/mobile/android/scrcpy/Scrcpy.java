@@ -141,7 +141,7 @@ public class Scrcpy {
 
                 width = screenStream.read() << 8 | screenStream.read();
                 heigth = screenStream.read() << 8 | screenStream.read();
-                log.info("[scrcpy][{}]width: {} heigth: {}", deviceId, width, heigth);
+                log.info("[scrcpy][{}]width: {} heigth: {}", mobileId, width, heigth);
 
                 byte[] packet = new byte[1024 * 1024];
                 int packetSize;
@@ -229,19 +229,19 @@ public class Scrcpy {
     }
 
     public void home() {
-        commitKeyCode(KEYCODE_HOME);
+        commitKeycode(KEYCODE_HOME);
     }
 
     public void back() {
-        commitKeyCode(KEYCODE_BACK);
+        commitKeycode(KEYCODE_BACK);
     }
 
     public void menu() {
-        commitKeyCode(KEYCODE_MENU);
+        commitKeycode(KEYCODE_MENU);
     }
 
     public void power() {
-        commitKeyCode(KEYCODE_POWER);
+        commitKeycode(KEYCODE_POWER);
     }
 
     // Scrcpy.server ControlMessage
@@ -292,7 +292,7 @@ public class Scrcpy {
     private ByteBuffer keycodeBuffer = ByteBuffer.allocate(20);
 
     // Scrcpy.server ControlMessageReader.parseInjectKeycode
-    private void commitKeyCode(int keycode) {
+    private void commitKeycode(int keycode) {
         keycodeBuffer.rewind();
 
         keycodeBuffer.put((byte) TYPE_INJECT_KEYCODE);

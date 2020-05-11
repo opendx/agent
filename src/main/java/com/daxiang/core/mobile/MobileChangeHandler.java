@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class MobileChangeHandler {
 
-
     protected void mobileConnected(IDevice iDevice) {
         String mobileId = iDevice.getSerialNumber();
 

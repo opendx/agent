@@ -118,8 +118,9 @@ public class AndroidUtil {
     public static String executeShellCommand(IDevice iDevice, String cmd) throws IDeviceExecuteShellCommandException {
         Assert.notNull(iDevice, "iDevice can not be null");
         Assert.hasText(cmd, "cmd can not be empty");
+        String mobileId = iDevice.getSerialNumber();
 
-        log.info("[{}==>]", cmd);
+        log.info("[{}] => {}", mobileId, cmd);
         CollectingOutputReceiver collectingOutputReceiver = new CollectingOutputReceiver();
         try {
             iDevice.executeShellCommand(cmd, collectingOutputReceiver);
@@ -128,7 +129,7 @@ public class AndroidUtil {
         }
 
         String response = collectingOutputReceiver.getOutput();
-        log.info("[{}<==]{}", cmd, response);
+        log.info("[{}] <= {}", mobileId, response);
         return response;
     }
 

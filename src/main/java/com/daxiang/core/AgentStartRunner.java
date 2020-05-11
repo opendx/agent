@@ -5,6 +5,7 @@ import com.daxiang.core.mobile.android.AndroidDeviceChangeListener;
 import com.daxiang.core.mobile.appium.AppiumServer;
 import com.daxiang.core.mobile.ios.IosDeviceChangeListener;
 import com.daxiang.core.mobile.ios.IosDeviceMonitor;
+import com.daxiang.core.pc.web.Browser;
 import com.daxiang.core.pc.web.BrowserInitializer;
 import com.daxiang.utils.Terminal;
 import lombok.extern.slf4j.Slf4j;
@@ -69,7 +70,7 @@ public class AgentStartRunner implements ApplicationRunner {
 
         // pc端
         if (enablePcWeb) {
-            browserInitializer.init();
+            browserInitializer.init(Browser.PROPERTIES_PATH);
         } else {
             log.info("[web]未开启pc web功能");
         }

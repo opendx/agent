@@ -69,7 +69,7 @@ public class DeviceTestTaskExecutor {
 
             Class clazz = JavaCompiler.compile(className, code);
 
-            JSONObject caps = new JSONObject();
+            JSONObject caps = null;
             try {
                 if (StringUtils.hasText(deviceTestTask.getCapabilities())) {
                     caps = JSONObject.parseObject(deviceTestTask.getCapabilities());

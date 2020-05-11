@@ -38,7 +38,7 @@ public class BrowserServer extends DeviceServer {
             builder.usingPort(port);
 
             driverService = builder.build();
-            log.info("start driver service, agentPort: {}, driverFile: {}", port, driverFile.getAbsolutePath());
+            log.info("start driver service, port: {}, driverFile: {}", port, driverFile.getAbsolutePath());
             driverService.start();
             url = driverService.getUrl();
 

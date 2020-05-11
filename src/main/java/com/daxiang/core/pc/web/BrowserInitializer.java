@@ -18,7 +18,6 @@ import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -30,14 +29,13 @@ import java.util.stream.Collectors;
 @Component
 public class BrowserInitializer {
 
-    public void init() throws IOException {
-        List<BrowserJsonItem> browserJsonItems = parseBrowserProperties();
+    public void init(String browserPropertiesPath) throws IOException {
+        List<BrowserJsonItem> browserJsonItems = parseBrowserProperties(browserPropertiesPath);
         if (browserJsonItems.isEmpty()) {
-            log.warn("empty browser in " + Browser.PROPERTIES_PATH);
-            return;
+            throw new IllegalStateException(browserPropertiesPath + " has no browser");
         }
 
-        // 检查浏览器配置文件是否合法
+        // 检查浏览器配置文件内容是否合法
         checkBrowserJsonItems(browserJsonItems);
 
         boolean reWriteBrowserProperties = false;
@@ -49,8 +47,8 @@ public class BrowserInitializer {
         }
         if (reWriteBrowserProperties) { // 填充了浏览器id，重新写入配置
             String newBrowserProperties = JSONArray.toJSONString(browserJsonItems, true);
-            log.info("write {}: {}", Browser.PROPERTIES_PATH, newBrowserProperties);
-            FileUtils.writeStringToFile(new File(Browser.PROPERTIES_PATH), newBrowserProperties, StandardCharsets.UTF_8);
+            log.info("write {}: {}", browserPropertiesPath, newBrowserProperties);
+            FileUtils.writeStringToFile(new File(browserPropertiesPath), newBrowserProperties, StandardCharsets.UTF_8);
         }
 
         browserJsonItems.forEach(browserJsonItem -> {
@@ -81,6 +79,7 @@ public class BrowserInitializer {
                 browserDevice = constructor.newInstance(browser, browserServer);
             } catch (Exception e) {
                 log.error("{} 初始化browserDevice失败", browserJsonItem, e);
+                browserServer.stop();
                 return;
             }
 
@@ -89,23 +88,24 @@ public class BrowserInitializer {
         });
     }
 
-    private List<BrowserJsonItem> parseBrowserProperties() throws IOException {
-        File browserPropertiesFile = new File(Browser.PROPERTIES_PATH);
+    private List<BrowserJsonItem> parseBrowserProperties(String browserPropertiesPath) throws IOException {
+        if (!StringUtils.hasText(browserPropertiesPath)) {
+            throw new IllegalArgumentException(browserPropertiesPath + " must hasText");
+        }
+
+        File browserPropertiesFile = new File(browserPropertiesPath);
         if (!browserPropertiesFile.exists()) {
-            log.warn(Browser.PROPERTIES_PATH + " not exists");
-            return Collections.EMPTY_LIST;
+            throw new IllegalArgumentException(browserPropertiesPath + " not exists");
         }
 
         String browserProperties = FileUtils.readFileToString(browserPropertiesFile, StandardCharsets.UTF_8);
         if (!StringUtils.hasText(browserProperties)) {
-            log.warn(Browser.PROPERTIES_PATH + " has no text");
-            return Collections.EMPTY_LIST;
+            throw new IllegalArgumentException(browserPropertiesPath + " must has content");
         }
 
         List<BrowserJsonItem> browserJsonItems = JSONArray.parseArray(browserProperties, BrowserJsonItem.class);
         if (CollectionUtils.isEmpty(browserJsonItems)) {
-            log.warn(Browser.PROPERTIES_PATH + " has no browser");
-            return Collections.EMPTY_LIST;
+            throw new IllegalArgumentException(browserPropertiesPath + " has no browser");
         }
 
         return browserJsonItems.stream().filter(Objects::nonNull).collect(Collectors.toList());
