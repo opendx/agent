@@ -97,7 +97,7 @@ public class AndroidDeviceChangeListener implements AndroidDebugBridge.IDeviceCh
             androidDevice.setMinicap(new Minicap(iDevice));
             androidDevice.setMinitouch(new Minitouch(iDevice));
             androidDevice.setAdbKit(new AdbKit(deviceId));
-            androidDevice.setScrcpy(new Scrcpy(iDevice));
+            androidDevice.setScrcpy(new Scrcpy(iDevice, androidDevice.getDevice().getScreenHeight() / 2));
 
             MobileDeviceHolder.add(deviceId, mobileDevice);
         } else {

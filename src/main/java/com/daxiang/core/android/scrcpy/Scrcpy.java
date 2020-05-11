@@ -31,6 +31,7 @@ public class Scrcpy {
 
     private IDevice iDevice;
     private String deviceId;
+    private int maxSize;
 
     private int pid;
 
@@ -38,9 +39,10 @@ public class Scrcpy {
 
     private boolean isRunning = false;
 
-    public Scrcpy(IDevice iDevice) {
+    public Scrcpy(IDevice iDevice, int maxSize) {
         this.iDevice = iDevice;
         deviceId = iDevice.getSerialNumber();
+        this.maxSize = maxSize;
     }
 
     public void setIDevice(IDevice iDevice) {
@@ -64,7 +66,7 @@ public class Scrcpy {
             try {
                 String startCmd = "CLASSPATH=" + REMOTE_SCRCPY_PATH + " app_process / com.genymobile.scrcpy.Server " +
                         App.getProperty("scrcpyVersion") + " " +            // clientVersion
-                        "800 " +                                            // maxSize
+                        maxSize + " " +                                     // maxSize
                         App.getProperty("remoteScrcpyBitRate") + " " +      // bitRate
                         "60 " +                                             // maxFps >=android10才生效
                         "true " +                                           // tunnelForward
@@ -207,7 +209,6 @@ public class Scrcpy {
         log.info("[scrcpy][{}]{} ", deviceId, chmodCmd);
         iDevice.executeShellCommand(chmodCmd, new NullOutputReceiver());
     }
-
 
     public void touchDown(int x, int y, int screenWidth, int screenHeight) {
         commitTouchEvent(ACTION_DOWN, x, y, screenWidth, screenHeight);
