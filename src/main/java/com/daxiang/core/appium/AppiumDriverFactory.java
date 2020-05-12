@@ -43,9 +43,7 @@ public class AppiumDriverFactory {
         JSONObject caps = new JSONObject();
         caps.put(MobileCapabilityType.NO_RESET, true);
         caps.put(AndroidMobileCapabilityType.UNICODE_KEYBOARD, true);
-        caps.put("showChromedriverLog", true);
         caps.put("recreateChromeDriverSessions", true);
-        caps.put("extractChromeAndroidPackageFromContextName", true);
 
         // 加速初始化速度
         caps.put("skipServerInstallation", true);
@@ -56,7 +54,6 @@ public class AppiumDriverFactory {
         if (!androidDevice.greaterOrEqualsToAndroid5()) { // 小于安卓5，必须指定app，否则会创建driver失败
             caps.put("appPackage", "io.appium.android.apis");
             caps.put("appActivity", "io.appium.android.apis.ApiDemos");
-            caps.put("autoLaunch", false);
         }
 
         // **** 以上caps可被传入的capabilities覆盖 ****
