@@ -1,9 +1,9 @@
 package com.daxiang.core;
 
 import com.alibaba.fastjson.JSONObject;
+import com.daxiang.core.testng.TestNGCodeConverterFactory;
 import com.daxiang.server.ServerClient;
 import com.daxiang.core.testng.TestNGCodeConvertException;
-import com.daxiang.core.testng.TestNGCodeConverter;
 import com.daxiang.core.testng.TestNGRunner;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.utils.UUIDUtil;
@@ -36,14 +36,14 @@ public class DeviceTestTaskExecutor {
                     deviceTestTask = testTaskQueue.take(); // 没有测试任务，线程阻塞在此
                 } catch (InterruptedException e) {
                     // 调用executeTestTaskThread.interrupt()可以执行到这里
-                    log.info("[自动化测试][{}]停止获取测试任务", device.getId());
+                    log.info("[{}]停止获取测试任务", device.getId());
                     break;
                 }
 
                 try {
                     executeTestTask(deviceTestTask);
                 } catch (Throwable e) {
-                    log.error("[自动化测试][{}]执行测试任务出错, deviceTestTaskId: {}", device.getId(), deviceTestTask.getId(), e);
+                    log.error("[{}]执行测试任务出错, deviceTestTaskId: {}", device.getId(), deviceTestTask.getId(), e);
                 }
             }
         });
@@ -52,19 +52,20 @@ public class DeviceTestTaskExecutor {
 
     public void commitTestTask(DeviceTestTask deviceTestTask) {
         if (!testTaskQueue.offer(deviceTestTask)) {
-            throw new RuntimeException("提交测试任务失败, deviceTestTaskId: " + deviceTestTask.getId());
+            throw new RuntimeException(String.format("[%s]提交测试任务失败, deviceTestTaskId: %d", device.getId(), deviceTestTask.getId()));
         }
     }
 
     private void executeTestTask(DeviceTestTask deviceTestTask) {
-        log.info("[自动化测试][{}]开始执行测试任务, deviceTestTaskId: {}", device.getId(), deviceTestTask.getId());
+        log.info("[{}]开始执行测试任务, deviceTestTaskId: {}", device.getId(), deviceTestTask.getId());
 
-        // 设备变为使用中
+        // device变为使用中
         device.usingToServer(deviceTestTask.getTestPlan().getName());
 
         try {
             String className = "Test_" + UUIDUtil.getUUID();
-            String code = new TestNGCodeConverter().convert(deviceTestTask, className);
+            String code = TestNGCodeConverterFactory.create(deviceTestTask.getPlatform())
+                    .convert(deviceTestTask, className);
             updateDeviceTestTaskCode(deviceTestTask.getId(), code);
 
             Class clazz = JavaCompiler.compile(className, code);
@@ -75,14 +76,14 @@ public class DeviceTestTaskExecutor {
                     caps = JSONObject.parseObject(deviceTestTask.getCapabilities());
                 }
             } catch (Exception e) {
-                log.warn("parse capabilities fail, deviceTestTask: {}", deviceTestTask, e);
+                log.warn("[{}]parse caps fail, caps: {}, deviceTestTaskId: {}", device.getId(), deviceTestTask.getCapabilities(), deviceTestTask.getId(), e);
             }
             device.freshDriver(caps);
 
             TestNGRunner.runTestCases(new Class[]{clazz}, deviceTestTask.getTestPlan().getFailRetryCount());
         } catch (TestNGCodeConvertException | DynamicCompilerException e) {
-            log.error("[自动化测试][{}]deviceTestTaskId: {}", device.getId(), deviceTestTask.getId(), e);
-            updateDeviceTestTaskStatusAndErrMsg(deviceTestTask.getId(), DeviceTestTask.ERROR_STATUS, ExceptionUtils.getStackTrace(e));
+            log.error("[{}]executeTestTask err, deviceTestTaskId: {}", device.getId(), deviceTestTask.getId(), e);
+            updateDeviceTestTaskErrMsg(deviceTestTask.getId(), ExceptionUtils.getStackTrace(e));
         } finally {
             device.quitDriver();
             device.idleToServer();
@@ -96,10 +97,10 @@ public class DeviceTestTaskExecutor {
         ServerClient.getInstance().updateDeviceTestTask(deviceTestTask);
     }
 
-    private void updateDeviceTestTaskStatusAndErrMsg(Integer deviceTestTaskId, Integer status, String errMsg) {
+    private void updateDeviceTestTaskErrMsg(Integer deviceTestTaskId, String errMsg) {
         DeviceTestTask deviceTestTask = new DeviceTestTask();
         deviceTestTask.setId(deviceTestTaskId);
-        deviceTestTask.setStatus(status);
+        deviceTestTask.setStatus(DeviceTestTask.ERROR_STATUS);
         deviceTestTask.setErrMsg(errMsg);
         ServerClient.getInstance().updateDeviceTestTask(deviceTestTask);
     }

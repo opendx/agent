@@ -107,7 +107,7 @@ public class MobileAction extends BaseAction {
         if (!StringUtils.hasText(maxSwipeCount)) {
             maxSwipeCount = "3";
         }
-        int count = validInt(maxSwipeCount);
+        int count = parseInt(maxSwipeCount);
 
         for (int i = 1; i <= count; i++) {
             log.info("[{}]滑动第{}次", mobileDevice.getId(), i);
@@ -151,7 +151,7 @@ public class MobileAction extends BaseAction {
         if (!StringUtils.hasText(maxSwipeCount)) {
             maxSwipeCount = "3";
         }
-        int count = validInt(maxSwipeCount);
+        int count = parseInt(maxSwipeCount);
 
         for (int i = 1; i <= count; i++) {
             log.info("[{}]容器内滑动第{}次", mobileDevice.getId(), i + 1);
@@ -179,8 +179,8 @@ public class MobileAction extends BaseAction {
      * @param once             是否只处理一次
      */
     public void asyncAcceptAlert(String timeoutInSeconds, String once) {
-        long _timeoutInSeconds = validLong(timeoutInSeconds);
-        boolean _once = validBoolean(once);
+        long _timeoutInSeconds = parseLong(timeoutInSeconds);
+        boolean _once = parseBoolean(once);
 
         new Thread(() -> {
             long startTime = System.currentTimeMillis();
@@ -213,8 +213,8 @@ public class MobileAction extends BaseAction {
      * @param once             是否只处理一次
      */
     public void asyncDismissAlert(String timeoutInSeconds, String once) {
-        long _timeoutInSeconds = validLong(timeoutInSeconds);
-        boolean _once = validBoolean(once);
+        long _timeoutInSeconds = parseLong(timeoutInSeconds);
+        boolean _once = parseBoolean(once);
 
         new Thread(() -> {
             long startTime = System.currentTimeMillis();
@@ -236,7 +236,7 @@ public class MobileAction extends BaseAction {
     private void swipe(Point start, Point end, String durationInMs) {
         long duration = DEFAULT_SWIPE_DURATION_IN_MS;
         if (!StringUtils.isEmpty(durationInMs)) {
-            duration = validLong(durationInMs);
+            duration = parseLong(durationInMs);
         }
 
         new TouchAction(driver)

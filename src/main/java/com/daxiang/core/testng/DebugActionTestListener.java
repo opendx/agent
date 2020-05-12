@@ -28,8 +28,7 @@ public class DebugActionTestListener extends TestListenerAdapter {
     }
 
     /**
-     * todo web.ftl
-     * mobile.ftl print()
+     * codetemplate/index.ftl print()
      *
      * @param msg
      */

@@ -75,7 +75,7 @@ public abstract class Device {
         throw new UnsupportedOperationException();
     }
 
-    public UploadFile stopRecordingScreenAndUploadToServer() throws IOException {
+    public UploadFile stopRecordingScreenThenUploadToServer() throws IOException {
         File video = stopRecordingScreen();
         try {
             return serverClient.uploadFile(video, FileType.VIDEO);
@@ -115,7 +115,7 @@ public abstract class Device {
         return driver.getScreenshotAs(OutputType.FILE);
     }
 
-    public UploadFile screenshotAndUploadToServer() {
+    public UploadFile screenshotThenUploadToServer() {
         File screenshotFile = screenshot();
         try {
             return ServerClient.getInstance().uploadFile(screenshotFile, FileType.IMG);

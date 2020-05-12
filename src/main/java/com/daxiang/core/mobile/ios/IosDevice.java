@@ -87,22 +87,22 @@ public class IosDevice extends MobileDevice {
         return videoFile;
     }
 
-    public int getMjpegServerPort() {
-        Object mjpegServerPort = driver.getCapabilities().asMap().get("mjpegServerPort");
-        return (int) ((long) mjpegServerPort);
+    public long getMjpegServerPort() {
+        return (long) driver.getCapabilities().asMap().get("mjpegServerPort");
     }
 
-    public int startMjpegServerIproxy() throws IOException {
-        int mjpegServerPort = getMjpegServerPort();
+    public long startMjpegServerIproxy() throws IOException {
+        long mjpegServerPort = getMjpegServerPort();
         String cmd = String.format(IPROXY_CMD, mjpegServerPort, mjpegServerPort, getId());
-        log.info("[ios][{}]mjpegServer: {}", getId(), cmd);
+
+        log.info("[{}]startMjpegServerIproxy: {}", getId(), cmd);
         iproxyMjpegServerWatchdog = Terminal.executeAsyncAndGetWatchdog(cmd);
         return mjpegServerPort;
     }
 
     public void stopMjpegServerIproxy() {
         if (iproxyMjpegServerWatchdog != null) {
-            log.info("[ios][{}]mjpegServer iproxy stop", getId());
+            log.info("[{}]stopMjpegServerIproxy", getId());
             iproxyMjpegServerWatchdog.destroyProcess();
         }
     }

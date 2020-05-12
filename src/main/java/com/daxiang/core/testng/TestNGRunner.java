@@ -14,20 +14,14 @@ import java.util.stream.Collectors;
  */
 public class TestNGRunner {
 
-    /**
-     * 运行测试用例
-     */
     public static void runTestCases(Class[] classes, Integer failRetryCount) {
         if (failRetryCount != null && failRetryCount > 0) {
-            run(classes, Arrays.asList(TestCaseTestListener.class, AnnotationTransformer.class));
+            run(classes, Arrays.asList(TestCaseTestListener.class, FailRetryAnnotationTransformer.class));
         } else {
             run(classes, Arrays.asList(TestCaseTestListener.class));
         }
     }
 
-    /**
-     * 调试action
-     */
     public static Response debugAction(Class clazz) {
         TestNG testNG = run(new Class[]{clazz}, Arrays.asList(DebugActionTestListener.class));
         if (testNG.getStatus() != 0) { // 运行有错误

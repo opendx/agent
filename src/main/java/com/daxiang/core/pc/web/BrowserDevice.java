@@ -53,7 +53,7 @@ public abstract class BrowserDevice extends Device {
         return browser.getStatus();
     }
 
-    public abstract Capabilities createCapabilities();
+    protected abstract Capabilities createCapabilities();
 
     @Override
     public RemoteWebDriver newDriver(JSONObject caps) {

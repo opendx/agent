@@ -29,7 +29,7 @@ public class DeviceHolder {
     public static Device getConnectedDevice(String deviceId) {
         if (!StringUtils.isEmpty(deviceId)) {
             Device device = get(deviceId);
-            if (device != null || device.isConnected()) {
+            if (device != null && device.isConnected()) {
                 return device;
             }
         }
@@ -40,7 +40,7 @@ public class DeviceHolder {
     public static Device getIdleDevice(String deviceId) {
         if (!StringUtils.isEmpty(deviceId)) {
             Device device = get(deviceId);
-            if (device != null || device.isIdle()) {
+            if (device != null && device.isIdle()) {
                 return device;
             }
         }

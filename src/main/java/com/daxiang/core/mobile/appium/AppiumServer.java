@@ -52,7 +52,7 @@ public class AppiumServer extends DeviceServer {
 
         try {
             watchdog = Terminal.executeAsyncAndGetWatchdog(startCmd);
-            String url = "http://localhost:" + port + "/wd/hub";
+            String url = String.format("http://localhost:%d/wd/hub", port);
             this.url = new URL(url);
             new UrlChecker().waitUntilAvailable(60, TimeUnit.SECONDS, new URL(url + "/status"));
             isRunning = true;

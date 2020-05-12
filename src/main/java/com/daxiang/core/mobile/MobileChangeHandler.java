@@ -21,21 +21,21 @@ public abstract class MobileChangeHandler {
         if (device == null) {
             log.info("[{}]首次接入agent", mobileId);
 
-            log.info("[{}]检查是否首次接入server", mobileId);
             Mobile mobile = ServerClient.getInstance().getMobileById(mobileId);
 
             log.info("[{}]启动appium server...", mobileId);
             AppiumServer appiumServer = new AppiumServer();
             appiumServer.start();
-            log.info("[{}]启动appium server完成，url: {}", mobileId, appiumServer.getUrl());
+            log.info("[{}]启动appium server完成, url: {}", mobileId, appiumServer.getUrl());
 
             if (mobile == null) {
                 try {
-                    log.info("[{}]首次接入server，开始初始化设备", mobileId);
+                    log.info("[{}]首次接入server，开始初始化...", mobileId);
                     device = initMobile(iDevice, appiumServer);
                 } catch (Exception e) {
+                    log.info("[{}]停止appium server", mobileId);
                     appiumServer.stop();
-                    throw new RuntimeException("初始化设备" + mobileId + "失败", e);
+                    throw new RuntimeException(String.format("[%s]初始化失败", mobileId), e);
                 }
             } else {
                 log.info("[{}]已接入过server", mobileId);

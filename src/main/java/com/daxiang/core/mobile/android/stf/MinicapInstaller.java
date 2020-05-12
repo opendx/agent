@@ -30,15 +30,15 @@ public class MinicapInstaller {
             String localMinicapSoPath = String.format(Minicap.LOCAL_MINICAP_SO_PATH, sdkVersion, cpuAbi);
 
             // push minicap to mobile
-            log.info("[minicap][{}]push minicap to mobile, {} -> {}", mobileId, localMinicapPath, Minicap.REMOTE_MINICAP_PATH);
+            log.info("[{}]push minicap to mobile, {} -> {}", mobileId, localMinicapPath, Minicap.REMOTE_MINICAP_PATH);
             iDevice.pushFile(localMinicapPath, Minicap.REMOTE_MINICAP_PATH);
 
             // push minicap.so to mobile
-            log.info("[minicap][{}]push minicap.so to mobile, {} -> {}", mobileId, localMinicapSoPath, Minicap.REMOTE_MINICAP_SO_PATH);
+            log.info("[{}]push minicap.so to mobile, {} -> {}", mobileId, localMinicapSoPath, Minicap.REMOTE_MINICAP_SO_PATH);
             iDevice.pushFile(localMinicapSoPath, Minicap.REMOTE_MINICAP_SO_PATH);
 
             String chmodCmd = String.format("chmod 777 %s %s", Minicap.REMOTE_MINICAP_PATH, Minicap.REMOTE_MINICAP_SO_PATH);
-            log.info("[minicap][{}]{} ", mobileId, chmodCmd);
+            log.info("[{}]{} ", mobileId, chmodCmd);
             iDevice.executeShellCommand(chmodCmd, new NullOutputReceiver());
         } catch (Exception e) {
             throw new StfComponentInstallException(e);

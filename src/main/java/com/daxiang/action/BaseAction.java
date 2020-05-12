@@ -21,9 +21,11 @@ public class BaseAction {
 
     public static final int EXECUTE_JAVA_CODE_ID = 1;
 
+    protected Device device;
     protected RemoteWebDriver driver;
 
     public BaseAction(Device device) {
+        this.device = device;
         this.driver = device.getDriver();
     }
 
@@ -43,7 +45,7 @@ public class BaseAction {
      * @throws InterruptedException
      */
     public void sleep(String ms) throws InterruptedException {
-        Thread.sleep(validLong(ms));
+        Thread.sleep(parseLong(ms));
     }
 
     /**
@@ -104,7 +106,7 @@ public class BaseAction {
      * @param seconds
      */
     public void setImplicitlyWaitTime(String seconds) {
-        driver.manage().timeouts().implicitlyWait(validLong(seconds), TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(parseLong(seconds), TimeUnit.SECONDS);
     }
 
     /**
@@ -116,7 +118,7 @@ public class BaseAction {
      * @return
      */
     public WebElement waitForElementVisible(String findBy, String value, String timeoutInSeconds) {
-        return new WebDriverWait(driver, validLong(timeoutInSeconds))
+        return new WebDriverWait(driver, parseLong(timeoutInSeconds))
                 .until(ExpectedConditions.visibilityOfElementLocated(createBy(findBy, value)));
     }
 
@@ -130,7 +132,7 @@ public class BaseAction {
      * @return
      */
     public WebElement waitForElementPresence(String findBy, String value, String timeoutInSeconds) {
-        return new WebDriverWait(driver, validLong(timeoutInSeconds))
+        return new WebDriverWait(driver, parseLong(timeoutInSeconds))
                 .until(ExpectedConditions.presenceOfElementLocated(createBy(findBy, value)));
     }
 
@@ -172,7 +174,7 @@ public class BaseAction {
         }
     }
 
-    public boolean validBoolean(String booleanString) {
+    public boolean parseBoolean(String booleanString) {
         try {
             return Boolean.parseBoolean(booleanString);
         } catch (Exception e) {
@@ -180,7 +182,7 @@ public class BaseAction {
         }
     }
 
-    public long validLong(String longString) {
+    public long parseLong(String longString) {
         try {
             return Long.parseLong(longString);
         } catch (Exception e) {
@@ -188,7 +190,7 @@ public class BaseAction {
         }
     }
 
-    public int validInt(String intString) {
+    public int parseInt(String intString) {
         try {
             return Integer.parseInt(intString);
         } catch (Exception e) {

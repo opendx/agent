@@ -35,7 +35,7 @@ public class Minitouch {
     private int height;
 
     /**
-     * 运行在设备里的进程id
+     * 运行在Mobile里的进程id
      */
     private int pid;
 
@@ -69,12 +69,12 @@ public class Minitouch {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         new Thread(() -> {
             try {
-                log.info("[minitouch][{}]启动: {}", mobileId, REMOTE_MINITOUCH_PATH);
+                log.info("[{}]启动minitouch: {}", mobileId, REMOTE_MINITOUCH_PATH);
                 iDevice.executeShellCommand(REMOTE_MINITOUCH_PATH, new MultiLineReceiver() {
                     @Override
                     public void processNewLines(String[] lines) {
                         for (String line : lines) {
-                            log.info("[minitouch][{}]{}", mobileId, line);
+                            log.info("[{}]minitouch: {}", mobileId, line);
                             if (!StringUtils.isEmpty(line) && line.startsWith("Type")) {
                                 // minitouch启动完成
                                 countDownLatch.countDown();
@@ -87,32 +87,30 @@ public class Minitouch {
                         return false;
                     }
                 }, 0, TimeUnit.SECONDS);
-                log.info("[minitouch][{}]已停止运行", mobileId);
+                log.info("[{}]minitouch已停止运行", mobileId);
                 isRunning = false;
             } catch (Exception e) {
-                throw new RuntimeException("启动minitouch失败", e);
+                throw new RuntimeException(String.format("[%s]启动minitouch失败", mobileId), e);
             }
         }).start();
 
         int localPort = PortProvider.getMinitouchAvailablePort();
 
-        log.info("[minitouch][{}]adb forward: {} -> remote minitouch", mobileId, localPort);
+        log.info("[{}]adb forward: {} -> remote minitouch", mobileId, localPort);
         iDevice.createForward(localPort, "minitouch", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
 
         countDownLatch.await(30, TimeUnit.SECONDS);
-        log.info("[minitouch][{}]minitouch启动完成", mobileId);
+        log.info("[{}]minitouch启动完成", mobileId);
         isRunning = true;
 
         new Thread(() -> {
             try (Socket socket = new Socket("127.0.0.1", localPort);
                  BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                  PrintWriter printWriter = new PrintWriter(socket.getOutputStream())) {
-                log.info("[minitouch][{}]创建socket获取minitouch输出的数据: 127.0.0.1:{}", mobileId, localPort);
                 this.printWriter = printWriter;
 
                 String line;
                 while ((line = br.readLine()) != null) {
-                    log.info("[minitouch][{}]socket获取: {}", mobileId, line);
                     // https://github.com/openstf/minitouch#readable-from-the-socket
                     if (line.startsWith("^")) {
                         // ^ <max-contacts> <max-x> <max-y> <max-pressure>
@@ -120,15 +118,15 @@ public class Minitouch {
                         String[] content = line.split(" ");
                         width = Integer.parseInt(content[2]);
                         height = Integer.parseInt(content[3]);
-                        log.info("[minitouch][{}]minitouch输出设备宽度:{},高度:{}", mobileId, width, height);
+                        log.info("[{}]minitouch width: {} height: {}", mobileId, width, height);
                     } else if (line.startsWith("$")) {
                         // $ 12310
                         pid = Integer.parseInt(line.split(" ")[1]);
-                        log.info("[minitouch][{}]运行进程id: {}", mobileId, pid);
+                        log.info("[{}]minitouch pid: {}", mobileId, pid);
                     }
                 }
             } catch (Exception e) {
-                log.error("[minitouch][{}]处理minitouch数据出错", mobileId, e);
+                log.error("[{}]处理minitouch数据失败", mobileId, e);
             }
 
             if (printWriter != null) {
@@ -136,10 +134,10 @@ public class Minitouch {
             }
 
             try {
-                log.info("[minitouch][{}]移除adb forward: {} -> remote minitouch", mobileId, localPort);
+                log.info("[{}]移除adb forward: {} -> remote minitouch", mobileId, localPort);
                 iDevice.removeForward(localPort, "minitouch", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
             } catch (Exception e) {
-                log.error("[minitouch][{}]移除adb forward出错", mobileId, e);
+                log.error("[{}]移除adb forward出错", mobileId, e);
             }
         }).start();
 
@@ -152,10 +150,10 @@ public class Minitouch {
         if (isRunning) {
             String cmd = "kill -9 " + pid;
             try {
-                log.info("[minitouch][{}]kill minitouch: {}", mobileId, cmd);
+                log.info("[{}]kill minitouch: {}", mobileId, cmd);
                 iDevice.executeShellCommand(cmd, new NullOutputReceiver());
             } catch (Exception e) {
-                log.error("[minitouch][{}]{}执行出错", mobileId, cmd, e);
+                log.error("[{}]{}执行出错", mobileId, cmd, e);
             }
         }
     }

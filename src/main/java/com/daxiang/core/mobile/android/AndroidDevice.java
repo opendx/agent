@@ -83,7 +83,7 @@ public class AndroidDevice extends MobileDevice {
             // 主要因为appium server无法在安装app时，响应其他请求，所以这里用ddmlib安装
             AndroidUtil.installApk(iDevice, appFile.getAbsolutePath());
         } catch (InstallException e) {
-            throw new RuntimeException("安装app失败", e);
+            throw new RuntimeException(String.format("[%s]安装app失败", getId()), e);
         } finally {
             if (!scheduleService.isShutdown()) {
                 scheduleService.shutdown();
@@ -127,7 +127,7 @@ public class AndroidDevice extends MobileDevice {
                 ((AndroidDriver) driver).startRecordingScreen(androidOptions);
                 return;
             } catch (Exception e) {
-                log.warn("[{}]无法使用appium录制视频，改用scrcpy录制视频", getId(), e);
+                log.warn("[{}]无法使用appium录制视频", getId(), e);
                 canUseAppiumRecordVideo = false;
             }
         }
@@ -176,7 +176,7 @@ public class AndroidDevice extends MobileDevice {
 
         if (!chromedriverFile.exists()) {
             try {
-                log.info("[chromedriver][{}]download => {}", getId(), downloadUrl);
+                log.info("[{}]download chromedriver from {}", getId(), downloadUrl);
                 HttpUtil.downloadFile(downloadUrl, chromedriverFile);
 
                 if (!Terminal.IS_WINDOWS) {
@@ -202,7 +202,7 @@ public class AndroidDevice extends MobileDevice {
     }
 
     public void setIDevice(IDevice iDevice) {
-        // 设备重新插拔后，IDevice需要更新
+        // mobile重新插拔后，IDevice需要更新
         this.iDevice = iDevice;
         if (minicap != null) {
             minicap.setIDevice(iDevice);

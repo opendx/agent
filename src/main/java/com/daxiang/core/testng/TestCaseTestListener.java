@@ -25,14 +25,14 @@ public class TestCaseTestListener extends TestListenerAdapter {
     private static final ThreadLocal<String> CONFIG_FAIL_ERR_INFO = new ThreadLocal<>();
 
     /**
-     * 每个设备开始测试调用的方法，这里可能有多个线程同时调用
+     * 每个device开始测试调用的方法，这里可能有多个线程同时调用
      *
      * @param testContext
      */
     @Override
     public void onStart(ITestContext testContext) {
         TestDescription testDesc = new TestDescription(testContext.getAllTestMethods()[0].getDescription());
-        log.info("[自动化测试][{}]onStart, deviceTestTaskId：{}, recordVideo: {}", testDesc.getDeviceId(), testDesc.getDeviceTestTaskId(), testDesc.getRecordVideo());
+        log.info("[{}]onStart, deviceTestTaskId：{}, recordVideo: {}", testDesc.getDeviceId(), testDesc.getDeviceTestTaskId(), testDesc.getRecordVideo());
         testContext.setAttribute(TEST_DESCRIPTION, testDesc);
 
         DeviceTestTask deviceTestTask = new DeviceTestTask();
@@ -44,14 +44,14 @@ public class TestCaseTestListener extends TestListenerAdapter {
     }
 
     /**
-     * 每个设备结束测试调用的方法，这里可能有多个线程同时调用
+     * 每个device结束测试调用的方法，这里可能有多个线程同时调用
      *
      * @param testContext
      */
     @Override
     public void onFinish(ITestContext testContext) {
         TestDescription testDesc = (TestDescription) testContext.getAttribute(TEST_DESCRIPTION);
-        log.info("[自动化测试][{}]onFinish, deviceTestTaskId: {}", testDesc.getDeviceId(), testDesc.getDeviceTestTaskId());
+        log.info("[{}]onFinish, deviceTestTaskId: {}", testDesc.getDeviceId(), testDesc.getDeviceTestTaskId());
 
         CURRENT_TEST_CASE_ID.remove();
         CONFIG_FAIL_ERR_INFO.remove();
@@ -65,7 +65,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
     }
 
     /**
-     * 每个设备执行每条测试用例前调用的方法，这里可能有多个线程同时调用
+     * 每个device执行每条测试用例前调用的方法，这里可能有多个线程同时调用
      *
      * @param tr
      */
@@ -74,7 +74,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         TestDescription testDesc = (TestDescription) tr.getTestContext().getAttribute(TEST_DESCRIPTION);
         Integer testcaseId = testDesc.setTestcaseIdByTestDesc(tr.getMethod().getDescription());
         CURRENT_TEST_CASE_ID.set(testcaseId);
-        log.info("[自动化测试][{}]onTestStart, testcaseId: {}", testDesc.getDeviceId(), testcaseId);
+        log.info("[{}]onTestStart, testcaseId: {}", testDesc.getDeviceId(), testcaseId);
 
         Testcase testcase = new Testcase();
         testcase.setId(testcaseId);
@@ -85,10 +85,10 @@ public class TestCaseTestListener extends TestListenerAdapter {
         // 当前置任务执行失败，或依赖的用例执行失败，tr.getThrowable() != null，此时不需要开启视频录制，因为testng会马上调用onTestSkip
         if (tr.getThrowable() == null && testDesc.getRecordVideo()) {
             try {
-                log.info("[自动化测试][{}]testcaseId: {}, 开始录制视频...", testDesc.getDeviceId(), testcaseId);
+                log.info("[{}]testcaseId: {}, 开始录制视频...", testDesc.getDeviceId(), testcaseId);
                 testDesc.getDevice().startRecordingScreen();
             } catch (Exception e) {
-                log.error("[自动化测试][{}]testcaseId: {}, 启动录制视频失败", testDesc.getDeviceId(), testcaseId, e);
+                log.error("[{}]testcaseId: {}, 启动录制视频失败", testDesc.getDeviceId(), testcaseId, e);
                 testDesc.setRecordVideo(false);
             }
         }
@@ -97,7 +97,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
     @Override
     public void onTestSuccess(ITestResult tr) {
         TestDescription testDesc = (TestDescription) tr.getTestContext().getAttribute(TEST_DESCRIPTION);
-        log.info("[自动化测试][{}]onTestSuccess, testcaseId: {}", testDesc.getDeviceId(), testDesc.getTestcaseId());
+        log.info("[{}]onTestSuccess, testcaseId: {}", testDesc.getDeviceId(), testDesc.getTestcaseId());
 
         Testcase testcase = new Testcase();
         testcase.setId(testDesc.getTestcaseId());
@@ -111,7 +111,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
     @Override
     public void onTestFailure(ITestResult tr) {
         TestDescription testDesc = (TestDescription) tr.getTestContext().getAttribute(TEST_DESCRIPTION);
-        log.error("[自动化测试][{}]onTestFailure, testcaseId: {}", testDesc.getDeviceId(), testDesc.getTestcaseId());
+        log.error("[{}]onTestFailure, testcaseId: {}", testDesc.getDeviceId(), testDesc.getTestcaseId());
 
         Testcase testcase = new Testcase();
         testcase.setId(testDesc.getTestcaseId());
@@ -127,7 +127,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
     @Override
     public void onTestSkipped(ITestResult tr) {
         TestDescription testDesc = (TestDescription) tr.getTestContext().getAttribute(TEST_DESCRIPTION);
-        log.warn("[自动化测试][{}]onTestSkipped, testcaseId: {}", testDesc.getDeviceId(), testDesc.getTestcaseId());
+        log.warn("[{}]onTestSkipped, testcaseId: {}", testDesc.getDeviceId(), testDesc.getTestcaseId());
 
         Testcase testcase = new Testcase();
         testcase.setId(testDesc.getTestcaseId());
@@ -156,33 +156,33 @@ public class TestCaseTestListener extends TestListenerAdapter {
     @Override
     public void onConfigurationFailure(ITestResult tr) {
         TestDescription testDesc = (TestDescription) tr.getTestContext().getAttribute(TEST_DESCRIPTION);
-        log.error("[自动化测试][{}]{}执行失败", testDesc.getDeviceId(), tr.getName(), tr.getThrowable());
+        log.error("[{}]{}执行失败", testDesc.getDeviceId(), tr.getName(), tr.getThrowable());
 
         CONFIG_FAIL_ERR_INFO.set(tr.getName() + "执行失败!\n\n" + ExceptionUtils.getStackTrace(tr.getThrowable()));
     }
 
     private String uploadScreenshot(TestDescription testDesc) {
         try {
-            return testDesc.getDevice().screenshotAndUploadToServer().getFilePath();
+            return testDesc.getDevice().screenshotThenUploadToServer().getFilePath();
         } catch (Exception e) {
-            log.error("[自动化测试][{}]testcaseId: {}，截图并上传到server失败", testDesc.getDeviceId(), testDesc.getTestcaseId(), e);
+            log.error("[{}]testcaseId: {}，截图并上传到server失败", testDesc.getDeviceId(), testDesc.getTestcaseId(), e);
             return null;
         }
     }
 
     private String uploadVideo(TestDescription testDesc) {
-        if (!testDesc.getRecordVideo()) {
+        if (!testDesc.getRecordVideo()) { // server未开启录制视频 或 启动录制视频失败
             return null;
         }
 
         try {
-            log.info("[自动化测试][{}]testcaseId: {}, 停止录制视频...", testDesc.getDeviceId(), testDesc.getTestcaseId());
+            log.info("[{}]testcaseId: {}, 停止录制视频...", testDesc.getDeviceId(), testDesc.getTestcaseId());
             long startTime = System.currentTimeMillis();
-            String uploadFilePath = testDesc.getDevice().stopRecordingScreenAndUploadToServer().getFilePath();
-            log.info("[自动化测试][{}]testcaseId: {}, 停止录制视频并上传到server完成，耗时: {} ms", testDesc.getDeviceId(), testDesc.getTestcaseId(), System.currentTimeMillis() - startTime);
+            String uploadFilePath = testDesc.getDevice().stopRecordingScreenThenUploadToServer().getFilePath();
+            log.info("[{}]testcaseId: {}, 停止录制视频并上传到server完成, 耗时: {} ms", testDesc.getDeviceId(), testDesc.getTestcaseId(), System.currentTimeMillis() - startTime);
             return uploadFilePath;
         } catch (Exception e) {
-            log.error("[自动化测试][{}]testcaseId: {}，stopRecordingScreenAndUploadToServer err", testDesc.getDeviceId(), testDesc.getTestcaseId(), e);
+            log.error("[{}]testcaseId: {}，停止录制视频并上传到server失败", testDesc.getDeviceId(), testDesc.getTestcaseId(), e);
             return null;
         }
     }

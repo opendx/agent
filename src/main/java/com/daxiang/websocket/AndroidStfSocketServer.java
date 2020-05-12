@@ -37,7 +37,7 @@ public class AndroidStfSocketServer extends DeviceSocketServer {
         String realResolution = width + "x" + height;
         String virtualResolution = width / 2 + "x" + height / 2;
 
-        // android5以下的设备不多，暂不处理横竖屏切换
+        // android5以下的Mobile不多，暂不处理横竖屏切换
         sender.sendText("启动minicap...");
         androidDevice.getMinicap().start(Integer.parseInt(App.getProperty("minicap-quality")),
                 realResolution,
@@ -47,14 +47,12 @@ public class AndroidStfSocketServer extends DeviceSocketServer {
                     try {
                         sender.sendBinary(minicapImgData);
                     } catch (IOException e) {
-                        log.error("[websocket][{}]发送minicap数据异常", mobileId, e);
+                        log.error("[{}]发送minicap数据异常", mobileId, e);
                     }
                 });
-        sender.sendText("启动minicap完成");
 
         sender.sendText("启动minitouch...");
         androidDevice.getMinitouch().start();
-        sender.sendText("启动minitouch完成");
 
         freshDriver(projectId);
         onWebsocketOpenFinish();
@@ -71,7 +69,7 @@ public class AndroidStfSocketServer extends DeviceSocketServer {
 
     @OnError
     public void onError(Throwable t) {
-        log.error("[websocket][{}]onError", deviceId, t);
+        log.error("[{}]onError", deviceId, t);
     }
 
     @OnMessage

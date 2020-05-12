@@ -41,14 +41,15 @@ public class Terminal {
             PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(outputStream, errorStream);
             executor.setStreamHandler(pumpStreamHandler);
 
+            String result;
             if (showLog) {
-                log.info("[=>]{}", command);
-            }
-            executor.execute(createCommandLine(command));
-
-            String result = outputStream.toString() + errorStream.toString();
-            if (showLog) {
-                log.info("[<=]{}", result);
+                log.info("[Terminal]execute: {}", command);
+                executor.execute(createCommandLine(command));
+                result = outputStream.toString() + errorStream.toString();
+                log.info("[Terminal]{}", result);
+            } else {
+                executor.execute(createCommandLine(command));
+                result = outputStream.toString() + errorStream.toString();
             }
 
             if (!StringUtils.isEmpty(result)) {
@@ -67,7 +68,7 @@ public class Terminal {
      * 异步执行命令
      *
      * @param command
-     * @return watchdog，watchdog可杀掉正在执行的进程
+     * @return watchdog watchdog可杀掉正在执行的进程
      * @throws IOException
      */
     public static ExecuteWatchdog executeAsyncAndGetWatchdog(String command) throws IOException {
@@ -90,11 +91,11 @@ public class Terminal {
         executor.setWatchdog(watchdog);
 
         if (showLog) {
-            log.info("[=>]{}", command);
+            log.info("[Terminal]execute: {}", command);
             PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(new LogOutputStream() {
                 @Override
                 protected void processLine(String line, int i) {
-                    log.info("[<=]{}", line);
+                    log.info("[Terminal]{}", line);
                 }
             });
             executor.setStreamHandler(pumpStreamHandler);

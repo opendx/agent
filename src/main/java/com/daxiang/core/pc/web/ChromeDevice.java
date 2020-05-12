@@ -14,7 +14,7 @@ public class ChromeDevice extends BrowserDevice {
     }
 
     @Override
-    public Capabilities createCapabilities() {
+    protected Capabilities createCapabilities() {
         ChromeOptions chromeOptions = new ChromeOptions();
 
         if (!StringUtils.isEmpty(browser.getPath())) {

@@ -8,7 +8,7 @@ import org.testng.ITestResult;
  * Created by jiangyitao.
  */
 @Slf4j
-public class RetryAnalyzer implements IRetryAnalyzer {
+public class FailRetryAnalyzer implements IRetryAnalyzer {
 
     private int retryCount = 0;
 
@@ -19,7 +19,7 @@ public class RetryAnalyzer implements IRetryAnalyzer {
 
         if (retryCount < failRetryCount) {
             retryCount++;
-            log.info("[自动化测试][{}]fail retry, testcaseId: {}, failRetryCount: {}, retryCount: {}", testDesc.getDeviceId(), testDesc.getTestcaseId(), failRetryCount, retryCount);
+            log.info("[{}]fail retry, testcaseId: {}, failRetryCount: {}, retryCount: {}", testDesc.getDeviceId(), testDesc.getTestcaseId(), failRetryCount, retryCount);
             return true;
         } else {
             return false;

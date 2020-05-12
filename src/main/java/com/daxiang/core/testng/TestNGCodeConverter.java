@@ -2,13 +2,10 @@ package com.daxiang.core.testng;
 
 import com.alibaba.fastjson.JSONObject;
 import com.daxiang.action.BaseAction;
-import com.daxiang.core.ProjectPlatform;
 import com.daxiang.model.action.*;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.model.devicetesttask.Testcase;
 import freemarker.template.TemplateException;
-import lombok.Data;
-import lombok.experimental.Accessors;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -19,9 +16,10 @@ import java.util.stream.Collectors;
 /**
  * Created by jiangyitao.
  */
-@Data
-@Accessors(chain = true)
-public class TestNGCodeConverter {
+public abstract class TestNGCodeConverter {
+
+    private static final String FTL_BASE_PACKAGE_PATH = "/codetemplate";
+    private static final String FTL_FILE_NAME = "index.ftl";
 
     private static final String ACTION_PREFIX = "action_";
     private static final String TESTCASE_PREFIX = "testcase_";
@@ -91,21 +89,29 @@ public class TestNGCodeConverter {
         dataModel.put("testcasePrefix", TESTCASE_PREFIX);
         dataModel.put("executeJavaCodeActionId", BaseAction.EXECUTE_JAVA_CODE_ID);
 
+        dataModel.put("driverClassSimpleName", getDriverClass().getSimpleName());
+        dataModel.put("actionClassSimpleName", getActionClass().getSimpleName());
+        dataModel.put("deviceClassSimpleName", getDeviceClass().getSimpleName());
+
         handleJavaImports();
         dataModel.put("javaImports", javaImports);
 
         dataModel.put("deviceTestTask", deviceTestTask);
-        dataModel.put("isAndroid", deviceTestTask.getPlatform() == ProjectPlatform.ANDROID);
-
-        String ftlBasePackagePath = "/codetemplate";
-        String ftlFileName = "mobile.ftl";
 
         try {
-            return FreemarkerUtil.process(ftlBasePackagePath, ftlFileName, dataModel);
+            return FreemarkerUtil.process(FTL_BASE_PACKAGE_PATH, FTL_FILE_NAME, dataModel);
         } catch (IOException | TemplateException e) {
             throw new TestNGCodeConvertException(e);
         }
     }
+
+    protected abstract Class getDriverClass();
+
+    protected abstract Class getActionClass();
+
+    protected abstract Class getDeviceClass();
+
+    protected abstract void addJavaImports(Set<String> javaImports);
 
     private String getDesc(DeviceTestTask deviceTestTask, Testcase testcase) {
         if (deviceTestTask.getId() == null) { // 调试
@@ -133,20 +139,16 @@ public class TestNGCodeConverter {
     }
 
     private void handleJavaImports() {
-        javaImports.add("import com.daxiang.core.*");
-        javaImports.add("import com.daxiang.core.mobile.android.AndroidDevice");
-        javaImports.add("import com.daxiang.core.mobile.ios.IosDevice");
         javaImports.add("import com.daxiang.core.testng.TestCaseTestListener");
         javaImports.add("import com.daxiang.core.testng.DebugActionTestListener");
-        javaImports.add("import com.daxiang.action.*");
 
-        javaImports.add("import io.appium.java_client.*");
-        javaImports.add("import io.appium.java_client.ios.IOSDriver");
-        javaImports.add("import io.appium.java_client.android.AndroidDriver");
-        javaImports.add("import io.appium.java_client.pagefactory.*");
+        javaImports.add("import com.daxiang.core.Device");
+        javaImports.add("import com.daxiang.core.DeviceHolder");
 
         javaImports.add("import org.testng.annotations.*");
         javaImports.add("import org.testng.SkipException");
+
+        javaImports.add("import io.appium.java_client.pagefactory.*"); // AppiumFieldDecorator同样适用于pc web
 
         javaImports.add("import org.openqa.selenium.*");
         javaImports.add("import org.openqa.selenium.support.*");
@@ -154,10 +156,12 @@ public class TestNGCodeConverter {
         javaImports.add("import java.util.*");
         javaImports.add("import static org.assertj.core.api.Assertions.*");
 
+        addJavaImports(javaImports);
+
         cachedActions.values().forEach(action -> {
-            List<String> javaImports = action.getJavaImports();
-            if (!CollectionUtils.isEmpty(javaImports)) {
-                this.javaImports.addAll(javaImports);
+            List<String> actionJavaImports = action.getJavaImports();
+            if (!CollectionUtils.isEmpty(actionJavaImports)) {
+                javaImports.addAll(actionJavaImports);
             }
         });
     }

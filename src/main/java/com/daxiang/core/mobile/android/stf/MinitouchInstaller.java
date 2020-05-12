@@ -27,11 +27,11 @@ public class MinitouchInstaller {
             String cpuAbi = AndroidUtil.getCpuAbi(iDevice);
             String localMinitouchPath = String.format(Minitouch.LOCAL_MINITOUCH_PATH, cpuAbi);
 
-            log.info("[minitouch][{}]push minitouch to mobile, {} -> {}", mobileId, localMinitouchPath, Minitouch.REMOTE_MINITOUCH_PATH);
+            log.info("[{}]push minitouch to mobile, {} -> {}", mobileId, localMinitouchPath, Minitouch.REMOTE_MINITOUCH_PATH);
             iDevice.pushFile(localMinitouchPath, Minitouch.REMOTE_MINITOUCH_PATH);
 
             String chmodCmd = "chmod 777 " + Minitouch.REMOTE_MINITOUCH_PATH;
-            log.info("[minitouch][{}]{} ", mobileId, chmodCmd);
+            log.info("[{}]{} ", mobileId, chmodCmd);
             iDevice.executeShellCommand(chmodCmd, new NullOutputReceiver());
         } catch (Exception e) {
             throw new StfComponentInstallException(e);

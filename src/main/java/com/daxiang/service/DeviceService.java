@@ -24,7 +24,7 @@ public class DeviceService {
             return Response.fail(deviceId + "未连接");
         }
 
-        UploadFile uploadFile = device.screenshotAndUploadToServer();
+        UploadFile uploadFile = device.screenshotThenUploadToServer();
 
         JSONObject response = new JSONObject();
         response.put("imgUrl", uploadFile.getDownloadUrl());

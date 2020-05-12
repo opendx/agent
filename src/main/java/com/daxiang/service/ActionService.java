@@ -2,12 +2,12 @@ package com.daxiang.service;
 
 import com.daxiang.core.JavaCompiler;
 import com.daxiang.core.testng.TestNGCodeConvertException;
+import com.daxiang.core.testng.TestNGCodeConverterFactory;
 import com.daxiang.core.testng.TestNGRunner;
 import com.daxiang.model.Response;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.model.devicetesttask.Testcase;
 import com.daxiang.model.request.ActionDebugRequest;
-import com.daxiang.core.testng.TestNGCodeConverter;
 import com.daxiang.utils.UUIDUtil;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
@@ -41,9 +41,10 @@ public class ActionService {
         String className = "Debug_" + UUIDUtil.getUUID();
         String code;
         try {
-            code = new TestNGCodeConverter().convert(deviceTestTask, className);
+            code = TestNGCodeConverterFactory.create(deviceTestTask.getPlatform())
+                    .convert(deviceTestTask, className);
         } catch (TestNGCodeConvertException e) {
-            log.error("{}转换代码失败", request.getDeviceId(), e);
+            log.error("[{}]转换代码失败", request.getDeviceId(), e);
             return Response.fail(e.getMessage());
         }
 
@@ -60,6 +61,7 @@ public class ActionService {
             Class clazz = JavaCompiler.compile(className, code);
             return TestNGRunner.debugAction(clazz);
         } catch (DynamicCompilerException e) {
+            log.error("编译{}失败: {}", className, e.getMessage());
             return Response.fail(e.getMessage());
         }
     }

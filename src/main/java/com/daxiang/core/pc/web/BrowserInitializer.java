@@ -58,17 +58,19 @@ public class BrowserInitializer {
 
             BrowserServer browserServer;
             try {
-                Class<? extends DriverService.Builder> builderClass = BrowserDevice.DRIVER_SERVICE_BUILDER_MAP.get(browserJsonItem.getType());
-                if (builderClass == null) {
-                    log.warn("{} 找不到DriverService.Builder", browserJsonItem);
+                Class<? extends DriverService.Builder> driverBuilderClass = BrowserDevice.DRIVER_SERVICE_BUILDER_MAP.get(browserJsonItem.getType());
+                if (driverBuilderClass == null) {
+                    log.warn("[{}]找不到DriverService.Builder", browserJsonItem.getId());
                     return;
                 }
                 File driverFile = new File(browserJsonItem.getDriverPath());
 
-                browserServer = new BrowserServer(builderClass, driverFile);
+                log.info("[{}]启动browser server...", browserJsonItem.getId());
+                browserServer = new BrowserServer(driverBuilderClass, driverFile);
                 browserServer.start();
+                log.info("[{}]启动browser server完成, url: {}", browserJsonItem.getId(), browserServer.getUrl());
             } catch (Exception e) {
-                log.error("{} 启动browserServer失败", browserJsonItem, e);
+                log.error("[{}]启动browser server失败", browserJsonItem.getId(), e);
                 return;
             }
 
@@ -78,7 +80,8 @@ public class BrowserInitializer {
                 Constructor<? extends BrowserDevice> constructor = clazz.getConstructor(Browser.class, BrowserServer.class);
                 browserDevice = constructor.newInstance(browser, browserServer);
             } catch (Exception e) {
-                log.error("{} 初始化browserDevice失败", browserJsonItem, e);
+                log.error("[{}]初始化browserDevice失败", browserJsonItem.getId(), e);
+                log.info("[{}]停止browser server", browserJsonItem.getId());
                 browserServer.stop();
                 return;
             }

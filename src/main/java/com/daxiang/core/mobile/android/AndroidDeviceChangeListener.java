@@ -48,11 +48,11 @@ public class AndroidDeviceChangeListener extends MobileChangeHandler implements 
 
     private void androidDeviceConnected(IDevice iDevice) {
         String mobileId = iDevice.getSerialNumber();
-        log.info("[android][{}]已连接", mobileId);
+        log.info("[{}]已连接", mobileId);
 
-        log.info("[android][{}]等待上线", mobileId);
-        AndroidUtil.waitForDeviceOnline(iDevice, 5 * 60);
-        log.info("[android][{}]已上线", mobileId);
+        log.info("[{}]等待上线", mobileId);
+        AndroidUtil.waitForMobileOnline(iDevice, 5 * 60);
+        log.info("[{}]已上线", mobileId);
 
         mobileConnected(iDevice);
     }
@@ -82,20 +82,20 @@ public class AndroidDeviceChangeListener extends MobileChangeHandler implements 
         // 小于android5.0使用stf远程真机方案，否则使用scrcpy方案
         // 小于android5.0初始化driver需要指定app
         if (!androidDevice.greaterOrEqualsToAndroid5()) {
-            log.info("[android][{}]开始安装minicap", mobileId);
+            log.info("[{}]开始安装minicap", mobileId);
             MinicapInstaller minicapInstaller = new MinicapInstaller(iDevice);
             minicapInstaller.install();
-            log.info("[android][{}]安装minicap成功", mobileId);
+            log.info("[{}]安装minicap成功", mobileId);
 
-            log.info("[android][{}]开始安装minitouch", mobileId);
+            log.info("[{}]开始安装minitouch", mobileId);
             MinitouchInstaller minitouchInstaller = new MinitouchInstaller(iDevice);
             minitouchInstaller.install();
-            log.info("[android][{}]安装minitouch成功", mobileId);
+            log.info("[{}]安装minitouch成功", mobileId);
 
             // 安装一个测试apk，用于初始化appium driver
-            log.info("[android][{}]开始安装{}", mobileId, APIDEMOS_APK);
+            log.info("[{}]开始安装{}", mobileId, APIDEMOS_APK);
             androidDevice.installApp(new File(APIDEMOS_APK));
-            log.info("[android][{}]安装{}完成", mobileId, APIDEMOS_APK);
+            log.info("[{}]安装{}完成", mobileId, APIDEMOS_APK);
         }
 
         JSONObject caps = new JSONObject();
@@ -104,12 +104,12 @@ public class AndroidDeviceChangeListener extends MobileChangeHandler implements 
         caps.put("skipUnlock", false);
         caps.put("skipLogcatCapture", false);
 
-        log.info("[android][{}]开始初始化appium", mobileId);
+        log.info("[{}]开始初始化appium", mobileId);
         RemoteWebDriver driver = androidDevice.freshDriver(caps);
-        log.info("[android][{}]初始化appium完成", mobileId);
+        log.info("[{}]初始化appium完成", mobileId);
 
         // 截图并上传到服务器
-        UploadFile uploadFile = androidDevice.screenshotAndUploadToServer();
+        UploadFile uploadFile = androidDevice.screenshotThenUploadToServer();
         mobile.setImgPath(uploadFile.getFilePath());
 
         driver.quit();
@@ -124,6 +124,7 @@ public class AndroidDeviceChangeListener extends MobileChangeHandler implements 
 
     @Override
     protected void reconnectToAgent(Device device, IDevice iDevice) {
+        // 重连到agent 更新IDevice
         ((AndroidDevice) device).setIDevice(iDevice);
     }
 

@@ -28,11 +28,12 @@ public class AndroidScrcpySocketServer extends DeviceSocketServer {
         onWebsocketOpenStart(mobileId, username, session);
         scrcpy = ((AndroidDevice) device).getScrcpy();
 
+        sender.sendText("启动scrcpy...");
         scrcpy.start(imgData -> {
             try {
                 sender.sendBinary(imgData);
             } catch (IOException e) {
-                log.error("[websocket][{}]发送scrcpy数据异常", mobileId, e);
+                log.error("[{}]发送scrcpy数据异常", mobileId, e);
             }
         });
 
@@ -50,7 +51,7 @@ public class AndroidScrcpySocketServer extends DeviceSocketServer {
 
     @OnError
     public void onError(Throwable t) {
-        log.error("[websocket][{}]onError", deviceId, t);
+        log.error("[{}]onError", deviceId, t);
     }
 
     @OnMessage

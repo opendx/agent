@@ -34,7 +34,7 @@ public class AdbKit {
         // https://github.com/openstf/adbkit
         String cmd = String.format("node %s usb-device-to-tcp -p %d %s", LOCAL_ADBKIT, localPort, mobileId);
 
-        log.info("[adbkit][{}]开启远程调试功能: {}", mobileId, cmd);
+        log.info("[{}]开启远程调试功能: {}", mobileId, cmd);
         watchdog = Terminal.executeAsyncAndGetWatchdog(cmd);
 
         return localPort;
@@ -45,7 +45,7 @@ public class AdbKit {
      */
     public void stop() {
         if (watchdog != null) {
-            log.info("[adbkit][{}]关闭adbkit", mobileId);
+            log.info("[{}]关闭adbkit", mobileId);
             watchdog.destroyProcess();
         }
     }

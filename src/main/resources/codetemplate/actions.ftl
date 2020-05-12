@@ -1,7 +1,6 @@
 <#-- <#if></#if>不能处于同一行，否则if不满足时，会出现空行 -->
 <#if actions?? && (actions?size>0)>
     <#list actions as action>
-
         <#-- 方法注释 -->
         <#if action.name?? && action.name!=''>
             <#lt>    // ${action.name}
@@ -41,7 +40,7 @@
                     <#if step.handleException??>
                         <#lt>        try {
                     </#if>
-                    <#-- (设备任务id && 测试用例)记录步骤的执行开始时间 -->
+                    <#-- (deviceTestTask.id && 测试用例)记录步骤的执行开始时间 -->
                     <#if deviceTestTask.id?? && action.type==3>
                         <#lt><#if step.handleException??>    </#if>        TestCaseTestListener.recordTestCaseStepTime(${deviceTestTask.id?c}, ${action.id?c}, true, ${step.number?c});
                     </#if>
@@ -59,7 +58,7 @@
                             </#list>
                         </#if><#lt>);
                     </#if>
-                    <#-- (设备任务id && 测试用例)记录步骤的执行结束时间 -->
+                    <#-- (deviceTestTask.id && 测试用例)记录步骤的执行结束时间 -->
                     <#if deviceTestTask.id?? && action.type==3>
                         <#lt><#if step.handleException??>    </#if>        TestCaseTestListener.recordTestCaseStepTime(${deviceTestTask.id?c}, ${action.id?c}, false, ${step.number?c});
                     </#if>

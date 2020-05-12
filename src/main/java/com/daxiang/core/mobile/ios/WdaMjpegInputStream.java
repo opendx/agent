@@ -71,7 +71,7 @@ public class WdaMjpegInputStream extends DataInputStream {
     }
 
     /**
-     * 从mjpeg流中读取图片
+     * 从wda mjpeg流中读取图片
      *
      * @return
      * @throws IOException

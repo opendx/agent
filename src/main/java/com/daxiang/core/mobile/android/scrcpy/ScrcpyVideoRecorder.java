@@ -19,24 +19,24 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class ScrcpyVideoRecorder {
 
-    private String deviceId;
+    private String mobileId;
 
     private String startCmd;
     private String videoName;
     private boolean isRecording = false;
     private CountDownLatch countDownLatch;
 
-    public ScrcpyVideoRecorder(String deviceId) {
-        this.deviceId = deviceId;
+    public ScrcpyVideoRecorder(String mobileId) {
+        this.mobileId = mobileId;
 
         if (Terminal.IS_WINDOWS) {
-            throw new RuntimeException("暂不支持windows录屏");
+            throw new IllegalStateException("暂不支持windows录屏");
         }
 
         try {
             String version = Terminal.execute("scrcpy -v");
             if (StringUtils.isEmpty(version) || !version.startsWith("scrcpy")) {
-                throw new RuntimeException("未找到scrcpy，需要将scrcpy配置到环境变量，更多信息: https://github.com/Genymobile/scrcpy");
+                throw new IllegalStateException("未找到scrcpy，需要将scrcpy配置到环境变量，更多信息: https://github.com/Genymobile/scrcpy");
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -53,15 +53,15 @@ public class ScrcpyVideoRecorder {
         try {
             videoName = UUIDUtil.getUUID() + ".mp4";
             startCmd = String.format("scrcpy -s %s -Nr %s -b%sM -p %d",
-                    deviceId,
+                    mobileId,
                     videoName,
                     App.getProperty("androidRecordVideoBitRate"),
                     PortProvider.getScrcpyRecordVideoPort());
-            log.info("[scrcpy][{}]start record video, cmd: {}", deviceId, startCmd);
+            log.info("[{}]start record video, cmd: {}", mobileId, startCmd);
             Terminal.executeAsync(startCmd, new PumpStreamHandler(new LogOutputStream() {
                 @Override
                 protected void processLine(String line, int i) {
-                    log.info("[scrcpy][{}]{}", deviceId, line);
+                    log.info("[{}]scrcpy: {}", mobileId, line);
                     if (line.contains("Recording complete")) {
                         countDownLatch.countDown();
                     }
@@ -75,8 +75,8 @@ public class ScrcpyVideoRecorder {
     }
 
     /**
-     * 1. kill scrcpy server来停止录制视频是最优方案。但大多数安卓设备只能通过ps（非ps -ef）获取到scrcpy server进程,
-     * 此时的进程名为app_process, appium在设备里运行的进程也是app_process，所以可能会误杀appium在设备里运行的进程，不采用该方法
+     * 1. kill scrcpy server来停止录制视频是最优方案。但大多数安卓Mobile只能通过ps（非ps -ef）获取到scrcpy server进程,
+     * 此时的进程名为app_process, appium在Mobile里运行的进程也是app_process，所以可能会误杀appium在Mobile里运行的进程，不采用该方法
      * 2. ExecuteWatchdog.destroyProcess()会导致最后一部分视频无法写入，
      * 因为运行在pc的scrcpy进程被直接干掉，无法写入最终的视频，导致获取到破损的视频
      * 3. 在非windows操作系统下，scrcpy收到kill信号后，会写入最后一部分视频，目前采用该方法
@@ -84,10 +84,10 @@ public class ScrcpyVideoRecorder {
      */
     public synchronized File stop() throws IOException {
         if (!isRecording) {
-            throw new RuntimeException("video is not in recording");
+            throw new IllegalStateException("video is not in recording");
         }
 
-        log.info("[scrcpy][{}]stop record video: {}", deviceId, videoName);
+        log.info("[{}]stop record video: {}", mobileId, videoName);
 
         String killScrcpyCmd = String.format("ps -ef|grep '%s'|grep -v grep|awk '{print \"kill \"$2}'|sh", startCmd);
         Terminal.execute(killScrcpyCmd);
@@ -99,7 +99,7 @@ public class ScrcpyVideoRecorder {
             throw new RuntimeException(e);
         }
 
-        log.info("[scrcpy][{}]video: {} recording complete", deviceId, videoName);
+        log.info("[{}]video: {} recording complete", mobileId, videoName);
         isRecording = false;
 
         return new File(videoName);

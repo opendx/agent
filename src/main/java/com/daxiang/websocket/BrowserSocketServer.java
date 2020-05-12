@@ -32,11 +32,11 @@ public class BrowserSocketServer extends DeviceSocketServer {
 
     @OnError
     public void onError(Throwable t) {
-        log.error("[websocket][{}]onError", deviceId, t);
+        log.error("[{}]onError", deviceId, t);
     }
 
     @OnMessage
     public void onMessage(String message) {
-        log.info("[websocket][{}]message: {}", deviceId, message);
+        log.info("[{}]message: {}", deviceId, message);
     }
 }

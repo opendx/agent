@@ -32,7 +32,6 @@ public class BrowserServer extends DeviceServer {
 
         try {
             DriverService.Builder builder = builderClass.newInstance();
-
             builder.usingDriverExecutable(driverFile);
             int port = PortProvider.getPcDriverServiceAvailablePort();
             builder.usingPort(port);
@@ -40,8 +39,8 @@ public class BrowserServer extends DeviceServer {
             driverService = builder.build();
             log.info("start driver service, port: {}, driverFile: {}", port, driverFile.getAbsolutePath());
             driverService.start();
-            url = driverService.getUrl();
 
+            url = driverService.getUrl();
             isRunning = driverService.isRunning();
         } catch (Exception e) {
             throw new RuntimeException("启动driver service失败", e);

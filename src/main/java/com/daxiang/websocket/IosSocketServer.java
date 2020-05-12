@@ -48,7 +48,7 @@ public class IosSocketServer extends DeviceSocketServer {
         freshDriver(projectId);
 
         // 转发本地端口到wdaMjpegServer,这样可以通过localhost访问到wdaMjpegServer屏幕数据
-        int mjpegServerPort = iosDevice.startMjpegServerIproxy();
+        long mjpegServerPort = iosDevice.startMjpegServerIproxy();
         String mjpegServerUrl = "http://localhost:" + mjpegServerPort;
 
         URL url = new URL(mjpegServerUrl);
@@ -57,6 +57,7 @@ public class IosSocketServer extends DeviceSocketServer {
         conn.setReadTimeout(30000);    // ms
 
         // 连接wdaMjpegServer
+        sender.sendText("连接wdaMjpegServer...");
         long startTime = System.currentTimeMillis();
         while (true) {
             try {
@@ -66,7 +67,7 @@ public class IosSocketServer extends DeviceSocketServer {
                 Thread.sleep(1000);
             }
             if (System.currentTimeMillis() - startTime > 15000) {
-                throw new RuntimeException(String.format("连接%s失败", mjpegServerUrl));
+                throw new RuntimeException(String.format("[%s]连接%s失败", mobileId, mjpegServerUrl));
             }
         }
 
@@ -77,9 +78,9 @@ public class IosSocketServer extends DeviceSocketServer {
                     sender.sendBinary(wdaIn.readImg());
                 }
             } catch (Exception e) {
-                log.info("[websocket][{}]{}", mobileId, e.getMessage());
+                log.info("[{}]{}", mobileId, e.getMessage());
             }
-            log.info("[websocket][{}]停止发送图片数据", mobileId);
+            log.info("[{}]停止发送图片数据", mobileId);
             conn.disconnect();
         }).start();
 
@@ -96,7 +97,7 @@ public class IosSocketServer extends DeviceSocketServer {
 
     @OnError
     public void onError(Throwable t) {
-        log.error("[websocket][{}]onError", deviceId, t);
+        log.error("[{}]onError", deviceId, t);
     }
 
     @OnMessage

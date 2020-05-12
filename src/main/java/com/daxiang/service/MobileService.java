@@ -39,7 +39,7 @@ public class MobileService {
             ((MobileDevice) device).installApp(appFile);
             return Response.success("安装成功");
         } catch (Exception e) {
-            log.error("安装app失败", e);
+            log.error("[{}]安装app失败", mobileId, e);
             return Response.fail(e.getMessage());
         } finally {
             FileUtils.deleteQuietly(appFile);

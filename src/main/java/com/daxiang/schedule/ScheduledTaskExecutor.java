@@ -24,11 +24,11 @@ public class ScheduledTaskExecutor {
     private ServerClient serverClient;
 
     /**
-     * 定时检测设备的测试任务
+     * 定时检测device的测试任务
      */
     @Scheduled(fixedRate = 10000)
     public void commitDeviceTestTask() {
-        // 在线闲置的设备
+        // 在线闲置的device
         List<Device> devices = DeviceHolder.getAll().stream()
                 .filter(Device::isIdle)
                 .collect(Collectors.toList());
@@ -37,10 +37,10 @@ public class ScheduledTaskExecutor {
         }
 
         devices.stream().parallel().forEach(device -> {
-            // 获取最早的一个未开始的设备测试任务
+            // 获取最早的一个未开始的任务
             DeviceTestTask deviceTestTask = serverClient.getFirstUnStartDeviceTestTask(device.getId());
             if (deviceTestTask != null) {
-                log.info("[自动化测试][{}]提交测试任务，deviceTestTaskId: {}", device.getId(), deviceTestTask.getId());
+                log.info("[{}]提交测试任务, deviceTestTaskId: {}", device.getId(), deviceTestTask.getId());
                 device.getDeviceTestTaskExecutor().commitTestTask(deviceTestTask);
             }
         });

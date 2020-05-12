@@ -14,28 +14,16 @@ import java.io.IOException;
 @Slf4j
 public class ADB {
 
-
-    /**
-     * 添加Android设备监听器
-     *
-     * @param deviceChangeListener
-     */
     public static void addDeviceChangeListener(AndroidDebugBridge.IDeviceChangeListener deviceChangeListener) {
         AndroidDebugBridge.init(false);
         AndroidDebugBridge.createBridge(getPath(), false);
         AndroidDebugBridge.addDeviceChangeListener(deviceChangeListener);
     }
 
-    /**
-     * 杀掉adb服务
-     */
     public static void killServer() throws IOException {
         Terminal.execute("adb kill-server");
     }
 
-    /**
-     * 启动adb服务
-     */
     public static void startServer() throws IOException {
         Terminal.execute("adb start-server");
     }
@@ -47,10 +35,10 @@ public class ADB {
      */
     private static String getPath() {
         String androidHome = System.getenv("ANDROID_HOME");
-        log.info("[adb]环境变量ANDROID_HOME: {}", androidHome);
+        log.info("环境变量ANDROID_HOME: {}", androidHome);
 
         if (StringUtils.isEmpty(androidHome)) {
-            throw new RuntimeException("未获取到ANDROID_HOME，请配置ANDOIRD_HOME环境变量");
+            throw new RuntimeException("未获取到ANDROID_HOME，请配置ANDROID_HOME环境变量");
         }
 
         String adbPath = androidHome + File.separator + "platform-tools" + File.separator;
@@ -59,7 +47,7 @@ public class ADB {
         } else {
             adbPath = adbPath + "adb";
         }
-        log.info("[adb]adb路径: {}", adbPath);
+        log.info("adb路径: {}", adbPath);
         return adbPath;
     }
 }

@@ -51,16 +51,9 @@ public abstract class MobileDevice extends Device {
 
     @Override
     public Map<String, Object> dump() {
-        int type;
-        String pageSource;
-
-        if (isNativeContext()) {
-            if (isAndroid()) {
-                type = Page.TYPE_ANDROID_NATIVE;
-            } else {
-                type = Page.TYPE_IOS_NATIVE;
-            }
-
+        if (isNativeContext()) { // 原生
+            int type = isAndroid() ? Page.TYPE_ANDROID_NATIVE : Page.TYPE_IOS_NATIVE;
+            String pageSource;
             try {
                 pageSource = nativePageSourceHandler.handle(driver.getPageSource());
             } catch (IOException | DocumentException e) {
@@ -68,11 +61,10 @@ public abstract class MobileDevice extends Device {
             }
 
             pageSource = XML.toJSONObject(pageSource).toString();
-        } else {
+            return ImmutableMap.of("type", type, "pageSource", pageSource);
+        } else { // webview
             return super.dump();
         }
-
-        return ImmutableMap.of("type", type, "pageSource", pageSource);
     }
 
     @Override

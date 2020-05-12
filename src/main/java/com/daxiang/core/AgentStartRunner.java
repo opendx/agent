@@ -52,27 +52,27 @@ public class AgentStartRunner implements ApplicationRunner {
                 Thread.sleep(1000);
                 ADB.startServer();
                 ADB.addDeviceChangeListener(androidDeviceChangeListener);
-                log.info("[android]开始监听设备连接/断开");
+                log.info("开始监听AndroidDevice连接/断开");
             } else {
-                log.info("[android]未开启Android功能");
+                log.info("未开启Android功能");
             }
 
             if (enableIos) {
                 IosDeviceMonitor iosDeviceMonitor = IosDeviceMonitor.getInstance();
                 iosDeviceMonitor.start(iosDeviceChangeListener);
-                log.info("[ios]开始监听设备连接/断开");
+                log.info("开始监听IosDevice连接/断开");
             } else {
-                log.info("[ios]未开启ios功能");
+                log.info("未开启iOS功能");
             }
         } else {
-            log.info("[mobile]未开启Android & iOS功能");
+            log.info("未开启Android与iOS功能");
         }
 
         // pc端
         if (enablePcWeb) {
             browserInitializer.init(Browser.PROPERTIES_PATH);
         } else {
-            log.info("[web]未开启pc web功能");
+            log.info("未开启pc web功能");
         }
 
         // 是否配置了aapt
@@ -89,7 +89,7 @@ public class AgentStartRunner implements ApplicationRunner {
 
     private void checkAppiumVersion(String appiumVersion) {
         if (StringUtils.isEmpty(appiumVersion) || !appiumVersion.matches("\\d+.\\d+.\\d+")) {
-            throw new IllegalArgumentException("appium版本错误: " + appiumVersion);
+            throw new IllegalArgumentException("非法的appium版本: " + appiumVersion);
         }
 
         String[] appiumVersionArr = appiumVersion.split("\\.");
@@ -97,7 +97,7 @@ public class AgentStartRunner implements ApplicationRunner {
         int middle = Integer.parseInt(appiumVersionArr[1]);
 
         if (first < 1 || (first == 1 && middle < 16)) {
-            throw new IllegalArgumentException("appium版本必须>=1.16.0");
+            throw new IllegalArgumentException("appium版本不能低于1.16.0");
         }
     }
 
