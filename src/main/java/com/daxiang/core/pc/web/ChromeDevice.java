@@ -21,6 +21,9 @@ public class ChromeDevice extends BrowserDevice {
             chromeOptions.setBinary(browser.getPath());
         }
 
+        chromeOptions.addArguments("--ignore-certificate-errors");
+        chromeOptions.addArguments("no-default-browser-check");
+
         return chromeOptions;
     }
 }

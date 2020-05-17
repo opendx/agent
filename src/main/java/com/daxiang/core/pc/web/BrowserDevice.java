@@ -30,6 +30,7 @@ public abstract class BrowserDevice extends Device {
 
     public static final Map<String, Class<? extends BrowserDevice>> BROWSER_MAP = ImmutableMap.<String, Class<? extends BrowserDevice>>builder()
             .put("chrome", ChromeDevice.class)
+            .put("firefox", FirefoxDevice.class)
             .build();
 
     protected Browser browser;
@@ -57,7 +58,7 @@ public abstract class BrowserDevice extends Device {
 
     @Override
     public RemoteWebDriver newDriver(JSONObject caps) {
-        // server.project.caps暂时先不用
+        // todo server.project.caps
         return new RemoteWebDriver(deviceServer.getUrl(), createCapabilities());
     }
 
