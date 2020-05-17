@@ -7,7 +7,6 @@ import com.daxiang.App;
 import com.daxiang.core.PortProvider;
 import com.daxiang.core.mobile.android.AndroidDevice;
 import com.daxiang.core.mobile.android.AndroidImgDataConsumer;
-import com.daxiang.utils.IOUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -151,7 +150,10 @@ public class Scrcpy {
                         screenStream.read();
                     }
 
-                    packetSize = IOUtil.readInt(screenStream);
+                    packetSize = (screenStream.read() & 0xff) << 24
+                            | (screenStream.read() & 0xff) << 16
+                            | (screenStream.read() & 0xff) << 8
+                            | (screenStream.read() & 0xff);
                     if (packetSize > packet.length) {
                         packet = new byte[packetSize];
                     }
