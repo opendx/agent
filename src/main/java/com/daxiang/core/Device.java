@@ -100,9 +100,11 @@ public abstract class Device {
     }
 
     public void quitDriver() {
-        try {
-            driver.quit();
-        } catch (Exception ign) {
+        if (driver != null) {
+            try {
+                driver.quit();
+            } catch (Exception ign) {
+            }
         }
     }
 

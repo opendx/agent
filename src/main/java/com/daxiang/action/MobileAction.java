@@ -25,12 +25,14 @@ public class MobileAction extends BaseAction {
     private static final long DEFAULT_SWIPE_DURATION_IN_MS = 100L;
 
     private MobileDevice mobileDevice;
-    protected AppiumDriver driver;
 
     public MobileAction(MobileDevice mobileDevice) {
         super(mobileDevice);
         this.mobileDevice = mobileDevice;
-        driver = (AppiumDriver) mobileDevice.getDriver();
+    }
+
+    private AppiumDriver getAppiumDriver() {
+        return (AppiumDriver) device.getDriver();
     }
 
     /**
@@ -40,7 +42,7 @@ public class MobileAction extends BaseAction {
      */
     public void switchContext(String context) {
         Assert.hasText(context, "context不能为空");
-        driver.context(context);
+        getAppiumDriver().context(context);
     }
 
     /**
@@ -73,7 +75,7 @@ public class MobileAction extends BaseAction {
      * @param durationInMs 滑动耗时
      */
     public void swipe(String startPoint, String endPoint, String durationInMs) {
-        Dimension window = driver.manage().window().getSize();
+        Dimension window = getAppiumDriver().manage().window().getSize();
         Point start = createPoint(startPoint, window);
         Point end = createPoint(endPoint, window);
 
@@ -94,6 +96,7 @@ public class MobileAction extends BaseAction {
     public WebElement swipeToFindElement(String findBy, String value,
                                          String startPoint, String endPoint, String maxSwipeCount, String onceDurationInMs) {
         By by = createBy(findBy, value);
+        AppiumDriver driver = getAppiumDriver();
         try {
             return driver.findElement(by);
         } catch (Exception ign) {
@@ -140,6 +143,7 @@ public class MobileAction extends BaseAction {
     public WebElement swipeInContainerToFindElement(WebElement container, String findBy, String value,
                                                     String startPoint, String endPoint, String maxSwipeCount, String onceDurationInMs) {
         By by = createBy(findBy, value);
+        AppiumDriver driver = getAppiumDriver();
         try {
             return driver.findElement(by);
         } catch (Exception ign) {
@@ -239,7 +243,7 @@ public class MobileAction extends BaseAction {
             duration = parseLong(durationInMs);
         }
 
-        new TouchAction(driver)
+        new TouchAction(getAppiumDriver())
                 .press(PointOption.point(start))
                 .waitAction(WaitOptions.waitOptions(Duration.ofMillis(duration)))
                 .moveTo(PointOption.point(end))

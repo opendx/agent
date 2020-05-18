@@ -3,6 +3,7 @@ package com.daxiang.action;
 import com.daxiang.core.mobile.ios.IosDevice;
 import com.daxiang.core.mobile.ios.IosUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.springframework.util.Assert;
 
 /**
@@ -25,6 +26,7 @@ public class IosAction extends MobileAction {
     public void restartIosApp(String bundleId) {
         Assert.hasText(bundleId, "bundleId不能为空");
 
+        RemoteWebDriver driver = device.getDriver();
         IosUtil.terminateApp(driver, bundleId);
         IosUtil.launchApp(driver, bundleId);
     }

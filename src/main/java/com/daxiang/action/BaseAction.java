@@ -4,7 +4,6 @@ import com.daxiang.core.Device;
 import io.appium.java_client.MobileBy;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.util.Assert;
@@ -22,11 +21,9 @@ public class BaseAction {
     public static final int EXECUTE_JAVA_CODE_ID = 1;
 
     protected Device device;
-    protected RemoteWebDriver driver;
 
     public BaseAction(Device device) {
         this.device = device;
-        this.driver = device.getDriver();
     }
 
     /**
@@ -69,7 +66,7 @@ public class BaseAction {
      * @return
      */
     public WebElement findElement(String findBy, String value) {
-        return driver.findElement(createBy(findBy, value));
+        return device.getDriver().findElement(createBy(findBy, value));
     }
 
     /**
@@ -80,7 +77,7 @@ public class BaseAction {
      * @return 返回所有匹配的元素
      */
     public List<WebElement> findElements(String findBy, String value) {
-        return driver.findElements(createBy(findBy, value));
+        return device.getDriver().findElements(createBy(findBy, value));
     }
 
     /**
@@ -92,7 +89,7 @@ public class BaseAction {
      * @return
      */
     public WebElement sendKeys(String findBy, String value, String content) {
-        WebElement element = driver.findElement(createBy(findBy, value));
+        WebElement element = device.getDriver().findElement(createBy(findBy, value));
         if (content == null) {
             content = "";
         }
@@ -106,7 +103,7 @@ public class BaseAction {
      * @param seconds
      */
     public void setImplicitlyWaitTime(String seconds) {
-        driver.manage().timeouts().implicitlyWait(parseLong(seconds), TimeUnit.SECONDS);
+        device.getDriver().manage().timeouts().implicitlyWait(parseLong(seconds), TimeUnit.SECONDS);
     }
 
     /**
@@ -118,7 +115,7 @@ public class BaseAction {
      * @return
      */
     public WebElement waitForElementVisible(String findBy, String value, String timeoutInSeconds) {
-        return new WebDriverWait(driver, parseLong(timeoutInSeconds))
+        return new WebDriverWait(device.getDriver(), parseLong(timeoutInSeconds))
                 .until(ExpectedConditions.visibilityOfElementLocated(createBy(findBy, value)));
     }
 
@@ -132,7 +129,7 @@ public class BaseAction {
      * @return
      */
     public WebElement waitForElementPresence(String findBy, String value, String timeoutInSeconds) {
-        return new WebDriverWait(driver, parseLong(timeoutInSeconds))
+        return new WebDriverWait(device.getDriver(), parseLong(timeoutInSeconds))
                 .until(ExpectedConditions.presenceOfElementLocated(createBy(findBy, value)));
     }
 
