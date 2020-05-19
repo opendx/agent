@@ -1,6 +1,5 @@
 package com.daxiang.core;
 
-import com.alibaba.fastjson.JSONObject;
 import com.daxiang.App;
 import com.daxiang.model.FileType;
 import com.daxiang.model.UploadFile;
@@ -8,6 +7,7 @@ import com.daxiang.model.page.Page;
 import com.daxiang.server.ServerClient;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -31,6 +31,8 @@ public abstract class Device {
     protected DeviceServer deviceServer;
     protected RemoteWebDriver driver;
     protected ServerClient serverClient;
+
+    protected Capabilities caps;
 
     public Device(DeviceServer deviceServer) {
         this.deviceServer = deviceServer;
@@ -57,7 +59,17 @@ public abstract class Device {
 
     public abstract Integer getStatus();
 
-    public abstract RemoteWebDriver newDriver(JSONObject caps);
+    public void setCaps(Capabilities caps, boolean merge) {
+        if (caps != null && !merge) {
+            this.caps = caps;
+        } else {
+            this.caps = newCaps(caps);
+        }
+    }
+
+    public abstract RemoteWebDriver newDriver();
+
+    protected abstract Capabilities newCaps(Capabilities capsToMerge);
 
     public abstract void onlineToServer();
 
@@ -93,9 +105,16 @@ public abstract class Device {
         return getStatus() == IDLE_STATUS;
     }
 
-    public RemoteWebDriver freshDriver(JSONObject caps) {
+    // codetemplate/index.ftl
+    // 使用当前caps刷新driver
+    public RemoteWebDriver freshDriver() {
+        return freshDriver(caps, false);
+    }
+
+    public RemoteWebDriver freshDriver(Capabilities caps, boolean merge) {
         quitDriver();
-        driver = newDriver(caps);
+        setCaps(caps, merge);
+        driver = newDriver();
         return driver;
     }
 

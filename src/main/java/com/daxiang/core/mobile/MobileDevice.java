@@ -22,6 +22,11 @@ import java.util.Map;
 @Slf4j
 public abstract class MobileDevice extends Device {
 
+    /**
+     * 调试action需要，两次命令之间最大允许12小时间隔
+     */
+    public static final int NEW_COMMAND_TIMEOUT = 60 * 60 * 12;
+
     public static final String NATIVE_CONTEXT = "NATIVE_APP";
 
     public static final int PLATFORM_ANDROID = 1;

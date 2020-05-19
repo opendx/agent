@@ -56,7 +56,7 @@ public class DefaultIosDeviceChangeListener extends MobileChangeHandler implemen
         IosDevice iosDevice = new IosDevice(mobile, appiumServer);
 
         log.info("[{}]开始初始化appium", mobileId);
-        RemoteWebDriver driver = iosDevice.freshDriver(null);
+        RemoteWebDriver driver = iosDevice.freshDriver(null, true);
         log.info("[{}]初始化appium完成", mobileId);
 
         if (!isRealDevice) {

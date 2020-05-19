@@ -10,6 +10,8 @@ import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.model.devicetesttask.Testcase;
 import com.daxiang.utils.Terminal;
 import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -69,7 +71,7 @@ public class ServerClient {
         return INSTANCE;
     }
 
-    public JSONObject getCapabilitiesByProjectId(Integer projectId) {
+    public Capabilities getCapabilitiesByProjectId(Integer projectId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -88,13 +90,13 @@ public class ServerClient {
                 String capabilities = project.get().get("capabilities");
                 if (StringUtils.hasText(capabilities)) {
                     try {
-                        return JSONObject.parseObject(capabilities);
+                        return new DesiredCapabilities(JSONObject.parseObject(capabilities));
                     } catch (Exception ign) {
                     }
                 }
             }
 
-            return new JSONObject();
+            return null;
         } else {
             throw new RuntimeException(response.getMsg());
         }

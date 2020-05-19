@@ -1,12 +1,12 @@
 package com.daxiang.websocket;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.daxiang.core.Device;
 import com.daxiang.core.DeviceHolder;
 import com.daxiang.server.ServerClient;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.Capabilities;
 
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.Session;
@@ -48,10 +48,10 @@ public class DeviceSocketServer {
     }
 
     protected void freshDriver(Integer projectId) throws IOException {
-        JSONObject projectCaps = ServerClient.getInstance().getCapabilitiesByProjectId(projectId);
+        Capabilities projectCaps = ServerClient.getInstance().getCapabilitiesByProjectId(projectId);
 
         sender.sendText("初始化driver...");
-        device.freshDriver(projectCaps);
+        device.freshDriver(projectCaps, true);
         sender.sendText("初始化driver完成");
     }
 

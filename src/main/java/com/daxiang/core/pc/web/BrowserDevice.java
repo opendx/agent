@@ -1,9 +1,7 @@
 package com.daxiang.core.pc.web;
 
-import com.alibaba.fastjson.JSONObject;
 import com.daxiang.core.Device;
 import com.google.common.collect.ImmutableMap;
-import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.firefox.GeckoDriverService;
@@ -54,12 +52,9 @@ public abstract class BrowserDevice extends Device {
         return browser.getStatus();
     }
 
-    protected abstract Capabilities createCapabilities();
-
     @Override
-    public RemoteWebDriver newDriver(JSONObject caps) {
-        // todo server.project.caps
-        return new RemoteWebDriver(deviceServer.getUrl(), createCapabilities());
+    public RemoteWebDriver newDriver() {
+        return new RemoteWebDriver(deviceServer.getUrl(), this.caps);
     }
 
     @Override

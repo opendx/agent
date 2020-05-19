@@ -1,11 +1,10 @@
 package com.daxiang.core.mobile.android;
 
-import com.alibaba.fastjson.JSONObject;
 import com.android.ddmlib.IDevice;
 import com.android.ddmlib.InstallException;
 import com.daxiang.App;
+import com.daxiang.core.PortProvider;
 import com.daxiang.core.mobile.Mobile;
-import com.daxiang.core.mobile.appium.AppiumDriverFactory;
 import com.daxiang.server.ServerClient;
 import com.daxiang.core.mobile.MobileDevice;
 import com.daxiang.core.mobile.android.scrcpy.Scrcpy;
@@ -20,9 +19,15 @@ import com.daxiang.utils.Terminal;
 import com.daxiang.utils.UUIDUtil;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidStartScreenRecordingOptions;
+import io.appium.java_client.remote.AndroidMobileCapabilityType;
+import io.appium.java_client.remote.AutomationName;
+import io.appium.java_client.remote.MobileCapabilityType;
+import io.appium.java_client.remote.MobilePlatform;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.springframework.util.StringUtils;
 
@@ -64,8 +69,56 @@ public class AndroidDevice extends MobileDevice {
     }
 
     @Override
-    public RemoteWebDriver newDriver(JSONObject caps) {
-        return AppiumDriverFactory.createAndroidDriver(this, caps);
+    public RemoteWebDriver newDriver() {
+        return new AndroidDriver(getDeviceServer().getUrl(), this.caps);
+    }
+
+    @Override
+    protected Capabilities newCaps(Capabilities capsToMerge) {
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        capabilities.setCapability(MobileCapabilityType.NO_RESET, true);
+        capabilities.setCapability(AndroidMobileCapabilityType.UNICODE_KEYBOARD, true);
+        capabilities.setCapability(AndroidMobileCapabilityType.RESET_KEYBOARD, true);
+        capabilities.setCapability("recreateChromeDriverSessions", true);
+
+        // 加速初始化速度
+        capabilities.setCapability("skipServerInstallation", true);
+        capabilities.setCapability("skipDeviceInitialization", true);
+        capabilities.setCapability("skipUnlock", true);
+        // 这个暂时用不到 先skip提升性能
+        capabilities.setCapability("skipLogcatCapture", true);
+
+        if (!greaterOrEqualsToAndroid5()) { // 小于安卓5，必须指定app，否则会创建driver失败
+            capabilities.setCapability("appPackage", "io.appium.android.apis");
+            capabilities.setCapability("appActivity", "io.appium.android.apis.ApiDemos");
+        }
+
+        // **** 以上capabilities可被传入的caps覆盖 ****
+
+        capabilities.merge(capsToMerge);
+
+        // **** 以下capabilities具有更高优先级，将覆盖传入的caps ****
+
+        if (greaterOrEqualsToAndroid5()) {
+            capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, AutomationName.ANDROID_UIAUTOMATOR2); // UIAutomation2 is only supported since Android 5.0 (Lollipop)
+        } else {
+            capabilities.setCapability(MobileCapabilityType.AUTOMATION_NAME, "UIAutomator1");
+        }
+        capabilities.setCapability(AndroidMobileCapabilityType.SYSTEM_PORT, PortProvider.getUiautomator2ServerAvailablePort());
+
+        capabilities.setCapability("chromedriverPort", PortProvider.getAndroidChromeDriverAvailablePort());
+        String chromedriverFilePath = getChromedriverFilePath();
+        if (StringUtils.isEmpty(chromedriverFilePath)) {
+            capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, chromedriverFilePath);
+        }
+
+        capabilities.setCapability(MobileCapabilityType.UDID, getId());
+        capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, mobile.getName());
+        capabilities.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
+        capabilities.setCapability(MobileCapabilityType.PLATFORM_VERSION, mobile.getSystemVersion());
+        capabilities.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, NEW_COMMAND_TIMEOUT);
+
+        return capabilities;
     }
 
     public boolean greaterOrEqualsToAndroid5() {

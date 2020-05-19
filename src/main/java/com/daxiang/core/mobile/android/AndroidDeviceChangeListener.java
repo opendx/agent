@@ -1,6 +1,5 @@
 package com.daxiang.core.mobile.android;
 
-import com.alibaba.fastjson.JSONObject;
 import com.android.ddmlib.*;
 import com.daxiang.core.Device;
 import com.daxiang.core.mobile.Mobile;
@@ -15,6 +14,7 @@ import com.daxiang.core.mobile.android.stf.MinitouchInstaller;
 import com.daxiang.core.mobile.appium.AppiumServer;
 import com.daxiang.model.UploadFile;
 import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.springframework.stereotype.Component;
 
@@ -98,14 +98,14 @@ public class AndroidDeviceChangeListener extends MobileChangeHandler implements 
             log.info("[{}]安装{}完成", mobileId, APIDEMOS_APK);
         }
 
-        JSONObject caps = new JSONObject();
-        caps.put("skipServerInstallation", false);
-        caps.put("skipDeviceInitialization", false);
-        caps.put("skipUnlock", false);
-        caps.put("skipLogcatCapture", false);
+        DesiredCapabilities caps = new DesiredCapabilities();
+        caps.setCapability("skipServerInstallation", false);
+        caps.setCapability("skipDeviceInitialization", false);
+        caps.setCapability("skipUnlock", false);
+        caps.setCapability("skipLogcatCapture", false);
 
         log.info("[{}]开始初始化appium", mobileId);
-        RemoteWebDriver driver = androidDevice.freshDriver(caps);
+        RemoteWebDriver driver = androidDevice.freshDriver(caps, true);
         log.info("[{}]初始化appium完成", mobileId);
 
         // 截图并上传到服务器
