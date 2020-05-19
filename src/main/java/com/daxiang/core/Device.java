@@ -67,7 +67,9 @@ public abstract class Device {
         }
     }
 
-    public abstract RemoteWebDriver newDriver();
+    public RemoteWebDriver newDriver() {
+        return new RemoteWebDriver(deviceServer.getUrl(), this.caps);
+    }
 
     protected abstract Capabilities newCaps(Capabilities capsToMerge);
 

@@ -6,7 +6,6 @@ import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.firefox.GeckoDriverService;
 import org.openqa.selenium.ie.InternetExplorerDriverService;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.service.DriverService;
 import org.openqa.selenium.safari.SafariDriverService;
 
@@ -50,11 +49,6 @@ public abstract class BrowserDevice extends Device {
     @Override
     public Integer getStatus() {
         return browser.getStatus();
-    }
-
-    @Override
-    public RemoteWebDriver newDriver() {
-        return new RemoteWebDriver(deviceServer.getUrl(), this.caps);
     }
 
     @Override
