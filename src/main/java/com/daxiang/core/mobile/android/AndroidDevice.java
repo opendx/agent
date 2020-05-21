@@ -70,7 +70,7 @@ public class AndroidDevice extends MobileDevice {
 
     @Override
     public RemoteWebDriver newDriver() {
-        return new AndroidDriver(getDeviceServer().getUrl(), this.caps);
+        return new AndroidDriver(deviceServer.getUrl(), caps);
     }
 
     @Override

@@ -47,7 +47,7 @@ public class IosDevice extends MobileDevice {
 
     @Override
     public RemoteWebDriver newDriver() {
-        return new IOSDriver(getDeviceServer().getUrl(), this.caps);
+        return new IOSDriver(deviceServer.getUrl(), caps);
     }
 
     @Override

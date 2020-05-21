@@ -14,14 +14,14 @@ public class ChromeDevice extends BrowserDevice {
     }
 
     @Override
-    protected Capabilities newCaps(Capabilities caps) {
+    protected Capabilities newCaps(Capabilities capsToMerge) {
         ChromeOptions chromeOptions = new ChromeOptions();
         chromeOptions.addArguments("--ignore-certificate-errors");
         chromeOptions.addArguments("no-default-browser-check");
 
         // **** 以上capabilities可被传入的caps覆盖 ****
 
-        chromeOptions.merge(caps);
+        chromeOptions.merge(capsToMerge);
 
         // **** 以下capabilities具有更高优先级，将覆盖传入的caps ****
 

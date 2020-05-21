@@ -133,6 +133,35 @@ public class BaseAction {
                 .until(ExpectedConditions.presenceOfElementLocated(createBy(findBy, value)));
     }
 
+    /**
+     * 14.[web]访问url
+     *
+     * @param url
+     */
+    public void getUrl(String url) {
+        Assert.hasText(url, "url不能为空");
+        device.getDriver().get(url);
+    }
+
+    /**
+     * 15.[web]窗口最大化
+     */
+    public void windowMaximize() {
+        device.getDriver().manage().window().maximize();
+    }
+
+    /**
+     * 16.[web]鼠标光标移动到element上
+     */
+    public void mouseOver(WebElement element) {
+        Assert.notNull(element, "element不能为空");
+
+        String js = "var evObj = document.createEvent('MouseEvents');" +
+                "evObj.initEvent(\"mouseover\",true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);" +
+                "arguments[0].dispatchEvent(evObj);";
+        device.getDriver().executeScript(js, element);
+    }
+
     public By createBy(String findBy, String value) {
         Assert.hasText(findBy, "findBy不能为空");
         Assert.hasText(value, "value不能为空");

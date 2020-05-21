@@ -156,6 +156,55 @@ VALUES
   REPLACE('[#,{"name":"timeoutInSeconds","type":"String","description":"最大等待时间(秒)"}]','#',@findbyAndValue)
 );
 
+-- 14.getUrl
+INSERT INTO `action` (
+  `id`,
+  `name`,
+  `invoke`,
+  `return_value`,
+  `params`
+)
+VALUES
+(
+  14,
+  '[web]访问url[getUrl]',
+  '$.getUrl',
+  'void',
+  '[{"name":"url","type":"String","description":"要访问的url"}]'
+);
+
+-- 15.windowMaximize
+INSERT INTO `action` (
+  `id`,
+  `name`,
+  `invoke`,
+  `return_value`
+)
+VALUES
+(
+  15,
+  '[web]窗口最大化[windowMaximize]',
+  '$.windowMaximize',
+  'void'
+);
+
+-- 16.mouseOver
+INSERT INTO `action` (
+  `id`,
+  `name`,
+  `invoke`,
+  `return_value`,
+  `params`
+)
+VALUES
+(
+  16,
+  '[web]光标移动到元素上[mouseOver]',
+  '$.mouseOver',
+  'void',
+  '[{"name":"element","type":"WebElement","description":""}]'
+);
+
 -- 1000~1999 MobileAction platforms = [1,2]
 
 -- 1000.switchContext
