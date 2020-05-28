@@ -47,10 +47,6 @@ public abstract class Device {
         return driver;
     }
 
-    public DeviceServer getDeviceServer() {
-        return deviceServer;
-    }
-
     public DeviceTestTaskExecutor getDeviceTestTaskExecutor() {
         return deviceTestTaskExecutor;
     }
@@ -114,6 +110,10 @@ public abstract class Device {
     }
 
     public RemoteWebDriver freshDriver(Capabilities caps, boolean merge) {
+        if (!deviceServer.isAvailable(30)) {
+            deviceServer.restart();
+        }
+
         quitDriver();
         setCaps(caps, merge);
         driver = newDriver();
