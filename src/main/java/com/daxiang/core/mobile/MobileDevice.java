@@ -7,7 +7,6 @@ import com.daxiang.core.mobile.appium.AppiumServer;
 import com.google.common.collect.ImmutableMap;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.dom4j.DocumentException;
 import org.json.XML;
 
@@ -47,11 +46,7 @@ public abstract class MobileDevice extends Device {
     public abstract boolean dismissAlert();
 
     public void installApp(File appFile) {
-        try {
-            ((AppiumDriver) driver).installApp(appFile.getAbsolutePath());
-        } finally {
-            FileUtils.deleteQuietly(appFile);
-        }
+        ((AppiumDriver) driver).installApp(appFile.getAbsolutePath());
     }
 
     @Override

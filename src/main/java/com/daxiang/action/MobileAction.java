@@ -8,10 +8,13 @@ import io.appium.java_client.TouchAction;
 import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.PointOption;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.*;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 
 /**
@@ -51,9 +54,15 @@ public class MobileAction extends BaseAction {
      * @param appDownloadUrl
      * @throws Exception
      */
-    public void installApp(String appDownloadUrl) throws Exception {
+    public void installApp(String appDownloadUrl) throws IOException {
         Assert.hasText(appDownloadUrl, "appDownloadUrl不能为空");
-        mobileDevice.installApp(HttpUtil.downloadFile(appDownloadUrl));
+
+        File app = HttpUtil.downloadFile(appDownloadUrl);
+        try {
+            mobileDevice.installApp(app);
+        } finally {
+            FileUtils.deleteQuietly(app);
+        }
     }
 
     /**
