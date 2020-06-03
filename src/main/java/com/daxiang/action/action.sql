@@ -205,6 +205,40 @@ VALUES
   '[{"name":"element","type":"WebElement","description":""}]'
 );
 
+-- 17.isElementDisplayed
+INSERT INTO `action` (
+  `id`,
+  `name`,
+  `invoke`,
+  `return_value`,
+  `params`
+)
+VALUES
+(
+  17,
+  '元素是否显示[isElementDisplayed]',
+  '$.isElementDisplayed',
+  'boolean',
+   REPLACE('[#]','#',@findbyAndValue)
+);
+
+-- 18.isElementDisplayed
+INSERT INTO `action` (
+  `id`,
+  `name`,
+  `invoke`,
+  `return_value`,
+  `params`
+)
+VALUES
+(
+  18,
+  '元素是否显示[isElementDisplayed]',
+  '$.isElementDisplayed',
+  'boolean',
+  '[{"name":"element","type":"WebElement"}]'
+);
+
 -- 1000~1999 MobileAction platforms = [1,2]
 
 -- 1000.switchContext

@@ -162,6 +162,35 @@ public class BaseAction {
         device.getDriver().executeScript(js, element);
     }
 
+    /**
+     * 17. 元素是否显示
+     * @param findBy
+     * @param value
+     * @return
+     */
+    public boolean isElementDisplayed(String findBy, String value) {
+        try {
+            return isElementDisplayed(findElement(findBy, value));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * 18. 元素是否显示
+     * @param element
+     * @return
+     */
+    public boolean isElementDisplayed(WebElement element) {
+        Assert.notNull(element, "element不能为空");
+
+        try {
+            return element.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public By createBy(String findBy, String value) {
         Assert.hasText(findBy, "findBy不能为空");
         Assert.hasText(value, "value不能为空");
