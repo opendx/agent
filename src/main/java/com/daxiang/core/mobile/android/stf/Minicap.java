@@ -31,7 +31,7 @@ public class Minicap {
      */
     private int pid;
 
-    private boolean isRun = false;
+    private boolean isRunning = false;
 
     public Minicap(IDevice iDevice) {
         this.iDevice = iDevice;
@@ -50,8 +50,9 @@ public class Minicap {
      * @param virtualResolution minicap输出的图片分辨率 eg.1080x1920
      * @param orientation       屏幕的旋转角度
      */
-    public synchronized void start(int quality, String realResolution, String virtualResolution, int orientation, AndroidImgDataConsumer androidImgDataConsumer) throws Exception {
-        if (isRun) {
+    public synchronized void start(int quality, String realResolution, String virtualResolution,
+                                   int orientation, AndroidImgDataConsumer androidImgDataConsumer) throws Exception {
+        if (isRunning) {
             return;
         }
 
@@ -84,7 +85,7 @@ public class Minicap {
                     }
                 }, 0, TimeUnit.SECONDS);
                 log.info("[{}]minicap已停止运行", mobileId);
-                isRun = false;
+                isRunning = false;
             } catch (Exception e) {
                 throw new RuntimeException(String.format("[%s]minicap启动失败", mobileId), e);
             }
@@ -97,7 +98,7 @@ public class Minicap {
 
         countDownLatch.await(30, TimeUnit.SECONDS);
         log.info("[{}]minicap启动完成", mobileId);
-        isRun = true;
+        isRunning = true;
 
         new Thread(() -> {
             try (Socket socket = new Socket("127.0.0.1", localPort);
@@ -130,7 +131,7 @@ public class Minicap {
     }
 
     public synchronized void stop() {
-        if (isRun) {
+        if (isRunning) {
             String cmd = "kill -9 " + pid;
             try {
                 log.info("[{}]kill minicap: {}", mobileId, cmd);

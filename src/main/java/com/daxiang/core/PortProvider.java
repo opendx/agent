@@ -24,57 +24,59 @@ public class PortProvider {
     // pc web
     private static final int[] PC_DRIVER_SERVICE_PORTS = {31000, 34999, 31000};
 
-    public static synchronized int getAndroidChromeDriverAvailablePort() {
+    public static int getAndroidChromeDriverAvailablePort() {
         return getAvaliablePort(ANDROID_CHROME_DRIVER_PORTS);
     }
 
-    public static synchronized int getWebkitDebugProxyAvalilablePort() {
+    public static int getWebkitDebugProxyAvalilablePort() {
         return getAvaliablePort(WEBKIT_DEBUG_PROXY_PORTS);
     }
 
-    public static synchronized int getAppiumServerAvailablePort() {
+    public static int getAppiumServerAvailablePort() {
         return getAvaliablePort(APPIUM_SERVER_PORTS);
     }
 
-    public static synchronized int getMinitouchAvailablePort() {
+    public static int getMinitouchAvailablePort() {
         return getAvaliablePort(MINITOUCH_PORTS);
     }
 
-    public static synchronized int getMinicapAvailablePort() {
+    public static int getMinicapAvailablePort() {
         return getAvaliablePort(MINICAP_PORTS);
     }
 
-    public static synchronized int getAdbKitAvailablePort() {
+    public static int getAdbKitAvailablePort() {
         return getAvaliablePort(ADBKIT_PORTS);
     }
 
-    public static synchronized int getUiautomator2ServerAvailablePort() {
+    public static int getUiautomator2ServerAvailablePort() {
         return getAvaliablePort(UIAUTOMATOR2_SERVER_PORTS);
     }
 
-    public static synchronized int getWdaLocalAvailablePort() {
+    public static int getWdaLocalAvailablePort() {
         return getAvaliablePort(WDA_LOCAL_PORTS);
     }
 
-    public static synchronized int getWdaMjpegServerAvailablePort() {
+    public static int getWdaMjpegServerAvailablePort() {
         return getAvaliablePort(WDA_MJPEG_SERVER_PORTS);
     }
 
-    public static synchronized int getScrcpyAvailablePort() {
+    public static int getScrcpyAvailablePort() {
         return getAvaliablePort(SCRCPY_PORTS);
     }
 
-    public static synchronized int getScrcpyRecordVideoPort() {
+    public static int getScrcpyRecordVideoPort() {
         return getAvaliablePort(SCRCPY_RECORD_VIDEO_PORTS);
     }
 
-    public static synchronized int getPcDriverServiceAvailablePort() {
+    public static int getPcDriverServiceAvailablePort() {
         return getAvaliablePort(PC_DRIVER_SERVICE_PORTS);
     }
 
     private static int getAvaliablePort(int[] ports) {
-        int availablePort = NetUtil.getAvailablePort(ports[0], ports[1], ports[2]);
-        ports[2] = availablePort + 1;
-        return availablePort;
+        synchronized (ports) {
+            int availablePort = NetUtil.getAvailablePort(ports[0], ports[1], ports[2]);
+            ports[2] = availablePort + 1;
+            return availablePort;
+        }
     }
 }
