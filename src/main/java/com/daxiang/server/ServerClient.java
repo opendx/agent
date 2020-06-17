@@ -60,7 +60,7 @@ public class ServerClient {
     @Value("${server}/deviceTestTask/update")
     private String updateDeviceTestTaskUrl;
     @Value("${server}/deviceTestTask/firstUnStart/device/{deviceId}")
-    private String findFirstUnStartDeviceTestTaskUrl;
+    private String getFirstUnStartDeviceTestTaskUrl;
     @Value("${server}/deviceTestTask/{deviceTestTaskId}/updateTestcase")
     private String updateTestcaseUrl;
 
@@ -192,7 +192,7 @@ public class ServerClient {
      * 获取最早的未开始的测试任务
      */
     public DeviceTestTask getFirstUnStartDeviceTestTask(String deviceId) {
-        Response<DeviceTestTask> response = restTemplate.exchange(findFirstUnStartDeviceTestTaskUrl,
+        Response<DeviceTestTask> response = restTemplate.exchange(getFirstUnStartDeviceTestTaskUrl,
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<Response<DeviceTestTask>>() {

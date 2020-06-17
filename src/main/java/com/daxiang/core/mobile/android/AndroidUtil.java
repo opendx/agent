@@ -161,7 +161,7 @@ public class AndroidUtil {
     public static List<String> getImeList(IDevice iDevice) throws IDeviceExecuteShellCommandException {
         String imeListString = executeShellCommand(iDevice, "ime list -s");
         if (StringUtils.isEmpty(imeListString)) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
 
         return Arrays.asList(imeListString.split("\\r?\\n"));

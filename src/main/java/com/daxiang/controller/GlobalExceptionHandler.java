@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.validation.ConstraintViolationException;
+
 /**
  * Created by jiangyitao.
  */
@@ -17,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class GlobalExceptionHandler {
 
     /**
-     * 没处理到的异常
+     * 未处理的异常
      *
      * @param e
      * @return
@@ -42,7 +44,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 参数校验不通过，非@RequestBody
+     * 参数校验不通过
      *
      * @param e
      * @return
@@ -54,7 +56,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 参数校验不通过，@RequestBody
+     * 参数校验不通过
      *
      * @param e
      * @return
@@ -63,6 +65,17 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public Response handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         return Response.fail(e.getBindingResult().getFieldError().getDefaultMessage());
+    }
+
+    /**
+     * 参数校验不通过
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseBody
+    public Response handleConstraintViolationException(ConstraintViolationException e) {
+        return Response.fail(e.getConstraintViolations().stream().findFirst().get().getMessage());
     }
 
 }

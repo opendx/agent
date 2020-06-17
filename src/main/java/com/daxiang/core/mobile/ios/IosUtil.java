@@ -29,13 +29,13 @@ public class IosUtil {
         try {
             String cmdResponse = Terminal.execute(cmd, showLog);
             if (!StringUtils.hasText(cmdResponse)) {
-                return Collections.emptySet();
+                return new HashSet<>();
             }
 
             return Arrays.asList(cmdResponse.split("\\r?\\n")).stream().collect(Collectors.toSet());
         } catch (Exception e) {
             log.error("execute '{}' err", cmd, e);
-            return Collections.emptySet();
+            return new HashSet<>();
         }
     }
 
@@ -50,7 +50,7 @@ public class IosUtil {
         try {
             String cmdResponse = Terminal.execute(cmd, showLog);
             if (!StringUtils.hasText(cmdResponse)) {
-                return Collections.emptySet();
+                return new HashSet<>();
             }
 
             Set<String> simulatorIds = new HashSet<>();
@@ -63,7 +63,7 @@ public class IosUtil {
             return simulatorIds;
         } catch (Exception e) {
             log.error("execute '{}' err", cmd, e);
-            return Collections.emptySet();
+            return new HashSet<>();
         }
     }
 
