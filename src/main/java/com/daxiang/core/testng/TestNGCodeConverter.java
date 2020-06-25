@@ -26,7 +26,7 @@ public abstract class TestNGCodeConverter {
     /**
      * actionId: Action
      */
-    private final Map<Integer, Action> cachedActions = new HashMap();
+    private final Map<Integer, Action> cachedActions = new HashMap<>();
 
     private final Set<String> javaImports = new HashSet<>();
 
@@ -34,55 +34,54 @@ public abstract class TestNGCodeConverter {
      * 转换为testng代码
      */
     public String convert(DeviceTestTask deviceTestTask, String className) throws TestNGCodeConvertException {
-        Map<String, Object> dataModel = new HashMap();
-        List<Action> actionTreeList = new ArrayList<>();
+        Map<String, Object> dataModel = new HashMap<>();
 
         List<Testcase> testcases = deviceTestTask.getTestcases();
-        actionTreeList.addAll(testcases);
-
         dataModel.put("testcases", testcases.stream().map(testcase -> {
             JSONObject tc = new JSONObject();
-            tc.put("invoke", convertToInvokeMethodStringWithParamNull(testcase));
-            tc.put("description", getDesc(deviceTestTask, testcase));
-            tc.put("dependsOnMethods", getDependsOnMethods(testcase.getDepends()));
+            tc.put("invoke", getInvokeMethodStringWithParamNull(testcase));
+            tc.put("description", getTestcaseDesc(deviceTestTask, testcase));
+            tc.put("dependsOnMethods", getTestcaseDependsOnMethods(testcase.getDepends()));
             tc.put("id", testcase.getId());
             return tc;
         }).collect(Collectors.toList()));
 
+        List<Action> actions = new ArrayList<>(testcases);
+
         Action beforeClass = deviceTestTask.getBeforeClass();
         if (beforeClass != null) {
-            actionTreeList.add(beforeClass);
-            String invokeBeforeClass = convertToInvokeMethodStringWithParamNull(beforeClass);
+            actions.add(beforeClass);
+            String invokeBeforeClass = getInvokeMethodStringWithParamNull(beforeClass);
             dataModel.put("beforeClass", invokeBeforeClass);
         }
 
         Action afterClass = deviceTestTask.getAfterClass();
         if (afterClass != null) {
-            actionTreeList.add(afterClass);
-            String invokeAfterClass = convertToInvokeMethodStringWithParamNull(afterClass);
+            actions.add(afterClass);
+            String invokeAfterClass = getInvokeMethodStringWithParamNull(afterClass);
             dataModel.put("afterClass", invokeAfterClass);
         }
 
         Action beforeMethod = deviceTestTask.getBeforeMethod();
         if (beforeMethod != null) {
-            actionTreeList.add(beforeMethod);
-            String invokeBeforeMethod = convertToInvokeMethodStringWithParamNull(beforeMethod);
+            actions.add(beforeMethod);
+            String invokeBeforeMethod = getInvokeMethodStringWithParamNull(beforeMethod);
             dataModel.put("beforeMethod", invokeBeforeMethod);
         }
 
         Action afterMethod = deviceTestTask.getAfterMethod();
         if (afterMethod != null) {
-            actionTreeList.add(afterMethod);
-            String invokeAfterMethod = convertToInvokeMethodStringWithParamNull(afterMethod);
+            actions.add(afterMethod);
+            String invokeAfterMethod = getInvokeMethodStringWithParamNull(afterMethod);
             dataModel.put("afterMethod", invokeAfterMethod);
         }
 
-        parseActions(actionTreeList);
-
-        handleActions();
+        parseActions(actions);
+        cachedActions.remove(BaseAction.EXECUTE_JAVA_CODE_ID); // ExecuteJavaCode无需调用
+        handleActionValue();
         dataModel.put("actions", cachedActions.values());
 
-        handleGlobalVars(deviceTestTask.getGlobalVars());
+        handleGlobalVarValue(deviceTestTask.getGlobalVars());
 
         dataModel.put("className", className);
         dataModel.put("actionPrefix", ACTION_PREFIX);
@@ -113,23 +112,21 @@ public abstract class TestNGCodeConverter {
 
     protected abstract void addJavaImports(Set<String> javaImports);
 
-    private String getDesc(DeviceTestTask deviceTestTask, Testcase testcase) {
+    private String getTestcaseDesc(DeviceTestTask deviceTestTask, Testcase testcase) {
         if (deviceTestTask.getId() == null) { // 调试
             return null;
         }
 
-        return deviceTestTask.getDeviceId()
-                + "_"
-                + deviceTestTask.getId()
-                + "_"
-                + testcase.getId()
-                + "_"
-                + deviceTestTask.getTestPlan().getEnableRecordVideo()
-                + "_"
-                + deviceTestTask.getTestPlan().getFailRetryCount();
+        String deviceId = deviceTestTask.getDeviceId();
+        Integer deviceTestTaskId = deviceTestTask.getId();
+        Integer testcaseId = testcase.getId();
+        Integer enableRecordVideo = deviceTestTask.getTestPlan().getEnableRecordVideo();
+        Integer failRetryCount = deviceTestTask.getTestPlan().getFailRetryCount();
+
+        return String.format("%s_%d_%d_%d_%d", deviceId, deviceTestTaskId, testcaseId, enableRecordVideo, failRetryCount);
     }
 
-    private String getDependsOnMethods(List<Integer> depends) {
+    private String getTestcaseDependsOnMethods(List<Integer> depends) {
         if (CollectionUtils.isEmpty(depends)) {
             return null;
         }
@@ -166,13 +163,7 @@ public abstract class TestNGCodeConverter {
         });
     }
 
-    /**
-     * 转换Action为方法调用的字符串，如果需要传递参数则传入null
-     *
-     * @param action
-     * @return
-     */
-    private String convertToInvokeMethodStringWithParamNull(Action action) {
+    private String getInvokeMethodStringWithParamNull(Action action) {
         StringBuilder invokeMethod = new StringBuilder(ACTION_PREFIX + action.getId() + "(");
         List<Param> actionParams = action.getParams();
         // 如果有参数 则都传入null
@@ -184,7 +175,7 @@ public abstract class TestNGCodeConverter {
     }
 
     /**
-     * 递归把每个action放到cachedActions里，排除掉内嵌代码ExecuteJavaCode
+     * 递归把所有action放到cachedActions里
      */
     private void parseActions(List<Action> actions) {
         for (Action action : actions) {
@@ -210,46 +201,41 @@ public abstract class TestNGCodeConverter {
                 cachedActions.put(action.getId(), action);
             }
         }
-
-        // 2019-10-02 新增内嵌代码ExecuteJavaCode，ExecuteJavaCode.ID是不需要调用的
-        cachedActions.remove(BaseAction.EXECUTE_JAVA_CODE_ID);
     }
 
     /**
-     * 处理全局变量值
+     * 处理globalVar value
      */
-    private void handleGlobalVars(List<GlobalVar> globalVars) {
+    private void handleGlobalVarValue(List<GlobalVar> globalVars) {
         if (!CollectionUtils.isEmpty(globalVars)) {
             globalVars.forEach(globalVar -> globalVar.setValue(handleValue(globalVar.getValue())));
         }
     }
 
     /**
-     * 处理actions
+     * 处理action localVar value & step paramValue
      */
-    private void handleActions() {
-        List<Action> actions = new ArrayList<>(cachedActions.values());
+    private void handleActionValue() {
+        Collection<Action> actions = cachedActions.values();
         for (Action action : actions) {
-            // 局部变量
             List<LocalVar> localVars = action.getLocalVars();
             if (!CollectionUtils.isEmpty(localVars)) {
                 localVars.forEach(localVar -> localVar.setValue(handleValue(localVar.getValue())));
             }
-            // 步骤
+
             List<Step> steps = action.getSteps();
             if (!CollectionUtils.isEmpty(steps)) {
-                steps.forEach(step -> {
-                    // 处理步骤传入的参数值
+                for (Step step : steps) {
                     List<ParamValue> paramValues = step.getParamValues();
                     if (!CollectionUtils.isEmpty(paramValues)) {
                         for (ParamValue paramValue : paramValues) {
-                            // 2019-10-02 ExecuteJavaCode直接嵌入代码，无需做处理
+                            // ExecuteJavaCode直接嵌入模版，无需处理
                             if (step.getActionId() != BaseAction.EXECUTE_JAVA_CODE_ID) {
                                 paramValue.setParamValue(handleValue(paramValue.getParamValue()));
                             }
                         }
                     }
-                });
+                }
             }
         }
     }

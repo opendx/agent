@@ -8,7 +8,7 @@ import java.io.InputStream;
  */
 public class IOUtil {
 
-    public static int readUInt32LE(InputStream inputStream) throws IOException {
-        return (inputStream.read() << 0 >>> 0) + (inputStream.read() << 8 >>> 0) + (inputStream.read() << 16 >>> 0) + (inputStream.read() << 24 >>> 0);
+    public static int readUInt32LE(InputStream in) throws IOException {
+        return (in.read() & 0xff) | (in.read() & 0xff) << 8 | (in.read() & 0xff) << 16 | (in.read() & 0xff) << 24;
     }
 }
