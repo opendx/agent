@@ -12,7 +12,7 @@ INSERT INTO `action` (
 VALUES
 (
   1,
-  '执行java代码[executeJavaCode]',
+  '执行java代码',
   '$.executeJavaCode',
   'void',
   '[{"name":"code","type":"String","description":"java代码"}]'
@@ -29,7 +29,7 @@ INSERT INTO `action` (
 VALUES
 (
   2,
-  '休眠[sleep]',
+  '休眠',
   '$.sleep',
   'void',
   '[{"name":"ms","type":"String","description": "休眠时长(毫秒)"}]'
@@ -46,7 +46,7 @@ INSERT INTO `action` (
 VALUES
 (
   7,
-  '点击[click]',
+  '点击',
   '$.click',
   'WebElement',
   REPLACE('[#]','#',@findbyAndValue)
@@ -63,7 +63,7 @@ INSERT INTO `action` (
 VALUES
 (
   8,
-  '查找元素[findElement]',
+  '查找元素',
   '$.findElement',
   'WebElement',
   REPLACE('[#]','#',@findbyAndValue)
@@ -80,7 +80,7 @@ INSERT INTO `action` (
 VALUES
 (
   9,
-  '查找元素列表[findElements]',
+  '查找元素列表',
   '$.findElements',
   'List<WebElement>',
   REPLACE('[#]','#',@findbyAndValue)
@@ -97,7 +97,7 @@ INSERT INTO `action` (
 VALUES
 (
   10,
-  '输入[sendKeys]',
+  '输入',
   '$.sendKeys',
   'WebElement',
   REPLACE('[#,{"name":"content","type":"String","description":"输入内容"}]','#',@findbyAndValue)
@@ -114,7 +114,7 @@ INSERT INTO `action` (
 VALUES
 (
   11,
-  '设置隐式等待时间[setImplicitlyWaitTime]',
+  '设置隐式等待时间',
   '$.setImplicitlyWaitTime',
   'void',
   '[{"name":"seconds","type":"String","description":"隐式等待时间(秒)"}]'
@@ -131,7 +131,7 @@ INSERT INTO `action` (
 VALUES
 (
   12,
-  '等待元素可见[waitForElementVisible]',
+  '等待元素可见',
   '$.waitForElementVisible',
   'WebElement',
   REPLACE('[#,{"name":"timeoutInSeconds","type":"String","description":"最大等待时间(秒)"}]','#',@findbyAndValue)
@@ -149,7 +149,7 @@ INSERT INTO `action` (
 VALUES
 (
   13,
-  '等待元素出现[waitForElementPresence]',
+  '等待元素出现',
   '等待元素在Page DOM里出现，不一定可见。移动端可用于检测toast',
   '$.waitForElementPresence',
   'WebElement',
@@ -167,42 +167,10 @@ INSERT INTO `action` (
 VALUES
 (
   14,
-  '[web]访问url[getUrl]',
+  '[web]访问url',
   '$.getUrl',
   'void',
   '[{"name":"url","type":"String","description":"要访问的url"}]'
-);
-
--- 15.windowMaximize
-INSERT INTO `action` (
-  `id`,
-  `name`,
-  `invoke`,
-  `return_value`
-)
-VALUES
-(
-  15,
-  '[web]窗口最大化[windowMaximize]',
-  '$.windowMaximize',
-  'void'
-);
-
--- 16.mouseOver
-INSERT INTO `action` (
-  `id`,
-  `name`,
-  `invoke`,
-  `return_value`,
-  `params`
-)
-VALUES
-(
-  16,
-  '[web]光标移动到元素上[mouseOver]',
-  '$.mouseOver',
-  'void',
-  '[{"name":"element","type":"WebElement","description":""}]'
 );
 
 -- 17.isElementDisplayed
@@ -216,7 +184,7 @@ INSERT INTO `action` (
 VALUES
 (
   17,
-  '元素是否显示[isElementDisplayed]',
+  '元素是否显示',
   '$.isElementDisplayed',
   'boolean',
    REPLACE('[#]','#',@findbyAndValue)
@@ -233,7 +201,7 @@ INSERT INTO `action` (
 VALUES
 (
   18,
-  '元素是否显示[isElementDisplayed]',
+  '元素是否显示',
   '$.isElementDisplayed',
   'boolean',
   '[{"name":"element","type":"WebElement"}]'
@@ -253,7 +221,7 @@ INSERT INTO `action` (
 VALUES
 (
   1000,
-  '切换context[switchContext]',
+  '切换context',
   '$.switchContext',
   'void',
   '[{"name":"context","type":"String","description":"context","possibleValues":[{"value":"NATIVE_APP","description":"原生"}]}]',
@@ -272,7 +240,7 @@ INSERT INTO `action` (
 VALUES
 (
   1001,
-  '安装App[installApp]',
+  '安装App',
   '$.installApp',
   'void',
   '[{"name":"appDownloadUrl","type":"String","description":"app下载地址"}]',
@@ -291,7 +259,7 @@ INSERT INTO `action` (
 VALUES
 (
   1002,
-  '卸载App[uninstallApp]',
+  '卸载App',
   '$.uninstallApp',
   'void',
   '[{"name":"app","type":"String","description":"android: packageName, iOS: bundleId"}]',
@@ -310,7 +278,7 @@ INSERT INTO `action` (
 VALUES
 (
   1003,
-  '滑动屏幕[swipe]',
+  '滑动屏幕',
   '$.swipe',
   'void',
   '[{"name":"startPoint","type":"String","description":"起点，如: {x:0.5,y:0.5} => 屏幕中心点"},{"name":"endPoint","type":"String","description":"终点，如: {x:0.5,y:0.5} => 屏幕中心点"},{"name":"durationInMs","type":"String","description":"滑动一次的时间，单位: ms。时间越短，滑的距离越长"}]',
@@ -329,7 +297,7 @@ INSERT INTO `action` (
 VALUES
 (
   1004,
-  '滑动屏幕查找元素[swipeToFindElement]',
+  '滑动屏幕查找元素',
   '$.swipeToFindElement',
   'WebElement',
   REPLACE('[#,{"name":"startPoint","type":"String","description":"起点，如: {x:0.5,y:0.5} => 屏幕中心点"},{"name":"endPoint","type":"String","description":"终点，如: {x:0.5,y:0.5} => 屏幕中心点"},{"name":"maxSwipeCount","type":"String","description":"最大滑动次数"},{"name":"onceDurationInMs","type":"String","description":"滑动一次的时间，单位: ms。时间越短，滑的距离越长"}]','#',@findbyAndValue),
@@ -348,7 +316,7 @@ INSERT INTO `action` (
 VALUES
 (
   1005,
-  '容器内滑动[swipeInContainer]',
+  '容器内滑动',
   '$.swipeInContainer',
   'void',
   '[{"name":"container","type":"WebElement","description":"容器元素"},{"name":"startPoint","type":"String","description":"起点，如: {x:0.5,y:0.5} => 容器中心点"},{"name":"endPoint","type":"String","description":"终点，如: {x:0.5,y:0.5} => 容器中心点"},{"name":"onceDurationInMs","type":"String","description":"滑动一次的时间，单位: ms。时间越短，滑的距离越长"}]',
@@ -367,7 +335,7 @@ INSERT INTO `action` (
 VALUES
 (
   1006,
-  '容器内滑动查找元素[swipeInContainerToFindElement]',
+  '容器内滑动查找元素',
   '$.swipeInContainerToFindElement',
   'WebElement',
   REPLACE('[{"name":"container","type":"WebElement","description":"容器元素"},#,{"name":"startPoint","type":"String","description":"起点，如: {x:0.5,y:0.5} => 容器中心点"},{"name":"endPoint","type":"String","description":"终点，如: {x:0.5,y:0.5} => 容器中心点"},{"name":"maxSwipeCount","type":"String","description":"最大滑动次数"},{"name":"onceDurationInMs","type":"String","description":"滑动一次的时间，单位: ms。时间越短，滑的距离越长"}]','#',@findbyAndValue),
@@ -385,7 +353,7 @@ INSERT INTO `action` (
 VALUES
 (
   1007,
-  'accept对话框[acceptAlert]',
+  'accept对话框',
   '$.acceptAlert',
   'boolean',
   '[1,2]'
@@ -403,7 +371,7 @@ INSERT INTO `action` (
 VALUES
 (
   1008,
-  '异步accept对话框[asyncAcceptAlert]',
+  '异步accept对话框',
   '$.asyncAcceptAlert',
   'void',
   '[{"name":"timeoutInSeconds","type":"String","description":"超时时间,单位: 秒"},{"name":"once","type":"String","description":"是否只处理一次, true or false"}]',
@@ -421,7 +389,7 @@ INSERT INTO `action` (
 VALUES
 (
   1009,
-  'dismiss对话框[dismissAlert]',
+  'dismiss对话框',
   '$.dismissAlert',
   'boolean',
   '[1,2]'
@@ -439,7 +407,7 @@ INSERT INTO `action` (
 VALUES
 (
   1010,
-  '异步dismiss对话框[asyncDismissAlert]',
+  '异步dismiss对话框',
   '$.asyncDismissAlert',
   'void',
   '[{"name":"timeoutInSeconds","type":"String","description":"超时时间,单位: 秒"},{"name":"once","type":"String","description":"是否只处理一次, true or false"}]',
@@ -454,17 +422,17 @@ INSERT INTO `action` (
   `name`,
   `invoke`,
   `return_value`,
-  `platforms`,
-  `params`
+  `params`,
+  `platforms`
 )
 VALUES
 (
   2000,
-  '清除apk数据[clearApkData]',
+  '清除apk数据',
   '$.clearApkData',
   'void',
-  '[1]',
-  '[{"name":"packageName","type":"String","description":"包名"}]'
+  '[{"name":"packageName","type":"String","description":"包名"}]',
+  '[1]'
 );
 
 -- 2001.restartApk
@@ -473,17 +441,17 @@ INSERT INTO `action` (
   `name`,
   `invoke`,
   `return_value`,
-  `platforms`,
-  `params`
+  `params`,
+  `platforms`
 )
 VALUES
 (
   2001,
-  '启动/重启apk[restartApk]',
+  '启动/重启apk',
   '$.restartApk',
   'void',
-  '[1]',
-  '[{"name":"packageName","type":"String","description":"包名"},{"name":"launchActivity","type":"String","description":"启动Activity名"}]'
+  '[{"name":"packageName","type":"String","description":"包名"},{"name":"launchActivity","type":"String","description":"启动Activity名"}]',
+  '[1]'
 );
 
 -- 3000~3999 IosAction platforms = [2]
@@ -494,15 +462,53 @@ INSERT INTO `action` (
   `name`,
   `invoke`,
   `return_value`,
-  `platforms`,
-  `params`
+  `params`,
+  `platforms`
 )
 VALUES
 (
   3000,
-  '启动/重启app[restartIosApp]',
+  '启动/重启app',
   '$.restartIosApp',
   'void',
-  '[2]',
-  '[{"name":"bundleId","type":"String","description": "app bundleId"}]'
+  '[{"name":"bundleId","type":"String","description": "app bundleId"}]',
+  '[2]'
+);
+
+-- 4000~4999 PCWebAction platforms = [3]
+
+-- 4000.windowMaximize
+INSERT INTO `action` (
+  `id`,
+  `name`,
+  `invoke`,
+  `return_value`,
+  `platforms`
+)
+VALUES
+(
+  4000,
+  '窗口最大化',
+  '$.windowMaximize',
+  'void',
+  '[3]'
+);
+
+-- 4001.mouseOver
+INSERT INTO `action` (
+  `id`,
+  `name`,
+  `invoke`,
+  `return_value`,
+  `params`,
+  `platforms`
+)
+VALUES
+(
+  4001,
+  '光标移动到元素上',
+  '$.mouseOver',
+  'void',
+  '[{"name":"element","type":"WebElement","description":""}]',
+  '[3]'
 );
