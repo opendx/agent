@@ -246,6 +246,23 @@ public class MobileAction extends BaseAction {
         }).start();
     }
 
+    /**
+     * 1011.通过TouchAction点击
+     */
+    public WebElement clickByTouchAction(String findBy, String value) {
+        WebElement element = findElement(findBy, value);
+
+        Point leftTopPoint = element.getLocation();
+        Dimension dimension = element.getSize();
+
+        int x = leftTopPoint.x + dimension.width / 2;
+        int y = leftTopPoint.y + dimension.height / 2;
+        PointOption center = PointOption.point(x, y);
+
+        new TouchAction(getAppiumDriver()).tap(center).perform();
+        return element;
+    }
+
     private void swipe(Point start, Point end, String durationInMs) {
         long duration = DEFAULT_SWIPE_DURATION_IN_MS;
         if (!StringUtils.isEmpty(durationInMs)) {

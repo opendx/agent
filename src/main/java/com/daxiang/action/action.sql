@@ -414,6 +414,25 @@ VALUES
   '[1,2]'
 );
 
+-- 1011.clickByTouchAction
+INSERT INTO `action` (
+  `id`,
+  `name`,
+  `invoke`,
+  `return_value`,
+  `params`,
+  `platforms`
+)
+VALUES
+(
+  1011,
+  '(TouchAction)点击',
+  '$.clickByTouchAction',
+  'WebElement',
+   REPLACE('[#]','#',@findbyAndValue),
+  '[1,2]'
+);
+
 -- 2000~2999 AndroidAction platforms = [1]
 
 -- 2000.clearApkData
