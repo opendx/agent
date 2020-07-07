@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * Created by jiangyitao.
@@ -32,7 +31,7 @@ public class IosUtil {
                 return new HashSet<>();
             }
 
-            return Arrays.asList(cmdResponse.split("\\r?\\n")).stream().collect(Collectors.toSet());
+            return new HashSet<>(Arrays.asList(cmdResponse.split("\\r?\\n")));
         } catch (Exception e) {
             log.error("execute '{}' err", cmd, e);
             return new HashSet<>();
