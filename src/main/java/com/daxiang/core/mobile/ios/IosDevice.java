@@ -6,7 +6,6 @@ import com.daxiang.core.mobile.MobileDevice;
 import com.daxiang.core.mobile.appium.AppiumServer;
 import com.daxiang.core.mobile.appium.IosNativePageSourceHandler;
 import com.daxiang.core.mobile.Mobile;
-import com.daxiang.utils.Terminal;
 import com.daxiang.utils.UUIDUtil;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.ios.IOSStartScreenRecordingOptions;
@@ -32,11 +31,6 @@ import java.util.Base64;
  */
 @Slf4j
 public class IosDevice extends MobileDevice {
-
-    /**
-     * iproxy localPort remotePort mobileId
-     */
-    private static final String IPROXY_CMD = "iproxy %d %d %s";
 
     private ExecuteWatchdog iproxyMjpegServerWatchdog;
 
@@ -94,6 +88,19 @@ public class IosDevice extends MobileDevice {
     }
 
     @Override
+    public void installApp(File appFile) {
+        if (appFile.getName().endsWith(".ipa")) {
+            try {
+                IosUtil.installAppByIdeviceinstaller(getId(), appFile.getAbsolutePath());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            super.installApp(appFile);
+        }
+    }
+
+    @Override
     public void uninstallApp(String app) {
         IosUtil.uninstallApp(driver, app);
     }
@@ -143,10 +150,8 @@ public class IosDevice extends MobileDevice {
 
     public long startMjpegServerIproxy() throws IOException {
         long mjpegServerPort = getMjpegServerPort();
-        String cmd = String.format(IPROXY_CMD, mjpegServerPort, mjpegServerPort, getId());
-
-        log.info("[{}]startMjpegServerIproxy: {}", getId(), cmd);
-        iproxyMjpegServerWatchdog = Terminal.executeAsyncAndGetWatchdog(cmd);
+        log.info("[{}]startMjpegServerIproxy", getId());
+        iproxyMjpegServerWatchdog = IosUtil.iproxy(mjpegServerPort, mjpegServerPort, getId());
         return mjpegServerPort;
     }
 

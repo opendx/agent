@@ -3,6 +3,7 @@ package com.daxiang.core.mobile.ios;
 import com.daxiang.utils.Terminal;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.exec.ExecuteWatchdog;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.springframework.util.StringUtils;
 
@@ -79,6 +80,11 @@ public class IosUtil {
         }
     }
 
+    public static void installAppByIdeviceinstaller(String mobileId, String appPath) throws IOException {
+        String cmd = "ideviceinstaller -u %s -i %s";
+        Terminal.execute(String.format(cmd, mobileId, appPath));
+    }
+
     public static void uninstallApp(RemoteWebDriver driver, String bundleId) {
         driver.executeScript("mobile: removeApp", ImmutableMap.of("bundleId", bundleId));
     }
@@ -95,5 +101,24 @@ public class IosUtil {
     // http://appium.io/docs/en/commands/mobile-command/
     public static void pressHome(RemoteWebDriver driver) {
         driver.executeScript("mobile:pressButton", ImmutableMap.of("name", "home"));
+    }
+
+    private static Boolean isOldIproxy = null;
+
+    public static ExecuteWatchdog iproxy(long localPort, long remotePort, String mobileId) throws IOException {
+        if (isOldIproxy == null) {
+            // libusbmuxd < 2.0.2
+            isOldIproxy = Terminal.execute("iproxy -v")
+                    .contains("usage: iproxy LOCAL_TCP_PORT DEVICE_TCP_PORT [UDID]");
+        }
+
+        String cmd;
+        if (isOldIproxy) {
+            cmd = String.format("iproxy %d %d %s", localPort, remotePort, mobileId);
+        } else {
+            cmd = String.format("iproxy %d:%d -u %s", localPort, remotePort, mobileId);
+        }
+
+        return Terminal.executeAsyncAndGetWatchdog(cmd);
     }
 }
