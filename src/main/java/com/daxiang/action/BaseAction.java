@@ -145,6 +145,7 @@ public class BaseAction {
 
     /**
      * 17. 元素是否显示
+     *
      * @param findBy
      * @param value
      * @return
@@ -159,6 +160,7 @@ public class BaseAction {
 
     /**
      * 18. 元素是否显示
+     *
      * @param element
      * @return
      */
@@ -170,6 +172,14 @@ public class BaseAction {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    /**
+     * 19.等待元素可见
+     */
+    public WebElement waitForElementVisible(WebElement element, String timeoutInSeconds) {
+        return new WebDriverWait(device.getDriver(), parseLong(timeoutInSeconds))
+                .until(ExpectedConditions.visibilityOf(element));
     }
 
     public By createBy(String findBy, String value) {

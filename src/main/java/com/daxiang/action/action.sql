@@ -207,6 +207,23 @@ VALUES
   '[{"name":"element","type":"WebElement"}]'
 );
 
+-- 19.waitForElementVisible
+INSERT INTO `action` (
+  `id`,
+  `name`,
+  `invoke`,
+  `return_value`,
+  `params`
+)
+VALUES
+(
+  19,
+  '等待元素可见',
+  '$.waitForElementVisible',
+  'WebElement',
+  '[{"name":"element","type":"WebElement"},{"name":"timeoutInSeconds","type":"String","description":"最大等待时间(秒)"}]'
+);
+
 -- 1000~1999 MobileAction platforms = [1,2]
 
 -- 1000.switchContext
