@@ -108,7 +108,7 @@ public class AndroidDevice extends MobileDevice {
 
         capabilities.setCapability("chromedriverPort", PortProvider.getAndroidChromeDriverAvailablePort());
         String chromedriverFilePath = getChromedriverFilePath();
-        if (StringUtils.isEmpty(chromedriverFilePath)) {
+        if (!StringUtils.isEmpty(chromedriverFilePath)) {
             capabilities.setCapability(AndroidMobileCapabilityType.CHROMEDRIVER_EXECUTABLE, chromedriverFilePath);
         }
 
