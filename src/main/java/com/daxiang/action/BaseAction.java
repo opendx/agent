@@ -7,7 +7,10 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -180,6 +183,23 @@ public class BaseAction {
     public WebElement waitForElementVisible(WebElement element, String timeoutInSeconds) {
         return new WebDriverWait(device.getDriver(), parseLong(timeoutInSeconds))
                 .until(ExpectedConditions.visibilityOf(element));
+    }
+
+    /**
+     * 20.获取当前时间
+     *
+     * @param pattern
+     * @return
+     */
+    public String now(String pattern) {
+        if (StringUtils.isEmpty(pattern)) {
+            pattern = "yyyy-MM-dd HH:mm:ss";
+        }
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern(pattern));
+    }
+
+    public String now() {
+        return now("yyyy-MM-dd HH:mm:ss");
     }
 
     public By createBy(String findBy, String value) {

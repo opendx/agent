@@ -224,6 +224,23 @@ VALUES
   '[{"name":"element","type":"WebElement"},{"name":"timeoutInSeconds","type":"String","description":"最大等待时间(秒)"}]'
 );
 
+-- 20.now
+INSERT INTO `action` (
+  `id`,
+  `name`,
+  `invoke`,
+  `return_value`,
+  `params`
+)
+VALUES
+(
+  20,
+  '获取当前时间',
+  '$.now',
+  'String',
+  '[{"name":"pattern","type":"String","description": "默认yyyy-MM-dd HH:mm:ss"}]'
+);
+
 -- 1000~1999 MobileAction platforms = [1,2]
 
 -- 1000.switchContext
