@@ -115,11 +115,7 @@ public class MobileAction extends BaseAction {
         Point start = createPoint(startPoint, window);
         Point end = createPoint(endPoint, window);
 
-        // 默认最多滑动3次
-        if (!StringUtils.hasText(maxSwipeCount)) {
-            maxSwipeCount = "3";
-        }
-        int count = parseInt(maxSwipeCount);
+        int count = StringUtils.hasText(maxSwipeCount) ? parseInt(maxSwipeCount) : 3;
 
         for (int i = 1; i <= count; i++) {
             log.info("[{}]滑动第{}次", mobileDevice.getId(), i);
@@ -160,11 +156,7 @@ public class MobileAction extends BaseAction {
 
         Point[] points = createStartAndEndPointInContainer(container, startPoint, endPoint);
 
-        // 默认最多滑动3次
-        if (!StringUtils.hasText(maxSwipeCount)) {
-            maxSwipeCount = "3";
-        }
-        int count = parseInt(maxSwipeCount);
+        int count = StringUtils.hasText(maxSwipeCount) ? parseInt(maxSwipeCount) : 3;
 
         for (int i = 1; i <= count; i++) {
             log.info("[{}]容器内滑动第{}次", mobileDevice.getId(), i + 1);
@@ -251,24 +243,38 @@ public class MobileAction extends BaseAction {
      */
     public WebElement clickByTouchAction(String findBy, String value) {
         WebElement element = findElement(findBy, value);
+        PointOption center = getElementCenter(element);
+
+        new TouchAction(getAppiumDriver()).tap(center).perform();
+        return element;
+    }
+
+    /**
+     * 1012.长按元素
+     */
+    public void longPressElement(WebElement element, String durationInMs) {
+        Assert.hasText(durationInMs, "durationInMs不能为空");
+
+        PointOption center = getElementCenter(element);
+        new TouchAction(getAppiumDriver())
+                .longPress(center)
+                .waitAction(WaitOptions.waitOptions(Duration.ofMillis(parseLong(durationInMs))))
+                .release().perform();
+    }
+
+    private PointOption getElementCenter(WebElement element) {
+        Assert.notNull(element, "element不能为空");
 
         Point leftTopPoint = element.getLocation();
         Dimension dimension = element.getSize();
 
         int x = leftTopPoint.x + dimension.width / 2;
         int y = leftTopPoint.y + dimension.height / 2;
-        PointOption center = PointOption.point(x, y);
-
-        new TouchAction(getAppiumDriver()).tap(center).perform();
-        return element;
+        return PointOption.point(x, y);
     }
 
     private void swipe(Point start, Point end, String durationInMs) {
-        long duration = DEFAULT_SWIPE_DURATION_IN_MS;
-        if (!StringUtils.isEmpty(durationInMs)) {
-            duration = parseLong(durationInMs);
-        }
-
+        long duration = StringUtils.hasText(durationInMs) ? parseLong(durationInMs) : DEFAULT_SWIPE_DURATION_IN_MS;
         new TouchAction(getAppiumDriver())
                 .press(PointOption.point(start))
                 .waitAction(WaitOptions.waitOptions(Duration.ofMillis(duration)))
@@ -278,13 +284,10 @@ public class MobileAction extends BaseAction {
     }
 
     private Point createPoint(String point, Dimension window) {
-        int screenWidth = window.width;
-        int screenHeight = window.height;
-
         try {
             JSONObject _point = JSONObject.parseObject(point.trim());
-            int x = (int) (_point.getFloat("x") * screenWidth);
-            int y = (int) (_point.getFloat("y") * screenHeight);
+            int x = (int) (_point.getFloat("x") * window.width);
+            int y = (int) (_point.getFloat("y") * window.height);
 
             return new Point(x, y);
         } catch (Exception e) {

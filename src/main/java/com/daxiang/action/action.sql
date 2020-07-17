@@ -467,6 +467,25 @@ VALUES
   '[1,2]'
 );
 
+-- 1012.longPressElement
+INSERT INTO `action` (
+  `id`,
+  `name`,
+  `invoke`,
+  `return_value`,
+  `params`,
+  `platforms`
+)
+VALUES
+(
+  1012,
+  '长按元素',
+  '$.longPressElement',
+  'void',
+  '[{"name":"element","type":"WebElement","description":""},{"name":"durationInMs","type":"String","description":"长按时间，单位: ms"}]',
+  '[1,2]'
+);
+
 -- 2000~2999 AndroidAction platforms = [1]
 
 -- 2000.clearApkData
