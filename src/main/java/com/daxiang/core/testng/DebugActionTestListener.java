@@ -13,7 +13,7 @@ import java.util.List;
 @Slf4j
 public class DebugActionTestListener extends TestListenerAdapter {
 
-    private static final ThreadLocal<String> FAIL_MSG = new ThreadLocal();
+    private static final ThreadLocal<String> FAIL_MSG = new ThreadLocal<>();
 
     private static final ThreadLocal<List<String>> PRINT_MSG_LIST = new ThreadLocal<>();
 

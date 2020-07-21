@@ -7,7 +7,6 @@ import org.testng.TestNG;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by jiangyitao.
@@ -32,7 +31,7 @@ public class TestNGRunner {
                 printMsgList = Arrays.asList("执行成功");
             }
 
-            return Response.success(printMsgList.stream().collect(Collectors.joining("\n")));
+            return Response.success(String.join("\n", printMsgList));
         }
     }
 

@@ -207,14 +207,22 @@ public class AndroidDevice extends MobileDevice {
      * 异步处理安装app时弹窗
      */
     private ScheduledExecutorService handleInstallBtnAsync() {
-        final ScheduledExecutorService scheduleService = Executors.newSingleThreadScheduledExecutor();
+        String installBtnXpath = "//android.widget.Button[" +
+                "contains(@text, '安装') " +
+                "or contains(@text, '下一步') " +
+                "or contains(@text, '确定') " +
+                "or contains(@text, '确认')" +
+                "]";
+        By installBtnBy = By.xpath(installBtnXpath);
+
+        ScheduledExecutorService scheduleService = Executors.newSingleThreadScheduledExecutor();
         scheduleService.scheduleAtFixedRate(() -> {
             try {
-                String installBtnXpath = "//android.widget.Button[contains(@text, '安装') or contains(@text, '下一步') or contains(@text, '确定') or contains(@text, '确认')]";
-                driver.findElement(By.xpath(installBtnXpath)).click();
+                driver.findElement(installBtnBy).click();
             } catch (Exception ign) {
             }
         }, 0, 1, TimeUnit.SECONDS);
+
         return scheduleService;
     }
 

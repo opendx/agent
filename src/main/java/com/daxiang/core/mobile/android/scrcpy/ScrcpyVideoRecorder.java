@@ -33,13 +33,15 @@ public class ScrcpyVideoRecorder {
             throw new IllegalStateException("暂不支持windows录屏");
         }
 
+        String version;
         try {
-            String version = Terminal.execute("scrcpy -v");
-            if (StringUtils.isEmpty(version) || !version.startsWith("scrcpy")) {
-                throw new IllegalStateException("未找到scrcpy，需要将scrcpy配置到环境变量，更多信息: https://github.com/Genymobile/scrcpy");
-            }
+            version = Terminal.execute("scrcpy -v");
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+
+        if (StringUtils.isEmpty(version) || !version.startsWith("scrcpy")) {
+            throw new IllegalStateException("未找到scrcpy，需要将scrcpy配置到环境变量，更多信息: https://github.com/Genymobile/scrcpy");
         }
     }
 
