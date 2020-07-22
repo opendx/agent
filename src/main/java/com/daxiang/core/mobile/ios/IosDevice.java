@@ -106,26 +106,6 @@ public class IosDevice extends MobileDevice {
     }
 
     @Override
-    public boolean acceptAlert() {
-        try {
-            driver.switchTo().alert().accept();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    @Override
-    public boolean dismissAlert() {
-        try {
-            driver.switchTo().alert().dismiss();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    @Override
     public void startRecordingScreen() {
         IOSStartScreenRecordingOptions iosOptions = new IOSStartScreenRecordingOptions();
         // The maximum value is 30 minutes.

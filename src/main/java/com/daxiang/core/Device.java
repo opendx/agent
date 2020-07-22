@@ -146,4 +146,22 @@ public abstract class Device {
             FileUtils.deleteQuietly(screenshotFile);
         }
     }
+
+    public boolean acceptAlert() {
+        try {
+            driver.switchTo().alert().accept();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean dismissAlert() {
+        try {
+            driver.switchTo().alert().dismiss();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

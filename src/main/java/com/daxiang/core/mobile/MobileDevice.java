@@ -41,10 +41,6 @@ public abstract class MobileDevice extends Device {
 
     public abstract void uninstallApp(String app) throws Exception;
 
-    public abstract boolean acceptAlert();
-
-    public abstract boolean dismissAlert();
-
     public void installApp(File appFile) {
         ((AppiumDriver) driver).installApp(appFile.getAbsolutePath());
     }

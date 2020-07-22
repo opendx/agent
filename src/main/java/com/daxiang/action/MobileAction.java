@@ -172,9 +172,10 @@ public class MobileAction extends BaseAction {
 
     /**
      * 1007.弹窗 允许/接受/...
+     * // todo 转移到BaseAction
      */
     public boolean acceptAlert() {
-        return mobileDevice.acceptAlert();
+        return device.acceptAlert();
     }
 
     /**
@@ -182,6 +183,7 @@ public class MobileAction extends BaseAction {
      *
      * @param timeoutInSeconds 超时处理时间
      * @param once             是否只处理一次
+     *                         // todo 转移到BaseAction
      */
     public void asyncAcceptAlert(String timeoutInSeconds, String once) {
         long _timeoutInSeconds = parseLong(timeoutInSeconds);
@@ -206,9 +208,10 @@ public class MobileAction extends BaseAction {
 
     /**
      * 1009.弹窗 拒绝/取消/...
+     * // todo 转移到BaseAction
      */
     public boolean dismissAlert() {
-        return mobileDevice.dismissAlert();
+        return device.dismissAlert();
     }
 
     /**
@@ -216,6 +219,7 @@ public class MobileAction extends BaseAction {
      *
      * @param timeoutInSeconds 超时处理时间
      * @param once             是否只处理一次
+     *                         // todo 转移到BaseAction
      */
     public void asyncDismissAlert(String timeoutInSeconds, String once) {
         long _timeoutInSeconds = parseLong(timeoutInSeconds);
