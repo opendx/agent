@@ -1,5 +1,6 @@
 package com.daxiang.core;
 
+import com.daxiang.core.action.BasicActionScanner;
 import com.daxiang.core.mobile.android.ADB;
 import com.daxiang.core.mobile.android.AndroidDeviceChangeListener;
 import com.daxiang.core.mobile.appium.AppiumServer;
@@ -7,6 +8,7 @@ import com.daxiang.core.mobile.ios.IosDeviceChangeListener;
 import com.daxiang.core.mobile.ios.IosDeviceMonitor;
 import com.daxiang.core.pc.web.Browser;
 import com.daxiang.core.pc.web.BrowserInitializer;
+import com.daxiang.model.action.Action;
 import com.daxiang.utils.Terminal;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +19,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by jiangyitao.
@@ -24,6 +27,8 @@ import java.io.IOException;
 @Slf4j
 @Component
 public class AgentStartRunner implements ApplicationRunner {
+
+    public static final String BASIC_ACTION_PACKAGE = "com.daxiang.action";
 
     @Autowired
     private AndroidDeviceChangeListener androidDeviceChangeListener;
@@ -85,6 +90,10 @@ public class AgentStartRunner implements ApplicationRunner {
 
         // ffmpeg
         Terminal.execute("ffmpeg -version");
+
+        BasicActionScanner basicActionScanner = new BasicActionScanner();
+        List<Action> basicActions = basicActionScanner.scan(BASIC_ACTION_PACKAGE);
+        // todo 发送到server
     }
 
     private void checkAppiumVersion(String appiumVersion) {

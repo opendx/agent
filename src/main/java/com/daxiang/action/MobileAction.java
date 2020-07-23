@@ -1,6 +1,8 @@
 package com.daxiang.action;
 
 import com.alibaba.fastjson.JSONObject;
+import com.daxiang.core.action.annotation.Action;
+import com.daxiang.core.action.annotation.Param;
 import com.daxiang.core.mobile.MobileDevice;
 import com.daxiang.utils.HttpUtil;
 import io.appium.java_client.AppiumDriver;
@@ -26,6 +28,13 @@ import java.time.Duration;
 public class MobileAction extends BaseAction {
 
     private static final long DEFAULT_SWIPE_DURATION_IN_MS = 100L;
+    public static final String POINT_POSSIBLE_VALUES = "[" +
+            "{'value':'{x:0.5, y:0.5}','description':'屏幕中心点'}," +
+            "{'value':'{x:0.8, y:0.5}','description':''}," +
+            "{'value':'{x:0.2, y:0.5}','description':''}," +
+            "{'value':'{x:0.5, y:0.8}','description':''}," +
+            "{'value':'{x:0.5, y:0.2}','description':''}," +
+            "]";
 
     private MobileDevice mobileDevice;
 
@@ -38,23 +47,14 @@ public class MobileAction extends BaseAction {
         return (AppiumDriver) device.getDriver();
     }
 
-    /**
-     * 1000.切换context
-     *
-     * @param context
-     */
-    public void switchContext(String context) {
+    @Action(id = 1000, name = "切换context", platforms = {1, 2})
+    public void switchContext(@Param(possibleValues = "[{'value': 'NATIVE_APP', 'description': '原生'}]") String context) {
         Assert.hasText(context, "context不能为空");
         getAppiumDriver().context(context);
     }
 
-    /**
-     * 1001.安装app
-     *
-     * @param appDownloadUrl
-     * @throws Exception
-     */
-    public void installApp(String appDownloadUrl) throws IOException {
+    @Action(id = 1001, name = "安装App", platforms = {1, 2})
+    public void installApp(@Param(description = "app下载地址") String appDownloadUrl) throws IOException {
         Assert.hasText(appDownloadUrl, "appDownloadUrl不能为空");
 
         File app = HttpUtil.downloadFile(appDownloadUrl);
@@ -65,25 +65,16 @@ public class MobileAction extends BaseAction {
         }
     }
 
-    /**
-     * 1002.卸载app
-     *
-     * @param app
-     * @throws Exception
-     */
-    public void uninstallApp(String app) throws Exception {
+    @Action(id = 1002, name = "卸载App", platforms = {1, 2})
+    public void uninstallApp(@Param(description = "android: packageName, iOS: bundleId") String app) throws Exception {
         Assert.hasText(app, "apk包名或ios bundleId不能为空");
         mobileDevice.uninstallApp(app);
     }
 
-    /**
-     * 1003.滑动屏幕
-     *
-     * @param startPoint   {x: 0.5, y: 0.5} => 屏幕宽/高 1/2的位置
-     * @param endPoint
-     * @param durationInMs 滑动耗时
-     */
-    public void swipe(String startPoint, String endPoint, String durationInMs) {
+    @Action(id = 1003, name = "滑动屏幕", platforms = {1, 2})
+    public void swipe(@Param(description = "起点", possibleValues = POINT_POSSIBLE_VALUES) String startPoint,
+                      @Param(description = "终点", possibleValues = POINT_POSSIBLE_VALUES) String endPoint,
+                      @Param(description = "滑动时间，单位：ms。时间越短，滑的距离越长") String durationInMs) {
         Dimension window = getAppiumDriver().manage().window().getSize();
         Point start = createPoint(startPoint, window);
         Point end = createPoint(endPoint, window);
@@ -91,19 +82,13 @@ public class MobileAction extends BaseAction {
         swipe(start, end, durationInMs);
     }
 
-    /**
-     * 1004.滑动屏幕查找元素
-     *
-     * @param findBy
-     * @param value
-     * @param startPoint       {x: 0.5, y: 0.5} => 屏幕宽/高 1/2的位置
-     * @param endPoint
-     * @param maxSwipeCount    最大滑动次数
-     * @param onceDurationInMs 滑动一次耗时
-     * @return
-     */
-    public WebElement swipeToFindElement(String findBy, String value,
-                                         String startPoint, String endPoint, String maxSwipeCount, String onceDurationInMs) {
+    @Action(id = 1004, name = "滑动屏幕查找元素", platforms = {1, 2})
+    public WebElement swipeToFindElement(@Param(description = "查找方式", possibleValues = FIND_BY_POSSIBLE_VALUES) String findBy,
+                                         String value,
+                                         @Param(description = "起点", possibleValues = POINT_POSSIBLE_VALUES) String startPoint,
+                                         @Param(description = "终点", possibleValues = POINT_POSSIBLE_VALUES) String endPoint,
+                                         @Param(description = "最大滑动次数") String maxSwipeCount,
+                                         @Param(description = "滑动一次的时间，单位: ms。时间越短，滑的距离越长") String onceDurationInMs) {
         By by = createBy(findBy, value);
         AppiumDriver driver = getAppiumDriver();
         try {
@@ -129,24 +114,23 @@ public class MobileAction extends BaseAction {
         return driver.findElement(by);
     }
 
-    /**
-     * 1005.在容器元素内滑动
-     *
-     * @param container
-     * @param startPoint       {x: 0.5, y: 0.5} => 容器元素宽/高 1/2的位置
-     * @param endPoint
-     * @param onceDurationInMs 滑动一次耗时
-     */
-    public void swipeInContainer(WebElement container, String startPoint, String endPoint, String onceDurationInMs) {
+    @Action(id = 1005, name = "容器内滑动", platforms = {1, 2})
+    public void swipeInContainer(@Param(description = "容器元素") WebElement container,
+                                 @Param(description = "起点", possibleValues = POINT_POSSIBLE_VALUES) String startPoint,
+                                 @Param(description = "终点", possibleValues = POINT_POSSIBLE_VALUES) String endPoint,
+                                 @Param(description = "滑动一次的时间，单位: ms。时间越短，滑的距离越长") String onceDurationInMs) {
         Point[] points = createStartAndEndPointInContainer(container, startPoint, endPoint);
         swipe(points[0], points[1], onceDurationInMs);
     }
 
-    /**
-     * 1006.在容器元素内滑动查找元素
-     */
-    public WebElement swipeInContainerToFindElement(WebElement container, String findBy, String value,
-                                                    String startPoint, String endPoint, String maxSwipeCount, String onceDurationInMs) {
+    @Action(id = 1006, name = "容器内滑动查找元素", platforms = {1, 2})
+    public WebElement swipeInContainerToFindElement(@Param(description = "容器元素") WebElement container,
+                                                    @Param(description = "查找方式", possibleValues = FIND_BY_POSSIBLE_VALUES) String findBy,
+                                                    String value,
+                                                    @Param(description = "起点", possibleValues = POINT_POSSIBLE_VALUES) String startPoint,
+                                                    @Param(description = "终点", possibleValues = POINT_POSSIBLE_VALUES) String endPoint,
+                                                    @Param(description = "最大滑动次数") String maxSwipeCount,
+                                                    @Param(description = "滑动一次的时间，单位: ms。时间越短，滑的距离越长") String onceDurationInMs) {
         By by = createBy(findBy, value);
         AppiumDriver driver = getAppiumDriver();
         try {
@@ -170,82 +154,34 @@ public class MobileAction extends BaseAction {
         return driver.findElement(by);
     }
 
-    /**
-     * 1007.弹窗 允许/接受/...
-     * // todo 转移到BaseAction
-     */
+    @Deprecated
+    @Action(id = 1007, name = "accept对话框", platforms = {1, 2})
     public boolean acceptAlert() {
-        return device.acceptAlert();
+        return super.acceptAlert();
     }
 
-    /**
-     * 1008.异步accept alert
-     *
-     * @param timeoutInSeconds 超时处理时间
-     * @param once             是否只处理一次
-     *                         // todo 转移到BaseAction
-     */
-    public void asyncAcceptAlert(String timeoutInSeconds, String once) {
-        long _timeoutInSeconds = parseLong(timeoutInSeconds);
-        boolean _once = parseBoolean(once);
-
-        new Thread(() -> {
-            long startTime = System.currentTimeMillis();
-            boolean success;
-            while (System.currentTimeMillis() - startTime < _timeoutInSeconds * 1000) {
-                success = acceptAlert();
-                if (_once && success) {
-                    break;
-                }
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-
-                }
-            }
-        }).start();
+    @Deprecated
+    @Action(id = 1008, name = "异步accept对话框", platforms = {1, 2})
+    public void asyncAcceptAlert(@Param(description = "超时时间，单位：秒") String timeoutInSeconds,
+                                 @Param(description = "是否只处理一次, true or false") String once) {
+        super.asyncAcceptAlert(timeoutInSeconds, once);
     }
 
-    /**
-     * 1009.弹窗 拒绝/取消/...
-     * // todo 转移到BaseAction
-     */
+    @Deprecated
+    @Action(id = 1009, name = "dismiss对话框", platforms = {1, 2})
     public boolean dismissAlert() {
-        return device.dismissAlert();
+        return super.dismissAlert();
     }
 
-    /**
-     * 1010.异步dismiss alert
-     *
-     * @param timeoutInSeconds 超时处理时间
-     * @param once             是否只处理一次
-     *                         // todo 转移到BaseAction
-     */
-    public void asyncDismissAlert(String timeoutInSeconds, String once) {
-        long _timeoutInSeconds = parseLong(timeoutInSeconds);
-        boolean _once = parseBoolean(once);
-
-        new Thread(() -> {
-            long startTime = System.currentTimeMillis();
-            boolean success;
-            while (System.currentTimeMillis() - startTime < _timeoutInSeconds * 1000) {
-                success = dismissAlert();
-                if (_once && success) {
-                    break;
-                }
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-
-                }
-            }
-        }).start();
+    @Deprecated
+    @Action(id = 1010, name = "异步dismiss对话框", platforms = {1, 2})
+    public void asyncDismissAlert(@Param(description = "超时时间，单位：秒") String timeoutInSeconds,
+                                  @Param(description = "是否只处理一次, true or false") String once) {
+        super.asyncDismissAlert(timeoutInSeconds, once);
     }
 
-    /**
-     * 1011.通过TouchAction点击
-     */
-    public WebElement clickByTouchAction(String findBy, String value) {
+    @Action(id = 1011, name = "(TouchAction)点击", platforms = {1, 2})
+    public WebElement clickByTouchAction(@Param(description = "查找方式", possibleValues = FIND_BY_POSSIBLE_VALUES) String findBy, String value) {
         WebElement element = findElement(findBy, value);
         PointOption center = getElementCenter(element);
 
@@ -253,10 +189,8 @@ public class MobileAction extends BaseAction {
         return element;
     }
 
-    /**
-     * 1012.长按元素
-     */
-    public void longPressElement(WebElement element, String durationInMs) {
+    @Action(id = 1012, name = "长按元素", platforms = {1, 2})
+    public void longPressElement(WebElement element, @Param(description = "长按时间，单位：ms") String durationInMs) {
         Assert.hasText(durationInMs, "durationInMs不能为空");
 
         PointOption center = getElementCenter(element);

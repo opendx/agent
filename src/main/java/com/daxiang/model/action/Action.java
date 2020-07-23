@@ -11,14 +11,13 @@ import java.util.List;
 public class Action {
 
     public static final int TYPE_BASE = 1;
-    public static final int HAS_RETURN_VALUE = 1;
 
     private Integer id;
     private String name;
     private Integer type;
-    private Integer platform;
+    private List<Integer> platforms;
     private String invoke;
-    private String returnValue;
+    private String returnValueType;
     private String returnValueDesc;
     private List<Param> params;
     private List<LocalVar> localVars;
@@ -26,4 +25,6 @@ public class Action {
     private List<String> javaImports;
     private List<Action> importActions;
     private List<Integer> depends;
+    private Integer categoryId;
+    private Integer projectId;
 }

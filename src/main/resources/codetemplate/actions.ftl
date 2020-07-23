@@ -6,7 +6,7 @@
             <#lt>    // ${action.name}
         </#if>
         <#-- 方法前缀 -->
-        <#lt>    public ${action.returnValue} ${actionPrefix}${action.id?c}(<#rt>
+        <#lt>    public ${action.returnValueType} ${actionPrefix}${action.id?c}(<#rt>
         <#-- 方法参数 -->
         <#if action.params?? && (action.params?size>0)>
             <#list action.params as param>
@@ -16,7 +16,7 @@
         <#-- 方法体 -->
         <#-- 基础action -->
         <#if action.type==1>
-            <#lt>        <#if action.returnValue!='void'>return </#if>${action.invoke}(<#rt>
+            <#lt>        <#if action.returnValueType!='void'>return </#if>${action.invoke}(<#rt>
             <#if action.params?? && (action.params?size>0)>
                 <#list action.params as param>
                     <#lt>${param.name}<#sep>, <#rt>

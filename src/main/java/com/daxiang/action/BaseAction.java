@@ -1,5 +1,7 @@
 package com.daxiang.action;
 
+import com.daxiang.core.action.annotation.Action;
+import com.daxiang.core.action.annotation.Param;
 import com.daxiang.core.Device;
 import io.appium.java_client.MobileBy;
 import org.openqa.selenium.By;
@@ -22,6 +24,21 @@ import java.util.concurrent.TimeUnit;
 public class BaseAction {
 
     public static final int EXECUTE_JAVA_CODE_ID = 1;
+    public static final String FIND_BY_POSSIBLE_VALUES = "[" +
+            "{'value':'id','description':'By.id'}," +
+            "{'value':'AccessibilityId','description':'By.AccessibilityId'}," +
+            "{'value':'xpath','description':'By.xpath'}," +
+            "{'value':'AndroidUIAutomator','description':'By.AndroidUIAutomator'}," +
+            "{'value':'iOSClassChain','description':'By.iOSClassChain'}," +
+            "{'value':'iOSNsPredicateString','description':'By.iOSNsPredicateString'}," +
+            "{'value':'image','description':'By.image'}," +
+            "{'value':'className','description':'By.className'}," +
+            "{'value':'name','description':'By.name'}," +
+            "{'value':'cssSelector','description':'By.cssSelector'}," +
+            "{'value':'linkText','description':'By.linkText'}," +
+            "{'value':'partialLinkText','description':'By.partialLinkText'}," +
+            "{'value':'tagName','description':'By.tagName'}" +
+            "]";
 
     protected Device device;
 
@@ -29,69 +46,36 @@ public class BaseAction {
         this.device = device;
     }
 
-    /**
-     * 1.执行java代码
-     *
-     * @param code
-     */
-    public void executeJavaCode(String code) {
+    @Action(id = 1, name = "执行java代码")
+    public void executeJavaCode(@Param(description = "java代码") String code) {
         Assert.hasText(code, "code不能为空");
     }
 
-    /**
-     * 2.休眠
-     *
-     * @param ms 毫秒
-     * @throws InterruptedException
-     */
-    public void sleep(String ms) throws InterruptedException {
+    @Action(id = 2, name = "休眠")
+    public void sleep(@Param(description = "休眠时长，单位：毫秒") String ms) throws InterruptedException {
         Thread.sleep(parseLong(ms));
     }
 
-    /**
-     * 7.点击
-     *
-     * @param findBy
-     * @param value
-     * @return
-     */
-    public WebElement click(String findBy, String value) {
+    @Action(id = 7, name = "点击")
+    public WebElement click(@Param(description = "查找方式", possibleValues = FIND_BY_POSSIBLE_VALUES) String findBy, String value) {
         WebElement element = findElement(findBy, value);
         element.click();
         return element;
     }
 
-    /**
-     * 8.查找元素
-     *
-     * @param findBy
-     * @param value
-     * @return
-     */
-    public WebElement findElement(String findBy, String value) {
+    @Action(id = 8, name = "查找元素")
+    public WebElement findElement(@Param(description = "查找方式", possibleValues = FIND_BY_POSSIBLE_VALUES) String findBy, String value) {
         return device.getDriver().findElement(createBy(findBy, value));
     }
 
-    /**
-     * 9.查找元素
-     *
-     * @param findBy
-     * @param value
-     * @return 返回所有匹配的元素
-     */
-    public List<WebElement> findElements(String findBy, String value) {
+    @Action(id = 9, name = "查找元素列表")
+    public List<WebElement> findElements(@Param(description = "查找方式", possibleValues = FIND_BY_POSSIBLE_VALUES) String findBy, String value) {
         return device.getDriver().findElements(createBy(findBy, value));
     }
 
-    /**
-     * 10.sendKeys
-     *
-     * @param findBy
-     * @param value
-     * @param content
-     * @return
-     */
-    public WebElement sendKeys(String findBy, String value, String content) {
+    @Action(id = 10, name = "输入")
+    public WebElement sendKeys(@Param(description = "查找方式", possibleValues = FIND_BY_POSSIBLE_VALUES) String findBy, String value,
+                               @Param(description = "输入内容") String content) {
         WebElement element = device.getDriver().findElement(createBy(findBy, value));
         if (content == null) {
             content = "";
@@ -100,60 +84,33 @@ public class BaseAction {
         return element;
     }
 
-    /**
-     * 11.设置隐式等待时间
-     *
-     * @param seconds
-     */
-    public void setImplicitlyWaitTime(String seconds) {
+    @Action(id = 11, name = "设置隐式等待时间")
+    public void setImplicitlyWaitTime(@Param(description = "隐式等待时间，单位：秒") String seconds) {
         device.getDriver().manage().timeouts().implicitlyWait(parseLong(seconds), TimeUnit.SECONDS);
     }
 
-    /**
-     * 12.等待元素可见
-     *
-     * @param findBy
-     * @param value
-     * @param timeoutInSeconds
-     * @return
-     */
-    public WebElement waitForElementVisible(String findBy, String value, String timeoutInSeconds) {
+    @Action(id = 12, name = "等待元素可见")
+    public WebElement waitForElementVisible(@Param(description = "查找方式", possibleValues = FIND_BY_POSSIBLE_VALUES) String findBy, String value,
+                                            @Param(description = "最大等待时间，单位：秒") String timeoutInSeconds) {
         return new WebDriverWait(device.getDriver(), parseLong(timeoutInSeconds))
                 .until(ExpectedConditions.visibilityOfElementLocated(createBy(findBy, value)));
     }
 
-    /**
-     * 13.等待元素在DOM里出现，不一定可见
-     * 可用于检查toast是否显示
-     *
-     * @param findBy
-     * @param value
-     * @param timeoutInSeconds
-     * @return
-     */
-    public WebElement waitForElementPresence(String findBy, String value, String timeoutInSeconds) {
+    @Action(id = 13, name = "等待元素出现", description = "等待元素在DOM里出现，不一定可见。移动端可用于检测toast")
+    public WebElement waitForElementPresence(@Param(description = "查找方式", possibleValues = FIND_BY_POSSIBLE_VALUES) String findBy, String value,
+                                             @Param(description = "最大等待时间，单位：秒") String timeoutInSeconds) {
         return new WebDriverWait(device.getDriver(), parseLong(timeoutInSeconds))
                 .until(ExpectedConditions.presenceOfElementLocated(createBy(findBy, value)));
     }
 
-    /**
-     * 14.[web]访问url
-     *
-     * @param url
-     */
+    @Action(id = 14, name = "[web]访问url")
     public void getUrl(String url) {
         Assert.hasText(url, "url不能为空");
         device.getDriver().get(url);
     }
 
-    /**
-     * 17. 元素是否显示
-     *
-     * @param findBy
-     * @param value
-     * @return
-     */
-    public boolean isElementDisplayed(String findBy, String value) {
+    @Action(id = 17, name = "元素是否显示")
+    public boolean isElementDisplayed(@Param(description = "查找方式", possibleValues = FIND_BY_POSSIBLE_VALUES) String findBy, String value) {
         try {
             return isElementDisplayed(findElement(findBy, value));
         } catch (Exception e) {
@@ -161,12 +118,7 @@ public class BaseAction {
         }
     }
 
-    /**
-     * 18. 元素是否显示
-     *
-     * @param element
-     * @return
-     */
+    @Action(id = 18, name = "元素是否显示")
     public boolean isElementDisplayed(WebElement element) {
         Assert.notNull(element, "element不能为空");
 
@@ -177,21 +129,14 @@ public class BaseAction {
         }
     }
 
-    /**
-     * 19.等待元素可见
-     */
-    public WebElement waitForElementVisible(WebElement element, String timeoutInSeconds) {
+    @Action(id = 19, name = "等待元素可见")
+    public WebElement waitForElementVisible(WebElement element, @Param(description = "最大等待时间，单位：秒") String timeoutInSeconds) {
         return new WebDriverWait(device.getDriver(), parseLong(timeoutInSeconds))
                 .until(ExpectedConditions.visibilityOf(element));
     }
 
-    /**
-     * 20.获取当前时间
-     *
-     * @param pattern
-     * @return
-     */
-    public String now(String pattern) {
+    @Action(id = 20, name = "获取当前时间")
+    public String now(@Param(description = "默认yyyy-MM-dd HH:mm:ss") String pattern) {
         if (StringUtils.isEmpty(pattern)) {
             pattern = "yyyy-MM-dd HH:mm:ss";
         }
@@ -200,6 +145,58 @@ public class BaseAction {
 
     public String now() {
         return now("yyyy-MM-dd HH:mm:ss");
+    }
+
+    @Action(id = 21, name = "accept对话框")
+    public boolean acceptAlert() {
+        return device.acceptAlert();
+    }
+
+    @Action(id = 22, name = "异步accept对话框")
+    public void asyncAcceptAlert(@Param(description = "超时时间，单位：秒") String timeoutInSeconds,
+                                 @Param(description = "是否只处理一次, true or false") String once) {
+        boolean _once = parseBoolean(once);
+        long timeoutInMs = parseLong(timeoutInSeconds) * 1000;
+
+        new Thread(() -> {
+            long startTime = System.currentTimeMillis();
+            while (System.currentTimeMillis() - startTime < timeoutInMs) {
+                if (_once && acceptAlert()) {
+                    break;
+                }
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+
+                }
+            }
+        }).start();
+    }
+
+    @Action(id = 23, name = "dismiss对话框")
+    public boolean dismissAlert() {
+        return device.dismissAlert();
+    }
+
+    @Action(id = 24, name = "异步dismiss对话框")
+    public void asyncDismissAlert(@Param(description = "超时时间，单位：秒") String timeoutInSeconds,
+                                  @Param(description = "是否只处理一次, true or false") String once) {
+        boolean _once = parseBoolean(once);
+        long timeoutInMs = parseLong(timeoutInSeconds) * 1000;
+
+        new Thread(() -> {
+            long startTime = System.currentTimeMillis();
+            while (System.currentTimeMillis() - startTime < timeoutInMs) {
+                if (_once && dismissAlert()) {
+                    break;
+                }
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+
+                }
+            }
+        }).start();
     }
 
     public By createBy(String findBy, String value) {
