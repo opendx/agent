@@ -7,6 +7,7 @@ import com.daxiang.model.action.PossibleValue;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Ints;
 import com.google.common.reflect.ClassPath;
+import org.apache.commons.lang3.reflect.TypeUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -83,7 +84,7 @@ public class BasicActionScanner {
         String actionInvoke = actionAnno.invoke() == 1 ? "$." + methodName : className + "." + methodName;
         action.setInvoke(actionInvoke);
 
-        action.setReturnValueType(method.getReturnType().getSimpleName());
+        action.setReturnValueType(TypeUtils.toString(method.getGenericReturnType()));
         action.setReturnValueDesc(actionAnno.returnValueDesc());
 
         if (method.getAnnotation(Deprecated.class) != null) {
@@ -100,7 +101,7 @@ public class BasicActionScanner {
 
         List<Param> params = Stream.of(method.getParameters()).map(parameter -> {
             Param param = new Param();
-            param.setType(parameter.getType().getSimpleName());
+            param.setType(TypeUtils.toString(parameter.getParameterizedType()));
             param.setName(parameter.getName());
 
             com.daxiang.core.action.annotation.Param paramAnno = parameter
