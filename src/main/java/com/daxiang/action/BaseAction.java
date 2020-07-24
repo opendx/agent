@@ -68,7 +68,7 @@ public class BaseAction {
         return device.getDriver().findElement(createBy(findBy, value));
     }
 
-    @Action(id = 9, name = "查找元素列表")
+    @Action(id = 9, name = "查找元素列表", returnValueDesc = "查找到的元素列表")
     public List<WebElement> findElements(@Param(description = "查找方式", possibleValues = FIND_BY_POSSIBLE_VALUES) String findBy, String value) {
         return device.getDriver().findElements(createBy(findBy, value));
     }
