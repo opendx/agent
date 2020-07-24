@@ -6,6 +6,7 @@ import com.daxiang.core.pc.web.Browser;
 import com.daxiang.core.mobile.Mobile;
 import com.daxiang.model.Response;
 import com.daxiang.model.UploadFile;
+import com.daxiang.model.action.Action;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
 import com.daxiang.model.devicetesttask.Testcase;
 import com.daxiang.utils.Terminal;
@@ -44,6 +45,9 @@ public class ServerClient {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Value("${server}/action/resetBasicAction")
+    private String resetBasicActionUrl;
+
     @Value("${server}/upload/file/{fileType}")
     private String uploadFileUrl;
     @Value("${server}/project/list")
@@ -69,6 +73,13 @@ public class ServerClient {
             INSTANCE = App.getBean(ServerClient.class);
         }
         return INSTANCE;
+    }
+
+    public void resetBasicAction(List<Action> actions) {
+        Response response = restTemplate.postForObject(resetBasicActionUrl, actions, Response.class);
+        if (!response.isSuccess()) {
+            throw new RuntimeException(response.getMsg());
+        }
     }
 
     public Capabilities getCapabilitiesByProjectId(Integer projectId) {

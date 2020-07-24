@@ -72,6 +72,7 @@ public class BasicActionScanner {
         Action action = new Action();
         action.setId(actionId);
         action.setType(Action.TYPE_BASE);
+        action.setState(actionAnno.state());
         action.setPlatforms(Ints.asList(actionAnno.platforms()));
         action.setReturnValueType(method.getReturnType().getSimpleName());
 

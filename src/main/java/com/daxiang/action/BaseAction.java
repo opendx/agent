@@ -46,7 +46,7 @@ public class BaseAction {
         this.device = device;
     }
 
-    @Action(id = 1, name = "执行java代码")
+    @Action(id = EXECUTE_JAVA_CODE_ID, name = "执行java代码")
     public void executeJavaCode(@Param(description = "java代码") String code) {
         Assert.hasText(code, "code不能为空");
     }

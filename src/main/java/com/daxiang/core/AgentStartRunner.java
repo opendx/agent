@@ -9,6 +9,7 @@ import com.daxiang.core.mobile.ios.IosDeviceMonitor;
 import com.daxiang.core.pc.web.Browser;
 import com.daxiang.core.pc.web.BrowserInitializer;
 import com.daxiang.model.action.Action;
+import com.daxiang.server.ServerClient;
 import com.daxiang.utils.Terminal;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +30,9 @@ import java.util.List;
 public class AgentStartRunner implements ApplicationRunner {
 
     public static final String BASIC_ACTION_PACKAGE = "com.daxiang.action";
+
+    @Autowired
+    private ServerClient serverClient;
 
     @Autowired
     private AndroidDeviceChangeListener androidDeviceChangeListener;
@@ -93,7 +97,7 @@ public class AgentStartRunner implements ApplicationRunner {
 
         BasicActionScanner basicActionScanner = new BasicActionScanner();
         List<Action> basicActions = basicActionScanner.scan(BASIC_ACTION_PACKAGE);
-        // todo 发送到server
+        serverClient.resetBasicAction(basicActions);
     }
 
     private void checkAppiumVersion(String appiumVersion) {

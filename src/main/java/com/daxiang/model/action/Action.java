@@ -27,4 +27,5 @@ public class Action {
     private List<Integer> depends;
     private Integer categoryId;
     private Integer projectId;
+    private Integer state;
 }
