@@ -71,23 +71,32 @@ public class BasicActionScanner {
 
         Action action = new Action();
         action.setId(actionId);
+
+        String methodName = method.getName();
+        String actionName = StringUtils.isEmpty(actionAnno.name()) ? methodName : actionAnno.name();
+        action.setName(actionName);
+
+        action.setDescription(actionAnno.description());
         action.setType(Action.TYPE_BASE);
-        action.setState(actionAnno.state());
-        action.setPlatforms(Ints.asList(actionAnno.platforms()));
+
+        // 默认使用$.methodName调用，否则使用全类名.methodName调用
+        String actionInvoke = actionAnno.invoke() == 1 ? "$." + methodName : className + "." + methodName;
+        action.setInvoke(actionInvoke);
+
         action.setReturnValueType(method.getReturnType().getSimpleName());
+        action.setReturnValueDesc(actionAnno.returnValueDesc());
 
         if (method.getAnnotation(Deprecated.class) != null) {
             // 废弃的action，添加到废弃分类
             action.setCategoryId(DEPRECATED_ACTION_CATEGORY_ID);
         }
 
-        String methodName = method.getName();
-        String actionName = StringUtils.isEmpty(actionAnno.name()) ? methodName : actionAnno.name();
-        action.setName(actionName);
+        // -1为默认值
+        if (actionAnno.projectId() != -1) {
+            action.setProjectId(actionAnno.projectId());
+        }
 
-        // 默认使用$.methodName调用，否则使用全类名.methodName调用
-        String actionInvoke = actionAnno.invoke() == 1 ? "$." + methodName : className + "." + methodName;
-        action.setInvoke(actionInvoke);
+        action.setState(actionAnno.state());
 
         List<Param> params = Stream.of(method.getParameters()).map(parameter -> {
             Param param = new Param();
@@ -105,6 +114,7 @@ public class BasicActionScanner {
             return param;
         }).collect(Collectors.toList());
         action.setParams(params);
+        action.setPlatforms(Ints.asList(actionAnno.platforms()));
 
         return action;
     }

@@ -22,4 +22,8 @@ public @interface Action {
     int[] platforms() default {}; // 1.android 2.ios 3.web 空:所有平台通用
 
     int state() default 2; // 0.禁用 1.草稿 2.发布
+
+    String returnValueDesc() default "";
+
+    int projectId() default -1;
 }

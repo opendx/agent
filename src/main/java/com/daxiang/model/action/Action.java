@@ -14,18 +14,19 @@ public class Action {
 
     private Integer id;
     private String name;
+    private String description;
     private Integer type;
-    private List<Integer> platforms;
     private String invoke;
     private String returnValueType;
     private String returnValueDesc;
+    private Integer categoryId;
+    private Integer projectId;
+    private Integer state;
     private List<Param> params;
     private List<LocalVar> localVars;
     private List<Step> steps;
     private List<String> javaImports;
     private List<Action> importActions;
+    private List<Integer> platforms;
     private List<Integer> depends;
-    private Integer categoryId;
-    private Integer projectId;
-    private Integer state;
 }
