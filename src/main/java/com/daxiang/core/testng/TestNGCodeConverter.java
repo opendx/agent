@@ -213,7 +213,7 @@ public abstract class TestNGCodeConverter {
     }
 
     /**
-     * 处理action localVar value & step paramValue
+     * 处理action localVar value & step args
      */
     private void handleActionValue() {
         Collection<Action> actions = cachedActions.values();
@@ -226,13 +226,12 @@ public abstract class TestNGCodeConverter {
             List<Step> steps = action.getSteps();
             if (!CollectionUtils.isEmpty(steps)) {
                 for (Step step : steps) {
-                    List<ParamValue> paramValues = step.getParamValues();
-                    if (!CollectionUtils.isEmpty(paramValues)) {
-                        for (ParamValue paramValue : paramValues) {
-                            // ExecuteJavaCode直接嵌入模版，无需处理
-                            if (step.getActionId() != BaseAction.EXECUTE_JAVA_CODE_ID) {
-                                paramValue.setParamValue(handleValue(paramValue.getParamValue()));
-                            }
+                    // ExecuteJavaCode直接嵌入模版，无需处理
+                    if (step.getActionId() != BaseAction.EXECUTE_JAVA_CODE_ID) {
+                        List<String> args = step.getArgs();
+                        if (!CollectionUtils.isEmpty(args)) {
+                            List<String> newArgs = args.stream().map(this::handleValue).collect(Collectors.toList());
+                            step.setArgs(newArgs);
                         }
                     }
                 }

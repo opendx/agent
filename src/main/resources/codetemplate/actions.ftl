@@ -46,15 +46,15 @@
                     </#if>
                     <#-- 直接嵌入java代码 -->
                     <#if step.actionId==executeJavaCodeActionId>
-                        <#list step.paramValues[0].paramValue?split("\n") as code>
+                        <#list step.args[0]?split("\n") as code>
                             <#lt><#if step.handleException??>    </#if>        ${code}
                         </#list>
                     <#else>
                         <#-- 非嵌入代码，步骤赋值，方法调用 -->
                         <#lt><#if step.handleException??>    </#if>        <#if step.evaluation?? && step.evaluation!=''>${step.evaluation} = </#if>${actionPrefix}${step.actionId?c}(<#rt>
-                        <#if step.paramValues?? && (step.paramValues?size>0)>
-                            <#list step.paramValues as paramValue>
-                                <#lt>${paramValue.paramValue}<#sep>, <#rt>
+                        <#if step.args?? && (step.args?size>0)>
+                            <#list step.args as arg>
+                                <#lt>${arg}<#sep>, <#rt>
                             </#list>
                         </#if><#lt>);
                     </#if>
