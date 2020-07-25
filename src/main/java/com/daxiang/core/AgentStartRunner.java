@@ -34,6 +34,9 @@ public class AgentStartRunner implements ApplicationRunner {
     @Autowired
     private ServerClient serverClient;
 
+    @Value("${version}")
+    private String version;
+
     @Autowired
     private AndroidDeviceChangeListener androidDeviceChangeListener;
     @Autowired
@@ -50,6 +53,8 @@ public class AgentStartRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws IOException, InterruptedException {
+        System.setProperty("agent.version", version);
+
         // 移动端
         if (enableAndroid || enableIos) {
             String appiumVersion = AppiumServer.getVersion();
