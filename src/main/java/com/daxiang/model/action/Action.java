@@ -11,19 +11,22 @@ import java.util.List;
 public class Action {
 
     public static final int TYPE_BASE = 1;
-    public static final int HAS_RETURN_VALUE = 1;
 
     private Integer id;
     private String name;
+    private String description;
     private Integer type;
-    private Integer platform;
     private String invoke;
-    private String returnValue;
+    private String returnValueType;
     private String returnValueDesc;
+    private Integer categoryId;
+    private Integer projectId;
+    private Integer state;
     private List<Param> params;
     private List<LocalVar> localVars;
     private List<Step> steps;
     private List<String> javaImports;
     private List<Action> importActions;
+    private List<Integer> platforms;
     private List<Integer> depends;
 }

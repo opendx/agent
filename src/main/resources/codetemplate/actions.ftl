@@ -6,7 +6,7 @@
             <#lt>    // ${action.name}
         </#if>
         <#-- 方法前缀 -->
-        <#lt>    public ${action.returnValue} ${actionPrefix}${action.id?c}(<#rt>
+        <#lt>    public ${action.returnValueType} ${actionPrefix}${action.id?c}(<#rt>
         <#-- 方法参数 -->
         <#if action.params?? && (action.params?size>0)>
             <#list action.params as param>
@@ -16,7 +16,7 @@
         <#-- 方法体 -->
         <#-- 基础action -->
         <#if action.type==1>
-            <#lt>        <#if action.returnValue!='void'>return </#if>${action.invoke}(<#rt>
+            <#lt>        <#if action.returnValueType!='void'>return </#if>${action.invoke}(<#rt>
             <#if action.params?? && (action.params?size>0)>
                 <#list action.params as param>
                     <#lt>${param.name}<#sep>, <#rt>
@@ -46,15 +46,15 @@
                     </#if>
                     <#-- 直接嵌入java代码 -->
                     <#if step.actionId==executeJavaCodeActionId>
-                        <#list step.paramValues[0].paramValue?split("\n") as code>
+                        <#list step.args[0]?split("\n") as code>
                             <#lt><#if step.handleException??>    </#if>        ${code}
                         </#list>
                     <#else>
                         <#-- 非嵌入代码，步骤赋值，方法调用 -->
                         <#lt><#if step.handleException??>    </#if>        <#if step.evaluation?? && step.evaluation!=''>${step.evaluation} = </#if>${actionPrefix}${step.actionId?c}(<#rt>
-                        <#if step.paramValues?? && (step.paramValues?size>0)>
-                            <#list step.paramValues as paramValue>
-                                <#lt>${paramValue.paramValue}<#sep>, <#rt>
+                        <#if step.args?? && (step.args?size>0)>
+                            <#list step.args as arg>
+                                <#lt>${arg}<#sep>, <#rt>
                             </#list>
                         </#if><#lt>);
                     </#if>

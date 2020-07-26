@@ -1,5 +1,6 @@
 package com.daxiang.action;
 
+import com.daxiang.core.action.annotation.Action;
 import com.daxiang.core.mobile.ios.IosDevice;
 import com.daxiang.core.mobile.ios.IosUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -18,11 +19,7 @@ public class IosAction extends MobileAction {
         super(iosDevice);
     }
 
-    /**
-     * 3000.启动/重启 app
-     *
-     * @param bundleId
-     */
+    @Action(id = 3000, name = "启动/重启app", platforms = 2)
     public void restartIosApp(String bundleId) {
         Assert.hasText(bundleId, "bundleId不能为空");
 

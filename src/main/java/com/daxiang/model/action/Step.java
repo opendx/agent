@@ -27,5 +27,5 @@ public class Step {
      */
     private Integer handleException;
     private Integer number;
-    private List<ParamValue> paramValues;
+    private List<String> args;
 }

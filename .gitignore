@@ -14,4 +14,4 @@ target
 test-output/
 *.mp4
 *.jpg
-spring.log
+spring.log*
