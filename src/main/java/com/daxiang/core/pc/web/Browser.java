@@ -11,8 +11,6 @@ import java.util.Date;
 @Data
 public class Browser extends BrowserJsonItem {
 
-    public static final String PROPERTIES_PATH = "browser.json";
-
     private Integer platform;  // 1.windows 2.linux 3.macos
     private Integer status;
     private String username;

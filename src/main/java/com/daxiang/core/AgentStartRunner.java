@@ -6,7 +6,6 @@ import com.daxiang.core.mobile.android.AndroidDeviceChangeListener;
 import com.daxiang.core.mobile.appium.AppiumServer;
 import com.daxiang.core.mobile.ios.IosDeviceChangeListener;
 import com.daxiang.core.mobile.ios.IosDeviceMonitor;
-import com.daxiang.core.pc.web.Browser;
 import com.daxiang.core.pc.web.BrowserInitializer;
 import com.daxiang.model.action.Action;
 import com.daxiang.server.ServerClient;
@@ -19,7 +18,6 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -29,13 +27,15 @@ import java.util.List;
 @Component
 public class AgentStartRunner implements ApplicationRunner {
 
-    public static final String BASIC_ACTION_PACKAGE = "com.daxiang.action";
-
     @Autowired
     private ServerClient serverClient;
 
     @Value("${version}")
     private String version;
+    @Value("${browserConfig}")
+    private String browserConfig;
+    @Value("${basicActionPackage}")
+    private String basicActionPackage;
 
     @Autowired
     private AndroidDeviceChangeListener androidDeviceChangeListener;
@@ -52,7 +52,7 @@ public class AgentStartRunner implements ApplicationRunner {
     private boolean enablePcWeb;
 
     @Override
-    public void run(ApplicationArguments args) throws IOException, InterruptedException {
+    public void run(ApplicationArguments args) throws Exception {
         System.setProperty("agent.version", version);
 
         // 移动端
@@ -84,7 +84,7 @@ public class AgentStartRunner implements ApplicationRunner {
 
         // pc端
         if (enablePcWeb) {
-            browserInitializer.init(Browser.PROPERTIES_PATH);
+            browserInitializer.init(browserConfig);
         } else {
             log.info("未开启pc web功能");
         }
@@ -101,7 +101,8 @@ public class AgentStartRunner implements ApplicationRunner {
         Terminal.execute("ffmpeg -version");
 
         BasicActionScanner basicActionScanner = new BasicActionScanner();
-        List<Action> basicActions = basicActionScanner.scan(BASIC_ACTION_PACKAGE);
+        List<Action> basicActions = basicActionScanner.scanRecursive(basicActionPackage);
+        log.info("scan: {}, basicActions: {}", basicActionPackage, basicActions);
         serverClient.resetBasicAction(basicActions);
     }
 

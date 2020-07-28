@@ -4,11 +4,15 @@ import com.alibaba.fastjson.JSONArray;
 import com.daxiang.model.action.Action;
 import com.daxiang.model.action.Param;
 import com.daxiang.model.action.PossibleValue;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Ints;
-import com.google.common.reflect.ClassPath;
 import org.apache.commons.lang3.reflect.TypeUtils;
-import org.springframework.util.Assert;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
+import org.springframework.core.type.classreading.MetadataReader;
+import org.springframework.core.type.classreading.MetadataReaderFactory;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -27,18 +31,28 @@ public class BasicActionScanner {
     // basic action最大id
     private static final int BASIC_ACTION_MAX_ID = 10000;
 
-    public List<Action> scan(String packageName) throws IOException {
-        Assert.hasText(packageName, "packageName must has text");
+    private PathMatchingResourcePatternResolver resourcePatternResolver;
+    private MetadataReaderFactory metadataReaderFactory;
+
+    public List<Action> scanRecursive(String basePackage) throws IOException, ClassNotFoundException {
+        if (resourcePatternResolver == null) {
+            resourcePatternResolver = new PathMatchingResourcePatternResolver();
+        }
+
+        String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
+                + ClassUtils.convertClassNameToResourcePath(basePackage)
+                + "/**/*.class";
+        Resource[] resources = resourcePatternResolver.getResources(packageSearchPath);
 
         List<Action> actions = new ArrayList<>();
 
-        // 扫描packageName目录及子目录
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        ImmutableSet<ClassPath.ClassInfo> classInfos = ClassPath.from(classLoader)
-                .getTopLevelClassesRecursive(packageName);
+        if (metadataReaderFactory == null) {
+            metadataReaderFactory = new CachingMetadataReaderFactory();
+        }
 
-        for (ClassPath.ClassInfo classInfo : classInfos) {
-            Class clazz = classInfo.load();
+        for (Resource resource : resources) {
+            MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(resource);
+            Class clazz = Class.forName(metadataReader.getClassMetadata().getClassName());
             Method[] methods = clazz.getDeclaredMethods();
             for (Method method : methods) {
                 Action action = createAction(clazz.getName(), method);
