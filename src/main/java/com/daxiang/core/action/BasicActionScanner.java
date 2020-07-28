@@ -35,13 +35,12 @@ public class BasicActionScanner {
     private MetadataReaderFactory metadataReaderFactory;
 
     public List<Action> scanRecursive(String basePackage) throws IOException, ClassNotFoundException {
-        if (resourcePatternResolver == null) {
-            resourcePatternResolver = new PathMatchingResourcePatternResolver();
-        }
-
         String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX
                 + ClassUtils.convertClassNameToResourcePath(basePackage)
                 + "/**/*.class";
+        if (resourcePatternResolver == null) {
+            resourcePatternResolver = new PathMatchingResourcePatternResolver();
+        }
         Resource[] resources = resourcePatternResolver.getResources(packageSearchPath);
 
         List<Action> actions = new ArrayList<>();
