@@ -37,4 +37,10 @@ public class AndroidAction extends MobileAction {
 
         AndroidUtil.restartApk(androidDevice.getIDevice(), packageName, launchActivity);
     }
+
+    @Action(id = 2002, name = "执行adb shell命令", returnValueDesc = "命令返回信息", platforms = 1)
+    public String executeAdbShellCommand(@Param(description = "命令") String cmd) throws IDeviceExecuteShellCommandException {
+        Assert.hasText(cmd, "命令不能为空");
+        return AndroidUtil.executeShellCommand(androidDevice.getIDevice(), cmd);
+    }
 }
