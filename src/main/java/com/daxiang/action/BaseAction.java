@@ -161,7 +161,7 @@ public class BaseAction {
         new Thread(() -> {
             long startTime = System.currentTimeMillis();
             while (System.currentTimeMillis() - startTime < timeoutInMs) {
-                if (_once && acceptAlert()) {
+                if (acceptAlert() && _once) {
                     break;
                 }
                 try {
@@ -187,7 +187,7 @@ public class BaseAction {
         new Thread(() -> {
             long startTime = System.currentTimeMillis();
             while (System.currentTimeMillis() - startTime < timeoutInMs) {
-                if (_once && dismissAlert()) {
+                if (dismissAlert() && _once) {
                     break;
                 }
                 try {
