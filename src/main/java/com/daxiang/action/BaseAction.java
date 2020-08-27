@@ -116,7 +116,13 @@ public class BaseAction {
         Assert.hasText(windowTitle, "窗口Title不能为空");
 
         RemoteWebDriver driver = device.getDriver();
-        String currWindowHandle = driver.getWindowHandle();
+
+        String currWindowHandle = null;
+        try {
+            currWindowHandle = driver.getWindowHandle();
+        } catch (Exception e) {
+            // 当前窗口可能已关闭
+        }
 
         Set<String> windowHandles = driver.getWindowHandles();
         for (String windowHandle : windowHandles) {
@@ -126,8 +132,10 @@ public class BaseAction {
             }
         }
 
-        // 没找到要切的窗口，切回原来的
-        driver.switchTo().window(currWindowHandle);
+        if (currWindowHandle != null) {
+            // 没找到要切的窗口，切回原来的
+            driver.switchTo().window(currWindowHandle);
+        }
         return false;
     }
 
