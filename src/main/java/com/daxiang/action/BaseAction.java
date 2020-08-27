@@ -131,6 +131,12 @@ public class BaseAction {
         return false;
     }
 
+    @Action(id = 16, name = "[web]点击(By JS)", description = "当通过click方法点击元素，出现element not interactable错误，可以尝试用该方法点击")
+    public Object clickByJs(WebElement element) {
+        Assert.notNull(element, "element不能为空");
+        return device.getDriver().executeScript("$(arguments[0]).click()", element);
+    }
+
     @Action(id = 17, name = "元素是否显示")
     public boolean isElementDisplayed(@Param(description = "查找方式", possibleValues = FIND_BY_POSSIBLE_VALUES) String findBy, String value) {
         try {
