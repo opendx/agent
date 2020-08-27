@@ -6,6 +6,7 @@ import com.daxiang.core.Device;
 import io.appium.java_client.MobileBy;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.util.Assert;
@@ -14,6 +15,7 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -107,6 +109,26 @@ public class BaseAction {
     public void getUrl(String url) {
         Assert.hasText(url, "url不能为空");
         device.getDriver().get(url);
+    }
+
+    @Action(id = 15, name = "[web]切换窗口", returnValueDesc = "是否切换成功")
+    public boolean switchWindow(@Param(description = "窗口Title") String windowTitle) {
+        Assert.hasText(windowTitle, "窗口Title不能为空");
+
+        RemoteWebDriver driver = device.getDriver();
+        String currWindowHandle = driver.getWindowHandle();
+
+        Set<String> windowHandles = driver.getWindowHandles();
+        for (String windowHandle : windowHandles) {
+            driver.switchTo().window(windowHandle);
+            if (windowTitle.equals(driver.getTitle())) {
+                return true;
+            }
+        }
+
+        // 没找到要切的窗口，切回原来的
+        driver.switchTo().window(currWindowHandle);
+        return false;
     }
 
     @Action(id = 17, name = "元素是否显示")
