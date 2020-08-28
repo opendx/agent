@@ -235,6 +235,26 @@ public class BaseAction {
         }).start();
     }
 
+    @Action(id = 25, name = "[web]切换frame")
+    public void switchToFrameByIndex(String index) {
+        device.getDriver().switchTo().frame(parseInt(index));
+    }
+
+    @Action(id = 26, name = "[web]切换frame")
+    public void switchToFrameByNameOrId(String nameOrId) {
+        device.getDriver().switchTo().frame(nameOrId);
+    }
+
+    @Action(id = 27, name = "[web]切换到parentFrame")
+    public void switchToParentFrame() {
+        device.getDriver().switchTo().parentFrame();
+    }
+
+    @Action(id = 28, name = "[web]切换到defaultContent")
+    public void switchToDefaultContent() {
+        device.getDriver().switchTo().defaultContent();
+    }
+
     public By createBy(String findBy, String value) {
         Assert.hasText(findBy, "findBy不能为空");
         Assert.hasText(value, "value不能为空");
