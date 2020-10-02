@@ -18,11 +18,12 @@ public class MobileController {
 
     @PostMapping("/{mobileId}/installApp")
     public Response installApp(MultipartFile app, @PathVariable String mobileId) {
-        return mobileService.installApp(app, mobileId);
+        mobileService.installApp(app, mobileId);
+        return Response.success("安装成功");
     }
 
     @GetMapping("/{mobileId}")
     public Response getMobile(@PathVariable String mobileId) {
-        return mobileService.getMobile(mobileId);
+        return Response.success(mobileService.getMobile(mobileId));
     }
 }

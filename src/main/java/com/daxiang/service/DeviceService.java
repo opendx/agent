@@ -1,15 +1,17 @@
 package com.daxiang.service;
 
-import com.alibaba.fastjson.JSONObject;
 import com.daxiang.core.Device;
 import com.daxiang.core.DeviceHolder;
 import com.daxiang.core.mobile.MobileDevice;
-import com.daxiang.model.Response;
+import com.daxiang.exception.AgentException;
 import com.daxiang.model.UploadFile;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.Dimension;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by jiangyitao.
@@ -18,17 +20,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class DeviceService {
 
-    public Response screenshot(String deviceId) {
+    public Map<String, Object> screenshot(String deviceId) {
         Device device = DeviceHolder.getConnectedDevice(deviceId);
         if (device == null) {
-            return Response.fail(deviceId + "未连接");
+            throw new AgentException(deviceId + "未连接");
         }
 
         UploadFile uploadFile = device.screenshotThenUploadToServer();
 
-        JSONObject response = new JSONObject();
-        response.put("imgUrl", uploadFile.getDownloadUrl());
-        response.put("imgPath", uploadFile.getFilePath());
+        Map<String, Object> res = new HashMap<>();
+        res.put("imgUrl", uploadFile.getDownloadUrl());
+        res.put("imgPath", uploadFile.getFilePath());
 
         if (device instanceof MobileDevice) {
             MobileDevice mobileDevice = (MobileDevice) device;
@@ -37,21 +39,21 @@ public class DeviceService {
                 // 在竖/横屏时，若android截图有虚拟按键，这里window的高度/宽度不包含虚拟按键
                 AppiumDriver driver = (AppiumDriver) mobileDevice.getDriver();
                 Dimension window = driver.manage().window().getSize();
-                response.put("windowHeight", window.getHeight());
-                response.put("windowWidth", window.getWidth());
-                response.put("windowOrientation", driver.getOrientation().value());
+                res.put("windowHeight", window.getHeight());
+                res.put("windowWidth", window.getWidth());
+                res.put("windowOrientation", driver.getOrientation().value());
             }
         }
 
-        return Response.success(response);
+        return res;
     }
 
-    public Response dump(String deviceId) {
+    public Map<String, Object> dump(String deviceId) {
         Device device = DeviceHolder.getConnectedDevice(deviceId);
         if (device == null) {
-            return Response.fail(deviceId + "未连接");
+            throw new AgentException(deviceId + "未连接");
         }
 
-        return Response.success(device.dump());
+        return device.dump();
     }
 }

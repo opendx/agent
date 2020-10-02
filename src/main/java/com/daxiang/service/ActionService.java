@@ -11,7 +11,6 @@ import com.daxiang.model.request.ActionDebugRequest;
 import com.daxiang.utils.UUIDUtil;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
-import org.dvare.dynamic.exceptions.DynamicCompilerException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -24,12 +23,6 @@ import java.util.Arrays;
 @Service
 public class ActionService {
 
-    /**
-     * 调试action
-     *
-     * @param request
-     * @return
-     */
     public Response debug(ActionDebugRequest request) {
         DeviceTestTask deviceTestTask = new DeviceTestTask();
         BeanUtils.copyProperties(request, deviceTestTask);
@@ -48,21 +41,13 @@ public class ActionService {
             return Response.fail(e.getMessage());
         }
 
-        Response response = compileAndDebug(className, code);
-        response.setData(ImmutableMap.of("code", code));
-        return response;
-    }
-
-    /**
-     * 编译调试运行
-     */
-    public Response compileAndDebug(String className, String code) {
         try {
             Class clazz = JavaCompiler.compile(className, code);
-            return TestNGRunner.debugAction(clazz);
-        } catch (DynamicCompilerException e) {
-            log.error("编译{}失败: {}", className, e.getMessage());
-            return Response.fail(e.getMessage());
+            String printInfo = TestNGRunner.debugAction(clazz);
+            return Response.success(printInfo, ImmutableMap.of("code", code));
+        } catch (Exception e) {
+            log.error("[{}]err msg: {}, code: {} ", request.getDeviceId(), e.getMessage(), code);
+            return Response.fail(e.getMessage(), ImmutableMap.of("code", code));
         }
     }
 

@@ -2,7 +2,6 @@ package com.daxiang.utils;
 
 import com.daxiang.App;
 import org.apache.commons.io.FileUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
@@ -25,11 +24,7 @@ public class HttpUtil {
     public static File downloadFile(String url, boolean renameFile) throws IOException {
         String fileName = url.substring(url.lastIndexOf("/") + 1);
         if (renameFile) {
-            if (fileName.contains(".")) {
-                fileName = UUIDUtil.getUUID() + "." + StringUtils.unqualify(fileName);
-            } else {
-                fileName = UUIDUtil.getUUID();
-            }
+            fileName = UUIDUtil.getUUIDFilename(fileName);
         }
 
         File file = new File(fileName);

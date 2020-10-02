@@ -55,7 +55,9 @@ public class AndroidUtil {
     }
 
     public static String getDeviceName(IDevice iDevice) {
-        return String.format("[%s] %s", iDevice.getProperty("ro.product.brand"), iDevice.getProperty("ro.product.model"));
+        String brand = iDevice.getProperty("ro.product.brand");
+        String model = iDevice.getProperty("ro.product.model");
+        return String.format("[%s] %s", brand, model);
     }
 
     public static String getAndroidVersion(Integer sdkVerison) {
@@ -134,10 +136,14 @@ public class AndroidUtil {
     }
 
     public static void clearApkData(IDevice iDevice, String packageName) throws IDeviceExecuteShellCommandException {
+        Assert.hasText(packageName, "packageName must has text");
         executeShellCommand(iDevice, "pm clear " + packageName);
     }
 
     public static void restartApk(IDevice iDevice, String packageName, String launchActivity) throws IDeviceExecuteShellCommandException {
+        Assert.hasText(packageName, "packageName must has text");
+        Assert.hasText(launchActivity, "launchActivity must has text");
+
         executeShellCommand(iDevice, "am start -S -n " + packageName + "/" + launchActivity);
     }
 
@@ -168,6 +174,7 @@ public class AndroidUtil {
     }
 
     public static void setIme(IDevice iDevice, String ime) throws IDeviceExecuteShellCommandException {
+        Assert.hasText(ime, "ime must has text");
         executeShellCommand(iDevice, "ime set " + ime);
     }
 

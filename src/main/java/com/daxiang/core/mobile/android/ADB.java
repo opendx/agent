@@ -7,6 +7,8 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * Created by jiangyitao.
@@ -28,26 +30,22 @@ public class ADB {
         Terminal.execute("adb start-server");
     }
 
-    /**
-     * 获取adb路径
-     *
-     * @return
-     */
     private static String getPath() {
         String androidHome = System.getenv("ANDROID_HOME");
-        log.info("环境变量ANDROID_HOME: {}", androidHome);
+        log.info("ANDROID_HOME: {}", androidHome);
 
         if (StringUtils.isEmpty(androidHome)) {
-            throw new RuntimeException("未获取到ANDROID_HOME，请配置ANDROID_HOME环境变量");
+            throw new IllegalStateException("环境变量缺少ANDROID_HOME");
         }
 
-        String adbPath = androidHome + File.separator + "platform-tools" + File.separator;
-        if (Terminal.IS_WINDOWS) {
-            adbPath = adbPath + "adb.exe";
-        } else {
-            adbPath = adbPath + "adb";
-        }
+        String adbPrefixPath = androidHome + File.separator + "platform-tools" + File.separator;
+        String adbPath = Terminal.IS_WINDOWS ? adbPrefixPath + "adb.exe" : adbPrefixPath + "adb";
         log.info("adb路径: {}", adbPath);
+
+        if (!Files.exists(Paths.get(adbPath))) {
+            throw new IllegalStateException(adbPath + "文件不存在");
+        }
+
         return adbPath;
     }
 }

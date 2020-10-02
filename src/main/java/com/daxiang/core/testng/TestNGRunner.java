@@ -1,6 +1,6 @@
 package com.daxiang.core.testng;
 
-import com.daxiang.model.Response;
+import com.daxiang.exception.ActionDebugException;
 import org.springframework.util.CollectionUtils;
 import org.testng.ITestNGListener;
 import org.testng.TestNG;
@@ -21,18 +21,18 @@ public class TestNGRunner {
         }
     }
 
-    public static Response debugAction(Class clazz) {
+    public static String debugAction(Class clazz) throws ActionDebugException {
         TestNG testNG = run(new Class[]{clazz}, Arrays.asList(DebugActionTestListener.class));
         if (testNG.getStatus() != 0) { // 运行有错误
-            return Response.fail(DebugActionTestListener.getFailMsg());
-        } else { // 运行成功
-            List<String> printMsgList = DebugActionTestListener.getPrintMsgList();
-            if (CollectionUtils.isEmpty(printMsgList)) {
-                printMsgList = Arrays.asList("执行成功");
-            }
-
-            return Response.success(String.join("\n", printMsgList));
+            throw new ActionDebugException(DebugActionTestListener.getFailMsg());
         }
+
+        List<String> printMsgList = DebugActionTestListener.getPrintMsgList();
+        if (CollectionUtils.isEmpty(printMsgList)) {
+            printMsgList = Arrays.asList("执行成功");
+        }
+
+        return String.join("\n", printMsgList);
     }
 
     private static TestNG run(Class[] testClasses, List<Class<? extends ITestNGListener>> listenerClasses) {

@@ -22,15 +22,4 @@ public class ActionController {
     public Response debug(@Valid @RequestBody ActionDebugRequest request) {
         return actionService.debug(request);
     }
-
-    /**
-     * 给开发者调试专用
-     *
-     * @param code
-     * @return
-     */
-    @PostMapping("/developer/debug")
-    public Response developerDebug(String className, String code) {
-        return actionService.compileAndDebug(className, code);
-    }
 }

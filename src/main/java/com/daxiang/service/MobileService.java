@@ -1,9 +1,10 @@
 package com.daxiang.service;
 
 import com.daxiang.core.Device;
+import com.daxiang.core.mobile.Mobile;
 import com.daxiang.core.mobile.MobileDevice;
 import com.daxiang.core.DeviceHolder;
-import com.daxiang.model.Response;
+import com.daxiang.exception.AgentException;
 import com.daxiang.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -20,43 +21,33 @@ import java.io.File;
 @Service
 public class MobileService {
 
-    public Response installApp(MultipartFile app, String mobileId) {
+    public void installApp(MultipartFile app, String mobileId) {
         Device device = DeviceHolder.getConnectedDevice(mobileId);
         if (device == null) {
-            return Response.fail(mobileId + "未连接");
+            throw new AgentException(mobileId + "未连接");
         }
 
         String fileName = app.getOriginalFilename();
-        if (fileName.contains(".")) {
-            fileName = UUIDUtil.getUUID() + "." + StringUtils.unqualify(fileName);
-        } else {
-            fileName = UUIDUtil.getUUID();
-        }
-
+        fileName = UUIDUtil.getUUIDFilename(fileName);
         File appFile = new File(fileName);
+
         try {
             FileUtils.copyInputStreamToFile(app.getInputStream(), appFile);
             ((MobileDevice) device).installApp(appFile);
-            return Response.success("安装成功");
         } catch (Exception e) {
             log.error("[{}]安装app失败", mobileId, e);
-            return Response.fail(e.getMessage());
+            throw new AgentException(e.getMessage());
         } finally {
             FileUtils.deleteQuietly(appFile);
         }
     }
 
-    public Response getMobile(String mobileId) {
+    public Mobile getMobile(String mobileId) {
         if (StringUtils.isEmpty(mobileId)) {
-            return Response.fail("mobileId不能为空");
+            throw new AgentException("mobileId不能为空");
         }
 
         Device device = DeviceHolder.get(mobileId);
-        if (device == null) {
-            return Response.success();
-        } else {
-            MobileDevice mobileDevice = (MobileDevice) device;
-            return Response.success(mobileDevice.getMobile());
-        }
+        return device == null ? null : ((MobileDevice) device).getMobile();
     }
 }

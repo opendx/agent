@@ -20,6 +20,6 @@ public class BrowserController {
 
     @GetMapping("/{browserId}")
     public Response getBrowser(@PathVariable String browserId) {
-        return browserService.getBrowser(browserId);
+        return Response.success(browserService.getBrowser(browserId));
     }
 }

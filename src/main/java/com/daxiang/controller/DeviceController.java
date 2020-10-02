@@ -17,12 +17,12 @@ public class DeviceController {
 
     @GetMapping("/{deviceId}/dump")
     public Response dump(@PathVariable String deviceId) {
-        return deviceService.dump(deviceId);
+        return Response.success(deviceService.dump(deviceId));
     }
 
     @GetMapping("/{deviceId}/screenshot")
     public Response screenshot(@PathVariable String deviceId) {
-        return deviceService.screenshot(deviceId);
+        return Response.success(deviceService.screenshot(deviceId));
     }
 
 }
