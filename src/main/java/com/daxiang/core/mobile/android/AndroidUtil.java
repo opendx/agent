@@ -33,6 +33,7 @@ public class AndroidUtil {
             .put(27, "8.1")
             .put(28, "9")
             .put(29, "10")
+            .put(30, "11")
             .build();
 
     public static String getCpuInfo(IDevice iDevice) throws IDeviceExecuteShellCommandException {
