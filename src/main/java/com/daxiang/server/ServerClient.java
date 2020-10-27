@@ -53,9 +53,9 @@ public class ServerClient {
     @Value("${server}/project/list")
     private String projectListUrl;
     @Value("${server}/mobile/list")
-    private String deviceListUrl;
+    private String mobileListUrl;
     @Value("${server}/mobile/save")
-    private String deviceSaveUrl;
+    private String mobileSaveUrl;
     @Value("${server}/browser/save")
     private String browserSaveUrl;
     @Value("${server}/driver/downloadUrl")
@@ -91,7 +91,7 @@ public class ServerClient {
 
         Response<List<Map<String, String>>> response = restTemplate.exchange(projectListUrl,
                 HttpMethod.POST,
-                new HttpEntity(params, headers),
+                new HttpEntity<>(params, headers),
                 new ParameterizedTypeReference<Response<List<Map<String, String>>>>() {
                 }).getBody();
 
@@ -120,9 +120,9 @@ public class ServerClient {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        Response<List<Mobile>> response = restTemplate.exchange(deviceListUrl,
+        Response<List<Mobile>> response = restTemplate.exchange(mobileListUrl,
                 HttpMethod.POST,
-                new HttpEntity(params, headers),
+                new HttpEntity<>(params, headers),
                 new ParameterizedTypeReference<Response<List<Mobile>>>() {
                 }).getBody();
 
@@ -161,7 +161,7 @@ public class ServerClient {
     }
 
     public void saveMobile(Mobile mobile) {
-        Response response = restTemplate.postForObject(deviceSaveUrl, mobile, Response.class);
+        Response response = restTemplate.postForObject(mobileSaveUrl, mobile, Response.class);
         if (!response.isSuccess()) {
             throw new RuntimeException(response.getMsg());
         }
