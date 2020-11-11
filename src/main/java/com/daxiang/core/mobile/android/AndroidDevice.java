@@ -14,7 +14,6 @@ import com.daxiang.core.mobile.android.stf.Minicap;
 import com.daxiang.core.mobile.android.stf.Minitouch;
 import com.daxiang.core.mobile.appium.AndroidNativePageSourceHandler;
 import com.daxiang.core.mobile.appium.AppiumServer;
-import com.daxiang.utils.HttpUtil;
 import com.daxiang.utils.Terminal;
 import com.daxiang.utils.UUIDUtil;
 import io.appium.java_client.android.AndroidDriver;
@@ -33,6 +32,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
 import java.time.Duration;
@@ -136,7 +136,7 @@ public class AndroidDevice extends MobileDevice {
             // 主要因为appium server无法在安装app时，响应其他请求，所以这里用ddmlib安装
             AndroidUtil.installApk(iDevice, appFile.getAbsolutePath());
         } catch (InstallException e) {
-            throw new RuntimeException(String.format("[%s]安装app失败", getId()), e);
+            throw new RuntimeException(String.format("[%s]安装app失败: %s", getId(), e.getMessage()), e);
         } finally {
             if (!scheduleService.isShutdown()) {
                 scheduleService.shutdown();
@@ -238,7 +238,7 @@ public class AndroidDevice extends MobileDevice {
         if (!chromedriverFile.exists()) {
             try {
                 log.info("[{}]download chromedriver from {}", getId(), downloadUrl);
-                HttpUtil.downloadFile(downloadUrl, chromedriverFile);
+                FileUtils.copyURLToFile(new URL(downloadUrl), chromedriverFile);
 
                 if (!Terminal.IS_WINDOWS) {
                     // 权限

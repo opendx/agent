@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.daxiang.core.action.annotation.Action;
 import com.daxiang.core.action.annotation.Param;
 import com.daxiang.core.mobile.MobileDevice;
-import com.daxiang.utils.HttpUtil;
+import com.daxiang.utils.FileUtil;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.touch.WaitOptions;
@@ -57,7 +57,7 @@ public class MobileAction extends BaseAction {
     public void installApp(@Param(description = "app下载地址") String appDownloadUrl) throws IOException {
         Assert.hasText(appDownloadUrl, "appDownloadUrl不能为空");
 
-        File app = HttpUtil.downloadFile(appDownloadUrl);
+        File app = FileUtil.downloadFile(appDownloadUrl);
         try {
             mobileDevice.installApp(app);
         } finally {
