@@ -33,7 +33,7 @@ public class MobileService {
 
         try {
             FileUtils.copyInputStreamToFile(app.getInputStream(), appFile);
-            ((MobileDevice) device).installApp(appFile);
+            ((MobileDevice) device).installApp(appFile.getAbsolutePath());
         } catch (Exception e) {
             log.error("[{}]安装app失败", mobileId, e);
             throw new AgentException(e.getMessage());

@@ -94,7 +94,7 @@ public class AndroidDeviceChangeListener extends MobileChangeHandler implements 
 
             // 安装一个测试apk，用于初始化appium driver
             log.info("[{}]开始安装{}", mobileId, APIDEMOS_APK);
-            androidDevice.installApp(new File(APIDEMOS_APK));
+            androidDevice.installApp(new File(APIDEMOS_APK).getAbsolutePath());
             log.info("[{}]安装{}完成", mobileId, APIDEMOS_APK);
         }
 

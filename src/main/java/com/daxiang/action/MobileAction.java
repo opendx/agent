@@ -4,18 +4,15 @@ import com.alibaba.fastjson.JSONObject;
 import com.daxiang.core.action.annotation.Action;
 import com.daxiang.core.action.annotation.Param;
 import com.daxiang.core.mobile.MobileDevice;
-import com.daxiang.utils.FileUtil;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.PointOption;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.*;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 
@@ -56,13 +53,7 @@ public class MobileAction extends BaseAction {
     @Action(id = 1001, name = "安装App", platforms = {1, 2})
     public void installApp(@Param(description = "app下载地址") String appDownloadUrl) throws IOException {
         Assert.hasText(appDownloadUrl, "appDownloadUrl不能为空");
-
-        File app = FileUtil.downloadFile(appDownloadUrl);
-        try {
-            mobileDevice.installApp(app);
-        } finally {
-            FileUtils.deleteQuietly(app);
-        }
+        mobileDevice.installApp(appDownloadUrl);
     }
 
     @Action(id = 1002, name = "卸载App", platforms = {1, 2})

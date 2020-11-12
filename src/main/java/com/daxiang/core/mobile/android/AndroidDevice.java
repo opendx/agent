@@ -14,6 +14,7 @@ import com.daxiang.core.mobile.android.stf.Minicap;
 import com.daxiang.core.mobile.android.stf.Minitouch;
 import com.daxiang.core.mobile.appium.AndroidNativePageSourceHandler;
 import com.daxiang.core.mobile.appium.AppiumServer;
+import com.daxiang.utils.FileUtil;
 import com.daxiang.utils.Terminal;
 import com.daxiang.utils.UUIDUtil;
 import io.appium.java_client.android.AndroidDriver;
@@ -32,6 +33,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
@@ -129,17 +131,35 @@ public class AndroidDevice extends MobileDevice {
     }
 
     @Override
-    public void installApp(File appFile) {
+    public void installApp(String app) {
+        boolean appIsUrl = true;
+        try {
+            new URL(app);
+        } catch (MalformedURLException e) {
+            appIsUrl = false;
+        }
+
+        if (appIsUrl) {
+            try {
+                app = FileUtil.downloadFile(app).getAbsolutePath();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         ScheduledExecutorService scheduleService = handleInstallBtnAsync();
         try {
             // 若使用appium安装，将导致handleInstallBtnAsync无法继续处理安装时的弹窗
             // 主要因为appium server无法在安装app时，响应其他请求，所以这里用ddmlib安装
-            AndroidUtil.installApk(iDevice, appFile.getAbsolutePath());
+            AndroidUtil.installApk(iDevice, app);
         } catch (InstallException e) {
             throw new RuntimeException(String.format("[%s]安装app失败: %s", getId(), e.getMessage()), e);
         } finally {
             if (!scheduleService.isShutdown()) {
                 scheduleService.shutdown();
+            }
+            if (appIsUrl) {
+                FileUtils.deleteQuietly(new File(app));
             }
         }
     }

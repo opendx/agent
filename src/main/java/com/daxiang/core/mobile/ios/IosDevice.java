@@ -88,16 +88,8 @@ public class IosDevice extends MobileDevice {
     }
 
     @Override
-    public void installApp(File appFile) {
-        if (appFile.getName().endsWith(".ipa")) {
-            try {
-                IosUtil.installAppByIdeviceinstaller(getId(), appFile.getAbsolutePath());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            super.installApp(appFile);
-        }
+    public void installApp(String app) {
+        IosUtil.installApp(driver, app);
     }
 
     @Override

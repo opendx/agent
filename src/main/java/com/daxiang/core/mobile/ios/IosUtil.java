@@ -85,6 +85,10 @@ public class IosUtil {
         Terminal.execute(String.format(cmd, mobileId, appPath));
     }
 
+    public static void installApp(RemoteWebDriver driver, String app) {
+        driver.executeScript("mobile: installApp", ImmutableMap.of("app", app));
+    }
+
     public static void uninstallApp(RemoteWebDriver driver, String bundleId) {
         driver.executeScript("mobile: removeApp", ImmutableMap.of("bundleId", bundleId));
     }

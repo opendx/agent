@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.dom4j.DocumentException;
 import org.json.XML;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
@@ -41,8 +40,11 @@ public abstract class MobileDevice extends Device {
 
     public abstract void uninstallApp(String app) throws Exception;
 
-    public void installApp(File appFile) {
-        ((AppiumDriver) driver).installApp(appFile.getAbsolutePath());
+    /**
+     * @param app 本地路径 or 下载地址
+     */
+    public void installApp(String app) {
+        ((AppiumDriver) driver).installApp(app);
     }
 
     @Override
