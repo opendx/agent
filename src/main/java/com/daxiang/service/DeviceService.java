@@ -4,6 +4,7 @@ import com.daxiang.core.Device;
 import com.daxiang.core.DeviceHolder;
 import com.daxiang.core.mobile.MobileDevice;
 import com.daxiang.exception.AgentException;
+import com.daxiang.model.FileType;
 import com.daxiang.model.UploadFile;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,7 @@ public class DeviceService {
             throw new AgentException(deviceId + "未连接");
         }
 
-        UploadFile uploadFile = device.screenshotThenUploadToServer();
+        UploadFile uploadFile = device.screenshotThenUploadToServer(FileType.TMP);
 
         Map<String, Object> res = new HashMap<>();
         res.put("imgUrl", uploadFile.getDownloadUrl());
