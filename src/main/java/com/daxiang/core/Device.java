@@ -139,9 +139,13 @@ public abstract class Device {
     }
 
     public UploadFile screenshotThenUploadToServer() {
+        return screenshotThenUploadToServer(FileType.IMG);
+    }
+
+    public UploadFile screenshotThenUploadToServer(Integer fileType) {
         File screenshotFile = screenshot();
         try {
-            return ServerClient.getInstance().uploadFile(screenshotFile, FileType.IMG);
+            return ServerClient.getInstance().uploadFile(screenshotFile, fileType);
         } finally {
             FileUtils.deleteQuietly(screenshotFile);
         }
