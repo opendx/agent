@@ -3,13 +3,14 @@ package com.daxiang.core.mobile.android.stf;
 import com.android.ddmlib.*;
 import com.daxiang.core.PortProvider;
 import com.daxiang.core.mobile.android.AndroidDevice;
-import com.daxiang.core.mobile.android.AndroidImgDataConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
 import java.io.InputStream;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.util.concurrent.*;
+import java.util.function.Consumer;
 
 /**
  * Created by jiangyitao.
@@ -51,7 +52,7 @@ public class Minicap {
      * @param orientation       屏幕的旋转角度
      */
     public synchronized void start(int quality, String realResolution, String virtualResolution,
-                                   int orientation, AndroidImgDataConsumer androidImgDataConsumer) throws Exception {
+                                   int orientation, Consumer<ByteBuffer> consumer) throws Exception {
         if (isRunning) {
             return;
         }
@@ -111,7 +112,7 @@ public class Minicap {
 
                 MinicapFrameParser minicapFrameParser = new MinicapFrameParser();
                 while (true) { // 获取不到minicap输出的数据时，将会抛出MinicapFrameSizeException，循环退出
-                    androidImgDataConsumer.consume(minicapFrameParser.parse(inputStream));
+                    consumer.accept(minicapFrameParser.parse(inputStream));
                 }
             } catch (MinicapFrameSizeException e) {
                 log.info("[{}]无法获取minicap输出数据", mobileId);

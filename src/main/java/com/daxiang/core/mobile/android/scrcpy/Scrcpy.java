@@ -6,7 +6,6 @@ import com.android.ddmlib.NullOutputReceiver;
 import com.daxiang.App;
 import com.daxiang.core.PortProvider;
 import com.daxiang.core.mobile.android.AndroidDevice;
-import com.daxiang.core.mobile.android.AndroidImgDataConsumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -18,6 +17,7 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * Created by jiangyitao.
@@ -51,8 +51,8 @@ public class Scrcpy {
         this.iDevice = iDevice;
     }
 
-    public synchronized void start(AndroidImgDataConsumer androidImgDataConsumer) throws Exception {
-        Assert.notNull(androidImgDataConsumer, "dataConsumer cannot be null");
+    public synchronized void start(Consumer<ByteBuffer> consumer) throws Exception {
+        Assert.notNull(consumer, "consumer cannot be null");
 
         if (isRunning) {
             return;
@@ -162,7 +162,7 @@ public class Scrcpy {
                         packet[i] = (byte) screenStream.read();
                     }
 
-                    androidImgDataConsumer.consume(ByteBuffer.wrap(packet, 0, packetSize));
+                    consumer.accept(ByteBuffer.wrap(packet, 0, packetSize));
                 }
             } catch (IndexOutOfBoundsException ign) {
             } catch (Exception e) {
