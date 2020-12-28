@@ -60,25 +60,16 @@ public class AndroidScrcpySocketServer extends DeviceSocketServer {
         String operation = message.getString("operation");
         switch (operation) {
             case "m":
-                scrcpy.moveTo(message.getInteger("x"), message.getInteger("y"), message.getInteger("width"), message.getInteger("height"));
+                scrcpy.moveTo(message.getIntValue("x"), message.getIntValue("y"), message.getIntValue("width"), message.getIntValue("height"));
                 break;
             case "d":
-                scrcpy.touchDown(message.getInteger("x"), message.getInteger("y"), message.getInteger("width"), message.getInteger("height"));
+                scrcpy.touchDown(message.getIntValue("x"), message.getIntValue("y"), message.getIntValue("width"), message.getIntValue("height"));
                 break;
             case "u":
-                scrcpy.touchUp(message.getInteger("x"), message.getInteger("y"), message.getInteger("width"), message.getInteger("height"));
+                scrcpy.touchUp(message.getIntValue("x"), message.getIntValue("y"), message.getIntValue("width"), message.getIntValue("height"));
                 break;
-            case "home":
-                scrcpy.home();
-                break;
-            case "back":
-                scrcpy.back();
-                break;
-            case "power":
-                scrcpy.power();
-                break;
-            case "menu":
-                scrcpy.menu();
+            case "k":
+                scrcpy.commitKeycode(message.getIntValue("keycode"));
                 break;
         }
     }

@@ -5,8 +5,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.daxiang.App;
 import com.daxiang.core.mobile.android.AndroidDevice;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.nativekey.AndroidKey;
-import io.appium.java_client.android.nativekey.KeyEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -79,26 +77,17 @@ public class AndroidStfSocketServer extends DeviceSocketServer {
         switch (operation) {
             case "m":
                 androidDevice.getMinitouch()
-                        .moveTo(message.getInteger("x"), message.getInteger("y"), message.getInteger("width"), message.getInteger("height"));
+                        .moveTo(message.getIntValue("x"), message.getIntValue("y"), message.getIntValue("width"), message.getIntValue("height"));
                 break;
             case "d":
                 androidDevice.getMinitouch()
-                        .touchDown(message.getInteger("x"), message.getInteger("y"), message.getInteger("width"), message.getInteger("height"));
+                        .touchDown(message.getIntValue("x"), message.getIntValue("y"), message.getIntValue("width"), message.getIntValue("height"));
                 break;
             case "u":
                 androidDevice.getMinitouch().touchUp();
                 break;
-            case "home":
-                ((AndroidDriver) androidDevice.getDriver()).pressKey(new KeyEvent(AndroidKey.HOME));
-                break;
-            case "back":
-                ((AndroidDriver) androidDevice.getDriver()).pressKey(new KeyEvent(AndroidKey.BACK));
-                break;
-            case "power":
-                ((AndroidDriver) androidDevice.getDriver()).pressKey(new KeyEvent(AndroidKey.POWER));
-                break;
-            case "menu":
-                ((AndroidDriver) androidDevice.getDriver()).pressKey(new KeyEvent(AndroidKey.MENU));
+            case "k":
+                ((AndroidDriver) androidDevice.getDriver()).pressKeyCode(message.getIntValue("keycode"));
                 break;
         }
     }

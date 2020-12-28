@@ -214,6 +214,11 @@ public class Scrcpy {
         iDevice.executeShellCommand(chmodCmd, new NullOutputReceiver());
     }
 
+    // android.view.MotionEvent
+    private static final byte ACTION_DOWN = 0;
+    private static final byte ACTION_UP = 1;
+    private static final byte ACTION_MOVE = 2;
+
     public void touchDown(int x, int y, int screenWidth, int screenHeight) {
         commitTouchEvent(ACTION_DOWN, x, y, screenWidth, screenHeight);
     }
@@ -226,35 +231,12 @@ public class Scrcpy {
         commitTouchEvent(ACTION_MOVE, x, y, screenWidth, screenHeight);
     }
 
-    public void home() {
-        commitKeycode(KEYCODE_HOME);
-    }
-
-    public void back() {
-        commitKeycode(KEYCODE_BACK);
-    }
-
-    public void menu() {
-        commitKeycode(KEYCODE_MENU);
-    }
-
-    public void power() {
-        commitKeycode(KEYCODE_POWER);
-    }
-
     // Scrcpy.server ControlMessage
-    private static final int TYPE_INJECT_TOUCH_EVENT = 2;
-    private static final int TYPE_INJECT_KEYCODE = 0;
-
-    // android.view.MotionEvent
-    private static final int ACTION_DOWN = 0;
-    private static final int ACTION_UP = 1;
-    private static final int ACTION_MOVE = 2;
-
+    private static final byte TYPE_INJECT_TOUCH_EVENT = 2;
     private ByteBuffer touchEventBuffer = ByteBuffer.allocate(28);
 
     // Scrcpy.server ControlMessageReader.parseInjectTouchEvent
-    private void commitTouchEvent(int actionType, int x, int y, int screenWidth, int screenHeight) {
+    private void commitTouchEvent(byte actionType, int x, int y, int screenWidth, int screenHeight) {
         // Scrcpy.server Device.computeVideoSize
         // 由于H264只接收8的倍数的宽高，所以scrcpy重新计算了video size
         // scrcpy输出的video size不能直接拿来用，否则会出现commitTouchEvent无效的问题
@@ -266,8 +248,8 @@ public class Scrcpy {
 
         touchEventBuffer.rewind();
 
-        touchEventBuffer.put((byte) TYPE_INJECT_TOUCH_EVENT);
-        touchEventBuffer.put((byte) actionType);
+        touchEventBuffer.put(TYPE_INJECT_TOUCH_EVENT);
+        touchEventBuffer.put(actionType);
         touchEventBuffer.putLong(-1L); // pointerId
         touchEventBuffer.putInt(x);
         touchEventBuffer.putInt(y);
@@ -279,27 +261,22 @@ public class Scrcpy {
         commit(touchEventBuffer.array());
     }
 
-    // android.view.KeyEvent
-    private static final int KEYCODE_HOME = 3;
-    private static final int KEYCODE_BACK = 4;
-    private static final int KEYCODE_MENU = 82;
-    private static final int KEYCODE_POWER = 26;
-    private static final int KEY_EVENT_ACTION_DOWN = 0;
-    private static final int KEY_EVENT_ACTION_UP = 1;
-
+    private static final byte KEY_EVENT_ACTION_DOWN = 0;
+    private static final byte KEY_EVENT_ACTION_UP = 1;
+    private static final byte TYPE_INJECT_KEYCODE = 0;
     private ByteBuffer keycodeBuffer = ByteBuffer.allocate(20);
 
     // Scrcpy.server ControlMessageReader.parseInjectKeycode
-    private void commitKeycode(int keycode) {
+    public void commitKeycode(int keycode) {
         keycodeBuffer.rewind();
 
-        keycodeBuffer.put((byte) TYPE_INJECT_KEYCODE);
-        keycodeBuffer.put((byte) KEY_EVENT_ACTION_DOWN); // 按下
+        keycodeBuffer.put(TYPE_INJECT_KEYCODE);
+        keycodeBuffer.put(KEY_EVENT_ACTION_DOWN); // 按下
         keycodeBuffer.putInt(keycode); // keycode
         keycodeBuffer.putInt(0); // metaState
 
-        keycodeBuffer.put((byte) TYPE_INJECT_KEYCODE);
-        keycodeBuffer.put((byte) KEY_EVENT_ACTION_UP); // 抬起
+        keycodeBuffer.put(TYPE_INJECT_KEYCODE);
+        keycodeBuffer.put(KEY_EVENT_ACTION_UP); // 抬起
         keycodeBuffer.putInt(keycode); // keycode
         keycodeBuffer.putInt(0); // metaState
 
