@@ -69,7 +69,16 @@ public class AndroidScrcpySocketServer extends DeviceSocketServer {
                 scrcpy.touchUp(message.getIntValue("x"), message.getIntValue("y"), message.getIntValue("width"), message.getIntValue("height"));
                 break;
             case "k":
-                scrcpy.commitKeycode(message.getIntValue("keycode"));
+                int keycode = message.getIntValue("keycode");
+                int metaState = message.getIntValue("metaState");
+                scrcpy.keyDown(keycode, metaState);
+                scrcpy.keyUp(keycode, metaState);
+                break;
+            case "kd":
+                scrcpy.keyDown(message.getIntValue("keycode"), message.getIntValue("metaState"));
+                break;
+            case "ku":
+                scrcpy.keyUp(message.getIntValue("keycode"), message.getIntValue("metaState"));
                 break;
         }
     }

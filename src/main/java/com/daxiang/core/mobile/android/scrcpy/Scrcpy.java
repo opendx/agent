@@ -263,22 +263,26 @@ public class Scrcpy {
 
     private static final byte KEY_EVENT_ACTION_DOWN = 0;
     private static final byte KEY_EVENT_ACTION_UP = 1;
-    private static final byte TYPE_INJECT_KEYCODE = 0;
-    private ByteBuffer keycodeBuffer = ByteBuffer.allocate(20);
 
     // Scrcpy.server ControlMessageReader.parseInjectKeycode
-    public void commitKeycode(int keycode) {
+    public void keyDown(int keycode, int metaState) {
+        commitKeycode(keycode, metaState, KEY_EVENT_ACTION_DOWN);
+    }
+
+    public void keyUp(int keycode, int metaState) {
+        commitKeycode(keycode, metaState, KEY_EVENT_ACTION_UP);
+    }
+
+    private static final byte TYPE_INJECT_KEYCODE = 0;
+    private ByteBuffer keycodeBuffer = ByteBuffer.allocate(10);
+
+    private void commitKeycode(int keycode, int metaState, byte keyDownOrUp) {
         keycodeBuffer.rewind();
 
         keycodeBuffer.put(TYPE_INJECT_KEYCODE);
-        keycodeBuffer.put(KEY_EVENT_ACTION_DOWN); // 按下
-        keycodeBuffer.putInt(keycode); // keycode
-        keycodeBuffer.putInt(0); // metaState
-
-        keycodeBuffer.put(TYPE_INJECT_KEYCODE);
-        keycodeBuffer.put(KEY_EVENT_ACTION_UP); // 抬起
-        keycodeBuffer.putInt(keycode); // keycode
-        keycodeBuffer.putInt(0); // metaState
+        keycodeBuffer.put(keyDownOrUp);
+        keycodeBuffer.putInt(keycode);
+        keycodeBuffer.putInt(metaState);
 
         commit(keycodeBuffer.array());
     }
