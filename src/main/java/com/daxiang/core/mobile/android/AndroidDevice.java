@@ -5,6 +5,8 @@ import com.android.ddmlib.InstallException;
 import com.daxiang.App;
 import com.daxiang.core.PortProvider;
 import com.daxiang.core.mobile.Mobile;
+import com.daxiang.core.mobile.appium.AppiumNativePageSourceHandler;
+import com.daxiang.model.page.Page;
 import com.daxiang.server.ServerClient;
 import com.daxiang.core.mobile.MobileDevice;
 import com.daxiang.core.mobile.android.scrcpy.Scrcpy;
@@ -51,6 +53,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class AndroidDevice extends MobileDevice {
 
+    public static final int PLATFORM = 1;
     public static final String TMP_FOLDER = "/data/local/tmp";
 
     private Integer sdkVersion;
@@ -67,7 +70,6 @@ public class AndroidDevice extends MobileDevice {
     public AndroidDevice(Mobile mobile, IDevice iDevice, AppiumServer appiumServer) {
         super(mobile, appiumServer);
         this.iDevice = iDevice;
-        this.nativePageSourceHandler = new AndroidNativePageSourceHandler();
     }
 
     @Override
@@ -162,6 +164,16 @@ public class AndroidDevice extends MobileDevice {
                 FileUtils.deleteQuietly(new File(app));
             }
         }
+    }
+
+    @Override
+    public int getNativePageType() {
+        return Page.TYPE_ANDROID_NATIVE;
+    }
+
+    @Override
+    public AppiumNativePageSourceHandler newAppiumNativePageSourceHandler() {
+        return new AndroidNativePageSourceHandler();
     }
 
     @Override

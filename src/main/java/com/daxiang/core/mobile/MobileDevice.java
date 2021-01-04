@@ -2,15 +2,12 @@ package com.daxiang.core.mobile;
 
 import com.daxiang.core.Device;
 import com.daxiang.core.mobile.appium.AppiumNativePageSourceHandler;
-import com.daxiang.model.page.Page;
 import com.daxiang.core.mobile.appium.AppiumServer;
 import com.google.common.collect.ImmutableMap;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
-import org.dom4j.DocumentException;
 import org.json.XML;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 
@@ -24,14 +21,11 @@ public abstract class MobileDevice extends Device {
      * 调试action需要，两次命令之间最大允许12小时间隔
      */
     public static final int NEW_COMMAND_TIMEOUT = 60 * 60 * 12;
-
     public static final String NATIVE_CONTEXT = "NATIVE_APP";
 
-    public static final int PLATFORM_ANDROID = 1;
-    public static final int PLATFORM_IOS = 2;
+    private AppiumNativePageSourceHandler appiumNativePageSourceHandler;
 
     protected Mobile mobile;
-    protected AppiumNativePageSourceHandler nativePageSourceHandler;
 
     public MobileDevice(Mobile mobile, AppiumServer appiumServer) {
         super(appiumServer);
@@ -47,19 +41,26 @@ public abstract class MobileDevice extends Device {
         ((AppiumDriver) driver).installApp(app);
     }
 
+    public abstract int getNativePageType();
+
+    public abstract AppiumNativePageSourceHandler newAppiumNativePageSourceHandler();
+
     @Override
     public Map<String, Object> dump() {
         if (isNativeContext()) { // 原生
-            int type = isAndroid() ? Page.TYPE_ANDROID_NATIVE : Page.TYPE_IOS_NATIVE;
+            if (appiumNativePageSourceHandler == null) {
+                appiumNativePageSourceHandler = newAppiumNativePageSourceHandler();
+            }
+
             String pageSource;
             try {
-                pageSource = nativePageSourceHandler.handle(driver.getPageSource());
-            } catch (IOException | DocumentException e) {
+                pageSource = appiumNativePageSourceHandler.handle(driver.getPageSource());
+                pageSource = XML.toJSONObject(pageSource).toString();
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
 
-            pageSource = XML.toJSONObject(pageSource).toString();
-            return ImmutableMap.of("type", type, "pageSource", pageSource);
+            return ImmutableMap.of("type", getNativePageType(), "pageSource", pageSource);
         } else { // webview
             return super.dump();
         }
@@ -108,9 +109,5 @@ public abstract class MobileDevice extends Device {
 
     public boolean isNativeContext() {
         return NATIVE_CONTEXT.equals(((AppiumDriver) driver).getContext());
-    }
-
-    public boolean isAndroid() {
-        return mobile.getPlatform() == PLATFORM_ANDROID;
     }
 }

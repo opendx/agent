@@ -63,7 +63,7 @@ public class AndroidDeviceChangeListener extends MobileChangeHandler implements 
 
         Mobile mobile = new Mobile();
 
-        mobile.setPlatform(MobileDevice.PLATFORM_ANDROID);
+        mobile.setPlatform(AndroidDevice.PLATFORM);
         mobile.setCreateTime(new Date());
         mobile.setId(mobileId);
         mobile.setSystemVersion(AndroidUtil.getAndroidVersion(AndroidUtil.getSdkVersion(iDevice)));

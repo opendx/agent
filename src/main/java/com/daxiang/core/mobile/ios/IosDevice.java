@@ -3,9 +3,11 @@ package com.daxiang.core.mobile.ios;
 import com.daxiang.App;
 import com.daxiang.core.PortProvider;
 import com.daxiang.core.mobile.MobileDevice;
+import com.daxiang.core.mobile.appium.AppiumNativePageSourceHandler;
 import com.daxiang.core.mobile.appium.AppiumServer;
 import com.daxiang.core.mobile.appium.IosNativePageSourceHandler;
 import com.daxiang.core.mobile.Mobile;
+import com.daxiang.model.page.Page;
 import com.daxiang.utils.UUIDUtil;
 import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.ios.IOSStartScreenRecordingOptions;
@@ -32,11 +34,12 @@ import java.util.Base64;
 @Slf4j
 public class IosDevice extends MobileDevice {
 
+    public static final int PLATFORM = 2;
+
     private ExecuteWatchdog iproxyMjpegServerWatchdog;
 
     public IosDevice(Mobile mobile, AppiumServer appiumServer) {
         super(mobile, appiumServer);
-        nativePageSourceHandler = new IosNativePageSourceHandler();
     }
 
     @Override
@@ -90,6 +93,16 @@ public class IosDevice extends MobileDevice {
     @Override
     public void installApp(String app) {
         IosUtil.installApp(driver, app);
+    }
+
+    @Override
+    public int getNativePageType() {
+        return Page.TYPE_IOS_NATIVE;
+    }
+
+    @Override
+    public AppiumNativePageSourceHandler newAppiumNativePageSourceHandler() {
+        return new IosNativePageSourceHandler();
     }
 
     @Override
