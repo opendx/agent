@@ -92,14 +92,19 @@ public class Minicap {
             }
         }).start();
 
+        int minicapStartTimeoutInSeconds = 30;
+        boolean minicapStartSuccess = countDownLatch.await(minicapStartTimeoutInSeconds, TimeUnit.SECONDS);
+        if (!minicapStartSuccess) {
+            throw new RuntimeException(String.format("[%s]minicap启动失败，超时时间：%d秒", mobileId, minicapStartTimeoutInSeconds));
+        }
+
+        log.info("[{}]minicap启动完成", mobileId);
+        isRunning = true;
+
         int localPort = PortProvider.getMinicapAvailablePort();
 
         log.info("[{}]adb forward: {} -> remote minicap", mobileId, localPort);
         iDevice.createForward(localPort, "minicap", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
-
-        countDownLatch.await(30, TimeUnit.SECONDS);
-        log.info("[{}]minicap启动完成", mobileId);
-        isRunning = true;
 
         new Thread(() -> {
             try (Socket socket = new Socket("127.0.0.1", localPort);

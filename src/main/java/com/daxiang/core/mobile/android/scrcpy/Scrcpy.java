@@ -100,7 +100,12 @@ public class Scrcpy {
             }
         }).start();
 
-        countDownLatch.await(30, TimeUnit.SECONDS);
+        int scrcpyStartTimeoutInSeconds = 30;
+        boolean scrcpyStartSuccess = countDownLatch.await(scrcpyStartTimeoutInSeconds, TimeUnit.SECONDS);
+        if (!scrcpyStartSuccess) {
+            throw new RuntimeException(String.format("[%s]启动scrcpy失败，超时时间：%d秒", mobileId, scrcpyStartTimeoutInSeconds));
+        }
+
         log.info("[{}]scrcpy启动完成", mobileId);
         isRunning = true;
 

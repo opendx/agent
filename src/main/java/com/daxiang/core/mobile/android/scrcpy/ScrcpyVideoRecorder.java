@@ -65,6 +65,7 @@ public class ScrcpyVideoRecorder {
                 protected void processLine(String line, int i) {
                     log.info("[{}]scrcpy: {}", mobileId, line);
                     if (line.contains("Recording complete")) {
+                        isRecording = false;
                         countDownLatch.countDown();
                     }
                 }
@@ -94,15 +95,19 @@ public class ScrcpyVideoRecorder {
         String killScrcpyCmd = String.format("ps -ef|grep '%s'|grep -v grep|awk '{print \"kill \"$2}'|sh", startCmd);
         Terminal.execute(killScrcpyCmd);
 
+        int recordingCompleteTimeoutInMinutes = 10;
+        boolean isRecordingComplete;
         try {
-            // 等待视频写入完成，最多等3min
-            countDownLatch.await(3, TimeUnit.MINUTES);
+            isRecordingComplete = countDownLatch.await(recordingCompleteTimeoutInMinutes, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
 
+        if (!isRecordingComplete) {
+            throw new RuntimeException(String.format("[%s]录制未完成，超时时间：%d分钟", mobileId, recordingCompleteTimeoutInMinutes));
+        }
+
         log.info("[{}]video: {} recording complete", mobileId, videoName);
-        isRecording = false;
 
         return new File(videoName);
     }

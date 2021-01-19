@@ -94,14 +94,19 @@ public class Minitouch {
             }
         }).start();
 
+        int minitouchStartTimeoutInSeconds = 30;
+        boolean minitouchStartSuccess = countDownLatch.await(minitouchStartTimeoutInSeconds, TimeUnit.SECONDS);
+        if (!minitouchStartSuccess) {
+            throw new RuntimeException(String.format("[%s]启动minitouch失败，超时时间：%d秒", mobileId, minitouchStartTimeoutInSeconds));
+        }
+
+        log.info("[{}]minitouch启动完成", mobileId);
+        isRunning = true;
+
         int localPort = PortProvider.getMinitouchAvailablePort();
 
         log.info("[{}]adb forward: {} -> remote minitouch", mobileId, localPort);
         iDevice.createForward(localPort, "minitouch", IDevice.DeviceUnixSocketNamespace.ABSTRACT);
-
-        countDownLatch.await(30, TimeUnit.SECONDS);
-        log.info("[{}]minitouch启动完成", mobileId);
-        isRunning = true;
 
         new Thread(() -> {
             try (Socket socket = new Socket("127.0.0.1", localPort);
