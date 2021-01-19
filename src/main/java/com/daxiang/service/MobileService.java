@@ -50,4 +50,18 @@ public class MobileService {
         Device device = DeviceHolder.get(mobileId);
         return device == null ? null : ((MobileDevice) device).getMobile();
     }
+
+    public Mobile delete(String mobileId) {
+        if (StringUtils.isEmpty(mobileId)) {
+            throw new AgentException("mobileId不能为空");
+        }
+
+        Device device = DeviceHolder.remove(mobileId);
+        if (device == null) {
+            return null;
+        }
+
+        device.getDeviceServer().stop();
+        return ((MobileDevice) device).getMobile();
+    }
 }

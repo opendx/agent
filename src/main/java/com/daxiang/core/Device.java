@@ -43,6 +43,10 @@ public abstract class Device {
         agentPort = Integer.parseInt(App.getProperty("port"));
     }
 
+    public DeviceServer getDeviceServer() {
+        return deviceServer;
+    }
+
     public RemoteWebDriver getDriver() {
         return driver;
     }

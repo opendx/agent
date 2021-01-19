@@ -18,6 +18,10 @@ public class DeviceHolder {
         DEVICE_HOLDER.put(deviceId, device);
     }
 
+    public static Device remove(String deviceId) {
+        return DEVICE_HOLDER.remove(deviceId);
+    }
+
     public static Device get(String deviceId) {
         return DEVICE_HOLDER.get(deviceId);
     }

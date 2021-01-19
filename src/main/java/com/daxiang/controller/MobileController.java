@@ -1,5 +1,6 @@
 package com.daxiang.controller;
 
+import com.daxiang.core.mobile.Mobile;
 import com.daxiang.model.Response;
 import com.daxiang.service.MobileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,5 +26,11 @@ public class MobileController {
     @GetMapping("/{mobileId}")
     public Response getMobile(@PathVariable String mobileId) {
         return Response.success(mobileService.getMobile(mobileId));
+    }
+
+    @DeleteMapping("/{mobileId}")
+    public Response delete(@PathVariable String mobileId) {
+        Mobile mobile = mobileService.delete(mobileId);
+        return Response.success(mobile);
     }
 }
