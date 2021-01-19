@@ -60,13 +60,35 @@ public class Scrcpy {
 
         // 由于scrcpy启动后会删除Mobile里的scrcpy，所以每次都需要重新push
         // Scrcpy.server - Server.java unlinkSelf()
+        // 1.12.1 -> 1.17 已经移除了unlinkSelf()，先保留这个逻辑
         pushScrcpyToDevice();
 
         CountDownLatch countDownLatch = new CountDownLatch(1);
 
         new Thread(() -> {
             try {
-                String startCmd = String.format("CLASSPATH=%s app_process / com.genymobile.scrcpy.Server %s %d %s 60 true - true true",
+                // 2021.1.19: 1.12.1 -> 1.17
+                String startCmd = String.format("CLASSPATH=%s app_process / com.genymobile.scrcpy.Server " +
+                                "%s " +    // scrcpyVersion
+                                "info " +  // logLevel
+                                "%d " +    // maxSize
+                                "%s " +    // bitRate
+                                "60 " +    // maxFps
+                                "-1 " +    // lockedVideoOrientation
+                                "true " +  // tunnelForward
+                                "- " +     // crop
+                                "true " +  // sendFrameMeta
+                                "true " +  // control
+                                "0 " +     // displayId https://github.com/Genymobile/scrcpy/pull/1177/files
+                                "true " +  // showTouches
+                                "true " +  // stayAwake
+                                /*
+                                codecOptions: 适配broadway.js
+                                "level": 0x100  format.setInteger(MediaFormat.KEY_LEVEL, MediaCodecInfo.CodecProfileLevel.AVCLevel3);
+                                "profile": 0x01 format.setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileBaseline);
+                                 */
+                                "level=256,profile=1 " + // codecOptions
+                                "-",       // encoderName https://github.com/Genymobile/scrcpy/pull/1827
                         REMOTE_SCRCPY_PATH,
                         App.getProperty("scrcpyVersion"),
                         maxSize,
@@ -279,7 +301,7 @@ public class Scrcpy {
     }
 
     private static final byte TYPE_INJECT_KEYCODE = 0;
-    private ByteBuffer keycodeBuffer = ByteBuffer.allocate(10);
+    private ByteBuffer keycodeBuffer = ByteBuffer.allocate(14);
 
     private void commitKeycode(int keycode, int metaState, byte keyDownOrUp) {
         keycodeBuffer.rewind();
@@ -287,6 +309,7 @@ public class Scrcpy {
         keycodeBuffer.put(TYPE_INJECT_KEYCODE);
         keycodeBuffer.put(keyDownOrUp);
         keycodeBuffer.putInt(keycode);
+        keycodeBuffer.putInt(0); // repeat先简单处理 https://github.com/Genymobile/scrcpy/issues/1013
         keycodeBuffer.putInt(metaState);
 
         commit(keycodeBuffer.array());
