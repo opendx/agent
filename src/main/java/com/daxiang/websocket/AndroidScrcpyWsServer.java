@@ -18,7 +18,7 @@ import java.io.IOException;
 @Slf4j
 @Component
 @ServerEndpoint(value = "/scrcpy/android/{mobileId}/user/{username}/project/{projectId}")
-public class AndroidScrcpySocketServer extends DeviceSocketServer {
+public class AndroidScrcpyWsServer extends DeviceWsServer {
 
     private Scrcpy scrcpy;
 

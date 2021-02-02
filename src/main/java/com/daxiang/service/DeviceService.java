@@ -27,7 +27,7 @@ public class DeviceService {
             throw new AgentException(deviceId + "未连接");
         }
 
-        UploadFile uploadFile = device.screenshotThenUploadToServer(FileType.TMP);
+        UploadFile uploadFile = device.screenshotAndUploadToServer(FileType.TMP);
 
         Map<String, Object> res = new HashMap<>();
         res.put("imgUrl", uploadFile.getDownloadUrl());

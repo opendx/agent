@@ -89,8 +89,6 @@ public class AndroidDevice extends MobileDevice {
         capabilities.setCapability("skipServerInstallation", true);
         capabilities.setCapability("skipDeviceInitialization", true);
         capabilities.setCapability("skipUnlock", true);
-        // 这个暂时用不到 先skip提升性能
-        capabilities.setCapability("skipLogcatCapture", true);
 
         if (!greaterOrEqualsToAndroid5()) { // 小于安卓5，必须指定app，否则会创建driver失败
             capabilities.setCapability("appPackage", "io.appium.android.apis");
@@ -174,6 +172,11 @@ public class AndroidDevice extends MobileDevice {
     @Override
     public AppiumNativePageSourceHandler newAppiumNativePageSourceHandler() {
         return new AndroidNativePageSourceHandler();
+    }
+
+    @Override
+    public String getLogType() {
+        return "logcat";
     }
 
     @Override

@@ -123,7 +123,8 @@ public abstract class TestNGCodeConverter {
         Integer enableRecordVideo = deviceTestTask.getTestPlan().getEnableRecordVideo();
         Integer failRetryCount = deviceTestTask.getTestPlan().getFailRetryCount();
 
-        return String.format("%s_%d_%d_%d_%d", deviceId, deviceTestTaskId, testcaseId, enableRecordVideo, failRetryCount);
+        return new TestDescription(deviceId, deviceTestTaskId, testcaseId,
+                enableRecordVideo, failRetryCount).toString();
     }
 
     private String getTestcaseDependsOnMethods(List<Integer> depends) {

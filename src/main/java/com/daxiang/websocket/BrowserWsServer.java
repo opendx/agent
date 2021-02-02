@@ -13,7 +13,7 @@ import javax.websocket.server.ServerEndpoint;
 @Slf4j
 @Component
 @ServerEndpoint(value = "/browser/{browserId}/user/{username}/project/{projectId}")
-public class BrowserSocketServer extends DeviceSocketServer {
+public class BrowserWsServer extends DeviceWsServer {
 
     @OnOpen
     public void onOpen(@PathParam("browserId") String browserId, @PathParam("username") String username,

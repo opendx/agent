@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableMap;
 import io.appium.java_client.AppiumDriver;
 import lombok.extern.slf4j.Slf4j;
 import org.json.XML;
+import org.springframework.util.Assert;
 
 import java.util.Date;
 import java.util.Map;
@@ -22,6 +23,9 @@ public abstract class MobileDevice extends Device {
      */
     public static final int NEW_COMMAND_TIMEOUT = 60 * 60 * 12;
     public static final String NATIVE_CONTEXT = "NATIVE_APP";
+
+    private boolean isAppiumLogsWsRunning = false;
+    private String wsUrl;
 
     private AppiumNativePageSourceHandler appiumNativePageSourceHandler;
 
@@ -109,5 +113,24 @@ public abstract class MobileDevice extends Device {
 
     public boolean isNativeContext() {
         return NATIVE_CONTEXT.equals(((AppiumDriver) driver).getContext());
+    }
+
+    public synchronized String startLogsBroadcast(String sessionId) {
+        Assert.hasText(sessionId, "sessionId不能为空");
+
+        if (!isAppiumLogsWsRunning) {
+            driver.executeScript("mobile:startLogsBroadcast");
+            wsUrl = String.format("ws://%s:%d/ws/session/%s/appium/device/%s",
+                    agentIp, deviceServer.getPort(), sessionId, getLogType());
+            isAppiumLogsWsRunning = true;
+        }
+        return wsUrl;
+    }
+
+    public synchronized void stopLogsBroadcast() {
+        if (isAppiumLogsWsRunning) {
+            driver.executeScript("mobile:stopLogsBroadcast");
+            isAppiumLogsWsRunning = false;
+        }
     }
 }

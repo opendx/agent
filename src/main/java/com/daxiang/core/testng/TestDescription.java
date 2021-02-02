@@ -1,9 +1,9 @@
 package com.daxiang.core.testng;
 
-import com.daxiang.core.Device;
-import com.daxiang.core.DeviceHolder;
 import com.daxiang.model.devicetesttask.TestPlan;
 import lombok.Data;
+
+import static java.lang.Integer.*;
 
 /**
  * Created by jiangyitao.
@@ -17,27 +17,31 @@ public class TestDescription {
     private Integer failRetryCount;
 
     private Boolean recordVideo;
-    private Device device;
 
-    /**
-     * @param testDesc deviceId_deviceTestTaskId_testcaseId_enableRecordVideo_failRetryCount
-     * @return
-     */
-    public TestDescription(String testDesc) {
-        String[] testDescArr = testDesc.split("_");
+    public TestDescription(String deviceId, Integer deviceTestTaskId, Integer testcaseId,
+                           Integer enableRecordVideo, Integer failRetryCount) {
+        this.deviceId = deviceId;
+        this.deviceTestTaskId = deviceTestTaskId;
+        this.testcaseId = testcaseId;
+        this.enableRecordVideo = enableRecordVideo;
+        this.failRetryCount = failRetryCount;
 
-        this.deviceId = testDescArr[0];
-        this.deviceTestTaskId = Integer.valueOf(testDescArr[1]);
-        this.testcaseId = Integer.valueOf(testDescArr[2]);
-        this.enableRecordVideo = Integer.valueOf(testDescArr[3]);
-        this.failRetryCount = Integer.valueOf(testDescArr[4]);
-
-        this.device = DeviceHolder.get(deviceId);
         this.recordVideo = (enableRecordVideo == TestPlan.ENABLE_RECORD_VIDEO);
     }
 
-    public Integer setTestcaseIdByTestDesc(String testDesc) {
-        testcaseId = Integer.valueOf(testDesc.split("_")[2]);
-        return testcaseId;
+    public static TestDescription create(String testDesc) {
+        String[] testDescArr = testDesc.split("_");
+        return new TestDescription(testDescArr[0], valueOf(testDescArr[1]),
+                valueOf(testDescArr[2]), valueOf(testDescArr[3]), valueOf(testDescArr[4]));
+    }
+
+    public static Integer parseTestcaseId(String testDesc) {
+        return valueOf(testDesc.split("_")[2]);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s_%d_%d_%d_%d", deviceId, deviceTestTaskId, testcaseId,
+                enableRecordVideo, failRetryCount);
     }
 }

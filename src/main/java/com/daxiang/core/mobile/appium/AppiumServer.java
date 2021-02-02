@@ -41,7 +41,7 @@ public class AppiumServer extends DeviceServer {
             return;
         }
 
-        int port = PortProvider.getAppiumServerAvailablePort();
+        port = PortProvider.getAppiumServerAvailablePort();
 
         String startCmd;
         if (StringUtils.isEmpty(APPIUM_JS)) {

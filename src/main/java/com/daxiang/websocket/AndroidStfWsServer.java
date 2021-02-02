@@ -19,7 +19,7 @@ import java.io.IOException;
 @Slf4j
 @Component
 @ServerEndpoint(value = "/stf/android/{mobileId}/user/{username}/project/{projectId}")
-public class AndroidStfSocketServer extends DeviceSocketServer {
+public class AndroidStfWsServer extends DeviceWsServer {
 
     private AndroidDevice androidDevice;
 

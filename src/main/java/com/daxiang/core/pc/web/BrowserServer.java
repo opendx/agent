@@ -33,7 +33,7 @@ public class BrowserServer extends DeviceServer {
         try {
             DriverService.Builder builder = builderClass.newInstance();
             builder.usingDriverExecutable(driverFile);
-            int port = PortProvider.getPcDriverServiceAvailablePort();
+            port = PortProvider.getPcDriverServiceAvailablePort();
             builder.usingPort(port);
 
             driverService = builder.build();

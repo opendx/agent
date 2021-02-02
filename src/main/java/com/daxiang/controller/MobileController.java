@@ -3,6 +3,7 @@ package com.daxiang.controller;
 import com.daxiang.core.mobile.Mobile;
 import com.daxiang.model.Response;
 import com.daxiang.service.MobileService;
+import com.google.common.collect.ImmutableMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,5 +33,16 @@ public class MobileController {
     public Response delete(@PathVariable String mobileId) {
         Mobile mobile = mobileService.delete(mobileId);
         return Response.success(mobile);
+    }
+
+    @GetMapping("/{mobileId}/session/{sessionId}/startLogsBroadcast")
+    public Response startLogsBroadcast(@PathVariable String sessionId, @PathVariable String mobileId) {
+        return Response.success(ImmutableMap.of("wsUrl", mobileService.startLogsBroadcast(mobileId, sessionId)));
+    }
+
+    @GetMapping("/{mobileId}/stopLogsBroadcast")
+    public Response stopLogsBroadcast(@PathVariable String mobileId) {
+        mobileService.stopLogsBroadcast(mobileId);
+        return Response.success();
     }
 }

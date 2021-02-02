@@ -52,7 +52,6 @@ public class IosDevice extends MobileDevice {
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability(MobileCapabilityType.NO_RESET, true);
         capabilities.setCapability("waitForQuiescence", false);
-        capabilities.setCapability("skipLogCapture", true);
         capabilities.setCapability("useJSONSource", true); // Get JSON source from WDA and parse into XML on Appium server. This can be much faster, especially on large devices.
 
         // https://github.com/appium/appium-xcuitest-driver/blob/master/docs/real-device-config.md
@@ -103,6 +102,11 @@ public class IosDevice extends MobileDevice {
     @Override
     public AppiumNativePageSourceHandler newAppiumNativePageSourceHandler() {
         return new IosNativePageSourceHandler();
+    }
+
+    @Override
+    public String getLogType() {
+        return "syslog";
     }
 
     @Override

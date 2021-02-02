@@ -85,7 +85,7 @@ public class DefaultIosDeviceChangeListener extends MobileChangeHandler implemen
         }
 
         // 截图并上传到服务器
-        UploadFile uploadFile = iosDevice.screenshotThenUploadToServer();
+        UploadFile uploadFile = iosDevice.screenshotAndUploadToServer();
         mobile.setImgPath(uploadFile.getFilePath());
 
         driver.quit();

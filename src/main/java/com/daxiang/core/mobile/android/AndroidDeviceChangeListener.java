@@ -109,7 +109,7 @@ public class AndroidDeviceChangeListener extends MobileChangeHandler implements 
         log.info("[{}]初始化appium完成", mobileId);
 
         // 截图并上传到服务器
-        UploadFile uploadFile = androidDevice.screenshotThenUploadToServer();
+        UploadFile uploadFile = androidDevice.screenshotAndUploadToServer();
         mobile.setImgPath(uploadFile.getFilePath());
 
         driver.quit();

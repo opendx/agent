@@ -3,6 +3,7 @@ package com.daxiang.websocket;
 import com.alibaba.fastjson.JSON;
 import com.daxiang.core.Device;
 import com.daxiang.core.DeviceHolder;
+import com.daxiang.core.mobile.MobileDevice;
 import com.daxiang.server.ServerClient;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,7 @@ import java.io.IOException;
  * Created by jiangyitao.
  */
 @Slf4j
-public class DeviceSocketServer {
+public class DeviceWsServer {
 
     protected String deviceId;
     protected RemoteEndpoint.Basic sender;
@@ -64,6 +65,9 @@ public class DeviceSocketServer {
         log.info("[{}]ws on close", deviceId);
         WebSocketSessionPool.remove(deviceId);
         if (device.isConnected()) {
+            if (device instanceof MobileDevice) {
+                ((MobileDevice) device).stopLogsBroadcast();
+            }
             device.quitDriver();
             device.idleToServer();
         } else {

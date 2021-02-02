@@ -26,7 +26,7 @@ import java.time.Duration;
 @Slf4j
 @Component
 @ServerEndpoint(value = "/ios/{mobileId}/user/{username}/project/{projectId}")
-public class IosSocketServer extends DeviceSocketServer {
+public class IosWsServer extends DeviceWsServer {
 
     private IosDevice iosDevice;
     private int mobileWidth;

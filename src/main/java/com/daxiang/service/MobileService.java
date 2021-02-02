@@ -64,4 +64,22 @@ public class MobileService {
         device.getDeviceServer().stop();
         return ((MobileDevice) device).getMobile();
     }
+
+    public String startLogsBroadcast(String mobileId, String sessionId) {
+        Device device = DeviceHolder.getConnectedDevice(mobileId);
+        if (device == null) {
+            throw new AgentException(mobileId + "未连接");
+        }
+
+        return ((MobileDevice) device).startLogsBroadcast(sessionId);
+    }
+
+    public void stopLogsBroadcast(String mobileId) {
+        Device device = DeviceHolder.getConnectedDevice(mobileId);
+        if (device == null) {
+            throw new AgentException(mobileId + "未连接");
+        }
+
+        ((MobileDevice) device).stopLogsBroadcast();
+    }
 }

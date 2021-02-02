@@ -14,6 +14,7 @@ public abstract class DeviceServer {
 
     protected boolean isRunning = false;
     protected URL url;
+    protected Integer port;
 
     public abstract void start();
 
@@ -44,5 +45,16 @@ public abstract class DeviceServer {
         }
 
         return url;
+    }
+
+    public int getPort() {
+        if (!isRunning) {
+            throw new IllegalStateException("device server未运行");
+        }
+        if (port == null) {
+            throw new IllegalStateException("port is null");
+        }
+
+        return port;
     }
 }

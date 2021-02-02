@@ -1,5 +1,7 @@
 package com.daxiang.core.testng;
 
+import com.daxiang.core.DeviceHolder;
+import com.daxiang.model.UploadFile;
 import com.daxiang.server.ServerClient;
 import com.daxiang.model.action.Step;
 import com.daxiang.model.devicetesttask.DeviceTestTask;
@@ -23,6 +25,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
 
     private static final ThreadLocal<Integer> CURRENT_TEST_CASE_ID = new ThreadLocal<>();
     private static final ThreadLocal<String> CONFIG_FAIL_ERR_INFO = new ThreadLocal<>();
+    private static final ThreadLocal<Long> TEST_CASE_START_TIME = new ThreadLocal<>();
 
     /**
      * 每个device开始测试调用的方法，这里可能有多个线程同时调用
@@ -31,8 +34,8 @@ public class TestCaseTestListener extends TestListenerAdapter {
      */
     @Override
     public void onStart(ITestContext testContext) {
-        TestDescription testDesc = new TestDescription(testContext.getAllTestMethods()[0].getDescription());
-        log.info("[{}]onStart, deviceTestTaskId：{}, recordVideo: {}", testDesc.getDeviceId(), testDesc.getDeviceTestTaskId(), testDesc.getRecordVideo());
+        TestDescription testDesc = TestDescription.create(testContext.getAllTestMethods()[0].getDescription());
+        log.info("[{}]onStart, deviceTestTaskId：{}", testDesc.getDeviceId(), testDesc.getDeviceTestTaskId());
         testContext.setAttribute(TEST_DESCRIPTION, testDesc);
 
         DeviceTestTask deviceTestTask = new DeviceTestTask();
@@ -55,6 +58,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
 
         CURRENT_TEST_CASE_ID.remove();
         CONFIG_FAIL_ERR_INFO.remove();
+        TEST_CASE_START_TIME.remove();
 
         DeviceTestTask deviceTestTask = new DeviceTestTask();
         deviceTestTask.setId(testDesc.getDeviceTestTaskId());
@@ -72,13 +76,16 @@ public class TestCaseTestListener extends TestListenerAdapter {
     @Override
     public void onTestStart(ITestResult tr) {
         TestDescription testDesc = (TestDescription) tr.getTestContext().getAttribute(TEST_DESCRIPTION);
-        Integer testcaseId = testDesc.setTestcaseIdByTestDesc(tr.getMethod().getDescription());
+        Integer testcaseId = TestDescription.parseTestcaseId(tr.getMethod().getDescription());
+        testDesc.setTestcaseId(testcaseId);
         CURRENT_TEST_CASE_ID.set(testcaseId);
         log.info("[{}]onTestStart, testcaseId: {}", testDesc.getDeviceId(), testcaseId);
 
         Testcase testcase = new Testcase();
         testcase.setId(testcaseId);
-        testcase.setStartTime(new Date());
+        Date now = new Date();
+        testcase.setStartTime(now);
+        TEST_CASE_START_TIME.set(now.getTime());
 
         ServerClient.getInstance().updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
 
@@ -86,7 +93,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         if (tr.getThrowable() == null && testDesc.getRecordVideo()) {
             try {
                 log.info("[{}]testcaseId: {}, 开始录制视频...", testDesc.getDeviceId(), testcaseId);
-                testDesc.getDevice().startRecordingScreen();
+                DeviceHolder.get(testDesc.getDeviceId()).startRecordingScreen();
             } catch (Exception e) {
                 log.error("[{}]testcaseId: {}, 启动录制视频失败", testDesc.getDeviceId(), testcaseId, e);
                 testDesc.setRecordVideo(false);
@@ -120,6 +127,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         testcase.setFailImgPath(uploadScreenshot(testDesc));
         testcase.setFailInfo(ExceptionUtils.getStackTrace(tr.getThrowable()));
         testcase.setVideoPath(uploadVideo(testDesc));
+        testcase.setLogPath(uploadLog(testDesc));
 
         ServerClient.getInstance().updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
     }
@@ -142,6 +150,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
             testcase.setFailInfo(tr.getThrowable().getMessage());
             testcase.setFailImgPath(uploadScreenshot(testDesc));
             testcase.setVideoPath(uploadVideo(testDesc));
+            testcase.setLogPath(uploadLog(testDesc));
         }
 
         ServerClient.getInstance().updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
@@ -163,9 +172,29 @@ public class TestCaseTestListener extends TestListenerAdapter {
 
     private String uploadScreenshot(TestDescription testDesc) {
         try {
-            return testDesc.getDevice().screenshotThenUploadToServer().getFilePath();
+            log.info("[{}]testcaseId: {}, 上传截图...", testDesc.getDeviceId(), testDesc.getTestcaseId());
+            return DeviceHolder.get(testDesc.getDeviceId()).screenshotAndUploadToServer().getFilePath();
         } catch (Exception e) {
             log.error("[{}]testcaseId: {}，截图并上传到server失败", testDesc.getDeviceId(), testDesc.getTestcaseId(), e);
+            return null;
+        }
+    }
+
+    private String uploadLog(TestDescription testDesc) {
+        try {
+            log.info("[{}]testcaseId: {}, 获取日志...", testDesc.getDeviceId(), testDesc.getTestcaseId());
+            long startTime = System.currentTimeMillis();
+            UploadFile uploadLogFile = DeviceHolder.get(testDesc.getDeviceId()).getLogAndUploadToServer(TEST_CASE_START_TIME.get());
+            if (uploadLogFile == null) {
+                log.info("[{}]testcaseId: {}, 无法获取日志", testDesc.getDeviceId(), testDesc.getTestcaseId());
+                return null;
+            }
+
+            String uploadFilePath = uploadLogFile.getFilePath();
+            log.info("[{}]testcaseId: {}, 获取日志并上传到server完成, 耗时: {} ms", testDesc.getDeviceId(), testDesc.getTestcaseId(), System.currentTimeMillis() - startTime);
+            return uploadFilePath;
+        } catch (Exception e) {
+            log.error("[{}]testcaseId: {}，获取日志并上传到server失败", testDesc.getDeviceId(), testDesc.getTestcaseId(), e);
             return null;
         }
     }
@@ -178,7 +207,7 @@ public class TestCaseTestListener extends TestListenerAdapter {
         try {
             log.info("[{}]testcaseId: {}, 停止录制视频...", testDesc.getDeviceId(), testDesc.getTestcaseId());
             long startTime = System.currentTimeMillis();
-            String uploadFilePath = testDesc.getDevice().stopRecordingScreenThenUploadToServer().getFilePath();
+            String uploadFilePath = DeviceHolder.get(testDesc.getDeviceId()).stopRecordingScreenAndUploadToServer().getFilePath();
             log.info("[{}]testcaseId: {}, 停止录制视频并上传到server完成, 耗时: {} ms", testDesc.getDeviceId(), testDesc.getTestcaseId(), System.currentTimeMillis() - startTime);
             return uploadFilePath;
         } catch (Exception e) {

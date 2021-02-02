@@ -5,19 +5,26 @@ import com.daxiang.model.FileType;
 import com.daxiang.model.UploadFile;
 import com.daxiang.model.page.Page;
 import com.daxiang.server.ServerClient;
+import com.daxiang.utils.UUIDUtil;
 import com.google.common.collect.ImmutableMap;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.OutputType;
+import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by jiangyitao.
  */
+@Slf4j
 public abstract class Device {
 
     public static final int OFFLINE_STATUS = 0;
@@ -89,12 +96,49 @@ public abstract class Device {
         throw new UnsupportedOperationException();
     }
 
-    public UploadFile stopRecordingScreenThenUploadToServer() throws IOException {
+    public UploadFile stopRecordingScreenAndUploadToServer() throws IOException {
         File video = stopRecordingScreen();
         try {
             return serverClient.uploadFile(video, FileType.VIDEO);
         } finally {
             FileUtils.deleteQuietly(video);
+        }
+    }
+
+    public File getLogFile(long startTime) throws IOException {
+        String logType = getLogType();
+        if (logType == null) {
+            return null;
+        }
+
+        List<String> logStrings = driver.manage().logs().get(logType).getAll().stream()
+                .filter(logEntry -> logEntry.getTimestamp() >= startTime)
+                .map(LogEntry::getMessage).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(logStrings)) {
+            return null;
+        }
+
+        File logFile = new File(UUIDUtil.getUUID() + ".txt");
+        boolean isCreateLogFileSuccess = logFile.createNewFile();
+        if (!isCreateLogFileSuccess) {
+            log.warn("create logfile={} fail", logFile.getAbsolutePath());
+            return null;
+        }
+
+        FileUtils.writeLines(logFile, "UTF-8", logStrings, true);
+        return logFile;
+    }
+
+    public UploadFile getLogAndUploadToServer(long startTime) throws IOException {
+        File logFile = getLogFile(startTime);
+        if (logFile == null) {
+            return null;
+        }
+
+        try {
+            return serverClient.uploadFile(logFile, FileType.LOG);
+        } finally {
+            FileUtils.deleteQuietly(logFile);
         }
     }
 
@@ -142,11 +186,11 @@ public abstract class Device {
         return driver.getScreenshotAs(OutputType.FILE);
     }
 
-    public UploadFile screenshotThenUploadToServer() {
-        return screenshotThenUploadToServer(FileType.IMG);
+    public UploadFile screenshotAndUploadToServer() {
+        return screenshotAndUploadToServer(FileType.IMG);
     }
 
-    public UploadFile screenshotThenUploadToServer(Integer fileType) {
+    public UploadFile screenshotAndUploadToServer(Integer fileType) {
         File screenshotFile = screenshot();
         try {
             return ServerClient.getInstance().uploadFile(screenshotFile, fileType);
@@ -171,5 +215,9 @@ public abstract class Device {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public String getLogType() {
+        return null;
     }
 }

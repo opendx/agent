@@ -35,5 +35,6 @@ public class Testcase extends Action {
      * 运行视频
      */
     private String videoPath;
+    private String logPath;
     private Integer status;
 }
