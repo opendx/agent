@@ -169,7 +169,7 @@ public abstract class TestNGCodeConverter {
         List<Param> actionParams = action.getParams();
         if (!CollectionUtils.isEmpty(actionParams)) {
             invokeMethod.append(actionParams.stream()
-                    .map(param -> getDefaultValueByJavaType(param.getType()))
+                    .map(param -> getDefaultJavaTypeValue(param.getType()))
                     .collect(Collectors.joining(",")));
         }
         invokeMethod.append(");");
@@ -253,7 +253,7 @@ public abstract class TestNGCodeConverter {
         }
     }
 
-    private String getDefaultValueByJavaType(String type) {
+    private String getDefaultJavaTypeValue(String type) {
         if ("byte".equals(type) || "short".equals(type) || "int".equals(type)
                 || "long".equals(type) || "float".equals(type) || "double".equals(type)) {
             return "0";
