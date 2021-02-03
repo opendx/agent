@@ -54,8 +54,8 @@ public class BaseAction {
     }
 
     @Action(id = 2, name = "休眠")
-    public void sleep(@Param(description = "休眠时长，单位：毫秒") String ms) throws InterruptedException {
-        Thread.sleep(parseLong(ms));
+    public void sleep(@Param(description = "休眠时长，单位：毫秒") long ms) throws InterruptedException {
+        Thread.sleep(ms);
     }
 
     @Action(id = 7, name = "点击")
@@ -87,21 +87,21 @@ public class BaseAction {
     }
 
     @Action(id = 11, name = "设置隐式等待时间")
-    public void setImplicitlyWaitTime(@Param(description = "隐式等待时间，单位：秒") String seconds) {
-        device.getDriver().manage().timeouts().implicitlyWait(parseLong(seconds), TimeUnit.SECONDS);
+    public void setImplicitlyWaitTime(@Param(description = "隐式等待时间，单位：秒") long seconds) {
+        device.getDriver().manage().timeouts().implicitlyWait(seconds, TimeUnit.SECONDS);
     }
 
     @Action(id = 12, name = "等待元素可见")
     public WebElement waitForElementVisible(@Param(description = "查找方式", possibleValues = FIND_BY_POSSIBLE_VALUES) String findBy, String value,
-                                            @Param(description = "最大等待时间，单位：秒") String timeoutInSeconds) {
-        return new WebDriverWait(device.getDriver(), parseLong(timeoutInSeconds))
+                                            @Param(description = "最大等待时间，单位：秒") long timeoutInSeconds) {
+        return new WebDriverWait(device.getDriver(), timeoutInSeconds)
                 .until(ExpectedConditions.visibilityOfElementLocated(createBy(findBy, value)));
     }
 
     @Action(id = 13, name = "等待元素出现", description = "等待元素在DOM里出现，不一定可见。移动端可用于检测toast")
     public WebElement waitForElementPresence(@Param(description = "查找方式", possibleValues = FIND_BY_POSSIBLE_VALUES) String findBy, String value,
-                                             @Param(description = "最大等待时间，单位：秒") String timeoutInSeconds) {
-        return new WebDriverWait(device.getDriver(), parseLong(timeoutInSeconds))
+                                             @Param(description = "最大等待时间，单位：秒") long timeoutInSeconds) {
+        return new WebDriverWait(device.getDriver(), timeoutInSeconds)
                 .until(ExpectedConditions.presenceOfElementLocated(createBy(findBy, value)));
     }
 
@@ -166,8 +166,8 @@ public class BaseAction {
     }
 
     @Action(id = 19, name = "等待元素可见")
-    public WebElement waitForElementVisible(WebElement element, @Param(description = "最大等待时间，单位：秒") String timeoutInSeconds) {
-        return new WebDriverWait(device.getDriver(), parseLong(timeoutInSeconds))
+    public WebElement waitForElementVisible(WebElement element, @Param(description = "最大等待时间，单位：秒") long timeoutInSeconds) {
+        return new WebDriverWait(device.getDriver(), timeoutInSeconds)
                 .until(ExpectedConditions.visibilityOf(element));
     }
 
@@ -189,15 +189,14 @@ public class BaseAction {
     }
 
     @Action(id = 22, name = "异步accept对话框")
-    public void asyncAcceptAlert(@Param(description = "超时时间，单位：秒") String timeoutInSeconds,
-                                 @Param(description = "是否只处理一次, true or false") String once) {
-        boolean _once = parseBoolean(once);
-        long timeoutInMs = parseLong(timeoutInSeconds) * 1000;
+    public void asyncAcceptAlert(@Param(description = "超时时间，单位：秒") long timeoutInSeconds,
+                                 @Param(description = "是否只处理一次, true or false") boolean once) {
+        long timeoutInMs = timeoutInSeconds * 1000;
 
         new Thread(() -> {
             long startTime = System.currentTimeMillis();
             while (System.currentTimeMillis() - startTime < timeoutInMs) {
-                if (acceptAlert() && _once) {
+                if (acceptAlert() && once) {
                     break;
                 }
                 try {
@@ -215,15 +214,14 @@ public class BaseAction {
     }
 
     @Action(id = 24, name = "异步dismiss对话框")
-    public void asyncDismissAlert(@Param(description = "超时时间，单位：秒") String timeoutInSeconds,
-                                  @Param(description = "是否只处理一次, true or false") String once) {
-        boolean _once = parseBoolean(once);
-        long timeoutInMs = parseLong(timeoutInSeconds) * 1000;
+    public void asyncDismissAlert(@Param(description = "超时时间，单位：秒") long timeoutInSeconds,
+                                  @Param(description = "是否只处理一次, true or false") boolean once) {
+        long timeoutInMs = timeoutInSeconds * 1000;
 
         new Thread(() -> {
             long startTime = System.currentTimeMillis();
             while (System.currentTimeMillis() - startTime < timeoutInMs) {
-                if (dismissAlert() && _once) {
+                if (dismissAlert() && once) {
                     break;
                 }
                 try {
@@ -236,8 +234,8 @@ public class BaseAction {
     }
 
     @Action(id = 25, name = "[web]切换frame")
-    public void switchToFrameByIndex(String index) {
-        device.getDriver().switchTo().frame(parseInt(index));
+    public void switchToFrameByIndex(int index) {
+        device.getDriver().switchTo().frame(index);
     }
 
     @Action(id = 26, name = "[web]切换frame")
@@ -290,30 +288,6 @@ public class BaseAction {
                 return MobileBy.tagName(value);
             default:
                 throw new IllegalArgumentException("暂不支持: " + findBy);
-        }
-    }
-
-    public boolean parseBoolean(String booleanString) {
-        try {
-            return Boolean.parseBoolean(booleanString);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(booleanString + "必须为 true or false");
-        }
-    }
-
-    public long parseLong(String longString) {
-        try {
-            return Long.parseLong(longString);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(longString + "必须为数值");
-        }
-    }
-
-    public int parseInt(String intString) {
-        try {
-            return Integer.parseInt(intString);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(intString + "必须为数值");
         }
     }
 

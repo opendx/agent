@@ -210,7 +210,7 @@ public abstract class TestNGCodeConverter {
      */
     private void handleGlobalVarValue(List<GlobalVar> globalVars) {
         if (!CollectionUtils.isEmpty(globalVars)) {
-            globalVars.forEach(globalVar -> globalVar.setValue(handleValue(globalVar.getValue())));
+            globalVars.forEach(globalVar -> globalVar.setValue(handleValue(globalVar.getType(), globalVar.getValue())));
         }
     }
 
@@ -222,35 +222,58 @@ public abstract class TestNGCodeConverter {
         for (Action action : actions) {
             List<LocalVar> localVars = action.getLocalVars();
             if (!CollectionUtils.isEmpty(localVars)) {
-                localVars.forEach(localVar -> localVar.setValue(handleValue(localVar.getValue())));
+                localVars.forEach(localVar -> localVar.setValue(handleValue(localVar.getType(), localVar.getValue())));
             }
 
             List<Step> steps = action.getSteps();
-            if (!CollectionUtils.isEmpty(steps)) {
-                for (Step step : steps) {
-                    // ExecuteJavaCode直接嵌入模版，无需处理
-                    if (step.getActionId() != BaseAction.EXECUTE_JAVA_CODE_ID) {
-                        List<String> args = step.getArgs();
-                        if (!CollectionUtils.isEmpty(args)) {
-                            List<String> newArgs = args.stream().map(this::handleValue).collect(Collectors.toList());
-                            step.setArgs(newArgs);
-                        }
+            if (CollectionUtils.isEmpty(steps)) {
+                continue;
+            }
+
+            for (Step step : steps) {
+                Integer stepActionId = step.getActionId();
+                // ExecuteJavaCode直接嵌入模版，无需处理
+                if (stepActionId == BaseAction.EXECUTE_JAVA_CODE_ID) {
+                    continue;
+                }
+
+                List<Param> stepActionParams = cachedActions.get(stepActionId).getParams();
+                if (CollectionUtils.isEmpty(stepActionParams)) {
+                    step.setArgs(new ArrayList<>(0));
+                    continue;
+                }
+
+                List<String> args = step.getArgs();
+                List<String> newArgs = new ArrayList<>(stepActionParams.size()); // 以actionParam为准
+
+                for (int i = 0; i < stepActionParams.size(); i++) {
+                    String type = stepActionParams.get(i).getType();
+                    if (args != null && i < args.size()) {
+                        newArgs.add(i, handleValue(type, args.get(i)));
+                    } else {
+                        newArgs.add(i, getDefaultJavaTypeValue(type));
                     }
                 }
+
+                step.setArgs(newArgs);
             }
         }
     }
 
-    private String handleValue(String value) {
+    private String handleValue(String type, String value) {
         if (StringUtils.isEmpty(value)) {
-            return "null";
+            return getDefaultJavaTypeValue(type);
         }
 
         if (value.startsWith("${") && value.endsWith("}")) {
             return value.substring(2, value.length() - 1);
-        } else { // 普通字符串
+        }
+
+        if ("String".equals(type) || "java.lang.String".equals(type)) {
             return "\"" + value + "\"";
         }
+
+        return value;
     }
 
     private String getDefaultJavaTypeValue(String type) {

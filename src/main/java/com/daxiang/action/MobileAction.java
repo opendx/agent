@@ -11,9 +11,6 @@ import io.appium.java_client.touch.offset.PointOption;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.*;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
-
-import java.io.IOException;
 import java.time.Duration;
 
 /**
@@ -51,7 +48,7 @@ public class MobileAction extends BaseAction {
     }
 
     @Action(id = 1001, name = "安装App", platforms = {1, 2})
-    public void installApp(@Param(description = "app下载地址") String appDownloadUrl) throws IOException {
+    public void installApp(@Param(description = "app下载地址") String appDownloadUrl) {
         Assert.hasText(appDownloadUrl, "appDownloadUrl不能为空");
         mobileDevice.installApp(appDownloadUrl);
     }
@@ -65,7 +62,7 @@ public class MobileAction extends BaseAction {
     @Action(id = 1003, name = "滑动屏幕", platforms = {1, 2})
     public void swipe(@Param(description = "起点", possibleValues = POINT_POSSIBLE_VALUES) String startPoint,
                       @Param(description = "终点", possibleValues = POINT_POSSIBLE_VALUES) String endPoint,
-                      @Param(description = "滑动时间，单位：ms。时间越短，滑的距离越长") String durationInMs) {
+                      @Param(description = "滑动时间，单位：ms。时间越短，滑的距离越长") long durationInMs) {
         Dimension window = getAppiumDriver().manage().window().getSize();
         Point start = createPoint(startPoint, window);
         Point end = createPoint(endPoint, window);
@@ -78,8 +75,8 @@ public class MobileAction extends BaseAction {
                                          String value,
                                          @Param(description = "起点", possibleValues = POINT_POSSIBLE_VALUES) String startPoint,
                                          @Param(description = "终点", possibleValues = POINT_POSSIBLE_VALUES) String endPoint,
-                                         @Param(description = "最大滑动次数") String maxSwipeCount,
-                                         @Param(description = "滑动一次的时间，单位: ms。时间越短，滑的距离越长") String onceDurationInMs) {
+                                         @Param(description = "最大滑动次数") int maxSwipeCount,
+                                         @Param(description = "滑动一次的时间，单位: ms。时间越短，滑的距离越长") long onceDurationInMs) {
         By by = createBy(findBy, value);
         AppiumDriver driver = getAppiumDriver();
         try {
@@ -91,9 +88,7 @@ public class MobileAction extends BaseAction {
         Point start = createPoint(startPoint, window);
         Point end = createPoint(endPoint, window);
 
-        int count = StringUtils.hasText(maxSwipeCount) ? parseInt(maxSwipeCount) : 3;
-
-        for (int i = 1; i <= count; i++) {
+        for (int i = 1; i <= maxSwipeCount; i++) {
             log.info("[{}]滑动第{}次", mobileDevice.getId(), i);
             swipe(start, end, onceDurationInMs);
             try {
@@ -109,7 +104,7 @@ public class MobileAction extends BaseAction {
     public void swipeInContainer(@Param(description = "容器元素") WebElement container,
                                  @Param(description = "起点", possibleValues = POINT_POSSIBLE_VALUES) String startPoint,
                                  @Param(description = "终点", possibleValues = POINT_POSSIBLE_VALUES) String endPoint,
-                                 @Param(description = "滑动一次的时间，单位: ms。时间越短，滑的距离越长") String onceDurationInMs) {
+                                 @Param(description = "滑动一次的时间，单位: ms。时间越短，滑的距离越长") long onceDurationInMs) {
         Point[] points = createStartAndEndPointInContainer(container, startPoint, endPoint);
         swipe(points[0], points[1], onceDurationInMs);
     }
@@ -120,8 +115,8 @@ public class MobileAction extends BaseAction {
                                                     String value,
                                                     @Param(description = "起点", possibleValues = POINT_POSSIBLE_VALUES) String startPoint,
                                                     @Param(description = "终点", possibleValues = POINT_POSSIBLE_VALUES) String endPoint,
-                                                    @Param(description = "最大滑动次数") String maxSwipeCount,
-                                                    @Param(description = "滑动一次的时间，单位: ms。时间越短，滑的距离越长") String onceDurationInMs) {
+                                                    @Param(description = "最大滑动次数") int maxSwipeCount,
+                                                    @Param(description = "滑动一次的时间，单位: ms。时间越短，滑的距离越长") long onceDurationInMs) {
         By by = createBy(findBy, value);
         AppiumDriver driver = getAppiumDriver();
         try {
@@ -131,10 +126,8 @@ public class MobileAction extends BaseAction {
 
         Point[] points = createStartAndEndPointInContainer(container, startPoint, endPoint);
 
-        int count = StringUtils.hasText(maxSwipeCount) ? parseInt(maxSwipeCount) : 3;
-
-        for (int i = 1; i <= count; i++) {
-            log.info("[{}]容器内滑动第{}次", mobileDevice.getId(), i + 1);
+        for (int i = 1; i <= maxSwipeCount; i++) {
+            log.info("[{}]容器内滑动第{}次", mobileDevice.getId(), i);
             swipe(points[0], points[1], onceDurationInMs);
             try {
                 return driver.findElement(by);
@@ -153,8 +146,8 @@ public class MobileAction extends BaseAction {
 
     @Deprecated
     @Action(id = 1008, name = "异步accept对话框", platforms = {1, 2})
-    public void asyncAcceptAlert(@Param(description = "超时时间，单位：秒") String timeoutInSeconds,
-                                 @Param(description = "是否只处理一次, true or false") String once) {
+    public void asyncAcceptAlert(@Param(description = "超时时间，单位：秒") long timeoutInSeconds,
+                                 @Param(description = "是否只处理一次, true or false") boolean once) {
         super.asyncAcceptAlert(timeoutInSeconds, once);
     }
 
@@ -166,8 +159,8 @@ public class MobileAction extends BaseAction {
 
     @Deprecated
     @Action(id = 1010, name = "异步dismiss对话框", platforms = {1, 2})
-    public void asyncDismissAlert(@Param(description = "超时时间，单位：秒") String timeoutInSeconds,
-                                  @Param(description = "是否只处理一次, true or false") String once) {
+    public void asyncDismissAlert(@Param(description = "超时时间，单位：秒") long timeoutInSeconds,
+                                  @Param(description = "是否只处理一次, true or false") boolean once) {
         super.asyncDismissAlert(timeoutInSeconds, once);
     }
 
@@ -181,13 +174,11 @@ public class MobileAction extends BaseAction {
     }
 
     @Action(id = 1012, name = "长按元素", platforms = {1, 2})
-    public void longPressElement(WebElement element, @Param(description = "长按时间，单位：ms") String durationInMs) {
-        Assert.hasText(durationInMs, "durationInMs不能为空");
-
+    public void longPressElement(WebElement element, @Param(description = "长按时间，单位：ms") long durationInMs) {
         PointOption center = getElementCenter(element);
         new TouchAction(getAppiumDriver())
                 .longPress(center)
-                .waitAction(WaitOptions.waitOptions(Duration.ofMillis(parseLong(durationInMs))))
+                .waitAction(WaitOptions.waitOptions(Duration.ofMillis(durationInMs)))
                 .release().perform();
     }
 
@@ -202,11 +193,13 @@ public class MobileAction extends BaseAction {
         return PointOption.point(x, y);
     }
 
-    private void swipe(Point start, Point end, String durationInMs) {
-        long duration = StringUtils.hasText(durationInMs) ? parseLong(durationInMs) : DEFAULT_SWIPE_DURATION_IN_MS;
+    private void swipe(Point start, Point end, long durationInMs) {
+        if (durationInMs == 0) {
+            durationInMs = DEFAULT_SWIPE_DURATION_IN_MS;
+        }
         new TouchAction(getAppiumDriver())
                 .press(PointOption.point(start))
-                .waitAction(WaitOptions.waitOptions(Duration.ofMillis(duration)))
+                .waitAction(WaitOptions.waitOptions(Duration.ofMillis(durationInMs)))
                 .moveTo(PointOption.point(end))
                 .release()
                 .perform();
