@@ -39,7 +39,7 @@ public abstract class TestNGCodeConverter {
         List<Testcase> testcases = deviceTestTask.getTestcases();
         dataModel.put("testcases", testcases.stream().map(testcase -> {
             JSONObject tc = new JSONObject();
-            tc.put("invoke", getInvokeMethodStringWithParamNull(testcase));
+            tc.put("invoke", getInvokeMethodStringWithDefaultParamValue(testcase));
             tc.put("description", getTestcaseDesc(deviceTestTask, testcase));
             tc.put("dependsOnMethods", getTestcaseDependsOnMethods(testcase.getDepends()));
             tc.put("id", testcase.getId());
@@ -51,28 +51,28 @@ public abstract class TestNGCodeConverter {
         Action beforeClass = deviceTestTask.getBeforeClass();
         if (beforeClass != null) {
             actions.add(beforeClass);
-            String invokeBeforeClass = getInvokeMethodStringWithParamNull(beforeClass);
+            String invokeBeforeClass = getInvokeMethodStringWithDefaultParamValue(beforeClass);
             dataModel.put("beforeClass", invokeBeforeClass);
         }
 
         Action afterClass = deviceTestTask.getAfterClass();
         if (afterClass != null) {
             actions.add(afterClass);
-            String invokeAfterClass = getInvokeMethodStringWithParamNull(afterClass);
+            String invokeAfterClass = getInvokeMethodStringWithDefaultParamValue(afterClass);
             dataModel.put("afterClass", invokeAfterClass);
         }
 
         Action beforeMethod = deviceTestTask.getBeforeMethod();
         if (beforeMethod != null) {
             actions.add(beforeMethod);
-            String invokeBeforeMethod = getInvokeMethodStringWithParamNull(beforeMethod);
+            String invokeBeforeMethod = getInvokeMethodStringWithDefaultParamValue(beforeMethod);
             dataModel.put("beforeMethod", invokeBeforeMethod);
         }
 
         Action afterMethod = deviceTestTask.getAfterMethod();
         if (afterMethod != null) {
             actions.add(afterMethod);
-            String invokeAfterMethod = getInvokeMethodStringWithParamNull(afterMethod);
+            String invokeAfterMethod = getInvokeMethodStringWithDefaultParamValue(afterMethod);
             dataModel.put("afterMethod", invokeAfterMethod);
         }
 
@@ -164,12 +164,13 @@ public abstract class TestNGCodeConverter {
         });
     }
 
-    private String getInvokeMethodStringWithParamNull(Action action) {
+    private String getInvokeMethodStringWithDefaultParamValue(Action action) {
         StringBuilder invokeMethod = new StringBuilder(ACTION_PREFIX + action.getId() + "(");
         List<Param> actionParams = action.getParams();
-        // 如果有参数 则都传入null
         if (!CollectionUtils.isEmpty(actionParams)) {
-            invokeMethod.append(actionParams.stream().map(i -> "null").collect(Collectors.joining(",")));
+            invokeMethod.append(actionParams.stream()
+                    .map(param -> getDefaultValueByJavaType(param.getType()))
+                    .collect(Collectors.joining(",")));
         }
         invokeMethod.append(");");
         return invokeMethod.toString();
@@ -249,6 +250,19 @@ public abstract class TestNGCodeConverter {
             return value.substring(2, value.length() - 1);
         } else { // 普通字符串
             return "\"" + value + "\"";
+        }
+    }
+
+    private String getDefaultValueByJavaType(String type) {
+        if ("byte".equals(type) || "short".equals(type) || "int".equals(type)
+                || "long".equals(type) || "float".equals(type) || "double".equals(type)) {
+            return "0";
+        } else if ("char".equals(type)) {
+            return "'\\u0000'";
+        } else if ("boolean".equals(type)) {
+            return "false";
+        } else {
+            return "null";
         }
     }
 }
