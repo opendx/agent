@@ -16,7 +16,7 @@ import io.appium.java_client.remote.IOSMobileCapabilityType;
 import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.remote.MobilePlatform;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.exec.ExecuteWatchdog;
+import org.apache.commons.exec.ShutdownHookProcessDestroyer;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -36,7 +36,7 @@ public class IosDevice extends MobileDevice {
 
     public static final int PLATFORM = 2;
 
-    private ExecuteWatchdog iproxyMjpegServerWatchdog;
+    private ShutdownHookProcessDestroyer mjpegServerIproxyProcessDestroyer;
 
     public IosDevice(Mobile mobile, AppiumServer appiumServer) {
         super(mobile, appiumServer);
@@ -140,14 +140,14 @@ public class IosDevice extends MobileDevice {
     public long startMjpegServerIproxy() throws IOException {
         long mjpegServerPort = getMjpegServerPort();
         log.info("[{}]startMjpegServerIproxy", getId());
-        iproxyMjpegServerWatchdog = IosUtil.iproxy(mjpegServerPort, mjpegServerPort, getId());
+        mjpegServerIproxyProcessDestroyer = IosUtil.iproxy(mjpegServerPort, mjpegServerPort, getId());
         return mjpegServerPort;
     }
 
     public void stopMjpegServerIproxy() {
-        if (iproxyMjpegServerWatchdog != null) {
+        if (mjpegServerIproxyProcessDestroyer != null) {
             log.info("[{}]stopMjpegServerIproxy", getId());
-            iproxyMjpegServerWatchdog.destroyProcess();
+            mjpegServerIproxyProcessDestroyer.run();
         }
     }
 

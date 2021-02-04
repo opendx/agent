@@ -15,7 +15,7 @@ public class AdbKit {
 
     private static final String LOCAL_ADBKIT = "vendor/adbkit/bin/adbkit";
 
-    private ExecuteWatchdog watchdog;
+    private ShutdownHookProcessDestroyer adbKitProcessDestroyer;
     private String mobileId;
 
     public AdbKit(String mobileId) {
@@ -35,7 +35,7 @@ public class AdbKit {
         String cmd = String.format("node %s usb-device-to-tcp -p %d %s", LOCAL_ADBKIT, localPort, mobileId);
 
         log.info("[{}]开启远程调试功能: {}", mobileId, cmd);
-        watchdog = Terminal.executeAsyncAndGetWatchdog(cmd);
+        adbKitProcessDestroyer = Terminal.executeAsync(cmd);
 
         return localPort;
     }
@@ -44,9 +44,9 @@ public class AdbKit {
      * 关闭远程调试功能
      */
     public void stop() {
-        if (watchdog != null) {
+        if (adbKitProcessDestroyer != null) {
             log.info("[{}]关闭adbkit", mobileId);
-            watchdog.destroyProcess();
+            adbKitProcessDestroyer.run();
         }
     }
 }

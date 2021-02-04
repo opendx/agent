@@ -20,13 +20,6 @@ public class Terminal {
     private static final String BASH = "/bin/sh";
     private static final String CMD_EXE = "cmd.exe";
 
-    /**
-     * 同步执行命令
-     *
-     * @param command
-     * @return
-     * @throws IOException
-     */
     public static String execute(String command) throws IOException {
         return execute(command, true);
     }
@@ -41,16 +34,10 @@ public class Terminal {
             PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(outputStream, errorStream);
             executor.setStreamHandler(pumpStreamHandler);
 
-            String result;
-            if (showLog) {
-                log.info("[Terminal]execute: {}", command);
-                executor.execute(createCommandLine(command));
-                result = outputStream.toString() + errorStream.toString();
-                log.info("[Terminal]{}", result);
-            } else {
-                executor.execute(createCommandLine(command));
-                result = outputStream.toString() + errorStream.toString();
-            }
+            int exitValue = executor.execute(createCommandLine(command));
+            String result = outputStream.toString() + errorStream.toString();
+
+            if (showLog) log.info("[Terminal]{} -> {} exitValue={}", command, result, exitValue);
 
             if (!StringUtils.isEmpty(result)) {
                 if (result.endsWith("\r\n")) {
@@ -64,45 +51,37 @@ public class Terminal {
         }
     }
 
-    /**
-     * 异步执行命令
-     *
-     * @param command
-     * @return watchdog watchdog可杀掉正在执行的进程
-     * @throws IOException
-     */
-    public static ExecuteWatchdog executeAsyncAndGetWatchdog(String command) throws IOException {
-        return executeAsyncAndGetWatchdog(command, true);
+    public static ShutdownHookProcessDestroyer executeAsync(String command) throws IOException {
+        return executeAsync(command, true);
     }
 
-    public static void executeAsync(String command, PumpStreamHandler pumpStreamHandler) throws IOException {
-        Executor executor = new DaemonExecutor();
-        executor.setExitValues(null);
-        executor.setStreamHandler(pumpStreamHandler);
-
-        executor.execute(createCommandLine(command), new DefaultExecuteResultHandler());
-    }
-
-    public static ExecuteWatchdog executeAsyncAndGetWatchdog(String command, boolean showLog) throws IOException {
-        Executor executor = new DaemonExecutor();
-        executor.setExitValues(null);
-
-        ExecuteWatchdog watchdog = new ExecuteWatchdog(ExecuteWatchdog.INFINITE_TIMEOUT);
-        executor.setWatchdog(watchdog);
-
+    public static ShutdownHookProcessDestroyer executeAsync(String command, boolean showLog) throws IOException {
+        ExecuteStreamHandler executeStreamHandler = null;
         if (showLog) {
-            log.info("[Terminal]execute: {}", command);
-            PumpStreamHandler pumpStreamHandler = new PumpStreamHandler(new LogOutputStream() {
+            log.info("[Terminal]{}", command);
+            executeStreamHandler = new PumpStreamHandler(new LogOutputStream() {
                 @Override
                 protected void processLine(String line, int i) {
                     log.info("[Terminal]{}", line);
                 }
             });
-            executor.setStreamHandler(pumpStreamHandler);
+        }
+        return executeAsync(command, executeStreamHandler);
+    }
+
+    public static ShutdownHookProcessDestroyer executeAsync(String command, ExecuteStreamHandler executeStreamHandler) throws IOException {
+        Executor executor = new DaemonExecutor();
+        executor.setExitValues(null);
+
+        if (executeStreamHandler != null) {
+            executor.setStreamHandler(executeStreamHandler);
         }
 
+        ShutdownHookProcessDestroyer processDestroyer = new ShutdownHookProcessDestroyer();
+        executor.setProcessDestroyer(processDestroyer);
+
         executor.execute(createCommandLine(command), new DefaultExecuteResultHandler());
-        return watchdog;
+        return processDestroyer;
     }
 
     private static CommandLine createCommandLine(String command) {

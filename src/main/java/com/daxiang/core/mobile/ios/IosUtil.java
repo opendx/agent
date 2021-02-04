@@ -3,7 +3,7 @@ package com.daxiang.core.mobile.ios;
 import com.daxiang.utils.Terminal;
 import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.exec.ExecuteWatchdog;
+import org.apache.commons.exec.ShutdownHookProcessDestroyer;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.springframework.util.StringUtils;
 
@@ -109,7 +109,7 @@ public class IosUtil {
 
     private static Boolean isOldIproxy = null;
 
-    public static ExecuteWatchdog iproxy(long localPort, long remotePort, String mobileId) throws IOException {
+    public static ShutdownHookProcessDestroyer iproxy(long localPort, long remotePort, String mobileId) throws IOException {
         if (isOldIproxy == null) {
             // libusbmuxd < 2.0.2
             isOldIproxy = Terminal.execute("iproxy -v")
@@ -123,6 +123,6 @@ public class IosUtil {
             cmd = String.format("iproxy %d:%d -u %s", localPort, remotePort, mobileId);
         }
 
-        return Terminal.executeAsyncAndGetWatchdog(cmd);
+        return Terminal.executeAsync(cmd);
     }
 }

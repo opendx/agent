@@ -5,7 +5,7 @@ import com.daxiang.core.DeviceServer;
 import com.daxiang.core.PortProvider;
 import com.daxiang.utils.Terminal;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.exec.ExecuteWatchdog;
+import org.apache.commons.exec.ShutdownHookProcessDestroyer;
 import org.openqa.selenium.net.UrlChecker;
 import org.springframework.util.StringUtils;
 
@@ -33,7 +33,7 @@ public class AppiumServer extends DeviceServer {
         return version;
     }
 
-    private ExecuteWatchdog watchdog;
+    private ShutdownHookProcessDestroyer appiumServerProcessDestroyer;
 
     @Override
     public synchronized void start() {
@@ -51,7 +51,7 @@ public class AppiumServer extends DeviceServer {
         }
 
         try {
-            watchdog = Terminal.executeAsyncAndGetWatchdog(startCmd);
+            appiumServerProcessDestroyer = Terminal.executeAsync(startCmd);
             String url = String.format("http://localhost:%d/wd/hub", port);
             this.url = new URL(url);
             new UrlChecker().waitUntilAvailable(60, TimeUnit.SECONDS, new URL(url + "/status"));
@@ -65,7 +65,7 @@ public class AppiumServer extends DeviceServer {
     @Override
     public synchronized void stop() {
         if (isRunning) {
-            watchdog.destroyProcess();
+            appiumServerProcessDestroyer.run();
             isRunning = false;
         }
     }
