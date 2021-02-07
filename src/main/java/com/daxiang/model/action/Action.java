@@ -24,7 +24,9 @@ public class Action {
     private Integer state;
     private List<Param> params;
     private List<LocalVar> localVars;
+    private List<Step> setUp;
     private List<Step> steps;
+    private List<Step> tearDown;
     private List<String> javaImports;
     private List<Action> importActions;
     private List<Integer> platforms;

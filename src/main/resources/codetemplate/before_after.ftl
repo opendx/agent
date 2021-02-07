@@ -1,24 +1,24 @@
 <#if beforeClass??>
-    <#lt>    @BeforeClass
-    <#lt>    public void beforeClass() throws Throwable {
-    <#lt>        ${beforeClass}
-    <#lt>    }
+    @BeforeClass
+    public void beforeClass() throws Throwable {
+        ${beforeClass}
+    }
 </#if>
 <#if afterClass??>
-    <#lt>    @AfterClass
-    <#lt>    public void afterClass() throws Throwable {
-    <#lt>        ${afterClass}
-    <#lt>    }
+    @AfterClass
+    public void afterClass() throws Throwable {
+        ${afterClass}
+    }
 </#if>
 <#if beforeMethod??>
-    <#lt>    @BeforeMethod
-    <#lt>    public void beforeMethod() throws Throwable {
-    <#lt>        ${beforeMethod}
-    <#lt>    }
+    @BeforeMethod
+    public void beforeMethod() throws Throwable {
+        ${beforeMethod}
+    }
 </#if>
 <#if afterMethod??>
-    <#lt>    @AfterMethod
-    <#lt>    public void afterMethod() throws Throwable {
-    <#lt>        ${afterMethod}
-    <#lt>    }
+    @AfterMethod
+    public void afterMethod() throws Throwable {
+        ${afterMethod}
+    }
 </#if>

@@ -1,5 +1,5 @@
 <#list javaImports as javaImport>
-    <#lt>${javaImport};
+    ${javaImport};
 </#list>
 
 public class ${className} {

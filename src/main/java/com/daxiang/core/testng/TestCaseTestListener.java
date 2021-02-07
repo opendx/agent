@@ -10,10 +10,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
+import org.testng.SkipException;
 import org.testng.TestListenerAdapter;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by jiangyitao.
@@ -89,7 +91,8 @@ public class TestCaseTestListener extends TestListenerAdapter {
 
         ServerClient.getInstance().updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
 
-        // 当前置任务执行失败，或依赖的用例执行失败，tr.getThrowable() != null，此时不需要开启视频录制，因为testng会马上调用onTestSkip
+        // 当BeforeClass或dependsOnMethods执行失败 -> tr.getThrowable() != null
+        // 不需要开启视频录制，因为testng会马上调用onTestSkip
         if (tr.getThrowable() == null && testDesc.getRecordVideo()) {
             try {
                 log.info("[{}]testcaseId: {}, 开始录制视频...", testDesc.getDeviceId(), testcaseId);
@@ -142,22 +145,24 @@ public class TestCaseTestListener extends TestListenerAdapter {
         testcase.setEndTime(new Date());
         testcase.setStatus(Testcase.SKIP_STATUS);
 
-        if (CONFIG_FAIL_ERR_INFO.get() != null) { // 前置任务执行失败
+        if (CONFIG_FAIL_ERR_INFO.get() != null) {
+            // BeforeClass执行失败
             testcase.setFailInfo(CONFIG_FAIL_ERR_INFO.get());
-        } else if (tr.getThrowable() != null) { // dependsOnMethods执行失败。实际前置任务执行失败，也是!=null，但为了获取更加详细的信息，已经在上面的if作了处理
-            testcase.setFailInfo(tr.getThrowable().getMessage());
-        } else { // 正常情况下的跳过，throw SkipException导致
-            testcase.setFailInfo(tr.getThrowable().getMessage());
+        } else if (tr.getThrowable() != null) {
+            testcase.setFailInfo(ExceptionUtils.getStackTrace(tr.getThrowable()));
             testcase.setFailImgPath(uploadScreenshot(testDesc));
-            testcase.setVideoPath(uploadVideo(testDesc));
-            testcase.setLogPath(uploadLog(testDesc));
+            // setUp失败或手动throw SkipException
+            if (tr.getThrowable() instanceof SkipException) {
+                testcase.setVideoPath(uploadVideo(testDesc));
+                testcase.setLogPath(uploadLog(testDesc));
+            }
         }
 
         ServerClient.getInstance().updateTestcase(testDesc.getDeviceTestTaskId(), testcase);
     }
 
     /**
-     * 前置任务执行出错时，将进入该方法
+     * BeforeClass执行出错时，将进入该方法
      * 进入该方法后，后续的testcase都将跳过。将直接调用onTestStart -> onTestSkipped，不会调用@Test
      *
      * @param tr
@@ -217,9 +222,13 @@ public class TestCaseTestListener extends TestListenerAdapter {
     }
 
     /**
-     * 提供给actions.ftl调用，记录用例步骤的执行开始/结束时间
+     * 提供给actions.ftl调用，记录步骤的执行开始/结束时间
+     * flag       start end
+     * step        1    2
+     * setUp       3    4
+     * tearDown    5    6
      */
-    public static void recordTestCaseStepTime(Integer deviceTestTaskId, Integer actionId, boolean isStart, Integer stepNumber) {
+    public static void recordStepTime(Integer deviceTestTaskId, Integer actionId, Integer stepNumber, int flag) {
         Integer currentTestcaseId = CURRENT_TEST_CASE_ID.get();
         // 只记录当前正在执行的测试用例里的步骤
         if (!actionId.equals(currentTestcaseId)) {
@@ -227,16 +236,25 @@ public class TestCaseTestListener extends TestListenerAdapter {
         }
 
         Step step = new Step();
-        if (isStart) {
+        step.setNumber(stepNumber);
+
+        if (flag == 1 || flag == 3 || flag == 5) {
             step.setStartTime(new Date());
-        } else {
+        } else if (flag == 2 || flag == 4 || flag == 6) {
             step.setEndTime(new Date());
         }
-        step.setNumber(stepNumber);
 
         Testcase testcase = new Testcase();
         testcase.setId(currentTestcaseId);
-        testcase.setSteps(Arrays.asList(step));
+
+        List<Step> steps = Collections.singletonList(step);
+        if (flag == 1 || flag == 2) {
+            testcase.setSteps(steps);
+        } else if (flag == 3 || flag == 4) {
+            testcase.setSetUp(steps);
+        } else if (flag == 5 || flag == 6) {
+            testcase.setTearDown(steps);
+        }
 
         ServerClient.getInstance().updateTestcase(deviceTestTaskId, testcase);
     }
