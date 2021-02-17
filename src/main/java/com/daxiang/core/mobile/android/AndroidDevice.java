@@ -16,7 +16,6 @@ import com.daxiang.core.mobile.android.stf.Minicap;
 import com.daxiang.core.mobile.android.stf.Minitouch;
 import com.daxiang.core.mobile.appium.AndroidNativePageSourceHandler;
 import com.daxiang.core.mobile.appium.AppiumServer;
-import com.daxiang.utils.FileUtil;
 import com.daxiang.utils.Terminal;
 import com.daxiang.utils.UUIDUtil;
 import io.appium.java_client.android.AndroidDriver;
@@ -141,7 +140,9 @@ public class AndroidDevice extends MobileDevice {
 
         if (appIsUrl) {
             try {
-                app = FileUtil.downloadFile(app).getAbsolutePath();
+                File appFile = new File(UUIDUtil.getUUID());
+                FileUtils.copyURLToFile(new URL(app), appFile);
+                app = appFile.getAbsolutePath();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

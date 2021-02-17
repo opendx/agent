@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -93,8 +94,9 @@ public class BasicActionScanner {
         action.setDescription(actionAnno.description());
         action.setType(Action.TYPE_BASE);
 
-        // 默认使用$.methodName调用，否则使用全类名.methodName调用
-        String actionInvoke = actionAnno.invoke() == 1 ? "$." + methodName : className + "." + methodName;
+        // 静态方法使用className.methodName调用，否则使用$.methodName调用
+        String actionInvoke = Modifier.isStatic(method.getModifiers())
+                ? className + "." + methodName : "$." + methodName;
         action.setInvoke(actionInvoke);
 
         action.setReturnValueType(TypeUtils.toString(method.getGenericReturnType()));

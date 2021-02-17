@@ -17,8 +17,6 @@ public @interface Action {
 
     String description() default "";
 
-    int invoke() default 1; // 1. $.methodName  2. ClassName.methodName
-
     int[] platforms() default {}; // 1.android 2.ios 3.web 空:所有平台通用
 
     int state() default 2; // 0.禁用 1.草稿 2.发布

@@ -3,7 +3,9 @@ package com.daxiang.action;
 import com.daxiang.core.action.annotation.Action;
 import com.daxiang.core.action.annotation.Param;
 import com.daxiang.core.Device;
+import com.daxiang.utils.UUIDUtil;
 import io.appium.java_client.MobileBy;
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -12,6 +14,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -56,6 +61,19 @@ public class BaseAction {
     @Action(id = 2, name = "休眠")
     public void sleep(@Param(description = "休眠时长，单位：毫秒") long ms) throws InterruptedException {
         Thread.sleep(ms);
+    }
+
+    @Action(id = 3, name = "下载文件", returnValueDesc = "文件绝对路径")
+    public String downloadFile(@Param(description = "下载文件") String url, @Param(description = "文件扩展名，如: jpg") String ext) throws IOException {
+        String file = StringUtils.isEmpty(ext) ? UUIDUtil.getUUIDFilename(url) : UUIDUtil.getUUID() + "." + ext;
+        File downloadFile = new File(file);
+        FileUtils.copyURLToFile(new URL(url), downloadFile);
+        return downloadFile.getAbsolutePath();
+    }
+
+    @Action(id = 4, name = "删除文件")
+    public boolean deleteFileQuitely(@Param(description = "文件路径") String filePath) {
+        return FileUtils.deleteQuietly(new File(filePath));
     }
 
     @Action(id = 7, name = "点击")

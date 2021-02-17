@@ -1,6 +1,7 @@
 package com.daxiang.core;
 
 import com.daxiang.core.action.BasicActionScanner;
+import com.daxiang.core.classloader.AgentExtJarLoader;
 import com.daxiang.core.mobile.android.ADB;
 import com.daxiang.core.mobile.android.AndroidDeviceChangeListener;
 import com.daxiang.core.mobile.appium.AppiumServer;
@@ -104,6 +105,9 @@ public class AgentStartRunner implements ApplicationRunner {
         List<Action> basicActions = basicActionScanner.scanRecursive(basicActionPackage);
         log.info("scan: {}, basicActions: {}", basicActionPackage, basicActions);
         serverClient.resetBasicAction(basicActions);
+
+        // 初始化extJars
+        AgentExtJarLoader.getInstance().initExtJars();
     }
 
     private void checkAppiumVersion(String appiumVersion) {

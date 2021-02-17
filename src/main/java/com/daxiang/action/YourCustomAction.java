@@ -10,10 +10,7 @@ import org.apache.commons.lang3.RandomStringUtils;
  */
 public class YourCustomAction {
 
-    /**
-     * invoke = 2 将通过YourCustomAction.randomAlphanumeric 进行调用
-     */
-    @Action(id = 5000, name = "随机字符串（数字 & 字母）", invoke = 2)
+    @Action(id = 5000, name = "随机字符串（数字 & 字母）")
     public static String randomAlphanumeric(@Param(description = "字符串长度") int count) {
         return RandomStringUtils.randomAlphanumeric(count);
     }
