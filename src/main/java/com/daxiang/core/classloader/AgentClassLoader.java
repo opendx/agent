@@ -11,7 +11,7 @@ import java.net.URLClassLoader;
 public class AgentClassLoader extends URLClassLoader {
 
     public AgentClassLoader() {
-        super(new URL[0], ClassLoader.getSystemClassLoader());
+        super(new URL[0], Thread.currentThread().getContextClassLoader());
     }
 
     public void addJar(File jar) {
