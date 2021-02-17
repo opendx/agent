@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.daxiang.App;
 import com.daxiang.core.pc.web.Browser;
 import com.daxiang.core.mobile.Mobile;
+import com.daxiang.model.AgentExtJar;
 import com.daxiang.model.Response;
 import com.daxiang.model.UploadFile;
 import com.daxiang.model.action.Action;
@@ -32,6 +33,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Created by jiangyitao.
@@ -54,6 +56,8 @@ public class ServerClient {
     private String projectListUrl;
     @Value("${server}/mobile/list")
     private String mobileListUrl;
+    @Value("${server}/agentExtJar/lastUploadTimeList")
+    private String agentExtJarListUrl;
     @Value("${server}/mobile/save")
     private String mobileSaveUrl;
     @Value("${server}/browser/save")
@@ -128,6 +132,19 @@ public class ServerClient {
 
         if (response.isSuccess()) {
             return response.getData().stream().findFirst().orElse(null);
+        } else {
+            throw new RuntimeException(response.getMsg());
+        }
+    }
+
+    public Set<AgentExtJar> getAgentExtJars() {
+        Response<Set<AgentExtJar>> response = restTemplate.exchange(agentExtJarListUrl,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<Response<Set<AgentExtJar>>>() {
+                }).getBody();
+        if (response.isSuccess()) {
+            return response.getData();
         } else {
             throw new RuntimeException(response.getMsg());
         }

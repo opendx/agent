@@ -7,13 +7,14 @@ import com.daxiang.core.mobile.android.AndroidDevice;
 import com.daxiang.core.mobile.android.AndroidUtil;
 import com.daxiang.core.mobile.android.IDeviceExecuteShellCommandException;
 import com.daxiang.exception.AgentException;
-import com.daxiang.utils.FileUtil;
+import com.daxiang.utils.UUIDUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -47,9 +48,9 @@ public class AndroidService {
     }
 
     public String aaptDumpBadging(String apkDownloadUrl) {
-        File apkFile = null;
+        File apkFile = new File(UUIDUtil.getUUID());
         try {
-            apkFile = FileUtil.downloadFile(apkDownloadUrl);
+            FileUtils.copyURLToFile(new URL(apkDownloadUrl), apkFile);
             return AndroidUtil.aaptDumpBadging(apkFile.getAbsolutePath());
         } catch (IOException e) {
             log.error(e.getMessage(), e);

@@ -1,5 +1,6 @@
 package com.daxiang.core;
 
+import com.daxiang.core.classloader.AgentExtJarLoader;
 import lombok.extern.slf4j.Slf4j;
 import org.dvare.dynamic.compiler.DynamicCompiler;
 import org.dvare.dynamic.exceptions.DynamicCompilerException;
@@ -15,7 +16,8 @@ public class JavaCompiler {
         Assert.hasLength(className, "className cannot be empty");
         Assert.hasLength(code, "code cannot be empty");
 
-        DynamicCompiler dynamicCompiler = new DynamicCompiler();
+        ClassLoader classLoader = AgentExtJarLoader.getInstance().getClassLoader();
+        DynamicCompiler dynamicCompiler = new DynamicCompiler(classLoader);
         dynamicCompiler.addSource(className, code);
 
         log.info("[java编译]开始编译{}...", className);

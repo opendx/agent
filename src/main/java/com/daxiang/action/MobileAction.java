@@ -48,9 +48,9 @@ public class MobileAction extends BaseAction {
     }
 
     @Action(id = 1001, name = "安装App", platforms = {1, 2})
-    public void installApp(@Param(description = "app下载地址") String appDownloadUrl) {
-        Assert.hasText(appDownloadUrl, "appDownloadUrl不能为空");
-        mobileDevice.installApp(appDownloadUrl);
+    public void installApp(@Param(description = "本地路径 or 下载链接") String app) {
+        Assert.hasText(app, "app不能为空");
+        mobileDevice.installApp(app);
     }
 
     @Action(id = 1002, name = "卸载App", platforms = {1, 2})
