@@ -56,7 +56,7 @@ public class AgentExtJarLoader {
 
     private String getJarNameWithoutVersion(File jar) {
         Matcher matcher = Pattern.compile("(.+)-([0-9].*)\\.jar").matcher(jar.getName());
-        while (matcher.find()) {
+        if (matcher.find()) {
             return matcher.group(1); // spring-boot
         }
 
