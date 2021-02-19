@@ -105,7 +105,7 @@ public class AgentExtJarLoader {
 
         for (AgentExtJar localJar : localJars) {
             if (serverJars.contains(localJar)) {
-                AgentExtJarLoader.getInstance().load(localJar.getFile());
+                load(localJar.getFile());
             } else {
                 // 删除和服务端不匹配的文件
                 boolean deleteSucess = localJar.getFile().delete();
@@ -119,7 +119,7 @@ public class AgentExtJarLoader {
                 File localJarFile = new File(JAR_DIR, serverJar.getFilename());
                 log.info("download {} from {}", localJarFile, serverJar.getDownloadUrl());
                 FileUtils.copyURLToFile(new URL(serverJar.getDownloadUrl()), localJarFile);
-                AgentExtJarLoader.getInstance().load(localJarFile);
+                load(localJarFile);
             } catch (IOException e) {
                 log.error("download {} err", serverJar.getDownloadUrl(), e);
             }
