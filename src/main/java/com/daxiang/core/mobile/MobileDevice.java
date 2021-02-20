@@ -25,7 +25,7 @@ public abstract class MobileDevice extends Device {
     public static final String NATIVE_CONTEXT = "NATIVE_APP";
 
     private boolean isAppiumLogsWsRunning = false;
-    private String wsUrl;
+    private String appiumLogsWsUrl;
 
     private AppiumNativePageSourceHandler appiumNativePageSourceHandler;
 
@@ -120,11 +120,11 @@ public abstract class MobileDevice extends Device {
 
         if (!isAppiumLogsWsRunning) {
             driver.executeScript("mobile:startLogsBroadcast");
-            wsUrl = String.format("ws://%s:%d/ws/session/%s/appium/device/%s",
+            appiumLogsWsUrl = String.format("ws://%s:%d/ws/session/%s/appium/device/%s",
                     agentIp, deviceServer.getPort(), sessionId, getLogType());
             isAppiumLogsWsRunning = true;
         }
-        return wsUrl;
+        return appiumLogsWsUrl;
     }
 
     public synchronized void stopLogsBroadcast() {
